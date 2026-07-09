@@ -41,6 +41,7 @@ the dated entry, not the digest.
 - [B — 30 experiment ideas; council verdict selects the program](#appendix-b---30-experiment-ideas-council-verdict-selects-the-program-2026-07-08) (07-08)
 - [C — PRD written; Evan keeps LLM overlays as gated shadow mode](#appendix-c---prd-written-evan-keeps-llm-overlays-as-gated-shadow-mode-2026-07-08) (07-08)
 - [D — Overlay amended shadow→live-acting: control + veto sleeves from M3 day one](#appendix-d---overlay-amended-shadowlive-acting-control--veto-sleeves-from-m3-day-one-2026-07-08) (07-08)
+- [E — M0.1 executed: skeleton, venv, git init (first commit)](#appendix-e---m01-executed-skeleton-venv-git-init-first-commit-2026-07-08) (07-08)
 
 ---
 
@@ -265,3 +266,41 @@ table + rationale; HANDOFF decisions + workstream table; auto-memory file.
 
 **HONEST OPEN ITEM (not fixed):** unchanged from Appendix C — capital
 unconfirmed, Alpaca account BLOCKED-ON-EVAN, no code yet; next action M0.1.
+
+---
+
+# Appendix E - M0.1 executed: skeleton, venv, git init (first commit) (2026-07-08, ~23:15)
+
+**WHAT:** Ran PRD task M0.1. Created `swing_bot/` package
+(`__init__.py` with the split-adjusted/dividend-UNadjusted convention note),
+`scripts/` (`.gitkeep`), `.gitignore` (`.venv/`, `swing.db*`, `*_keys.env`,
+`*.env`, pycache), `requirements.txt` (yfinance, httpx; pytest optional).
+Created `.venv` and installed deps. `git init` (identity already configured:
+Evan-Daruwalla), staged all bootstrap docs + skeleton, verified `.venv/` is
+git-ignored, committed.
+
+**Commit:** `4ac785c` "M0.1: project skeleton, venv, git init". Working tree
+clean after.
+
+**Done-check (both pass):**
+- `git -C . log --oneline` → shows `4ac785c`.
+- `.venv\Scripts\python.exe -c "import yfinance, httpx"` → `import OK 1.5.1
+  0.28.1`, exit 0.
+
+**Environment captured:** Python 3.14.4 (system + venv), git 2.53.0.
+Resolved dep versions are NEW majors — pandas 3.0.3, numpy 2.5.1,
+yfinance 1.5.1, httpx 0.28.1, curl_cffi 0.15.0. requirements.txt is
+intentionally UNPINNED at bootstrap; will pin once E1 backtest is stable.
+
+**HONEST OPEN ITEM (flagged, not blocking):** Python 3.14 + pandas 3.0 are
+both bleeding-edge majors (pandas 3.0 defaults copy-on-write and drops some
+legacy APIs). yfinance imported clean, but a 3.14/pandas-3.0 edge could
+surface during M0.2 (price_cache reads) or M2 (backtest vectorization) — if
+so, the fix is pinning to a known-good set, not code contortions. Noted so a
+future session recognizes the symptom fast.
+
+**Cadence:** pm-cadence fired at prompt #6; this entry satisfies it (Appendix
+C covered #3). No miss.
+
+**Next action:** M0.2 — verify ETF price coverage in Trading's `price_cache`
+(read-only) and choose the data path.

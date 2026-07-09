@@ -10,16 +10,17 @@ portfolio asset. Reuse Trading's infrastructure selectively (backtest harness,
 paper-trading DB pattern, Alpaca PAPER mirror) — not its factor logic, which
 is long-horizon.
 
-## Current state — PRD written, execution not started
+## Current state — M0 in progress (M0.1 done)
 
 **Last updated: 2026-07-08** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-08 — Program selected and PRD written (record Appendices A–C).**
-> Research brief ranked ETF IBS mean reversion #1; a 5-advisor /llm-council
-> pass over 30 experiment ideas selected the program (Appendix B); Evan
-> decided to KEEP LLM overlays (as shadow-mode, gated promotion) and
-> `PRD_ROADMAP.md` now stands. Next action: M0 task 1.
+> **2026-07-08 — M0.1 executed (record Appendix E).** Repo skeleton, `.venv`,
+> git init; first commit `4ac785c`. Done-check green (venv imports yfinance
+> 1.5.1 + httpx 0.28.1). Env note: Python 3.14 + pandas 3.0 are bleeding-edge
+> majors — if a weird pandas/numpy error appears in M0.2/M2, pin versions
+> rather than fight it. Next: M0.2 (verify ETF coverage in Trading's
+> price_cache, read-only).
 
 ### Workstreams (mapped to PRD milestones)
 
@@ -27,7 +28,7 @@ lives in the record.
 |---|---|---|---|
 | Doc/memory system | — | **Done** | Bootstrapped 2026-07-08 |
 | PRD_ROADMAP.md | — | **Done** | Written 2026-07-08 to council program + Evan's overlay decision |
-| Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **Not started** | First open task: M0.1 |
+| Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **In progress** | M0.1 done (commit `4ac785c`); next M0.2 |
 | Pre-registration & fill ablation | M1 | **Not started** | Ordering-critical: prereg doc before engine code |
 | E1 IBS backtest | M2 | **Not started** | Gated behind M1 |
 | Live paper: control + LLM-veto sleeves | M3 | **GATED** | Needs M2 PASS + Evan go; Alpaca account BLOCKED-ON-EVAN |
