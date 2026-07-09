@@ -1,0 +1,24 @@
+# venv
+.venv/
+
+# project data DB (own SQLite; never committed)
+swing.db
+swing.db-journal
+swing.db-wal
+swing.db-shm
+
+# secrets (Alpaca keys etc.)
+*_keys.env
+*.env
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# os / editor
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/

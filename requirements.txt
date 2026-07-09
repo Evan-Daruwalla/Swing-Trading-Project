@@ -1,0 +1,6 @@
+# Swing Trading — runtime dependencies
+# Pinned loosely at bootstrap (2026-07-08); tighten once E1 backtest is stable.
+yfinance
+httpx
+# pytest is optional — frozen-regression tests run via their own __main__
+# (swing_bot/test_frozen.py), matching the Trading project's pattern.
