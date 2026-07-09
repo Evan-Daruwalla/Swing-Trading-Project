@@ -61,6 +61,7 @@ the dated entry, not the digest.
 - [V — Experiment catalog v2 (data-grounded, 20 items) + %/mo verdicts](#appendix-v---experiment-catalog-v2-data-grounded-20-items--mo-verdicts-2026-07-09) (07-09)
 - [W — Evan overrides IBS stop for A3; C1+screens sitting begins](#appendix-w---evan-overrides-ibs-stop-for-a3-c1screens-sitting-begins-2026-07-09) (07-09)
 - [X — C1: engine v2 (NAV-proportional, cash-capped) verified](#appendix-x---c1-engine-v2-nav-proportional-cash-capped-verified-2026-07-09) (07-09)
+- [Y — Screens: A3 dead, B1 dead, B4 rotation +2.15%/mo holdout standout](#appendix-y---screens-a3-dead-b1-dead-b4-rotation-215mo-holdout-standout-2026-07-09) (07-09)
 
 ---
 
@@ -1101,3 +1102,46 @@ cash), floored at 0 — sizes shrink after losses; cash can never go negative.
 
 **Next action:** the three in-sample screens (A3 override / B1 / B4), engine
 v2, labeled hypothesis-generating.
+
+---
+
+# Appendix Y - Screens: A3 dead, B1 dead, B4 rotation +2.15%/mo holdout standout (2026-07-09, ~15:15 local)
+
+**WHAT:** Ran the three in-sample screens (`scripts/screens_20260709.py`),
+results in `docs/research/2026-07-09_screen_results.md`. NAV-proportional
+sizing, 5bps/side, K=2, train/holdout/full reported with %/mo.
+
+**RESULTS (headline, %/mo):**
+- **A3 overnight-only IBS: DEAD.** Broad NET-NEGATIVE (−0.11%/mo full) —
+  the 6.3bps/signal gross overnight component can't pay 10bps round-trip
+  nightly. Leveraged holdout +0.56%/mo — BELOW the already-failed E2
+  next-open (+0.64). The overnight component is real but not separately
+  harvestable at retail cost. **The A3 override is spent; the IBS stop
+  effectively resumes in full.**
+- **B1 gap-down reversion at the open: DEAD.** Best variant +0.23%/mo
+  holdout (lev −2%, next-open exit), rest ≈0 or negative. Refuted at the
+  screened thresholds; no prereg warranted.
+- **B4 leverage rotation: STANDOUT.** TQQQ while QQQ > 200d MA else cash:
+  train +2.59%/mo (CAGR 35.9%), holdout +2.15%/mo (CAGR 29.0%), Sharpe
+  ~0.8, maxDD 48–58%, ~4 switches/yr (execution/cost mechanisms that killed
+  E1/E2 are irrelevant at this frequency). UPRO/SPY variant much weaker OOS
+  (+0.61%/mo holdout) — effect concentrates in the Nasdaq wrapper,
+  consistent with every prior finding (QQQ/XLK carried E1's edge too).
+  Matches the Gayed literature prior.
+
+**HONEST CAVEATS (recorded, not buried):** (1) the screens LOOKED at
+2022–2026 → holdout is contaminated for any follow-up prereg; confirmation
+must rest on a pre-registered robustness battery (MA 150–250, signal-source
+variants, execution lag, cost ×2) + LIVE PAPER as the only true OOS;
+(2) TQQQ/QQQ was the better of two variants seen (selection), mitigated by
+it also being the a priori literature construct; (3) B4 is trend-following
+leverage timing with weeks-to-months holds — fits Evan's high-return goal,
+stretches the "swing" label; flagged. (4) maxDD ~50–58% is the real
+accepted-risk contract.
+
+**Recommendation put to Evan:** pre-register **E4 = TQQQ/QQQ 200d-MA
+rotation** (UPRO secondary context) with robustness-battery gates on the
+full window (gate basis must acknowledge contamination) and live paper as
+confirmation. B1 dropped; A3 closed.
+
+**Next action:** Evan's call on E4 prereg.

@@ -12,10 +12,22 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — E2 FAILED; IBS family SHELVED (pre-committed stop); awaiting direction
+## Current state — screens done: B4 leverage rotation is the live lead (+2.15%/mo holdout)
 
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
+
+> **2026-07-09 — C1 + three screens (record Appendices W–Y).** Engine v2
+> (`size_on_nav=True`: NAV-proportional, cash-capped; v1 refs intact; 10
+> frozen refs green d=±0.0000pp). Screens (in-sample, hypothesis-generating):
+> **A3 overnight-IBS DEAD** (broad negative; lev holdout +0.56%/mo < failed
+> E2) — Evan's A3 override spent, IBS stop resumes; **B1 gap-reversion DEAD**
+> (best +0.23%/mo); **B4 TQQQ/QQQ 200d-MA rotation STANDOUT: +2.59%/mo
+> train, +2.15%/mo holdout (CAGR 29%), Sharpe ~0.8, maxDD 48–58%, ~4
+> switches/yr.** Caveats recorded: screen saw the holdout (contaminated for
+> prereg), variant selection, weeks-long holds stretch the "swing" label.
+> **Proposed next: pre-register E4 (TQQQ/QQQ rotation) with robustness-
+> battery gates + live paper as true OOS — awaiting Evan.**
 
 > **2026-07-09 — E2 = FAIL; IBS FAMILY SHELVED (record Appendices S-U).**
 > E2 (leveraged TQQQ/UPRO/SPXL/SOXL/TNA, K=2, prereg `865c09e`) holdout
