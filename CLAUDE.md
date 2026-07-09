@@ -8,6 +8,10 @@ task is the default work.
 ## Project identity
 - Swing-trading bot: holds of days to a few weeks, small capital
   ($100–1,000 assumed — see HANDOFF Open decisions).
+- Goal (Evan 2026-07-09): HIGH percent return, concentrated (K=1–3
+  positions), losses explicitly accepted. Gates are return-centric with
+  loosened-but-present drawdown ceilings. Risk appetite changes gate
+  NUMBERS, never rigor DISCIPLINE (prereg before results; no tuning a FAIL).
 - SEPARATE from `D:\ClaudeCode\Trading`. Never modify that repo from this
   project without Evan's explicit instruction. Never run backtests
   concurrently against Trading's DB.

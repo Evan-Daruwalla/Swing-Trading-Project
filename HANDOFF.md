@@ -2,18 +2,29 @@
 
 ## Goal
 
-Build a swing-trading bot — positions held days to a few weeks, sized for
-genuinely small capital ($100–1,000) — as a SEPARATE project from the
-long-term momentum bot in `D:\ClaudeCode\Trading`. Same ethos as Trading:
-**build rigor + a track record**, paper first; the documented process is the
-portfolio asset. Reuse Trading's infrastructure selectively (backtest harness,
-paper-trading DB pattern, Alpaca PAPER mirror) — not its factor logic, which
-is long-horizon.
+**(Redefined by Evan 2026-07-09, record Appendix R.)** Build a swing trader
+that, as accurately as possible, invests in a stock or a few stocks
+(concentrated, K=1–3) with a small amount of money ($100–1,000) to earn a
+**high percent return over a shorter amount of time** (holds days to a few
+weeks). **Losing money is OK and will happen — risk explicitly accepted.**
+Gates are return-centric with loosened (never absent) drawdown ceilings; the
+pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
+SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
+first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — E1 FAIL, E1b OOS near-miss FAIL; awaiting direction
+## Current state — goal redefined (high-return); E2 leveraged-ETF arm is next
 
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
+
+> **2026-07-09 — GOAL REDEFINED by Evan (record Appendix R).** High percent
+> return, short holds, concentrated K=1–3, losses accepted. PRD amended:
+> new M2b = E2 (leveraged-ETF IBS — TQQQ/UPRO/SPXL/SOXL/TNA wrap exactly the
+> underlyings where E1b proved the edge persists OOS), then M2c = E3 stub
+> (concentrated mega-cap stocks, survivorship caveat). Return-centric gates,
+> loosened-but-present DD ceiling, discipline unchanged (prereg before
+> results, no tuning on FAIL). **Next: M2b.1 (leveraged universe probe +
+> backfill) → M2b.2 (E2 prereg, doc-only) → M2b.3 (run) → M2b.4 (pin refs).**
 
 > **2026-07-09 — E1b OOS test = FAIL (near-miss) (record Appendix Q).** Evan
 > chose to pre-register broad_us with a holdout. E1b (`0126ce3`): broad_us
@@ -66,7 +77,9 @@ lives in the record.
 | PRD_ROADMAP.md | — | **Done** | Written 2026-07-08 to council program + Evan's overlay decision |
 | Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **Done** | All 5 tasks; modules prices/universe/coverage_gate/signals/test_frozen; `swing.db` 89,666 rows |
 | Pre-registration & fill ablation | M1 | **Done** | M1.6 power (`2a9edde`) + M1.7 prereg (`8963e49`) + M1.8 ablation; next-open keeps ~64% |
-| E1 IBS backtest | M2 | **Done — E1 FAILED** | Engine (`415c527`), verdict (`d28f899`), frozen refs pinned. M2.12 survivorship deferred (moot for failed ETF-only E1) |
+| E1 IBS backtest | M2 | **Done — E1 FAILED** | Engine (`415c527`), verdict (`d28f899`), frozen refs pinned. E1b OOS near-miss (Sharpe 0.4961, `1a71468`). M2.12 survivorship deferred |
+| E2 leveraged-ETF IBS (high-return arm) | M2b | **In progress** | Next: M2b.1 leveraged universe probe/backfill → M2b.2 prereg → M2b.3 run → M2b.4 pin refs |
+| E3 concentrated stocks | M2c | **Stub** | Designed after E2 readout; survivorship caveat mandatory |
 | Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — gate not open** | E1 did NOT pass M2→M3; needs a new pre-registered strategy that passes + Evan go + Alpaca account |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
 | Expansion (deferred ideas) | M5 | **GATED** | On M3 stable |
@@ -129,18 +142,10 @@ Full descriptions as Evan gave them: record Phase 0.
 
 ## Open decisions (BLOCKED-ON-EVAN)
 
-- **POST-E1b DIRECTION (the live one, 2026-07-09):** E1 FAILED; E1b
-  (broad_us OOS) FAILED as a near-miss (Sharpe 0.496 vs 0.50) with the edge
-  clearly persisting OOS. Pick the next move (each needs a NEW dated
-  pre-registration; no live until something passes):
-  1. Pre-register **E1c** at a liquidity-justified ~2bps/side cost (real
-     SPY/QQQ spreads ~1bp) WITH a PRE-COMMITTED STOP (if it fails, shelve ETF
-     IBS). One honest final swing — guards against fishing-by-multiplicity.
-  2. **Accept** broad_us IBS as a real-but-sub-bar, cost-sensitive effect;
-     write it up as the conclusion and pivot to a new strategy family.
-  3. Pre-register the **leveraged-ETF E2** (higher variance, same cost risk).
-  4. Shelve mean reversion entirely; move to a deferred idea / new family.
-  (Prior options preserved in record Appendix P.)
+- ~~POST-E1b direction~~ **RESOLVED 2026-07-09 by Evan's goal redefinition
+  (record Appendix R): high-return concentrated path → E2 (leveraged-ETF
+  IBS) next, E3 (stocks) after. Prior option menus preserved in record
+  Appendices P/Q.**
 - **Capital range**: brief says $100–1,000; inventory header said $100–10,000.
   Assuming $100–1,000; sizing is parameterized regardless.
 - **Alpaca PAPER account** (PRD M3.15): which of ~3 paper accounts — only

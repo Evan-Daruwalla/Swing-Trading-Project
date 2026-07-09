@@ -15,11 +15,23 @@ task seems to require breaking any of these, STOP and report.**
 
 ## 1. OBJECTIVE
 
-Build a systematic swing-trading bot (holds days–weeks, $100–1,000 capital,
-Alpaca PAPER) and run the council-selected experimental program (record
-Appendix B, 2026-07-08): prove or kill ETF IBS mean reversion against
-PRE-REGISTERED criteria, with execution-timing honesty and always-on
-divergence logging. The documented rigor loop — pre-registration before
+**GOAL (redefined by Evan 2026-07-09 — supersedes the 2026-07-08 framing;
+record Appendix R):** build a swing trader that, as accurately as possible,
+invests in a stock or a few stocks (concentrated, K=1–3) with a small amount
+of money to earn a HIGH PERCENT RETURN over a shorter amount of time. Losing
+money is acceptable and expected — the risk is Evan's, accepted explicitly.
+Consequences: future pre-registrations gate on RETURN (CAGR/expectancy)
+first, with substantially loosened — but never absent — drawdown ceilings
+(ruin guard); single stocks are in scope (survivorship caveat mandatory);
+the rigor machinery below is RETAINED as the accuracy instrument, not as a
+conservatism instrument. First high-return arm: E2 (leveraged-ETF IBS),
+because E1b proved the IBS edge persists OOS in exactly the underlyings the
+leveraged funds wrap.
+
+Original 2026-07-08 program (E1, complete — FAILED honestly; E1b near-miss):
+build and run the council-selected experimental program (record Appendix B):
+prove or kill ETF IBS mean reversion against PRE-REGISTERED criteria, with
+execution-timing honesty and always-on divergence logging. The documented rigor loop — pre-registration before
 code, kill-switches, honest negative results — is the deliverable as much as
 the strategy. LLM overlays are KEPT and LIVE-ACTING from
 day one (decided by Evan 2026-07-08, amended same day from the earlier
@@ -81,6 +93,10 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
       (assertion in code); every decision logged with UNIQUE(date,ticker).
 - [ ] Overlay readout happens at the pre-registered N / time horizon, not
       before; interim numbers labeled descriptive-only in every doc.
+- [ ] (M2b) Git history proves `docs/prereg_E2_leveraged_ibs.md` predates the
+      E2 runner; E2 verdict stated PASS/FAIL per criterion in the record.
+- [ ] (M2b) Frozen tests green (d=±0.0000pp) with E2 refs pinned alongside
+      E1's.
 
 ## 4. CONSTRAINTS
 
@@ -99,6 +115,10 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 - Own SQLite DB (`swing.db` at project root) for positions/NAV/results/logs.
   Prices: read Trading's `price_cache` read-only IF M0 task 2 confirms ETF
   coverage; else own fetcher into `swing.db` honoring the same convention.
+- Risk posture (Evan 2026-07-09, record Appendix R): high-return objective;
+  losses acceptable and expected. Gates emphasize return; drawdown ceilings
+  are loosened per-prereg but a ruin guard always exists. This changes gate
+  NUMBERS, never gate DISCIPLINE (pre-reg before results, no tuning on FAIL).
 - Out of scope — do not start even if convenient: real-money trading; any
   strategy from the dropped-16 list (record Appendix B); intraday data
   sources; dashboards beyond a minimal status page; touching Trading's
@@ -116,7 +136,9 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 | M0 | Foundations | git repo, venv, data access verified, ETF universe frozen, coverage gate, tripwire harness |
 | M1 | Pre-registration & ablation | power calc → pre-reg doc committed → fill-timing ablation (#15+#13) |
 | M2 | E1 backtest | IBS MR engine, run vs pre-registered gates, pin frozen refs, survivorship bound (#27) |
-| M3 | Live paper (GATED on M2 pass + Evan approval) | daily loop, Alpaca mirror, divergence logging (#28), control + LLM-veto sleeves live from day one |
+| M2b | E2: leveraged-ETF IBS — high-return arm (added by Evan's 2026-07-09 goal redefinition) | frozen leveraged universe, return-centric pre-reg, run vs gates, pin refs |
+| M2c | E3: concentrated mega-cap stocks (stub — designed after E2 readout) | liquidity-defined stock universe + survivorship caveat; own pre-reg |
+| M3 | Live paper (GATED on a passing pre-registered strategy + Evan approval) | daily loop, Alpaca mirror, divergence logging (#28), control + LLM-veto sleeves live from day one |
 | M4 | Overlay readout (GATED on pre-registered N/horizon) | evaluate veto vs control; continue, add cascade arm, or kill per pre-reg |
 | M5 | Expansion (GATED on M3 stable) | deferred ideas only: exit/stop ablations (#17/#18), sizing (#20), RSI comparison (#2), mega-cap pullback (#5), VIX gate (#11) |
 
@@ -212,6 +234,37 @@ breadth only after one strategy survives contact (M5 last).
 13. **GATE — BLOCKED-ON-EVAN.** Present M2 results; M3 starts only on E1
     PASS + Evan's explicit go. On FAIL: stop, record, await direction
     (fallback candidates: deferred list, M5).
+    *(Outcome 2026-07-09: E1 FAILED, E1b near-missed OOS; Evan redefined the
+    goal — record Appendices O/Q/R — and directed the high-return path.)*
+
+### M2b — E2: leveraged-ETF IBS (high-return arm; Evan's 2026-07-09 goal)
+
+14b. **Extend the universe with a frozen `leveraged` group.** Candidates
+     TQQQ, UPRO, SPXL, SOXL, TNA (3x long US equity/sector wrappers of
+     underlyings where the IBS edge is validated) — first-bar dates fetched
+     EMPIRICALLY (never invented), liquidity probed, appended to
+     `swing_bot/universe.py` as a new dated group (universe change = dated
+     decision, recorded). Backfill into `swing.db`; coverage gate must stay
+     green. Done: probe output + rows in swing.db + gate exit 0.
+14c. **Pre-register E2** (`docs/prereg_E2_leveraged_ibs.md`, doc-only commit
+     BEFORE the runner exists). Return-centric gates per the redefined goal:
+     primary = holdout CAGR / expectancy; drawdown ceiling LOOSENED (risk
+     accepted) but present (ruin guard); concentration K per Evan's goal
+     (1–3); same train/holdout protocol as E1b (train 2014–2021, holdout
+     2022–2026, holdout = the gate); exact numbers fixed in the prereg, not
+     here. Done: commit hash contains prereg only.
+14d. **Run E2 per prereg; verdict PLAINLY.** No tuning on FAIL. Done:
+     results doc + record entry with PASS/FAIL per criterion.
+14e. **Pin E2 frozen refs** into `swing_bot/test_frozen.py` (extend
+     REFERENCES). STOP at the gate — live requires PASS + Evan go + Alpaca
+     account. Done: frozen tests green d=±0.0000pp.
+
+### M2c — E3: concentrated mega-cap stocks (STUB — do not start until E2
+reads out and Evan directs)
+
+Liquidity-defined large/mega-cap universe (defined by dollar-volume floor,
+NOT by picking today's winners), survivorship-bias caveat mandatory in every
+result, own dated pre-registration. Signal family chosen after E2 evidence.
 
 ### M3 — Live paper (gated)
 

@@ -54,6 +54,7 @@ the dated entry, not the digest.
 - [O — M2.10: E1 backtest VERDICT = FAIL (honest, no tuning)](#appendix-o---m210-e1-backtest-verdict--fail-honest-no-tuning-2026-07-09) (07-09)
 - [P — M2.11: real E1 frozen refs pinned; STOP at M2.13 gate](#appendix-p---m211-real-e1-frozen-refs-pinned-stop-at-m213-gate-2026-07-09) (07-09)
 - [Q — E1b: broad_us OOS test = FAIL (near-miss, Sharpe 0.496)](#appendix-q---e1b-broad_us-oos-test--fail-near-miss-sharpe-0496-2026-07-09) (07-09)
+- [R — GOAL REDEFINED by Evan: high-return concentrated swing, risk accepted](#appendix-r---goal-redefined-by-evan-high-return-concentrated-swing-risk-accepted-2026-07-09) (07-09)
 
 ---
 
@@ -859,3 +860,52 @@ write it up, pivot to a new family; (c) leveraged E2 / other. No option goes
 live without passing + Evan go + Alpaca account.
 
 **Next action:** NONE autonomous — Evan chooses.
+
+---
+
+# Appendix R - GOAL REDEFINED by Evan: high-return concentrated swing, risk accepted (2026-07-09, ~14:25 local)
+
+**WHAT (decided by Evan 2026-07-09, verbatim intent):** the project goal is
+a swing trader that, as accurately as possible, invests in **a stock or a
+few stocks** with a small amount of money to earn a **high percent return
+over a shorter amount of time**; **losing money is OK and will happen** —
+the risk is accepted. Plan updated accordingly (PRD §1 goal amendment, new
+M2b milestone, HANDOFF, project CLAUDE.md risk-posture line, auto-memory).
+
+**What this CHANGES:**
+- Objective: from "rigor + track record on a defensible edge" to
+  "maximize percent return, short holds, concentrated (K=1–3 positions)" —
+  with the rigor machinery RETAINED as the accuracy instrument.
+- Kill-criteria philosophy for future pre-registrations: return-centric
+  (CAGR/expectancy primary), drawdown ceiling LOOSENED substantially (risk
+  accepted) but NOT removed — a ruin guard stays because a near-total
+  drawdown ends the compounding experiment (exact numbers set per-prereg).
+- Vehicles: single stocks are now in scope (E3, survivorship caveat
+  mandatory); leveraged ETFs are the first high-return arm (E2).
+
+**What this does NOT change:** pre-registration-before-results; honest
+FAIL reporting; frozen-regression tripwire; EOD-only data; paper-only until
+a pass + Evan's go + Alpaca account; Trading repo read-only; no post-hoc
+rebrands.
+
+**Path chosen for the next experiment — E2 (leveraged-ETF IBS):** the
+evidence points here, not at stocks first: E1b proved the IBS edge persists
+OOS specifically in SPY/QQQ-class broad-US indices (holdout Sharpe 0.496,
+exp +17.8bps at 5bps/side); TQQQ/UPRO/SPXL/SOXL/TNA are ~3x wrappers of
+those same underlyings — same validated signal, mechanically amplified
+returns, no survivorship bias, full infra reuse. E3 (concentrated mega-cap
+stocks) is designed AFTER E2 reads out.
+
+**Pushback stated to Evan (kept short):** (1) "accurately" and "high return
+short-window" trade off — variance blows up confidence intervals; the
+pre-reg/OOS machinery is retained as the accuracy tool; (2) stocks
+reintroduce yfinance survivorship bias — E3 must use a liquidity-defined
+mega-cap universe with the bias caveat in every result; (3) loosened DD
+ceiling is not "no ceiling."
+
+**Cadence:** pm-cadence fired at prompt #15; this entry satisfies it (last
+was Appendix K at #12-adjacent). No miss.
+
+**Next action:** M2b.1 — extend the universe with a frozen "leveraged" group
+(empirical first-bar probe, backfill), then M2b.2 pre-register E2 (doc-only
+commit before runner), M2b.3 run vs gates, M2b.4 pin refs, STOP at gate.
