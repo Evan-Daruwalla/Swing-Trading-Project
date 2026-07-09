@@ -10,22 +10,24 @@ portfolio asset. Reuse Trading's infrastructure selectively (backtest harness,
 paper-trading DB pattern, Alpaca PAPER mirror) — not its factor logic, which
 is long-horizon.
 
-## Current state — E1 tested → FAIL; at M2.13 decision gate
+## Current state — E1 FAIL, E1b OOS near-miss FAIL; awaiting direction
 
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-09 — E1 BACKTESTED, VERDICT = FAIL (record Appendices N-P).**
-> E1 (full 29-ETF IBS mean reversion) run per frozen pre-reg `8963e49`.
-> Primary (next-open, 10bps round-trip): n=3559, exp +4.7bps (PASS),
-> **Sharpe 0.23 (FAIL vs 0.50), maxDD 36% (FAIL vs 25%)** → **E1 FAIL, no
-> tuning.** Cause: cost-fragile (gross Sharpe 0.56 → net negative at 20bps);
-> country ETFs net-negative drag; 2022-26 decayed to Sharpe 0.01. broad_us
-> ALONE passes all four (Sharpe 0.60) — but that is a NEW hypothesis needing
-> its own pre-registration (E1b), NOT a post-hoc E1 rebrand. Frozen refs
-> pinned (test green, d=0.0000pp). **STOPPED at the M2->M3 gate: E1 did not
-> pass, no live trading. Awaiting Evan's direction — see the 4 options in
-> record Appendix P / below.**
+> **2026-07-09 — E1b OOS test = FAIL (near-miss) (record Appendix Q).** Evan
+> chose to pre-register broad_us with a holdout. E1b (`0126ce3`): broad_us
+> HOLDOUT 2022-26 next-open 5bps → n=560, exp +17.8bps (PASS), **Sharpe
+> 0.4961 (FAIL vs 0.50)**, maxDD 9.8% (PASS). Fails by 0.004 of Sharpe — NOT
+> rounded up. BUT the edge substantially PERSISTED OOS (train 0.66 → holdout
+> 0.496 through the 2022 bear) — real-but-decayed, unlike E1's decisive fail.
+> Cost is the swing factor (0bps→0.76, 10bps/side→0.23); 5bps/side is
+> conservative for SPY/QQQ/DIA/IWM (~1bp spreads). Sectors confirmed dead
+> weight (Sharpe −0.05). **No live trading. Awaiting Evan — options below.**
+
+> **2026-07-09 — E1 = FAIL (record Appendices N-P).** Full 29-ETF IBS run per
+> `8963e49`: Sharpe 0.23, maxDD 36% → FAIL, no tuning. Cost-fragile; country
+> ETFs drag; post-2021 decay. Frozen refs pinned (green, d=0.0000pp).
 
 > **2026-07-09 — M0.4 executed (record Appendix H).** Coverage/quality gate
 > `swing_bot/coverage_gate.py` (coverage vs listed-tickers + sanity scan);
@@ -127,16 +129,18 @@ Full descriptions as Evan gave them: record Phase 0.
 
 ## Open decisions (BLOCKED-ON-EVAN)
 
-- **POST-E1 DIRECTION (the live one, 2026-07-09):** E1 FAILED its
-  pre-registered criteria. Pick the next move (each needs a NEW dated
-  pre-registration — no post-hoc rebrand, no live trading until something
-  passes):
-  1. Pre-register **E1b** on broad_us (± sectors) with an out-of-sample
-     holdout (strongest lead; 2022-26 decay is the risk).
-  2. Pre-register a **lower-cost / higher-conviction** variant (edge is real
-     gross but cost-fragile).
+- **POST-E1b DIRECTION (the live one, 2026-07-09):** E1 FAILED; E1b
+  (broad_us OOS) FAILED as a near-miss (Sharpe 0.496 vs 0.50) with the edge
+  clearly persisting OOS. Pick the next move (each needs a NEW dated
+  pre-registration; no live until something passes):
+  1. Pre-register **E1c** at a liquidity-justified ~2bps/side cost (real
+     SPY/QQQ spreads ~1bp) WITH a PRE-COMMITTED STOP (if it fails, shelve ETF
+     IBS). One honest final swing — guards against fishing-by-multiplicity.
+  2. **Accept** broad_us IBS as a real-but-sub-bar, cost-sensitive effect;
+     write it up as the conclusion and pivot to a new strategy family.
   3. Pre-register the **leveraged-ETF E2** (higher variance, same cost risk).
-  4. Shelve mean reversion; move to a deferred idea / new family.
+  4. Shelve mean reversion entirely; move to a deferred idea / new family.
+  (Prior options preserved in record Appendix P.)
 - **Capital range**: brief says $100–1,000; inventory header said $100–10,000.
   Assuming $100–1,000; sizing is parameterized regardless.
 - **Alpaca PAPER account** (PRD M3.15): which of ~3 paper accounts — only

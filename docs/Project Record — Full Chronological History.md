@@ -53,6 +53,7 @@ the dated entry, not the digest.
 - [N — M2.9: backtest engine (hand-checked P&L exact)](#appendix-n---m29-backtest-engine-hand-checked-pl-exact-2026-07-09) (07-09)
 - [O — M2.10: E1 backtest VERDICT = FAIL (honest, no tuning)](#appendix-o---m210-e1-backtest-verdict--fail-honest-no-tuning-2026-07-09) (07-09)
 - [P — M2.11: real E1 frozen refs pinned; STOP at M2.13 gate](#appendix-p---m211-real-e1-frozen-refs-pinned-stop-at-m213-gate-2026-07-09) (07-09)
+- [Q — E1b: broad_us OOS test = FAIL (near-miss, Sharpe 0.496)](#appendix-q---e1b-broad_us-oos-test--fail-near-miss-sharpe-0496-2026-07-09) (07-09)
 
 ---
 
@@ -818,3 +819,43 @@ authorize live trading or a post-hoc universe rebrand.
 **Next action:** NONE autonomous — Evan chooses a direction. The doc system,
 data layer, engine, and tripwire (M0-M2 infra) are all reusable for whatever
 comes next.
+
+---
+
+# Appendix Q - E1b: broad_us OOS test = FAIL (near-miss, Sharpe 0.496) (2026-07-09, ~03:00 local)
+
+**WHAT:** Evan chose direction 1. Pre-registered E1b (`0126ce3`, doc-only,
+before the runner) then ran `scripts/run_e1b_backtest.py`. Full results in
+`docs/research/2026-07-09_E1b_broad_us_results.md`.
+
+**VERDICT: E1b FAILS** the pre-registered gate — but as a NEAR-MISS, and a
+categorically more encouraging result than E1. broad_us HOLDOUT (2022-01-01..
+2026-07-08, next-open, 5bps/side):
+- n=560 (PASS) · exp +17.77bps (PASS) · **Sharpe 0.49613 (FAIL vs 0.50)** ·
+  maxDD 9.77% (PASS). 3 of 4 pass, 2 decisively. FAILS by 0.0039 of Sharpe.
+- **NOT rounded up** — the >=0.50 bar was strict and committed pre-run.
+
+**KEY FINDING — prior was wrong in broad_us's favor:** I expected OOS decay
+to ~0 (full universe was Sharpe 0.01 in this window). Instead broad_us held
+Sharpe 0.66 (train) -> 0.496 (holdout) through the 2022 bear (maxDD only
+9.8%). The IBS edge substantially PERSISTED out-of-sample in the 4 broad US
+index ETFs — real but decayed, and just under the tradeability bar.
+
+**Cost is the swing factor:** 0bps Sharpe 0.76 / 5bps-side 0.496 / 10bps-side
+0.23. The pre-reg's 5bps/side is CONSERVATIVE for SPY/QQQ/DIA/IWM (~1bp real
+spreads). Secondary broad_us+sectors HOLDOUT is net-negative (Sharpe -0.05) —
+sectors confirmed dead weight.
+
+**INTEGRITY / multiplicity note:** two pre-registered tests now run (E1 fail,
+E1b near-miss). A third (lower-cost E1c) is defensible ONLY on independent
+liquidity grounds (real spreads ~1bp) AND with a PRE-COMMITTED STOP (if E1c
+fails, shelve ETF IBS). Otherwise it is fishing-by-multiplicity. Recorded so
+the temptation is visible, not acted on silently.
+
+**DISPOSITION:** E1b did not pass; no live trading. Awaiting Evan:
+(a) pre-register E1c at liquidity-justified ~2bps/side WITH a committed stop
+(one final swing); (b) accept broad_us IBS as a real-but-sub-bar effect,
+write it up, pivot to a new family; (c) leveraged E2 / other. No option goes
+live without passing + Evan go + Alpaca account.
+
+**Next action:** NONE autonomous — Evan chooses.
