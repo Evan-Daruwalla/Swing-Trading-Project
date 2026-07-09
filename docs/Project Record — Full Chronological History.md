@@ -44,6 +44,7 @@ the dated entry, not the digest.
 - [E — M0.1 executed: skeleton, venv, git init (first commit)](#appendix-e---m01-executed-skeleton-venv-git-init-first-commit-2026-07-08) (07-08)
 - [F — M0.2: price_cache lacks OHLC → own fetcher (swing_bot/prices.py)](#appendix-f---m02-price_cache-lacks-ohlc--own-fetcher-swing_botpricespy-2026-07-08) (07-08)
 - [G — M0.3: frozen 29-ETF universe + full backfill](#appendix-g---m03-frozen-29-etf-universe--full-backfill-2026-07-08) (07-08)
+- [H — M0.4: coverage+quality gate; found XLRE zero-range bars](#appendix-h---m04-coveragequality-gate-found-xlre-zero-range-bars-2026-07-08) (07-08)
 
 ---
 
@@ -429,3 +430,51 @@ default history start is 2014-01-01; deeper history exists for most (SPY to
 (`swing_bot/coverage_gate.py`): refuse to emit signals unless the full
 universe has a bar for the as-of date; fold in a basic split-misapplication
 sanity check.
+
+---
+
+# Appendix H - M0.4: coverage+quality gate; found XLRE zero-range bars (2026-07-08, ~00:05 07-09 local)
+
+**WHAT:** Ran PRD task M0.4. Wrote `swing_bot/coverage_gate.py` with two
+checks and a nonzero-exit `__main__`.
+
+1. **Coverage** (`coverage(conn, as_of)`): every ticker LISTED as of that
+   date (`data_start <= as_of`) must have a bar; a not-yet-listed ticker is
+   not counted missing (handles XLC pre-2018, XLRE pre-2015). Carries over
+   Trading's "gate on coverage count, not on 'ran today'" lesson.
+   `latest_common_date()` walks back to the newest fully-covered date for
+   the live loop's as-of.
+2. **Sanity** (`sanity_scan`): flags OHLC-ordering violations, zero-range
+   bars (IBS undefined), and |daily ret| > 35% (the split-misapplication
+   tell; our no-leverage ETF universe never legitimately moves that much).
+
+**DONE-CHECK (real output, both pass):**
+- `python -m swing_bot.coverage_gate` on real `swing.db`: `coverage as-of
+  2026-07-08: OK`, exit 0.
+- Truncated fixture (drop XLK's latest bar) → `coverage_ok=False
+  missing=['XLK']` — gate correctly fails/exits nonzero.
+
+**REAL DATA-QUALITY FINDING (not invented):** the sanity scan flagged 19
+anomalies, ALL `zero_range` (High==Low) in **XLRE 2015-10-13 .. 2016-02-25**
+— its first ~5 months after the 2015-10-08 launch. Cause: illiquid early
+trading (flat/'single-print' days), NOT a mis-applied split. Consequence:
+IBS = (close-low)/(high-low) DIVIDES BY ZERO on those bars. The other 28
+tickers were fully clean (no OHLC-order violations, no extreme returns, no
+zero-range).
+
+**DECISION:** coverage gate stays GREEN on zero-range days (coverage is
+about bar presence, not usability); handling is the E1 signal layer's job.
+Logged as a hard M2 requirement + in the gotchas bin: **E1 must skip any
+ticker on a day where high==low (IBS undefined → no signal), never crash.**
+
+**HONEST OPEN ITEM (not fixed):** sanity_scan is O(all bars) each call —
+fine at 90k rows, would need incremental scoping if the universe/history
+grows a lot. The 35% return threshold is a heuristic, not tuned. Neither is
+blocking.
+
+**Cadence:** pm-cadence fired at prompt #9; this entry satisfies it (last
+was Appendix E at #6). No miss.
+
+**Next action:** M0.5 — frozen-regression harness
+(`swing_bot/test_frozen.py`, own `__main__`, ±0.0000pp comparison,
+placeholder fixtures until real refs are pinned in M2).

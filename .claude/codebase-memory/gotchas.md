@@ -22,3 +22,11 @@ they apply to any yfinance-based pipeline built here:
 - Small-capital edges: Alpaca fractionability/minimum-order-size — the
   whole-share fallback in Trading's `fractionability.py` is load-bearing at
   $100–1,000, not an edge case.
+- 2026-07-08 (M0.4, measured on our swing.db): XLRE has 19 zero-range bars
+  (High==Low) in 2015-10..2016-02, its first ~5 months post-launch
+  (illiquid early trading, not a split error). IBS=(close-low)/(high-low)
+  DIVIDES BY ZERO on these. E1 signal code MUST skip any ticker on a day
+  where high==low (treat IBS as undefined → no signal), not crash. All other
+  28 universe tickers were clean in the M0.4 sanity scan (no OHLC-order
+  violations, no |daily ret|>35%, no zero-range). Detector:
+  `swing_bot/coverage_gate.sanity_scan`.
