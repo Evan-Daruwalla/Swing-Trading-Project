@@ -51,6 +51,7 @@ the dated entry, not the digest.
 - [L — M1.7: E1 PRE-REGISTRATION committed (8963e49) before any engine](#appendix-l---m17-e1-pre-registration-committed-8963e49-before-any-engine-2026-07-09) (07-09)
 - [M — M1.8: fill-timing ablation; M1 complete](#appendix-m---m18-fill-timing-ablation-m1-complete-2026-07-09) (07-09)
 - [N — M2.9: backtest engine (hand-checked P&L exact)](#appendix-n---m29-backtest-engine-hand-checked-pl-exact-2026-07-09) (07-09)
+- [O — M2.10: E1 backtest VERDICT = FAIL (honest, no tuning)](#appendix-o---m210-e1-backtest-verdict--fail-honest-no-tuning-2026-07-09) (07-09)
 
 ---
 
@@ -723,3 +724,42 @@ cost case 0.0515794734 (= 10*0.9995/(9.5*1.0005)-1). All asserts < 1e-12.
 pre-registration, both fill models + cost sensitivities + per-group + split-
 sample, and state PASS/FAIL vs the four kill criteria PLAINLY. No tuning on
 a FAIL.
+
+---
+
+# Appendix O - M2.10: E1 backtest VERDICT = FAIL (honest, no tuning) (2026-07-09, ~02:10 local)
+
+**WHAT:** Ran E1 per the frozen pre-registration (`8963e49`) via
+`scripts/run_e1_backtest.py`. Full results in
+`docs/research/2026-07-09_E1_backtest_results.md`.
+
+**VERDICT: E1 FAILS** (2 of 4 kill criteria). Primary (next-open, 10bps
+round-trip, full 29-ETF universe):
+- n=3559 (PASS, >=200) · exp +4.7bps/trade (PASS, >0) · **Sharpe 0.23
+  (FAIL, need >=0.50)** · **maxDD 36.0% (FAIL, need <=25%)**.
+
+**WHY (diagnostic, NOT tuning):**
+- Cost-fragile: 0bps Sharpe 0.56 / +14.7bps; 10bps/side NEGATIVE. The M1.8
+  ablation warning was correct — multi-day hold lifted gross to +14.7bps but
+  not enough to clear cost + the Sharpe/DD bars.
+- country_intl net NEGATIVE (-2.2bps, Sharpe 0.05, 57.5% maxDD) — overnight/
+  stale-NAV edge forfeited by next-open; the main drag.
+- Recent-era decay: 2014-2021 Sharpe 0.32 -> 2022-2026 Sharpe 0.01 (neg
+  expectancy). Public-signal crowding, realized.
+
+**INTEGRITY — the load-bearing moment:** broad_us alone passes all four
+(n=1478, Sharpe 0.60, maxDD 14.2%, +23.1bps). This is NOT a pass. The
+pre-registered experiment was the full universe and it FAILED; selecting
+broad_us post hoc is exactly the universe-narrowing pre-reg §10 forbids.
+"broad_us IBS" is a NEW hypothesis requiring its OWN dated pre-registration
+(E1b) with a real holdout — a lead, not a result. No tuning applied; the
+FAIL stands as the honest outcome. This is the process working as designed:
+the scaffolding prevented a p-hacked "win."
+
+**DISPOSITION:** E1 did NOT pass the M2->M3 gate. No live trading. Per PRD
+M2.13, stop and await Evan's direction. M2.11 (pin frozen refs) still runs —
+it makes this FAIL tamper-evident and tripwires the engine for any E1b.
+
+**Next action:** M2.11 — pin real E1 backtest refs into
+`swing_bot/test_frozen.py` (two short windows, exact tpnl%/closed_count),
+replacing the M0.5 placeholders. Then STOP at the M2.13 gate and report.
