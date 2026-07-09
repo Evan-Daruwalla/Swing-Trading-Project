@@ -62,6 +62,7 @@ the dated entry, not the digest.
 - [W — Evan overrides IBS stop for A3; C1+screens sitting begins](#appendix-w---evan-overrides-ibs-stop-for-a3-c1screens-sitting-begins-2026-07-09) (07-09)
 - [X — C1: engine v2 (NAV-proportional, cash-capped) verified](#appendix-x---c1-engine-v2-nav-proportional-cash-capped-verified-2026-07-09) (07-09)
 - [Y — Screens: A3 dead, B1 dead, B4 rotation +2.15%/mo holdout standout](#appendix-y---screens-a3-dead-b1-dead-b4-rotation-215mo-holdout-standout-2026-07-09) (07-09)
+- [Z — Findings write-up (E1→B4 arc) produced; session close](#appendix-z---findings-write-up-e1b4-arc-produced-session-close-2026-07-09) (07-09)
 
 ---
 
@@ -1145,3 +1146,30 @@ full window (gate basis must acknowledge contamination) and live paper as
 confirmation. B1 dropped; A3 closed.
 
 **Next action:** Evan's call on E4 prereg.
+
+---
+
+# Appendix Z - Findings write-up (E1->B4 arc) produced; session close (2026-07-09, ~15:30 local)
+
+**WHAT:** Evan chose to write up the arc rather than proceed to an E4 prereg.
+Produced `docs/findings_2026-07-09_experiment_arc.md` — a standalone
+synthesis deliverable (reads FROM this record; not part of the append-only
+chain). Covers: method/discipline (prereg-before-code, OOS holdout,
+kill-criteria, tripwire, data honesty); each experiment with %/mo verdict
+(E1 +0.19 FAIL, E1b +0.32 FAIL near-miss, E2 +0.64 FAIL, A3/B1 dead, B4
++2.15%/mo holdout lead); the unifying overnight-execution finding; honest
+limitations (B4 unconfirmed + holdout contamination + variant selection +
+50-58% DD + swing-label stretch + survivorship returns with stocks); and the
+meta-point (the falsifiable process is the deliverable, not a profitable bot).
+
+**Verification:** frozen tests still green (10 refs, d=+/-0.0000pp) — no code
+touched this step. All numbers in the write-up trace to committed backtests.
+
+**SESSION CLOSE.** Large session (2026-07-08 bootstrap through 2026-07-09
+E1->B4 arc, ~20 commits). Nothing live. The B4 leverage-rotation lead
+(+2.15%/mo OOS) is the open thread; next stage = E4 pre-registration +
+robustness battery + live paper, on Evan's direction. IBS family remains
+SHELVED (A3 override spent).
+
+**Next action:** none autonomous. Resume by pre-registering E4 (or a new
+direction).
