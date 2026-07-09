@@ -42,6 +42,7 @@ the dated entry, not the digest.
 - [C — PRD written; Evan keeps LLM overlays as gated shadow mode](#appendix-c---prd-written-evan-keeps-llm-overlays-as-gated-shadow-mode-2026-07-08) (07-08)
 - [D — Overlay amended shadow→live-acting: control + veto sleeves from M3 day one](#appendix-d---overlay-amended-shadowlive-acting-control--veto-sleeves-from-m3-day-one-2026-07-08) (07-08)
 - [E — M0.1 executed: skeleton, venv, git init (first commit)](#appendix-e---m01-executed-skeleton-venv-git-init-first-commit-2026-07-08) (07-08)
+- [F — M0.2: price_cache lacks OHLC → own fetcher (swing_bot/prices.py)](#appendix-f---m02-price_cache-lacks-ohlc--own-fetcher-swing_botpricespy-2026-07-08) (07-08)
 
 ---
 
@@ -304,3 +305,74 @@ C covered #3). No miss.
 
 **Next action:** M0.2 — verify ETF price coverage in Trading's `price_cache`
 (read-only) and choose the data path.
+
+---
+
+# Appendix F - M0.2: price_cache lacks OHLC → own fetcher (swing_bot/prices.py) (2026-07-08, ~23:35)
+
+**WHAT:** Ran PRD task M0.2 (verify ETF coverage in Trading's `price_cache`,
+read-only; choose the data path). Outcome: **reuse is not viable; own
+yfinance fetcher chosen.** Wrote `swing_bot/prices.py` (own OHLCV store in
+`swing.db`) and validated it end-to-end.
+
+**Tooling note:** the Grep/Glob tools return "no files found" against
+`D:\ClaudeCode\Trading` (an additional working dir) even though PowerShell
+confirms 6,961 `.py` files and the full `trading_bot/` package are present.
+All Trading-DB access this session went through venv Python scripts +
+PowerShell instead. Trading's `var/trades.db` is the DB; `price_cache` is
+real and matches the inventory: cols `(ticker, kind, key_date, price)`,
+37.4M rows, 12,486 tickers.
+
+**DECISIVE FINDING — why reuse fails for THIS project:**
+1. `price_cache` stores only `close`, `volume`, and derived flags
+   (`kind`s: next_open, close, next_open_vol, next_open_range, above_ma_50,
+   atr_pct_20, above_ma_200, split_ratio, splits_json, dividends_json,
+   dividends_total, volume). **There is NO high/low/open series.** IBS =
+   (close − low)/(high − low) — the #1 strategy — is therefore UNCOMPUTABLE
+   from it.
+2. `next_open` has ZERO rows for every ETF checked (even SPY) — so the
+   executable-fill model / M1 fill-timing ablation couldn't source it here.
+3. Universe gaps: DIA, IWM, and ALL country/international ETFs (EWJ, EWZ,
+   EWG, EWU, EWA, EWC, EWH, EWW, EWT, EWY, INDA, FXI, EEM, EFA) are absent.
+
+### Coverage snapshot (read-only probe, 2026-07-08)
+
+| Group | Tickers with `close` | Span | `next_open` |
+|---|---|---|---|
+| Broad | SPY, QQQ (3,043 rows, 2014-06→2026-07) | ~12yr | 0 for all |
+| Broad missing | DIA, IWM | — | — |
+| SPDR sectors | XLE/XLF/XLK/XLV/XLI/XLY/XLP/XLU/XLB (3,043); XLRE (2,701, from 2015-10); XLC (2,023, from 2018-06) | 8–12yr | 0 for all |
+| Country/intl | none present | — | — |
+
+**DECISION (decided 2026-07-08):** own yfinance fetcher, `auto_adjust=False`
+(split-adjusted, dividend-UNadjusted, matching Trading's convention), full
+OHLCV into `swing.db` table `bars` (PK ticker,date; cols
+open/high/low/close/adj_close/volume). This also removes cross-project data
+coupling and lets M0.3 freeze a universe that includes DIA/IWM + country
+ETFs.
+
+**VALIDATION (real output):**
+- yfinance smoke test: `SPY` OHLCV fetched, columns Open/High/Low/Close/
+  Adj Close/Volume present, network OK.
+- `prices.backfill` SPY + QQQ → 3,146 rows each, 2014-01-02..2026-07-08
+  (more complete than Trading's 3,043). `swing.db` created (gitignored).
+- IBS computes from a stored bar: SPY 2026-07-08 H=746.15 L=739.51 C=745.40
+  → IBS=0.887. The thing price_cache could not do, the own store does.
+
+**Downstream implications:** M0.3 universe can include DIA/IWM/country ETFs;
+M0.4 coverage gate runs on `swing.db` bars; M1.8 ablation sources next-day
+open as the following row's `open` (present in our OHLCV). Full-universe
+backfill deferred to after M0.3 (universe not yet frozen — one task per
+sitting).
+
+**HONEST OPEN ITEM (not fixed):** `prices.py` is minimal — no split-
+misapplication sanity check (Trading's >1000%-one-day-move tell) or
+incomplete-publication gate yet; those belong to M0.4 (coverage/quality
+gate) and M0.3 (universe filters). yfinance rate-limiting on a full-universe
+backfill is untested at scale.
+
+**Cadence:** not a cadence-fire prompt; entry written as part of the task's
+done sequence.
+
+**Next action:** M0.3 — freeze the ETF universe (`swing_bot/universe.py`)
+with per-ticker inclusion reason + listing date.

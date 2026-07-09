@@ -10,17 +10,24 @@ portfolio asset. Reuse Trading's infrastructure selectively (backtest harness,
 paper-trading DB pattern, Alpaca PAPER mirror) — not its factor logic, which
 is long-horizon.
 
-## Current state — M0 in progress (M0.1 done)
+## Current state — M0 in progress (M0.1–M0.2 done)
 
 **Last updated: 2026-07-08** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-08 — M0.1 executed (record Appendix E).** Repo skeleton, `.venv`,
-> git init; first commit `4ac785c`. Done-check green (venv imports yfinance
-> 1.5.1 + httpx 0.28.1). Env note: Python 3.14 + pandas 3.0 are bleeding-edge
-> majors — if a weird pandas/numpy error appears in M0.2/M2, pin versions
-> rather than fight it. Next: M0.2 (verify ETF coverage in Trading's
-> price_cache, read-only).
+> **2026-07-08 — M0.2 executed (record Appendix F).** Data-path decision:
+> **own yfinance fetcher**, NOT reuse of Trading's price_cache. Reason:
+> price_cache has no high/low/open series (only close+volume+flags), so IBS
+> is uncomputable from it; it also lacks DIA/IWM + all country ETFs and has
+> no next_open for ETFs. Wrote `swing_bot/prices.py` (OHLCV → `swing.db`,
+> `auto_adjust=False`); validated (SPY/QQQ backfilled, IBS computes).
+> Tooling: Grep/Glob don't reach `D:\ClaudeCode\Trading`; use venv-python +
+> PowerShell for its DB. Next: M0.3 (freeze ETF universe).
+
+> **2026-07-08 — M0.1 (record Appendix E).** Repo skeleton, `.venv`, git
+> init; commits `4ac785c`/`940a239`; deps pinned `3ba9cc1`
+> (requirements.txt + requirements.lock). Env note: Python 3.14 + pandas 3.0
+> are bleeding-edge — pin/downgrade rather than code around any pandas edge.
 
 ### Workstreams (mapped to PRD milestones)
 
@@ -28,7 +35,7 @@ lives in the record.
 |---|---|---|---|
 | Doc/memory system | — | **Done** | Bootstrapped 2026-07-08 |
 | PRD_ROADMAP.md | — | **Done** | Written 2026-07-08 to council program + Evan's overlay decision |
-| Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **In progress** | M0.1 done (commit `4ac785c`); next M0.2 |
+| Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **In progress** | M0.1–M0.2 done; data path = own OHLCV fetcher (`swing_bot/prices.py` → `swing.db`); next M0.3 |
 | Pre-registration & fill ablation | M1 | **Not started** | Ordering-critical: prereg doc before engine code |
 | E1 IBS backtest | M2 | **Not started** | Gated behind M1 |
 | Live paper: control + LLM-veto sleeves | M3 | **GATED** | Needs M2 PASS + Evan go; Alpaca account BLOCKED-ON-EVAN |
