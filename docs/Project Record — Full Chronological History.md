@@ -48,6 +48,7 @@ the dated entry, not the digest.
 - [I — M0.5: frozen-regression harness; M0 complete](#appendix-i---m05-frozen-regression-harness-m0-complete-2026-07-09) (07-09)
 - [J — Design Q&A: return prior + high-risk (leveraged-ETF) direction](#appendix-j---design-qa-return-prior--high-risk-leveraged-etf-direction-2026-07-09) (07-09)
 - [K — M1.6: power calc; E1 is powerable (19.6% signal rate)](#appendix-k---m16-power-calc-e1-is-powerable-196-signal-rate-2026-07-09) (07-09)
+- [L — M1.7: E1 PRE-REGISTRATION committed (8963e49) before any engine](#appendix-l---m17-e1-pre-registration-committed-8963e49-before-any-engine-2026-07-09) (07-09)
 
 ---
 
@@ -610,3 +611,42 @@ pre-registration not contaminated.
 **Next action:** M1.7 — write + commit `docs/prereg_E1_ibs.md` (exact rules,
 kill criteria incl. min-N, both fill models, overlay pre-reg). MUST be
 committed BEFORE any backtest-engine code (Success Criterion #1).
+
+---
+
+# Appendix L - M1.7: E1 PRE-REGISTRATION committed (8963e49) before any engine (2026-07-09, ~01:05 local)
+
+**WHAT:** Wrote and committed `docs/prereg_E1_ibs.md` — the project's core
+rigor artifact. **Commit `8963e49` contains ONLY the prereg doc (1 file, 132
+lines); verified no backtest-engine code exists in the repo at that hash**
+(swing_bot modules present: prices, universe, coverage_gate, signals,
+test_frozen — none an engine). Success Criterion #1 (git proves prereg
+predates engine code) is now permanently satisfied.
+
+**FIXED PARAMETERS (immutable after this commit):**
+- Entry: IBS<0.20 at close, long-only, on the frozen 29-ETF universe (skip
+  high==low). Exit: first close with IBS>0.80, OR 5-trading-day time stop.
+  No hard stop-loss in E1 (stop ablation is separate, M5).
+- Sizing: $500 nominal, K=5 concurrent, 20% each, lowest-IBS-first selection,
+  ties alphabetical. Fractional in backtest.
+- Fill models: PRIMARY next-open (executable, judged for kill criteria);
+  REFERENCE close-to-close (Pagonidis basis, for the haircut). Cost: PRIMARY
+  10bps round-trip; 0/20bps as sensitivity.
+- **KILL CRITERIA (E1 PASSES only if ALL, on next-open net of 10bps):**
+  >=200 closed trades; net mean return/trade > 0; net annualized Sharpe
+  >=0.50; max drawdown <= 25%. Any miss = FAIL = stop + record, no tuning.
+- Reported-not-gated: Model B + A-B haircut, per-group split (country ETFs
+  separate), 2014-2021 vs 2022-2026 split-sample.
+- Overlay veto arm pre-registered: control vs cash-veto, readout at 100
+  decisions or 6 months, kill if veto doesn't predict worse outcomes or
+  treatment NAV <= control NAV.
+
+**WHY the single-commit discipline:** isolating the doc in its own commit
+makes the ordering proof unambiguous — anyone can `git show 8963e49` and see
+rules-only, no results, no engine. That is what makes a later "E1 passed"
+claim credible rather than potentially p-hacked.
+
+**Next action:** M1.8 — fill-timing ablation (`scripts/ablation_fill_timing
+.py`): close-to-close vs next-open vs overnight-only component on IBS<0.20
+signals. Returns ARE now permitted (rules are locked). Names which fill model
+M2 treats as primary (pre-reg already says next-open).

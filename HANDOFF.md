@@ -15,13 +15,13 @@ is long-horizon.
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-09 — M0 DONE (record Appendix I).** All 5 foundation tasks
-> complete. Modules: `prices` (OHLCV fetcher), `universe` (frozen 29 ETFs),
-> `coverage_gate`, `signals` (`ibs()` primitive), `test_frozen` (tripwire,
-> green + has teeth). `swing.db` holds 89,666 clean OHLCV rows. **Next: M1
-> — pre-registration & ablation. M1.6 (power calc, NO return peeking) →
-> M1.7 (pre-reg doc, MUST commit before any backtest-engine code — the core
-> rigor claim) → M1.8 (fill-timing ablation).**
+> **2026-07-09 — M1.6-M1.7 done (record Appendices K-L).** Power calc: E1
+> powerable (19.6% signal rate, ~1,431 signals/yr, thousands of backtest
+> trades). **E1 PRE-REGISTRATION committed `8963e49` (doc-only, before any
+> engine — Success Criterion #1 satisfied):** IBS<0.20 entry / IBS>0.80-or-
+> 5day exit, K=5 20%-each next-open, kill criteria = >=200 trades + net
+> expectancy>0 + Sharpe>=0.5 + maxDD<=25%. Next: M1.8 (fill-timing ablation),
+> then M2 (engine + run). Params are FROZEN — do not tune to results.
 
 > **2026-07-09 — M0.4 executed (record Appendix H).** Coverage/quality gate
 > `swing_bot/coverage_gate.py` (coverage vs listed-tickers + sanity scan);
@@ -59,7 +59,7 @@ lives in the record.
 | Doc/memory system | — | **Done** | Bootstrapped 2026-07-08 |
 | PRD_ROADMAP.md | — | **Done** | Written 2026-07-08 to council program + Evan's overlay decision |
 | Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **Done** | All 5 tasks; modules prices/universe/coverage_gate/signals/test_frozen; `swing.db` 89,666 rows |
-| Pre-registration & fill ablation | M1 | **In progress** | Next: M1.6 power calc → M1.7 prereg doc (before engine code) → M1.8 ablation |
+| Pre-registration & fill ablation | M1 | **In progress** | M1.6 power + M1.7 prereg (`8963e49`) done; next M1.8 fill-timing ablation |
 | E1 IBS backtest | M2 | **Not started** | Gated behind M1 |
 | Live paper: control + LLM-veto sleeves | M3 | **GATED** | Needs M2 PASS + Evan go; Alpaca account BLOCKED-ON-EVAN |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
