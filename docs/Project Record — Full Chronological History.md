@@ -64,6 +64,7 @@ the dated entry, not the digest.
 - [Y — Screens: A3 dead, B1 dead, B4 rotation +2.15%/mo holdout standout](#appendix-y---screens-a3-dead-b1-dead-b4-rotation-215mo-holdout-standout-2026-07-09) (07-09)
 - [Z — Findings write-up (E1→B4 arc) produced; session close](#appendix-z---findings-write-up-e1b4-arc-produced-session-close-2026-07-09) (07-09)
 - [AA — E4 leverage rotation: pre-reg (313d88a), engine, VERDICT = PASS; STOP at live gate](#appendix-aa---e4-leverage-rotation-pre-reg-313d88a-engine-verdict--pass-stop-at-live-gate-2026-07-09) (07-09)
+- [AB — E5 regime test: E4 loses 93% in 2000-2013; VERDICT = FAIL; E4 de-authorized for paper](#appendix-ab---e5-regime-test-e4-loses-93-in-2000-2013-verdict--fail-e4-de-authorized-for-paper-2026-07-09) (07-09)
 
 ---
 
@@ -1220,3 +1221,41 @@ next-stoppage-point requested.
 account + go); (b) pre-register a harder E4 robustness test (other
 eras/markets) to fight the regime-flattery concern before committing paper;
 (c) new direction.
+
+---
+
+# Appendix AB - E5 regime test: E4 loses 93% in 2000-2013; VERDICT = FAIL; E4 de-authorized for paper (2026-07-09, ~17:30 local)
+
+**WHAT:** Evan chose to harden E4 before paper (option b). Ran E5 (PRD M2d
+hardening) per prereg `09a3a31`: synthesize daily-rebalanced 3x Nasdaq from
+QQQ (1999+), calibrate drag to real TQQQ, test the 200-MA rotation over the
+UNSEEN 2000-2013 (dot-com + 2008). `scripts/run_e5_regime.py` (does not touch
+swing.db). Results: `docs/research/2026-07-09_E5_regime_results.md`.
+
+**Validation gate PASS:** calibrated drag 4.00%/yr; synthetic CAGR 38.31% vs
+real TQQQ 38.36% (0.05pp); daily-return corr 0.9989. Synthetic is trustworthy.
+
+**VERDICT: E5 FAIL (all 3 gates).** 2000-2013 unseen window: rotation CAGR
+-3.37% (FAIL >0), **maxDD 92.7%** (FAIL <=65 and only 7pp better than
+buy-hold-3x's 100% wipeout), CAGR -3.4% < buy-hold-QQQ -0.5% (FAIL). Full
+2000-2026: rotation +1.01%/mo but with a 92.7% drawdown -- untradeable.
+
+**FINDING:** the 200-MA did NOT protect in choppy secular bears -- whipsaw
+(counter-trend rallies push QQQ back above the MA, re-entering 3x right
+before the next leg down) plus leverage = ~93% drawdown. **E4's +2.45%/mo
+was entirely a 2014-2026 regime artifact**, exactly the flag raised at E4's
+PASS (Appendix AA). Per prereg S5: E4 is REGIME-DEPENDENT -> de-authorized
+as a live-paper candidate. No tuning.
+
+**META (project state):** the mean-reversion family (E1/E1b/E2/A3/B1) and the
+leverage-rotation family (E4/E5) have now all been honestly falsified for a
+robust, regime-independent, cost-surviving, executable retail edge. The
+recurring, data-grounded finding: simple public EOD strategies do not carry
+such an edge at this scale -- caught here BEFORE any capital was risked, which
+is the rigor process working as intended. Nothing is live; nothing passed to
+paper.
+
+**STOPPAGE POINT.** No autonomous next action -- Evan chooses direction with
+this finding in hand (candidates: accept the falsification finding and write
+it up as the deliverable / try a genuinely different family from catalog v2 /
+test a de-leveraged 1x-2x rotation variant, each its own pre-registration).

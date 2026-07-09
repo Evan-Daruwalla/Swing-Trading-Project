@@ -12,22 +12,24 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — E4 rotation PASSED its pre-reg gate; STOPPED at live gate (BLOCKED-ON-EVAN)
+## Current state — E4 PASSED backtest but FAILED regime test (E5); de-authorized for paper
 
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-09 — E4 = PASS (record Appendix AA).** 200d-MA leverage rotation
-> (TQQQ while QQQ>200d SMA else cash, K=1). Pre-reg `313d88a` (doc-only,
-> gates target the un-peeked: fragility grid + benchmark value). Primary
-> QQQ->TQQQ N=200 lag0 5bps full window: CAGR 33.76% (+2.45%/mo), maxDD
-> 57.7%, Sharpe 0.86. **All 5 gates PASS** — FIRST strategy to clear a
-> pre-registered bar. Robustness battery: 20/20 cells positive, median 32.5%
-> CAGR, no cliff. **Honest caveats: does NOT beat buy-hold TQQQ on return
-> (33.8 vs 38.4%) — value is DD reduction 82->58%; regime-flattered (3x
-> Nasdaq/best tech decade); ~4 switches/yr so live validation takes years;
-> 57.7% DD real.** 12 frozen refs green. **STOPPED at M3 live gate: needs
-> Evan go + Alpaca account. No live money.**
+> **2026-07-09 — E5 regime test = FAIL; E4 de-authorized (record Appendix
+> AB).** Hardened E4 before paper (prereg `09a3a31`): synthesized 3x Nasdaq
+> from QQQ back to 1999 (validated vs real TQQQ: drag 4%/yr, corr 0.9989),
+> tested the 200-MA rotation over the UNSEEN 2000-2013 (dot-com + 2008).
+> **Rotation lost 92.7% (maxDD) and −3.4% CAGR there — the 200-MA whipsawed
+> in choppy bears and 3x leverage did the rest.** E4's +2.45%/mo was purely a
+> 2014-2026 artifact. Per prereg, E4 is REGIME-DEPENDENT → NOT deployed to
+> paper. **Nothing is live.**
+>
+> **Project meta:** both families tried — mean reversion (E1/E1b/E2/A3/B1)
+> and leverage rotation (E4/E5) — are now honestly falsified for a robust,
+> regime-independent, cost-surviving executable retail edge. The rigor
+> process caught E4 BEFORE any capital was risked. Next direction is Evan's.
 
 > **2026-07-09 — C1 + three screens (record Appendices W–Y).** Engine v2
 > (`size_on_nav=True`: NAV-proportional, cash-capped; v1 refs intact; 10
@@ -108,8 +110,8 @@ lives in the record.
 | E1 IBS backtest | M2 | **Done — E1 FAILED** | Engine (`415c527`), verdict (`d28f899`), frozen refs pinned. E1b OOS near-miss (Sharpe 0.4961, `1a71468`). M2.12 survivorship deferred |
 | E2 leveraged-ETF IBS (high-return arm) | M2b | **Done — E2 FAILED** | Prereg `865c09e`; CAGR 7.98%/maxDD 60.6% vs 15%/60% gates; refs pinned; **IBS family SHELVED (pre-committed stop)** |
 | E3 concentrated stocks | M2c | **Stub** | Different signal family; own prereg; survivorship caveat mandatory |
-| E4 leverage rotation | M2d | **Backtest PASS** | Pre-reg `313d88a`; CAGR 33.76%/maxDD 57.7%, all 5 gates + 20/20 battery. Caveat: DD-reduction not return-beating; regime-flattered. At M3 live gate (Evan) |
-| Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — Evan go + Alpaca acct** | E4 is the first candidate eligible for this gate |
+| E4 leverage rotation | M2d | **Backtest PASS but REGIME-DEPENDENT** | Pre-reg `313d88a` PASS on 2014-26; E5 (`09a3a31`) FAIL on 2000-2013 (92.7% DD). De-authorized for paper |
+| Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — no passing regime-robust strategy** | E1/E2/E4 all failed the bar for going live; needs a new candidate |
 | Findings write-up | — | **Done** | `docs/findings_2026-07-09_experiment_arc.md` (E1→B4 synthesis deliverable) |
 | Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — gate not open** | E1 did NOT pass M2→M3; needs a new pre-registered strategy that passes + Evan go + Alpaca account |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
