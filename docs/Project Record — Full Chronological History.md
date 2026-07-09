@@ -43,6 +43,7 @@ the dated entry, not the digest.
 - [D — Overlay amended shadow→live-acting: control + veto sleeves from M3 day one](#appendix-d---overlay-amended-shadowlive-acting-control--veto-sleeves-from-m3-day-one-2026-07-08) (07-08)
 - [E — M0.1 executed: skeleton, venv, git init (first commit)](#appendix-e---m01-executed-skeleton-venv-git-init-first-commit-2026-07-08) (07-08)
 - [F — M0.2: price_cache lacks OHLC → own fetcher (swing_bot/prices.py)](#appendix-f---m02-price_cache-lacks-ohlc--own-fetcher-swing_botpricespy-2026-07-08) (07-08)
+- [G — M0.3: frozen 29-ETF universe + full backfill](#appendix-g---m03-frozen-29-etf-universe--full-backfill-2026-07-08) (07-08)
 
 ---
 
@@ -376,3 +377,55 @@ done sequence.
 
 **Next action:** M0.3 — freeze the ETF universe (`swing_bot/universe.py`)
 with per-ticker inclusion reason + listing date.
+
+---
+
+# Appendix G - M0.3: frozen 29-ETF universe + full backfill (2026-07-08, ~23:50)
+
+**WHAT:** Ran PRD task M0.3. Wrote `swing_bot/universe.py` freezing a
+29-ticker ETF universe and `scripts/backfill_universe.py`; backfilled all 29
+into `swing.db` (89,666 rows).
+
+**Universe (frozen 2026-07-08; change = new dated decision):**
+- broad_us (4): SPY, QQQ, DIA, IWM
+- spdr_sector (11): XLE XLF XLK XLV XLI XLY XLP XLU XLB XLRE XLC
+- country_intl (14): EWJ EWZ EWG EWU EWA EWC EWH EWW EWT EWY INDA FXI EEM EFA
+
+Each entry carries name, group, `data_start`, and a one-line reason.
+`data_start` = the ticker's FIRST yfinance bar (auto_adjust=False), fetched
+empirically 2026-07-08 — NOT invented. First-bar dates span 1993 (SPY) to
+2018 (XLC); recorded exactly as returned.
+
+**WHY this composition:** IBS is best-evidenced on liquid equity-index ETFs
+(Pagonidis) and liquid country ETFs (arXiv 2306.12434); a broader-but-liquid
+basket also raises independent-signal count, the binding statistical-power
+constraint for this small-capital program (research brief 2026-07-08).
+Liquidity is a non-issue at $100–1,000 — the least-liquid member (EWG) had
+~$47M/day median dollar volume at the probe, orders of magnitude above any
+order here. `MIN_MEDIAN_DOLLAR_VOL = 20M` defined as a forward guard;
+enforcement is M0.4's job, not the universe file's.
+
+**VALIDATION (real output):**
+- Structure check: 29 tickers, all have reason + ISO `data_start`, no
+  duplicates; group counts 4/11/14.
+- Backfill: 27 of 29 have full 3,146 rows (2014-01-02..2026-07-08); XLRE
+  2,701 (from 2015-10-08) and XLC 2,023 (from 2018-06-19) shorter, matching
+  their real launch dates. Total 89,666 rows in `swing.db`.
+
+**KNOWN PROPERTY (not a defect, flag for E1 interpretation):** IBS on
+US-listed single-country ETFs (EWJ, EWG, …) has a different mechanism than
+on US-index ETFs — the home market is closed during US hours, so the US
+close reflects stale NAV plus US-hours repricing. This is part of WHY country
+-ETF mean reversion exists (arXiv paper), but it means the `country_intl`
+group's IBS behavior may not be homogeneous with `broad_us`/`spdr_sector`.
+E1 results should be reported per-group, not just pooled.
+
+**HONEST OPEN ITEM (not fixed):** no data-quality sanity checks run on the
+89,666 rows yet (split-misapplication tell, gaps) — that is M0.4. Backfill
+default history start is 2014-01-01; deeper history exists for most (SPY to
+1993) if a longer window is wanted later.
+
+**Next action:** M0.4 — data-coverage/quality gate
+(`swing_bot/coverage_gate.py`): refuse to emit signals unless the full
+universe has a bar for the as-of date; fold in a basic split-misapplication
+sanity check.

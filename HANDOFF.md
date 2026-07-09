@@ -10,10 +10,18 @@ portfolio asset. Reuse Trading's infrastructure selectively (backtest harness,
 paper-trading DB pattern, Alpaca PAPER mirror) — not its factor logic, which
 is long-horizon.
 
-## Current state — M0 in progress (M0.1–M0.2 done)
+## Current state — M0 in progress (M0.1–M0.3 done)
 
 **Last updated: 2026-07-08** — this file is the only live snapshot; history
 lives in the record.
+
+> **2026-07-08 — M0.3 executed (record Appendix G).** Frozen 29-ETF universe
+> in `swing_bot/universe.py` (4 broad US + 11 SPDR sectors + 14 country/
+> regional), each with a verified first-bar date + inclusion reason. Full
+> backfill (`scripts/backfill_universe.py`) wrote 89,666 rows into
+> `swing.db`. Flag for later: country-ETF IBS has a stale-NAV/overnight
+> mechanism distinct from US-index IBS — report E1 per-group. Next: M0.4
+> (coverage/quality gate).
 
 > **2026-07-08 — M0.2 executed (record Appendix F).** Data-path decision:
 > **own yfinance fetcher**, NOT reuse of Trading's price_cache. Reason:
@@ -35,7 +43,7 @@ lives in the record.
 |---|---|---|---|
 | Doc/memory system | — | **Done** | Bootstrapped 2026-07-08 |
 | PRD_ROADMAP.md | — | **Done** | Written 2026-07-08 to council program + Evan's overlay decision |
-| Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **In progress** | M0.1–M0.2 done; data path = own OHLCV fetcher (`swing_bot/prices.py` → `swing.db`); next M0.3 |
+| Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **In progress** | M0.1–M0.3 done; own OHLCV fetcher + frozen 29-ETF universe, `swing.db` backfilled (89,666 rows); next M0.4 (coverage gate) |
 | Pre-registration & fill ablation | M1 | **Not started** | Ordering-critical: prereg doc before engine code |
 | E1 IBS backtest | M2 | **Not started** | Gated behind M1 |
 | Live paper: control + LLM-veto sleeves | M3 | **GATED** | Needs M2 PASS + Evan go; Alpaca account BLOCKED-ON-EVAN |
