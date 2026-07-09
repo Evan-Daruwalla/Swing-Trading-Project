@@ -50,6 +50,7 @@ the dated entry, not the digest.
 - [K — M1.6: power calc; E1 is powerable (19.6% signal rate)](#appendix-k---m16-power-calc-e1-is-powerable-196-signal-rate-2026-07-09) (07-09)
 - [L — M1.7: E1 PRE-REGISTRATION committed (8963e49) before any engine](#appendix-l---m17-e1-pre-registration-committed-8963e49-before-any-engine-2026-07-09) (07-09)
 - [M — M1.8: fill-timing ablation; M1 complete](#appendix-m---m18-fill-timing-ablation-m1-complete-2026-07-09) (07-09)
+- [N — M2.9: backtest engine (hand-checked P&L exact)](#appendix-n---m29-backtest-engine-hand-checked-pl-exact-2026-07-09) (07-09)
 
 ---
 
@@ -695,3 +696,30 @@ edit to E1.
 IBS<0.20 entry / IBS>0.80-or-5day exit, K=5 20%-each, next-open primary,
 10bps). This is the FIRST engine code — it legitimately comes after
 `8963e49`. Then M2.10 runs it vs the kill criteria.
+
+---
+
+# Appendix N - M2.9: backtest engine (hand-checked P&L exact) (2026-07-09, ~01:45 local)
+
+**WHAT:** Built `swing_bot/backtest.py` — the minimal daily E1 engine (~200
+lines, purpose-built, NOT adapted from Trading's monthly factor_backtest).
+Implements the frozen pre-reg (`8963e49`) exactly: IBS<0.20 entry / IBS>0.80-
+or-5-day exit, K=5 concurrent at capital/5 each, lowest-IBS-first selection
+(ties alphabetical), next-open (primary) or c2c fills, cost_bps per side.
+`metrics()` computes the kill-criteria stats (n_trades, mean net return/trade,
+annualized Sharpe from daily NAV, max drawdown, CAGR). FIRST engine code in
+the repo — commit order after `8963e49` preserved.
+
+**DONE-CHECK (toy series, hand-computed, real output):** single-ticker toy
+with a d0 entry signal (IBS=0) and d1 exit signal (IBS=0.875). Engine
+reproduced hand math EXACTLY: net_ret 0.0526315789 (= 10.0/9.5-1, enter
+open d1, exit open d2), NAV end 505.2631578947, hold_days 1; and the 5bps-
+cost case 0.0515794734 (= 10*0.9995/(9.5*1.0005)-1). All asserts < 1e-12.
+
+**Note:** removed a speculative `hasattr(e,'tk')` line before testing
+(dead defensive code; simplicity).
+
+**Next action:** M2.10 — run E1 on the full `swing.db` window per the
+pre-registration, both fill models + cost sensitivities + per-group + split-
+sample, and state PASS/FAIL vs the four kill criteria PLAINLY. No tuning on
+a FAIL.
