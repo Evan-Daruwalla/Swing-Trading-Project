@@ -49,6 +49,7 @@ the dated entry, not the digest.
 - [J — Design Q&A: return prior + high-risk (leveraged-ETF) direction](#appendix-j---design-qa-return-prior--high-risk-leveraged-etf-direction-2026-07-09) (07-09)
 - [K — M1.6: power calc; E1 is powerable (19.6% signal rate)](#appendix-k---m16-power-calc-e1-is-powerable-196-signal-rate-2026-07-09) (07-09)
 - [L — M1.7: E1 PRE-REGISTRATION committed (8963e49) before any engine](#appendix-l---m17-e1-pre-registration-committed-8963e49-before-any-engine-2026-07-09) (07-09)
+- [M — M1.8: fill-timing ablation; M1 complete](#appendix-m---m18-fill-timing-ablation-m1-complete-2026-07-09) (07-09)
 
 ---
 
@@ -650,3 +651,47 @@ claim credible rather than potentially p-hacked.
 .py`): close-to-close vs next-open vs overnight-only component on IBS<0.20
 signals. Returns ARE now permitted (rules are locked). Names which fill model
 M2 treats as primary (pre-reg already says next-open).
+
+---
+
+# Appendix M - M1.8: fill-timing ablation; M1 complete (2026-07-09, ~01:25 local)
+
+**WHAT:** Ran PRD task M1.8 (fill-timing ablation), completing milestone M1.
+Wrote `scripts/ablation_fill_timing.py` + `docs/research/2026-07-09_E1_fill_
+timing_ablation.md`. First return computation of the project — run strictly
+AFTER the M1.7 pre-reg commit `8963e49`.
+
+**RESULT (per-signal 1-day-forward, gross, pooled 17,558 signals, bps):**
+c2c +11.8 / overnight +6.3 / intraday +5.4 / **next-open (executable) +7.5**.
+- **Overnight = 54% of the close-to-close edge** — the council's concern
+  was real: over half the idealized IBS effect sits in the post-signal gap.
+- **Next-open execution keeps ~64%** (haircut 4.3 bps). The executable edge
+  is positive pooled; it does not vanish.
+- **Per-group split (nopen1d):** broad_us +11.2, spdr_sector +8.0,
+  country_intl +6.1. Many single-country ETFs are weak/negative executable
+  (EWA -0.9, EWC -0.5, EWH ~0, EWU +0.1) — IBS edge there is an overnight/
+  stale-NAV artifact a next-open loop can't harvest. Strongest executable:
+  XLK +25.9, QQQ +21.6, EWY +19.4, XLC +18.9.
+
+**HONEST RISK FLAG carried to M2:** +7.5 bps gross/signal (1-day) is THIN vs
+the pre-registered 10 bps round-trip cost — a 1-day-hold view is net
+negative. E1's survival depends on the multi-day hold (exit IBS>0.80 or 5
+days) capturing materially more reversion than one day. The 1-day ablation
+is a LOWER BOUND on per-trade gross, not the strategy return. This lowers the
+prior on E1 passing; M2 decides. NO rule changes — universe/params frozen;
+the per-group concentration hint would be a FUTURE pre-registration, not an
+edit to E1.
+
+### Point-in-time snapshot — M1 (Pre-registration & ablation) COMPLETE
+
+| Task | Deliverable | Commit |
+|---|---|---|
+| M1.6 | power calc (E1 powerable, 19.6% signal rate) | `2a9edde` |
+| M1.7 | E1 pre-registration (doc-only, before engine) | `8963e49` (+rec `0062ec9`) |
+| M1.8 | fill-timing ablation (next-open keeps ~64%) | this entry |
+
+**Next action: M2 — E1 backtest.** M2.9: build `swing_bot/backtest.py`
+(minimal daily engine, ~200 lines, implements the frozen pre-reg EXACTLY:
+IBS<0.20 entry / IBS>0.80-or-5day exit, K=5 20%-each, next-open primary,
+10bps). This is the FIRST engine code — it legitimately comes after
+`8963e49`. Then M2.10 runs it vs the kill criteria.

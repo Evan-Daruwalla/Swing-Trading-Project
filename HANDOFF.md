@@ -15,13 +15,14 @@ is long-horizon.
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-09 — M1.6-M1.7 done (record Appendices K-L).** Power calc: E1
-> powerable (19.6% signal rate, ~1,431 signals/yr, thousands of backtest
-> trades). **E1 PRE-REGISTRATION committed `8963e49` (doc-only, before any
-> engine — Success Criterion #1 satisfied):** IBS<0.20 entry / IBS>0.80-or-
-> 5day exit, K=5 20%-each next-open, kill criteria = >=200 trades + net
-> expectancy>0 + Sharpe>=0.5 + maxDD<=25%. Next: M1.8 (fill-timing ablation),
-> then M2 (engine + run). Params are FROZEN — do not tune to results.
+> **2026-07-09 — M1 COMPLETE (record Appendices K-M).** Power calc: E1
+> powerable. **E1 PRE-REGISTRATION `8963e49` (doc-only, before any engine).**
+> Fill ablation: next-open keeps ~64% of the c2c edge (+7.5 bps/signal
+> gross), but that is THIN vs the 10bps round-trip cost — E1 survival hinges
+> on the multi-day hold beating 1-day. Country ETFs weak executable; broad/
+> tech strong. **Next: M2 — build `swing_bot/backtest.py` (M2.9, first engine
+> code, legitimately after `8963e49`) then run vs kill criteria (M2.10).**
+> Params FROZEN — no tuning to results; a FAIL is a valid result → stop.
 
 > **2026-07-09 — M0.4 executed (record Appendix H).** Coverage/quality gate
 > `swing_bot/coverage_gate.py` (coverage vs listed-tickers + sanity scan);
@@ -59,8 +60,8 @@ lives in the record.
 | Doc/memory system | — | **Done** | Bootstrapped 2026-07-08 |
 | PRD_ROADMAP.md | — | **Done** | Written 2026-07-08 to council program + Evan's overlay decision |
 | Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **Done** | All 5 tasks; modules prices/universe/coverage_gate/signals/test_frozen; `swing.db` 89,666 rows |
-| Pre-registration & fill ablation | M1 | **In progress** | M1.6 power + M1.7 prereg (`8963e49`) done; next M1.8 fill-timing ablation |
-| E1 IBS backtest | M2 | **Not started** | Gated behind M1 |
+| Pre-registration & fill ablation | M1 | **Done** | M1.6 power (`2a9edde`) + M1.7 prereg (`8963e49`) + M1.8 ablation; next-open keeps ~64% |
+| E1 IBS backtest | M2 | **In progress** | Next: M2.9 build `swing_bot/backtest.py` (first engine, after prereg) → M2.10 run vs kill criteria |
 | Live paper: control + LLM-veto sleeves | M3 | **GATED** | Needs M2 PASS + Evan go; Alpaca account BLOCKED-ON-EVAN |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
 | Expansion (deferred ideas) | M5 | **GATED** | On M3 stable |
