@@ -58,6 +58,7 @@ the dated entry, not the digest.
 - [S — M2b.1: frozen LEVERAGED universe (5 ETFs) + backfill](#appendix-s---m2b1-frozen-leveraged-universe-5-etfs--backfill-2026-07-09) (07-09)
 - [T — M2b.2-3: E2 prereg (865c09e) + run = FAIL; IBS family SHELVED](#appendix-t---m2b2-3-e2-prereg-865c09e--run--fail-ibs-family-shelved-2026-07-09) (07-09)
 - [U — M2b.4: E2 refs pinned; M2b complete; STOP at gate](#appendix-u---m2b4-e2-refs-pinned-m2b-complete-stop-at-gate-2026-07-09) (07-09)
+- [V — Experiment catalog v2 (data-grounded, 20 items) + %/mo verdicts](#appendix-v---experiment-catalog-v2-data-grounded-20-items--mo-verdicts-2026-07-09) (07-09)
 
 ---
 
@@ -1014,3 +1015,41 @@ quote infrastructure; the one variant the c2c numbers directly motivate);
 (3) pause and write up the E1/E1b/E2 arc as the project's first deliverable.
 
 **Next action:** NONE autonomous — Evan chooses.
+
+---
+
+# Appendix V - Experiment catalog v2 (data-grounded, 20 items) + %/mo verdicts (2026-07-09, ~15:40 local)
+
+**WHAT:** Evan asked for (a) as many experiments as possible planned from
+the measured data and (b) %/month figures on the verdicts. Wrote
+`docs/research/2026-07-09_experiment_catalog_v2.md` — 20 items in 4
+families, each with a MEASURED / LITERATURE / TBD prior (nothing invented).
+
+**Verdicts in %/mo (net, primary configs):** E1 +0.19%/mo FAIL · E1b
+holdout +0.32%/mo FAIL(near-miss) · E2 holdout +0.64%/mo FAIL · E2 c2c
+non-executable reference +1.40%/mo (would have passed). The 0.76%/mo gap
+between executable and c2c IS the overnight component — the prize.
+
+**Catalog structure:** Family A = IBS execution variants targeting the
+overnight component (A1 MOC-execution, A2 near-close market orders, A3
+overnight-only harvest, A4 minute-bar near-close backtest) — ALL marked
+STOP-OVERRIDE REQUIRED (IBS family shelved; a "go" on an A-item = Evan's
+dated override, to be recorded as such). Family B = new families,
+stop-clear (B1 gap-down reversion executed AT the open — dodges the
+overnight mechanism by construction; B2 gap-up continuation; B3
+momentum-burst on leveraged; B4 vol-regime leverage rotation, literature
+~1.2–1.5%/mo class single-source; B5 vol-filtered B4; B6 52wk-high
+breakout; B7 = E3 mega-cap momentum per M2c; B8 stock gap reversion
+(stop-adjacent, flagged); B9 PEAD blocked-on-data; B10 QQQ/SPY tilt).
+Family C = engineering prereqs (C1 NAV-proportional engine v2 — fixes the
+measured fixed-sizing gotcha; C2 near-close infra spike; C3 overlay
+unchanged; C4 divergence logger). Family D = data unlocks (D1 IEX minute
+bars 2016+; D2 earnings calendar).
+
+**Recommended sequence:** C1 → {A3 (if override) + B1 + B4 one-sitting
+screens} → prereg the best survivor → infra per evidence. Screens are
+labeled hypothesis-GENERATING; the chosen candidate still gets its own
+prereg with return-centric gates before its runner.
+
+**Next action:** Evan picks from the catalog (any A-item = dated stop
+override).
