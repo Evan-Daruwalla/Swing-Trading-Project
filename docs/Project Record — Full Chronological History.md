@@ -45,6 +45,7 @@ the dated entry, not the digest.
 - [F — M0.2: price_cache lacks OHLC → own fetcher (swing_bot/prices.py)](#appendix-f---m02-price_cache-lacks-ohlc--own-fetcher-swing_botpricespy-2026-07-08) (07-08)
 - [G — M0.3: frozen 29-ETF universe + full backfill](#appendix-g---m03-frozen-29-etf-universe--full-backfill-2026-07-08) (07-08)
 - [H — M0.4: coverage+quality gate; found XLRE zero-range bars](#appendix-h---m04-coveragequality-gate-found-xlre-zero-range-bars-2026-07-08) (07-08)
+- [I — M0.5: frozen-regression harness; M0 complete](#appendix-i---m05-frozen-regression-harness-m0-complete-2026-07-09) (07-09)
 
 ---
 
@@ -478,3 +479,58 @@ was Appendix E at #6). No miss.
 **Next action:** M0.5 — frozen-regression harness
 (`swing_bot/test_frozen.py`, own `__main__`, ±0.0000pp comparison,
 placeholder fixtures until real refs are pinned in M2).
+
+---
+
+# Appendix I - M0.5: frozen-regression harness; M0 complete (2026-07-09, ~00:20 local)
+
+**WHAT:** Ran PRD task M0.5, completing milestone M0 (Foundations). Wrote
+`swing_bot/test_frozen.py` (frozen-regression tripwire, Trading's pattern:
+reference table, exact-drift comparison, loud failure, own `__main__` exit
+code) plus `swing_bot/signals.py` (the `ibs()` primitive).
+
+**Judgment call (flagged to Evan):** added `signals.ibs(high, low, close)`
+now rather than in M2, so the frozen harness pins a REAL deterministic
+function instead of a self-referential toy. Kept strictly to the primitive
+(zero-range/inverted guard → returns None; the M0.4 gotcha baked in at the
+primitive level). No thresholds/entry/exit — E1 strategy logic remains M2.
+
+**DONE-CHECK (real output):**
+- `python -m swing_bot.test_frozen` → all cases PASS, "FROZEN TESTS: GREEN
+  (all d=0)", exit 0.
+- Teeth test (not committed): injected a 0.0001 drift → harness prints
+  "FAIL <<<" / "RED - DRIFT DETECTED", returns exit 1. The tripwire is not
+  vacuously green.
+
+**Placeholder fixtures:** 3 numeric IBS cases on synthetic bars (0.5/0.75/
+0.1, exact) + 2 invariants (zero-range→None, inverted→None). Per M2 task 11
+these get REPLACED by real E1 backtest refs (tpnl% unit 'pp' dp 4,
+closed_count unit '' dp 0) on two pinned windows. Harness is generic
+(`Case(name,value,ref,unit,dp)`), so M2 just extends `REFERENCES`.
+
+**Minor:** the RED banner originally used an em-dash that rendered as
+mojibake under the Windows console codepage — switched to ASCII hyphen
+(project ASCII-safety posture).
+
+### Point-in-time snapshot — M0 (Foundations) COMPLETE (2026-07-09)
+
+| Task | Deliverable | Status |
+|---|---|---|
+| M0.1 | skeleton, venv, git (`4ac785c`), pinned deps (`3ba9cc1`) | Done |
+| M0.2 | own OHLCV fetcher `swing_bot/prices.py` → `swing.db` (`11d2116`) | Done |
+| M0.3 | frozen 29-ETF `swing_bot/universe.py` + backfill 89,666 rows (`54f3876`) | Done |
+| M0.4 | coverage/quality gate `swing_bot/coverage_gate.py` (`731ff43`) | Done |
+| M0.5 | frozen harness `swing_bot/test_frozen.py` + `signals.py` | Done (this entry) |
+
+Code modules: prices, universe, coverage_gate, signals, test_frozen.
+Data: `swing.db` 89,666 OHLCV rows, 29 ETFs, clean except XLRE's 19
+early zero-range bars (guarded).
+
+**HONEST OPEN ITEM (not fixed):** frozen refs are placeholders (real ones
+need E1, M2). `signals.py` has only `ibs()`; the E1 entry/exit rules and the
+zero-range SKIP behavior at the strategy level are still M2.
+
+**Next action: M1 — Pre-registration & ablation.** First task M1.6 (power
+calc: IBS<0.20 signals/year per ticker, NO post-signal return peeking),
+which gates the pre-registration doc M1.7 (must be committed before any
+backtest-engine code — the project's core rigor claim).
