@@ -63,6 +63,7 @@ the dated entry, not the digest.
 - [X — C1: engine v2 (NAV-proportional, cash-capped) verified](#appendix-x---c1-engine-v2-nav-proportional-cash-capped-verified-2026-07-09) (07-09)
 - [Y — Screens: A3 dead, B1 dead, B4 rotation +2.15%/mo holdout standout](#appendix-y---screens-a3-dead-b1-dead-b4-rotation-215mo-holdout-standout-2026-07-09) (07-09)
 - [Z — Findings write-up (E1→B4 arc) produced; session close](#appendix-z---findings-write-up-e1b4-arc-produced-session-close-2026-07-09) (07-09)
+- [AA — E4 leverage rotation: pre-reg (313d88a), engine, VERDICT = PASS; STOP at live gate](#appendix-aa---e4-leverage-rotation-pre-reg-313d88a-engine-verdict--pass-stop-at-live-gate-2026-07-09) (07-09)
 
 ---
 
@@ -1173,3 +1174,49 @@ SHELVED (A3 override spent).
 
 **Next action:** none autonomous. Resume by pre-registering E4 (or a new
 direction).
+
+---
+
+# Appendix AA - E4 leverage rotation: pre-reg (313d88a), engine, VERDICT = PASS; STOP at live gate (2026-07-09, ~16:30 local)
+
+**WHAT:** Ran the full E4 chain (PRD M2d) to the live-paper gate. E4 =
+200-day-MA leverage rotation, hold TQQQ while QQQ closes above its 200-day
+SMA else cash, K=1.
+- **E4 prereg `313d88a`** (doc-only, before the runner): honestly disclosed
+  the primary cell is contaminated by the B4 screen, so gates target the
+  UNSEEN — fragility across an MA/lag/cost grid, and benchmark-relative
+  value (must cut buy-hold-TQQQ maxDD by >=15pp and beat buy-hold-QQQ CAGR).
+- **`swing_bot/rotation.py`** (engine, after prereg) — hand-checked on a toy
+  (both exec lags exact: lag0 NAV 590.909091, lag1 583.333333). Fixed a lag
+  off-by-one before testing (exec at j+1+lag). `scripts/run_e4_rotation.py`
+  runs the battery + benchmarks + gates.
+- **`backtest.metrics` generalized** to tolerate NAV-only strategies
+  (rotation switches lack IBS `net_ret`/`hold_days`) via presence checks —
+  pinned fields (total_ret/n_trades) unchanged, frozen refs stayed green.
+
+**VERDICT: E4 PASS (all 5 gates).** Primary QQQ->TQQQ N=200 lag0 5bps, full
+window: CAGR 33.76% (+2.45%/mo), maxDD 57.7%, Sharpe 0.86, 51 switches.
+Gates: CAGR>=15 PASS; maxDD<=65 PASS; cuts BH-TQQQ DD 81.8->57.7 (-24pp)
+PASS; CAGR 33.8 >= BH-QQQ 18.3 PASS; grid 100% cells positive, median 32.5%,
+no cliff PASS. Frozen refs: E4 rotation window (2015-16: tpnl -24.174806% /
+16 switches) pinned; 12 refs now green d=+/-0.0000pp.
+
+**HONEST FRAMING (recorded, not buried):** (1) rotation does NOT beat
+buy-hold TQQQ on return (33.8 vs 38.4% CAGR) — its value is DRAWDOWN
+reduction (82->58%), i.e. risk-managed leverage, not return enhancement;
+(2) regime-flattered — 3x Nasdaq over the best tech decade; forward returns
+almost certainly lower, treat +2.45%/mo as a ceiling not a forecast;
+(3) primary cell contaminated (battery/benchmark are the new passing
+evidence); (4) ~4 switches/yr => live-paper validation takes YEARS;
+(5) 57.7% DD is real ($500 -> ~$210 at trough). Full detail:
+`docs/research/2026-07-09_E4_rotation_results.md`.
+
+**STOP — M3 live gate (BLOCKED-ON-EVAN).** E4 passed the backtest gate;
+per prereg §5 this authorizes consideration for LIVE PAPER only, requiring
+Evan's explicit go + an Alpaca paper account. No live money. This is the
+next-stoppage-point requested.
+
+**Next action:** Evan decides — (a) deploy E4 to live paper (needs Alpaca
+account + go); (b) pre-register a harder E4 robustness test (other
+eras/markets) to fight the regime-flattery concern before committing paper;
+(c) new direction.

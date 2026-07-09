@@ -22,7 +22,7 @@ REFERENCES.
 import sqlite3
 from collections import namedtuple
 
-from swing_bot import prices, signals, backtest
+from swing_bot import prices, signals, backtest, rotation
 
 Case = namedtuple("Case", ["name", "value", "ref", "unit", "dp"])
 
@@ -58,6 +58,12 @@ _e2w2_tpnl, _e2w2_n = _window("2020-01-01", "2020-06-30",
 # Engine v2 (C1 2026-07-09): NAV-proportional cash-capped sizing path
 _v2w1_tpnl, _v2w1_n = _window("2019-01-01", "2019-06-30", size_on_nav=True)
 
+# E4 rotation engine (2026-07-09): QQQ->TQQQ N=200 lag0 5bps, fixed window
+_e4 = backtest.metrics(rotation.run_rotation(
+    prices.connect(), "TQQQ", "QQQ", ma_len=200, exec_lag=0, cost_bps=5.0,
+    start="2015-01-01", end="2016-12-31"))
+_e4_tpnl, _e4_n = _e4["total_ret"] * 100, _e4["n_trades"]
+
 # --- REAL E1 references (M2.11), pinned 2026-07-09 -----------------------
 # E1 = full 29-ETF universe, next-open, 5bps/side. These are the deterministic
 # engine outputs; E1 FAILED its kill criteria (record Appendix O) but the
@@ -73,6 +79,8 @@ REFERENCES = [
     Case("E2_2020H1_closed", _e2w2_n,    56,        "",   0),
     Case("E1v2_2019H1_tpnl",   _v2w1_tpnl, 9.016509, "pp", 4),
     Case("E1v2_2019H1_closed", _v2w1_n,    134,      "",   0),
+    Case("E4rot_1516_tpnl",   _e4_tpnl, -24.174806, "pp", 4),
+    Case("E4rot_1516_switch", _e4_n,     16,        "",   0),
 ]
 
 # --- Invariants (non-numeric asserts) -----------------------------------

@@ -148,7 +148,10 @@ def metrics(result):
     trades = result["trades"]
     nav = [v for _, v in result["nav"]]
     n = len(trades)
-    mean_net = sum(t["net_ret"] for t in trades) / n if n else float("nan")
+    # net_ret/hold_days are IBS-trade fields; absent for NAV-only strategies
+    # (e.g. rotation switches) — degrade to nan rather than KeyError.
+    _nets = [t["net_ret"] for t in trades if "net_ret" in t]
+    mean_net = sum(_nets) / len(_nets) if _nets else float("nan")
     # daily NAV returns -> annualized Sharpe
     rets = [nav[i] / nav[i - 1] - 1 for i in range(1, len(nav)) if nav[i - 1]]
     if len(rets) > 1:
@@ -166,6 +169,7 @@ def metrics(result):
     total_ret = nav[-1] / nav[0] - 1 if nav else float("nan")
     yrs = len(nav) / 252.0
     cagr = (nav[-1] / nav[0]) ** (1 / yrs) - 1 if nav and yrs > 0 else float("nan")
+    _holds = [t["hold_days"] for t in trades if "hold_days" in t]
     return dict(n_trades=n, mean_net_ret=mean_net, ann_sharpe=sharpe,
                 max_dd=mdd, total_ret=total_ret, cagr=cagr,
-                mean_hold=sum(t["hold_days"] for t in trades) / n if n else float("nan"))
+                mean_hold=sum(_holds) / len(_holds) if _holds else float("nan"))

@@ -12,18 +12,22 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — arc written up; B4 leverage rotation is the open lead (session closed)
+## Current state — E4 rotation PASSED its pre-reg gate; STOPPED at live gate (BLOCKED-ON-EVAN)
 
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-09 — Findings write-up produced; SESSION CLOSED (Appendix Z).**
-> `docs/findings_2026-07-09_experiment_arc.md` synthesizes the full E1->B4
-> arc (method, per-experiment %/mo verdicts, the overnight-execution
-> through-line, honest limitations, the process-as-deliverable meta-point).
-> Nothing live. Open thread: **E4 = TQQQ/QQQ 200d-MA rotation** (+2.15%/mo
-> OOS lead) needs its own prereg + robustness battery + live paper before it
-> is a real result. IBS family SHELVED (A3 override spent).
+> **2026-07-09 — E4 = PASS (record Appendix AA).** 200d-MA leverage rotation
+> (TQQQ while QQQ>200d SMA else cash, K=1). Pre-reg `313d88a` (doc-only,
+> gates target the un-peeked: fragility grid + benchmark value). Primary
+> QQQ->TQQQ N=200 lag0 5bps full window: CAGR 33.76% (+2.45%/mo), maxDD
+> 57.7%, Sharpe 0.86. **All 5 gates PASS** — FIRST strategy to clear a
+> pre-registered bar. Robustness battery: 20/20 cells positive, median 32.5%
+> CAGR, no cliff. **Honest caveats: does NOT beat buy-hold TQQQ on return
+> (33.8 vs 38.4%) — value is DD reduction 82->58%; regime-flattered (3x
+> Nasdaq/best tech decade); ~4 switches/yr so live validation takes years;
+> 57.7% DD real.** 12 frozen refs green. **STOPPED at M3 live gate: needs
+> Evan go + Alpaca account. No live money.**
 
 > **2026-07-09 — C1 + three screens (record Appendices W–Y).** Engine v2
 > (`size_on_nav=True`: NAV-proportional, cash-capped; v1 refs intact; 10
@@ -104,7 +108,8 @@ lives in the record.
 | E1 IBS backtest | M2 | **Done — E1 FAILED** | Engine (`415c527`), verdict (`d28f899`), frozen refs pinned. E1b OOS near-miss (Sharpe 0.4961, `1a71468`). M2.12 survivorship deferred |
 | E2 leveraged-ETF IBS (high-return arm) | M2b | **Done — E2 FAILED** | Prereg `865c09e`; CAGR 7.98%/maxDD 60.6% vs 15%/60% gates; refs pinned; **IBS family SHELVED (pre-committed stop)** |
 | E3 concentrated stocks | M2c | **Stub** | Different signal family; own prereg; survivorship caveat mandatory |
-| E4 leverage rotation (B4 lead) | M2d | **Screened — needs prereg** | TQQQ/QQQ 200d-MA, +2.15%/mo OOS (contaminated); prereg + robustness battery + live paper next |
+| E4 leverage rotation | M2d | **Backtest PASS** | Pre-reg `313d88a`; CAGR 33.76%/maxDD 57.7%, all 5 gates + 20/20 battery. Caveat: DD-reduction not return-beating; regime-flattered. At M3 live gate (Evan) |
+| Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — Evan go + Alpaca acct** | E4 is the first candidate eligible for this gate |
 | Findings write-up | — | **Done** | `docs/findings_2026-07-09_experiment_arc.md` (E1→B4 synthesis deliverable) |
 | Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — gate not open** | E1 did NOT pass M2→M3; needs a new pre-registered strategy that passes + Evan go + Alpaca account |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
