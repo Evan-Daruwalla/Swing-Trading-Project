@@ -10,19 +10,22 @@ portfolio asset. Reuse Trading's infrastructure selectively (backtest harness,
 paper-trading DB pattern, Alpaca PAPER mirror) — not its factor logic, which
 is long-horizon.
 
-## Current state — M0 COMPLETE; M1 next
+## Current state — E1 tested → FAIL; at M2.13 decision gate
 
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-09 — M1 COMPLETE (record Appendices K-M).** Power calc: E1
-> powerable. **E1 PRE-REGISTRATION `8963e49` (doc-only, before any engine).**
-> Fill ablation: next-open keeps ~64% of the c2c edge (+7.5 bps/signal
-> gross), but that is THIN vs the 10bps round-trip cost — E1 survival hinges
-> on the multi-day hold beating 1-day. Country ETFs weak executable; broad/
-> tech strong. **Next: M2 — build `swing_bot/backtest.py` (M2.9, first engine
-> code, legitimately after `8963e49`) then run vs kill criteria (M2.10).**
-> Params FROZEN — no tuning to results; a FAIL is a valid result → stop.
+> **2026-07-09 — E1 BACKTESTED, VERDICT = FAIL (record Appendices N-P).**
+> E1 (full 29-ETF IBS mean reversion) run per frozen pre-reg `8963e49`.
+> Primary (next-open, 10bps round-trip): n=3559, exp +4.7bps (PASS),
+> **Sharpe 0.23 (FAIL vs 0.50), maxDD 36% (FAIL vs 25%)** → **E1 FAIL, no
+> tuning.** Cause: cost-fragile (gross Sharpe 0.56 → net negative at 20bps);
+> country ETFs net-negative drag; 2022-26 decayed to Sharpe 0.01. broad_us
+> ALONE passes all four (Sharpe 0.60) — but that is a NEW hypothesis needing
+> its own pre-registration (E1b), NOT a post-hoc E1 rebrand. Frozen refs
+> pinned (test green, d=0.0000pp). **STOPPED at the M2->M3 gate: E1 did not
+> pass, no live trading. Awaiting Evan's direction — see the 4 options in
+> record Appendix P / below.**
 
 > **2026-07-09 — M0.4 executed (record Appendix H).** Coverage/quality gate
 > `swing_bot/coverage_gate.py` (coverage vs listed-tickers + sanity scan);
@@ -61,8 +64,8 @@ lives in the record.
 | PRD_ROADMAP.md | — | **Done** | Written 2026-07-08 to council program + Evan's overlay decision |
 | Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **Done** | All 5 tasks; modules prices/universe/coverage_gate/signals/test_frozen; `swing.db` 89,666 rows |
 | Pre-registration & fill ablation | M1 | **Done** | M1.6 power (`2a9edde`) + M1.7 prereg (`8963e49`) + M1.8 ablation; next-open keeps ~64% |
-| E1 IBS backtest | M2 | **In progress** | Next: M2.9 build `swing_bot/backtest.py` (first engine, after prereg) → M2.10 run vs kill criteria |
-| Live paper: control + LLM-veto sleeves | M3 | **GATED** | Needs M2 PASS + Evan go; Alpaca account BLOCKED-ON-EVAN |
+| E1 IBS backtest | M2 | **Done — E1 FAILED** | Engine (`415c527`), verdict (`d28f899`), frozen refs pinned. M2.12 survivorship deferred (moot for failed ETF-only E1) |
+| Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — gate not open** | E1 did NOT pass M2→M3; needs a new pre-registered strategy that passes + Evan go + Alpaca account |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
 | Expansion (deferred ideas) | M5 | **GATED** | On M3 stable |
 
@@ -124,12 +127,22 @@ Full descriptions as Evan gave them: record Phase 0.
 
 ## Open decisions (BLOCKED-ON-EVAN)
 
-- **Capital range**: Evan's 2026-07-08 brief says $100–1,000; his pasted
-  infrastructure-inventory header says $100–10,000. Assuming $100–1,000
-  (live instruction wins); sizing code parameterizes capital regardless.
-- **Alpaca PAPER account** (PRD M3.15): ~3 paper accounts per login, some
-  already used by Trading sleeves — which account this project gets.
-- **M2→M3 gate** (PRD M2.13): live paper starts only on E1 PASS + Evan go.
+- **POST-E1 DIRECTION (the live one, 2026-07-09):** E1 FAILED its
+  pre-registered criteria. Pick the next move (each needs a NEW dated
+  pre-registration — no post-hoc rebrand, no live trading until something
+  passes):
+  1. Pre-register **E1b** on broad_us (± sectors) with an out-of-sample
+     holdout (strongest lead; 2022-26 decay is the risk).
+  2. Pre-register a **lower-cost / higher-conviction** variant (edge is real
+     gross but cost-fragile).
+  3. Pre-register the **leveraged-ETF E2** (higher variance, same cost risk).
+  4. Shelve mean reversion; move to a deferred idea / new family.
+- **Capital range**: brief says $100–1,000; inventory header said $100–10,000.
+  Assuming $100–1,000; sizing is parameterized regardless.
+- **Alpaca PAPER account** (PRD M3.15): which of ~3 paper accounts — only
+  relevant once a strategy passes and live is authorized.
+- **M2.12 survivorship bound**: deferred as moot for failed ETF-only E1; run
+  only if a stock strategy enters scope.
 
 ## Documentation
 - `docs/Project Record — Full Chronological History.md` — append-only

@@ -52,6 +52,7 @@ the dated entry, not the digest.
 - [M — M1.8: fill-timing ablation; M1 complete](#appendix-m---m18-fill-timing-ablation-m1-complete-2026-07-09) (07-09)
 - [N — M2.9: backtest engine (hand-checked P&L exact)](#appendix-n---m29-backtest-engine-hand-checked-pl-exact-2026-07-09) (07-09)
 - [O — M2.10: E1 backtest VERDICT = FAIL (honest, no tuning)](#appendix-o---m210-e1-backtest-verdict--fail-honest-no-tuning-2026-07-09) (07-09)
+- [P — M2.11: real E1 frozen refs pinned; STOP at M2.13 gate](#appendix-p---m211-real-e1-frozen-refs-pinned-stop-at-m213-gate-2026-07-09) (07-09)
 
 ---
 
@@ -763,3 +764,57 @@ it makes this FAIL tamper-evident and tripwires the engine for any E1b.
 **Next action:** M2.11 — pin real E1 backtest refs into
 `swing_bot/test_frozen.py` (two short windows, exact tpnl%/closed_count),
 replacing the M0.5 placeholders. Then STOP at the M2.13 gate and report.
+
+---
+
+# Appendix P - M2.11: real E1 frozen refs pinned; STOP at M2.13 gate (2026-07-09, ~02:30 local)
+
+**WHAT:** M2.11 — replaced the M0.5 placeholder frozen refs in
+`swing_bot/test_frozen.py` with REAL E1 engine outputs on two fixed windows
+(full universe, next-open, 5bps): W1 2019-H1 tpnl 8.815909% / 134 closed;
+W2 2020-H1 tpnl 6.209800% / 162 closed. Kept the `ibs()` invariant guards.
+
+**DONE-CHECK:** `python -m swing_bot.test_frozen` → GREEN, all four E1 cases
+d=+0.0000pp (Evan's exact standard), invariants PASS, exit 0. The engine and
+the FAILED result are now tamper-evident: any unrelated code change that
+alters E1's output trips the tripwire. (Known property documented in the
+test: a RED after a swing.db re-backfill with unchanged code = upstream
+yfinance data drift, not a code bug.)
+
+**STOP — M2.13 GATE (BLOCKED-ON-EVAN).** E1 FAILED (Appendix O), so per the
+pre-reg and PRD M2.13 the M2->M3 live gate does NOT open: no live paper, no
+Alpaca account work. Execution of the autonomous PRD run halts here and
+awaits Evan's direction.
+
+**M2.12 (survivorship bound) DEFERRED — reported, not silently skipped:** it
+compares always-listed mega-cap STOCKS vs the ETF universe to bound
+survivorship bias. E1 is ETF-only (our 29 ETFs are all still-listed →
+survivorship-immune for this test) and E1 already FAILED, so running a stock
+basket now is low-value busywork on a dead strategy and would require
+fetching names outside the frozen universe. Recommend running it only if/when
+a stock strategy enters scope. Evan's call.
+
+### Point-in-time snapshot — M2 status (2026-07-09)
+
+| Task | Status |
+|---|---|
+| M2.9 engine (`415c527`) | Done, hand-checked |
+| M2.10 run vs kill criteria (`d28f899`) | Done — **E1 FAIL** |
+| M2.11 pin frozen refs | Done — green d=0.0000pp |
+| M2.12 survivorship bound | Deferred (moot for failed ETF-only E1) |
+| M2.13 M2->M3 gate | **STOP — E1 did not pass; awaiting Evan** |
+
+**DECISION FOR EVAN (candidate next directions):**
+1. Pre-register **E1b** on broad_us (± sectors) with a real out-of-sample
+   holdout — the data's strongest lead, but 2022-2026 decay is a warning.
+2. Pre-register a **lower-cost / different-signal** variant (the edge is
+   real gross but cost-fragile — e.g. fewer, higher-conviction entries).
+3. Pre-register the **leveraged-ETF E2** idea (Appendix J) — higher variance,
+   same cost-fragility risk.
+4. Shelve mean reversion; move to a deferred idea / different strategy family.
+No option proceeds without a NEW dated pre-registration — E1's FAIL does not
+authorize live trading or a post-hoc universe rebrand.
+
+**Next action:** NONE autonomous — Evan chooses a direction. The doc system,
+data layer, engine, and tripwire (M0-M2 infra) are all reusable for whatever
+comes next.

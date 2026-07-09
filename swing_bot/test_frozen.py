@@ -9,25 +9,51 @@ regressions from "obviously unrelated" changes.
 Runs via its OWN __main__ (no pytest needed):
     .venv\\Scripts\\python.exe -m swing_bot.test_frozen
 
-M0.5 STATUS: the numeric cases below are PLACEHOLDER fixtures that prove the
-comparison machinery (reference table, drift calc, loud failure, exit code).
-They pin the deterministic `signals.ibs` primitive on synthetic bars. In M2
-(task 11) these are REPLACED by real E1 backtest references — tpnl% (unit
-'pp', dp 4) and closed_count (unit '', dp 0) on two pinned windows. Do not
-delete this harness; extend REFERENCES.
+M2.11 STATUS: real E1 references pinned. The numeric cases run the E1 engine
+(frozen pre-reg `8963e49`: next-open, 5bps/side) on two fixed windows of the
+backfilled `swing.db` and pin total-return% (unit 'pp', dp 4) and closed-
+trade count (unit '', dp 0). If this test goes RED after a code change with
+no data change, a regression was introduced. NOTE: it depends on the frozen
+`swing.db` backfill (M0.3 universe, 2014-01-01 start) — a RED after a
+re-backfill with unchanged code means upstream yfinance DATA drift, not a
+code bug; investigate the data. Do not delete this harness; extend
+REFERENCES.
 """
+import sqlite3
 from collections import namedtuple
 
-from swing_bot import signals
+from swing_bot import prices, signals, backtest
 
 Case = namedtuple("Case", ["name", "value", "ref", "unit", "dp"])
 
-# --- PLACEHOLDER numeric references (M0.5) -------------------------------
-# Synthetic bars: ibs() is exact rational arithmetic, so drift is exactly 0.
+
+def _window(start, end):
+    """Run E1 (next-open, 5bps) on a fixed swing.db window; return
+    (total_return_pct, closed_count)."""
+    src = prices.connect()
+    mem = sqlite3.connect(":memory:")
+    mem.execute(prices.SCHEMA)
+    rows = src.execute(
+        "SELECT ticker,date,open,high,low,close,adj_close,volume FROM bars "
+        "WHERE date>=? AND date<=?", (start, end)).fetchall()
+    mem.executemany("INSERT INTO bars VALUES (?,?,?,?,?,?,?,?)", rows)
+    mem.commit()
+    m = backtest.metrics(backtest.run_backtest(mem, fill="next_open",
+                                               cost_bps=5.0))
+    return m["total_ret"] * 100, m["n_trades"]
+
+_w1_tpnl, _w1_n = _window("2019-01-01", "2019-06-30")
+_w2_tpnl, _w2_n = _window("2020-01-01", "2020-06-30")
+
+# --- REAL E1 references (M2.11), pinned 2026-07-09 -----------------------
+# E1 = full 29-ETF universe, next-open, 5bps/side. These are the deterministic
+# engine outputs; E1 FAILED its kill criteria (record Appendix O) but the
+# tripwire pins the engine so the result stays tamper-evident.
 REFERENCES = [
-    Case("ibs_mid",  signals.ibs(10.0, 8.0, 9.0),  0.5,  "", 6),
-    Case("ibs_high", signals.ibs(10.0, 8.0, 9.5),  0.75, "", 6),
-    Case("ibs_low",  signals.ibs(10.0, 8.0, 8.2),  0.1,  "", 6),
+    Case("E1_2019H1_tpnl",   _w1_tpnl, 8.815909, "pp", 4),
+    Case("E1_2019H1_closed", _w1_n,    134,      "",   0),
+    Case("E1_2020H1_tpnl",   _w2_tpnl, 6.209800, "pp", 4),
+    Case("E1_2020H1_closed", _w2_n,    162,      "",   0),
 ]
 
 # --- Invariants (non-numeric asserts) -----------------------------------
