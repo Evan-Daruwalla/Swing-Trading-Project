@@ -55,6 +55,7 @@ the dated entry, not the digest.
 - [P — M2.11: real E1 frozen refs pinned; STOP at M2.13 gate](#appendix-p---m211-real-e1-frozen-refs-pinned-stop-at-m213-gate-2026-07-09) (07-09)
 - [Q — E1b: broad_us OOS test = FAIL (near-miss, Sharpe 0.496)](#appendix-q---e1b-broad_us-oos-test--fail-near-miss-sharpe-0496-2026-07-09) (07-09)
 - [R — GOAL REDEFINED by Evan: high-return concentrated swing, risk accepted](#appendix-r---goal-redefined-by-evan-high-return-concentrated-swing-risk-accepted-2026-07-09) (07-09)
+- [S — M2b.1: frozen LEVERAGED universe (5 ETFs) + backfill](#appendix-s---m2b1-frozen-leveraged-universe-5-etfs--backfill-2026-07-09) (07-09)
 
 ---
 
@@ -909,3 +910,34 @@ was Appendix K at #12-adjacent). No miss.
 **Next action:** M2b.1 — extend the universe with a frozen "leveraged" group
 (empirical first-bar probe, backfill), then M2b.2 pre-register E2 (doc-only
 commit before runner), M2b.3 run vs gates, M2b.4 pin refs, STOP at gate.
+
+---
+
+# Appendix S - M2b.1: frozen LEVERAGED universe (5 ETFs) + backfill (2026-07-09, ~14:45 local)
+
+**WHAT:** PRD task M2b.1. Probed candidates empirically, added a frozen
+`LEVERAGED` list to `swing_bot/universe.py` (TQQQ 2010-02-11, UPRO
+2009-06-25, SPXL 2008-11-05, SOXL 2010-03-11, TNA 2008-11-19 — first bars
+fetched, not invented; liquidity $0.4B–$10.9B/day median). Backfilled all 5
+into `swing.db`: 5 × 3,146 rows, 2014-01-02..2026-07-08.
+
+**Design decision:** `LEVERAGED` is a SEPARATE list, deliberately NOT
+appended to the frozen 29-ticker `UNIVERSE` — the E1 frozen-regression refs
+pin full-UNIVERSE output, so growing UNIVERSE would flip the tripwire RED
+and break E1's reproducibility. E2 runs on LEVERAGED explicitly.
+
+**Data hygiene:** market open during this session (2026-07-09) — backfill
+end-cut at 2026-07-08 (yfinance `end` exclusive) so no live partial bar
+entered the DB; leveraged rows align exactly with the 29-ETF backfill.
+
+**VERIFICATION (real output):** coverage gate exit 0, "coverage as-of
+2026-07-08: OK" (a first-look gate_exit=-1 was diagnosed as a PowerShell
+Select-Object broken-pipe artifact, re-run cleanly → 0). Frozen tests GREEN
+(E1 refs untouched). Sanity scan on LEVERAGED: 4 `extreme_ret` flags, ALL
+verified-real 3x moves, not corruption (2020-03-16 COVID crash: SOXL -38.6%,
+TNA -37.1%; 2025-04-09 tariff-pause rally: SOXL +54.8%, TQQQ +35.2%). No
+zero-range bars (the IBS-killer defect) in the group. NOTE: the 35% extreme-
+ret heuristic is calibrated for 1x funds; on 3x funds these are genuine
+daily moves — and a preview of the accepted risk profile.
+
+**Next action:** M2b.2 — pre-register E2 (doc-only commit before runner).

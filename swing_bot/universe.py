@@ -95,6 +95,32 @@ UNIVERSE = [
 ]
 
 
+# --- E2 leveraged universe (FROZEN 2026-07-09, record Appendix S) ---------
+# DELIBERATELY a separate list, NOT appended to UNIVERSE: the E1 frozen-
+# regression refs pin full-UNIVERSE backtest output, so growing UNIVERSE
+# would silently flip the tripwire RED and break E1's reproducibility.
+# E2 (PRD M2b) runs on THIS list. 3x long wrappers of underlyings where the
+# IBS edge was validated OOS (E1b: broad US indices). data_start = first
+# yfinance bar, fetched empirically 2026-07-09 — not invented.
+LEVERAGED = [
+    ETF("TQQQ", "ProShares UltraPro QQQ (3x Nasdaq-100)", "leveraged",
+        "2010-02-11",
+        "3x wrapper of QQQ, strongest E1b/ablation underlying; $5.1B/day"),
+    ETF("UPRO", "ProShares UltraPro S&P 500 (3x)", "leveraged",
+        "2009-06-25",
+        "3x wrapper of SPY (core validated IBS instrument); $0.4B/day"),
+    ETF("SPXL", "Direxion Daily S&P 500 Bull 3X", "leveraged",
+        "2008-11-05",
+        "Second 3x S&P wrapper (Direxion); $0.5B/day"),
+    ETF("SOXL", "Direxion Daily Semiconductor Bull 3X", "leveraged",
+        "2010-03-11",
+        "3x semis — highest-vol liquid 3x fund; $10.9B/day"),
+    ETF("TNA", "Direxion Daily Small Cap Bull 3X", "leveraged",
+        "2008-11-19",
+        "3x wrapper of IWM-class small caps (E1b universe member); $0.4B/day"),
+]
+
+
 def tickers(group=None):
     """All tickers, or those in one group (broad_us / spdr_sector /
     country_intl)."""
