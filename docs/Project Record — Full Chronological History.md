@@ -46,6 +46,8 @@ the dated entry, not the digest.
 - [G — M0.3: frozen 29-ETF universe + full backfill](#appendix-g---m03-frozen-29-etf-universe--full-backfill-2026-07-08) (07-08)
 - [H — M0.4: coverage+quality gate; found XLRE zero-range bars](#appendix-h---m04-coveragequality-gate-found-xlre-zero-range-bars-2026-07-08) (07-08)
 - [I — M0.5: frozen-regression harness; M0 complete](#appendix-i---m05-frozen-regression-harness-m0-complete-2026-07-09) (07-09)
+- [J — Design Q&A: return prior + high-risk (leveraged-ETF) direction](#appendix-j---design-qa-return-prior--high-risk-leveraged-etf-direction-2026-07-09) (07-09)
+- [K — M1.6: power calc; E1 is powerable (19.6% signal rate)](#appendix-k---m16-power-calc-e1-is-powerable-196-signal-rate-2026-07-09) (07-09)
 
 ---
 
@@ -534,3 +536,77 @@ zero-range SKIP behavior at the strategy level are still M2.
 calc: IBS<0.20 signals/year per ticker, NO post-signal return peeking),
 which gates the pre-registration doc M1.7 (must be committed before any
 backtest-engine code — the project's core rigor claim).
+
+---
+
+# Appendix J - Design Q&A: return prior + high-risk (leveraged-ETF) direction (2026-07-09, ~00:35 local)
+
+No code this turn — two design questions from Evan, recorded for scope
+context (cadence prompt #12).
+
+**Q1 "what do returns look like now (estimate)?"** Declined to compute a
+return on our data: doing so would run the E1 backtest before the M1.7
+pre-registration commit, breaking Success Criterion #1 (git proves prereg
+predates engine code) — the core rigor claim. Gave the LITERATURE PRIOR only
+(not our data): Pagonidis IBS next-day +0.35% after IBS<0.2 vs -0.13% after
+IBS>0.8; de Groot reversal 30-50 bps/week net (large caps only); RSI2 SPY
+~9%/yr invested ~28% of time (single-source). Honest executable band after
+haircuts (next-open forfeits overnight component; spread; crowding/decay):
+"roughly flat after costs" to "low-double-digit %/yr" — wide because the
+load-bearing unknowns are exactly what M1.8/M2 measure.
+
+**Q2 "high-risk strategies that could earn more?"** Recommendation
+(discussion, NOT yet a committed scope change): the cleanest higher-variance
+extension is running the SAME IBS mean-reversion signal on a LEVERAGED-ETF
+universe (TQQQ/UPRO/SOXL/TNA/...) as a SEPARATE pre-registered arm ("E2"),
+after E1's machinery is proven — same code, same harness, A/B-able vs E1,
+studied edge (leveraged ETFs overshoot intraday and revert). Honest risk
+flags: leverage/volatility decay in chop, 3x drawdowns amplified by MR's
+falling-knife tendency, overnight gap risk amplified under next-open fills.
+Rejected/deprioritized higher-risk options: concentration (variance knob,
+no new edge), high-vol single stocks/small caps (reintroduces survivorship
+bias + blow-up risk, weaker MR edge), options (new data + theta + spreads,
+scope explosion), crypto (thin MR evidence, scope explosion). Meta-point
+stated to Evan: at $100-1,000 the dollar delta between 10% and 30%/yr is
+~$50 vs ~$150 — and higher variance makes results LESS statistically
+distinguishable at n~20-40 trades, which HURTS the portfolio artifact whose
+value is a clean controlled experiment.
+
+**DECISION STATUS:** no scope change committed. Leveraged-ETF "E2" is a
+candidate for the M5 expansion list / a future parallel experiment, each
+with its own pre-registration; M1 order is unchanged. Awaiting Evan's call.
+
+---
+
+# Appendix K - M1.6: power calc; E1 is powerable (19.6% signal rate) (2026-07-09, ~00:50 local)
+
+**WHAT:** Ran PRD task M1.6 (power calc, NO return peeking). Wrote
+`docs/research/2026-07-09_E1_power.md`. Evan authorized running the full PRD
+chain this session, checking work + recording after each step, stopping at
+the M2.13 BLOCKED-ON-EVAN gate.
+
+**RESULT (signal counts only, from `swing.db`; no returns computed):**
+IBS<0.20 fires on 19.6% of valid bar-days (17,572 / 89,647). ~44-59
+signals/yr per ticker, strikingly uniform across broad/sector/country groups
+(the ~20% threshold mostly sets the count; the untested EDGE is what would
+differ). Universe ~1,431 signal-days/yr; 73% of trading days carry >=1
+signal; mean 7.6 simultaneous signals on a signal-day. E1 is therefore
+signal-ABUNDANT and CAPACITY-constrained (position slots, not signal supply,
+bound trade count).
+
+**Capacity/time-to-N (assumed hold H, real hold pinned in M1.7):** K=5,H=3 →
+~420 trades/yr → N=100 in ~2.9mo, N=200 in ~5.7mo, N=384 in ~11mo. Backtest
+(M2) gets thousands of trades over 12.5yr → not noise-limited.
+
+**VERDICT:** E1 is powerable — overwhelmingly for the backtest, and live
+paper reaches a meaningful N=100-200 in 3-6 months. Answers the council's
+"powerable before college apps?" concern. Implication logged for M1.7: a
+min-N kill criterion of 100-200 closed trades is reasonable AND reachable;
+the overlay/veto arm accrues N far slower and needs its own longer readout.
+
+**Integrity:** counts derived from IBS only; zero forward returns touched —
+pre-registration not contaminated.
+
+**Next action:** M1.7 — write + commit `docs/prereg_E1_ibs.md` (exact rules,
+kill criteria incl. min-N, both fill models, overlay pre-reg). MUST be
+committed BEFORE any backtest-engine code (Success Criterion #1).
