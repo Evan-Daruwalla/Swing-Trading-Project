@@ -12,19 +12,23 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — goal redefined (high-return); E2 leveraged-ETF arm is next
+## Current state — E2 FAILED; IBS family SHELVED (pre-committed stop); awaiting direction
 
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-09 — GOAL REDEFINED by Evan (record Appendix R).** High percent
-> return, short holds, concentrated K=1–3, losses accepted. PRD amended:
-> new M2b = E2 (leveraged-ETF IBS — TQQQ/UPRO/SPXL/SOXL/TNA wrap exactly the
-> underlyings where E1b proved the edge persists OOS), then M2c = E3 stub
-> (concentrated mega-cap stocks, survivorship caveat). Return-centric gates,
-> loosened-but-present DD ceiling, discipline unchanged (prereg before
-> results, no tuning on FAIL). **Next: M2b.1 (leveraged universe probe +
-> backfill) → M2b.2 (E2 prereg, doc-only) → M2b.3 (run) → M2b.4 (pin refs).**
+> **2026-07-09 — E2 = FAIL; IBS FAMILY SHELVED (record Appendices S-U).**
+> E2 (leveraged TQQQ/UPRO/SPXL/SOXL/TNA, K=2, prereg `865c09e`) holdout
+> 2022-26: n=351 PASS, exp +31bps PASS, **CAGR 7.98% FAIL (vs 15%), maxDD
+> 60.6% FAIL (vs 60%)**. Train 19.6% CAGR → holdout 7.98%: same OOS decay as
+> E1b. The c2c (non-executable) run would have PASSED (CAGR 18.15%) — the
+> overnight gap remains the killer (M1.8: 54% of edge). **Prereg §7 stop
+> executed: no E2b/E1c/execution variants without a NEW dated Evan decision.**
+> Engine gotcha logged: fixed initial-capital/K sizing (not NAV/K) — K=1 3x
+> run sent NAV negative; future engines size on current NAV. Frozen tests:
+> 8 refs (E1+E2) green d=±0.0000pp. Three-experiment scoreboard in Appendix
+> U. **No live trading. Options: E3 design / Evan overrides stop for
+> near-close-execution IBS / write up the arc.**
 
 > **2026-07-09 — E1b OOS test = FAIL (near-miss) (record Appendix Q).** Evan
 > chose to pre-register broad_us with a holdout. E1b (`0126ce3`): broad_us
@@ -78,8 +82,8 @@ lives in the record.
 | Foundations (repo/venv/data/universe/gate/tripwire) | M0 | **Done** | All 5 tasks; modules prices/universe/coverage_gate/signals/test_frozen; `swing.db` 89,666 rows |
 | Pre-registration & fill ablation | M1 | **Done** | M1.6 power (`2a9edde`) + M1.7 prereg (`8963e49`) + M1.8 ablation; next-open keeps ~64% |
 | E1 IBS backtest | M2 | **Done — E1 FAILED** | Engine (`415c527`), verdict (`d28f899`), frozen refs pinned. E1b OOS near-miss (Sharpe 0.4961, `1a71468`). M2.12 survivorship deferred |
-| E2 leveraged-ETF IBS (high-return arm) | M2b | **In progress** | Next: M2b.1 leveraged universe probe/backfill → M2b.2 prereg → M2b.3 run → M2b.4 pin refs |
-| E3 concentrated stocks | M2c | **Stub** | Designed after E2 readout; survivorship caveat mandatory |
+| E2 leveraged-ETF IBS (high-return arm) | M2b | **Done — E2 FAILED** | Prereg `865c09e`; CAGR 7.98%/maxDD 60.6% vs 15%/60% gates; refs pinned; **IBS family SHELVED (pre-committed stop)** |
+| E3 concentrated stocks | M2c | **Stub — next open path** | Different signal family; own prereg; survivorship caveat mandatory |
 | Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — gate not open** | E1 did NOT pass M2→M3; needs a new pre-registered strategy that passes + Evan go + Alpaca account |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
 | Expansion (deferred ideas) | M5 | **GATED** | On M3 stable |

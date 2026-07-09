@@ -27,9 +27,9 @@ from swing_bot import prices, signals, backtest
 Case = namedtuple("Case", ["name", "value", "ref", "unit", "dp"])
 
 
-def _window(start, end):
-    """Run E1 (next-open, 5bps) on a fixed swing.db window; return
-    (total_return_pct, closed_count)."""
+def _window(start, end, entries=None, k=5):
+    """Run the engine (next-open, 5bps) on a fixed swing.db window; return
+    (total_return_pct, closed_count). Default entries/k = E1 config."""
     src = prices.connect()
     mem = sqlite3.connect(":memory:")
     mem.execute(prices.SCHEMA)
@@ -38,12 +38,21 @@ def _window(start, end):
         "WHERE date>=? AND date<=?", (start, end)).fetchall()
     mem.executemany("INSERT INTO bars VALUES (?,?,?,?,?,?,?,?)", rows)
     mem.commit()
-    m = backtest.metrics(backtest.run_backtest(mem, fill="next_open",
-                                               cost_bps=5.0))
+    m = backtest.metrics(backtest.run_backtest(mem, entries=entries,
+                                               fill="next_open",
+                                               cost_bps=5.0, k=k))
     return m["total_ret"] * 100, m["n_trades"]
 
 _w1_tpnl, _w1_n = _window("2019-01-01", "2019-06-30")
 _w2_tpnl, _w2_n = _window("2020-01-01", "2020-06-30")
+
+# E2 config: LEVERAGED universe, K=2 (prereg 865c09e; verdict FAIL,
+# record Appendix T — pinned so the failed result stays tamper-evident)
+from swing_bot import universe as _universe
+_e2w1_tpnl, _e2w1_n = _window("2019-01-01", "2019-06-30",
+                              entries=_universe.LEVERAGED, k=2)
+_e2w2_tpnl, _e2w2_n = _window("2020-01-01", "2020-06-30",
+                              entries=_universe.LEVERAGED, k=2)
 
 # --- REAL E1 references (M2.11), pinned 2026-07-09 -----------------------
 # E1 = full 29-ETF universe, next-open, 5bps/side. These are the deterministic
@@ -54,6 +63,10 @@ REFERENCES = [
     Case("E1_2019H1_closed", _w1_n,    134,      "",   0),
     Case("E1_2020H1_tpnl",   _w2_tpnl, 6.209800, "pp", 4),
     Case("E1_2020H1_closed", _w2_n,    162,      "",   0),
+    Case("E2_2019H1_tpnl",   _e2w1_tpnl, 25.374807, "pp", 4),
+    Case("E2_2019H1_closed", _e2w1_n,    31,        "",   0),
+    Case("E2_2020H1_tpnl",   _e2w2_tpnl, 60.397839, "pp", 4),
+    Case("E2_2020H1_closed", _e2w2_n,    56,        "",   0),
 ]
 
 # --- Invariants (non-numeric asserts) -----------------------------------

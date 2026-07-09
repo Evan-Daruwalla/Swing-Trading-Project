@@ -56,6 +56,8 @@ the dated entry, not the digest.
 - [Q — E1b: broad_us OOS test = FAIL (near-miss, Sharpe 0.496)](#appendix-q---e1b-broad_us-oos-test--fail-near-miss-sharpe-0496-2026-07-09) (07-09)
 - [R — GOAL REDEFINED by Evan: high-return concentrated swing, risk accepted](#appendix-r---goal-redefined-by-evan-high-return-concentrated-swing-risk-accepted-2026-07-09) (07-09)
 - [S — M2b.1: frozen LEVERAGED universe (5 ETFs) + backfill](#appendix-s---m2b1-frozen-leveraged-universe-5-etfs--backfill-2026-07-09) (07-09)
+- [T — M2b.2-3: E2 prereg (865c09e) + run = FAIL; IBS family SHELVED](#appendix-t---m2b2-3-e2-prereg-865c09e--run--fail-ibs-family-shelved-2026-07-09) (07-09)
+- [U — M2b.4: E2 refs pinned; M2b complete; STOP at gate](#appendix-u---m2b4-e2-refs-pinned-m2b-complete-stop-at-gate-2026-07-09) (07-09)
 
 ---
 
@@ -941,3 +943,74 @@ ret heuristic is calibrated for 1x funds; on 3x funds these are genuine
 daily moves — and a preview of the accepted risk profile.
 
 **Next action:** M2b.2 — pre-register E2 (doc-only commit before runner).
+
+---
+
+# Appendix T - M2b.2-3: E2 prereg (865c09e) + run = FAIL; IBS family SHELVED (2026-07-09, ~15:05 local)
+
+**WHAT:** Pre-registered E2 (`865c09e`, doc-only, verified no runner existed;
+gates: K=2 holdout n>=100, expectancy>0, net CAGR>=15%, maxDD<=60%; Sharpe
+context-only; PRE-COMMITTED STOP in §7). Then built
+`scripts/run_e2_backtest.py` and ran. Full results:
+`docs/research/2026-07-09_E2_leveraged_results.md`.
+
+**VERDICT: E2 FAIL (2 of 4).** K=2 HOLDOUT (2022-2026, next-open, 5bps/side):
+n=351 PASS · exp +31.0bps PASS · **CAGR 7.98% FAIL (vs 15%)** · **maxDD
+60.6% FAIL (vs 60%)**. Train context: CAGR 19.6%, Sharpe 0.77 — same OOS
+decay pattern as E1b, leverage-amplified.
+
+**Key findings:** (1) the c2c (non-executable) holdout would have PASSED
+everything (CAGR 18.15%, maxDD 52.4%) — the overnight gap between signal
+close and next-open fill remains the project's central story (M1.8: 54% of
+edge is overnight); (2) 3x crash-buying drew down 60.6% — the accepted-risk
+profile, realized; (3) **engine property exposed:** K=1 context showed
+maxDD 104% (NAV negative) — the engine sizes at FIXED initial-capital/K,
+not current-NAV/K, i.e. implicit leverage after losses. Immaterial for
+E1/E1b; does not change the E2 verdict (all three experiments shared these
+semantics); recorded as a known limitation + gotchas bin. Any future engine
+sizes on current NAV.
+
+**THE PRE-COMMITTED STOP EXECUTES:** three pre-registered IBS tests have
+failed (E1, E1b near-miss, E2). Per `865c09e` §7 the IBS family — 1x and
+leveraged — is SHELVED. No E2b/E1c/execution-shaved re-runs by the executing
+model. A near-close-execution variant (which the c2c numbers hint at) is
+still IBS family → covered by the stop; only a NEW dated decision by Evan
+re-opens it.
+
+**Next action:** M2b.4 — pin E2 frozen refs; then STOP. Remaining open path:
+E3 (different signal family, concentrated mega-cap stocks, M2c) — design
+with its own prereg, on Evan's go.
+
+---
+
+# Appendix U - M2b.4: E2 refs pinned; M2b complete; STOP at gate (2026-07-09, ~15:20 local)
+
+**WHAT:** Pinned E2 frozen refs into `swing_bot/test_frozen.py` (LEVERAGED,
+K=2, next-open, 5bps): 2019H1 tpnl 25.374807% / 31 closed; 2020H1 tpnl
+60.397839% / 56 closed — alongside the E1 refs. Engine fixed-sizing property
+added to the gotchas bin (future engines size on current NAV).
+
+**DONE-CHECK (real output):** `python -m swing_bot.test_frozen` → 8 numeric
+refs + 2 invariants, ALL d=+0.0000pp / +0, GREEN, exit 0.
+
+### Point-in-time snapshot — experiment program state (2026-07-09)
+
+| Experiment | Prereg | Verdict | Gate misses |
+|---|---|---|---|
+| E1 — 29-ETF IBS | `8963e49` | **FAIL** | Sharpe 0.23 (vs 0.50), maxDD 36% (vs 25%) |
+| E1b — broad_us OOS | `0126ce3` | **FAIL (near-miss)** | Sharpe 0.4961 (vs 0.50) |
+| E2 — leveraged K=2, return-centric | `865c09e` | **FAIL** | CAGR 7.98% (vs 15%), maxDD 60.6% (vs 60%) |
+
+**IBS family: SHELVED** (pre-committed stop, `865c09e` §7). The recurring
+mechanism across all three: the effect is real close-to-close but over half
+of it sits in the overnight gap the EOD next-open loop cannot enter
+(M1.8: 54%); E2's c2c holdout would have passed everything (CAGR 18.15%).
+
+**STOPPED.** No live trading (nothing passed). Options put to Evan:
+(1) design E3 — different signal family on concentrated liquid stocks (PRD
+M2c, own prereg, survivorship caveat); (2) Evan overrides the stop with a
+NEW dated decision to test near-close execution of IBS (needs real-time
+quote infrastructure; the one variant the c2c numbers directly motivate);
+(3) pause and write up the E1/E1b/E2 arc as the project's first deliverable.
+
+**Next action:** NONE autonomous — Evan chooses.

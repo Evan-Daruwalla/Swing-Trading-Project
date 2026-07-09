@@ -22,6 +22,12 @@ they apply to any yfinance-based pipeline built here:
 - Small-capital edges: Alpaca fractionability/minimum-order-size — the
   whole-share fallback in Trading's `fractionability.py` is load-bearing at
   $100–1,000, not an edge case.
+- 2026-07-09 (E2, K=1 context run): `swing_bot/backtest.py` sizes positions
+  at FIXED initial-capital/K dollars, NOT current-NAV/K — after losses it
+  keeps buying full-size (implicit leverage; cash can go negative). At K=1
+  on 3x funds NAV crossed zero (maxDD 104%). Immaterial for diversified 1x
+  runs (E1/E1b); does NOT invalidate pinned refs (all experiments shared
+  these semantics). Any FUTURE engine or live loop MUST size on current NAV.
 - 2026-07-08 (M0.4, measured on our swing.db): XLRE has 19 zero-range bars
   (High==Low) in 2015-10..2016-02, its first ~5 months post-launch
   (illiquid early trading, not a split error). IBS=(close-low)/(high-low)
