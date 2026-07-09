@@ -39,11 +39,18 @@ def _load(conn, entries):
 
 def run_backtest(conn, entries=None, fill="next_open", cost_bps=5.0,
                  capital=500.0, k=K, ibs_entry=IBS_ENTRY, ibs_exit=IBS_EXIT,
-                 max_hold=MAX_HOLD):
+                 max_hold=MAX_HOLD, size_on_nav=False):
+    """size_on_nav=False (v1, default): positions sized at FIXED
+    initial-capital/k dollars — can drive cash negative after losses
+    (implicit leverage; see gotchas bin, E2 K=1). All E1/E1b/E2 pinned refs
+    use this path — do not change its behavior.
+    size_on_nav=True (v2, C1 2026-07-09): target = min(prev-close-NAV/k,
+    available cash), floored at 0 — sizes shrink with losses, cash can never
+    go negative."""
     entries = entries or universe.UNIVERSE
     dates, bars = _load(conn, entries)
     cost = cost_bps / 10000.0
-    target = capital / k
+    fixed_target = capital / k
     defer = (fill == "next_open")
 
     cash = capital
@@ -51,8 +58,17 @@ def run_backtest(conn, entries=None, fill="next_open", cost_bps=5.0,
     pend_entry, pend_exit = [], []   # decided at close, fill next open
     trades, nav = [], []
 
+    def cur_target():
+        if not size_on_nav:
+            return fixed_target
+        nav_prev = nav[-1][1] if nav else capital
+        return max(0.0, min(nav_prev / k, cash))
+
     def do_buy(tk, price, date, ei):
         nonlocal cash
+        target = cur_target()
+        if target <= 0:
+            return
         fillp = price * (1 + cost)
         shares = target / fillp
         cash -= shares * fillp
@@ -124,7 +140,7 @@ def run_backtest(conn, entries=None, fill="next_open", cost_bps=5.0,
     return dict(trades=trades, nav=nav,
                 params=dict(fill=fill, cost_bps=cost_bps, capital=capital,
                             k=k, ibs_entry=ibs_entry, ibs_exit=ibs_exit,
-                            max_hold=max_hold))
+                            max_hold=max_hold, size_on_nav=size_on_nav))
 
 
 def metrics(result):

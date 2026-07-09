@@ -59,6 +59,8 @@ the dated entry, not the digest.
 - [T — M2b.2-3: E2 prereg (865c09e) + run = FAIL; IBS family SHELVED](#appendix-t---m2b2-3-e2-prereg-865c09e--run--fail-ibs-family-shelved-2026-07-09) (07-09)
 - [U — M2b.4: E2 refs pinned; M2b complete; STOP at gate](#appendix-u---m2b4-e2-refs-pinned-m2b-complete-stop-at-gate-2026-07-09) (07-09)
 - [V — Experiment catalog v2 (data-grounded, 20 items) + %/mo verdicts](#appendix-v---experiment-catalog-v2-data-grounded-20-items--mo-verdicts-2026-07-09) (07-09)
+- [W — Evan overrides IBS stop for A3; C1+screens sitting begins](#appendix-w---evan-overrides-ibs-stop-for-a3-c1screens-sitting-begins-2026-07-09) (07-09)
+- [X — C1: engine v2 (NAV-proportional, cash-capped) verified](#appendix-x---c1-engine-v2-nav-proportional-cash-capped-verified-2026-07-09) (07-09)
 
 ---
 
@@ -1053,3 +1055,49 @@ prereg with return-centric gates before its runner.
 
 **Next action:** Evan picks from the catalog (any A-item = dated stop
 override).
+
+---
+
+# Appendix W - Evan overrides IBS stop for A3; C1+screens sitting begins (2026-07-09, ~14:50 local)
+
+**DECISION (Evan, 2026-07-09):** "go" on catalog option 1 — which, per the
+catalog's stop clause, constitutes his dated override of the `865c09e` §7
+IBS-family stop for **A3 only** (overnight-only IBS harvest screen). The
+stop remains in force for all other IBS variants (A1/A2/A4) unless
+separately green-lit.
+
+**Sitting plan:** C1 (engine v2: NAV-proportional, cash-capped sizing as an
+OPT-IN parameter so v1 frozen refs stay intact) → three one-sitting
+IN-SAMPLE SCREENS labeled hypothesis-generating: A3 (overnight-only IBS,
+override above), B1 (gap-down reversion executed at the open, stop-clear),
+B4 (vol-regime leverage rotation, stop-clear). Screens report train/holdout/
+full with %/mo. Best survivor then gets its own pre-registration before any
+confirmatory run.
+
+**Cadence:** pm-cadence fired at prompt #18; this entry satisfies it.
+
+**Next action:** C1 implementation.
+
+---
+
+# Appendix X - C1: engine v2 (NAV-proportional, cash-capped) verified (2026-07-09, ~15:00 local)
+
+**WHAT:** Added `size_on_nav` parameter to `swing_bot/backtest.py`.
+v1 (default False) = fixed initial-capital/K sizing, byte-identical to all
+pinned experiments. v2 (True) = target = min(prev-close-NAV/K, available
+cash), floored at 0 — sizes shrink after losses; cash can never go negative.
+
+**DONE-CHECK (real output):**
+- Toy v2 hand-check exact: after NAV halves, re-entry sizes at the new NAV
+  (final NAV engine 263.1579 = hand 263.1579).
+- The v1 failure mode is fixed: E2 K=1 leveraged holdout — v1 min_NAV
+  −33.44 (negative, maxDD 104.2%) → v2 min_NAV +109.73, maxDD 84.2%.
+- **Honest note:** v2's CAGR on that path is WORSE (−13.62% vs −2.70%) —
+  v1's implicit post-loss leverage happened to aid recovery there; v2 is
+  simply correct accounting, not a performance improvement.
+- Frozen tests: v2 ref pinned (E1-config 2019H1: tpnl 9.016509%/134) —
+  now 10 numeric refs + 2 invariants, ALL GREEN d=±0.0000pp, exit 0. v1
+  refs unchanged (v1 path untouched).
+
+**Next action:** the three in-sample screens (A3 override / B1 / B4), engine
+v2, labeled hypothesis-generating.

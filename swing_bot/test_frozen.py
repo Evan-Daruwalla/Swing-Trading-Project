@@ -27,7 +27,7 @@ from swing_bot import prices, signals, backtest
 Case = namedtuple("Case", ["name", "value", "ref", "unit", "dp"])
 
 
-def _window(start, end, entries=None, k=5):
+def _window(start, end, entries=None, k=5, size_on_nav=False):
     """Run the engine (next-open, 5bps) on a fixed swing.db window; return
     (total_return_pct, closed_count). Default entries/k = E1 config."""
     src = prices.connect()
@@ -40,7 +40,8 @@ def _window(start, end, entries=None, k=5):
     mem.commit()
     m = backtest.metrics(backtest.run_backtest(mem, entries=entries,
                                                fill="next_open",
-                                               cost_bps=5.0, k=k))
+                                               cost_bps=5.0, k=k,
+                                               size_on_nav=size_on_nav))
     return m["total_ret"] * 100, m["n_trades"]
 
 _w1_tpnl, _w1_n = _window("2019-01-01", "2019-06-30")
@@ -53,6 +54,9 @@ _e2w1_tpnl, _e2w1_n = _window("2019-01-01", "2019-06-30",
                               entries=_universe.LEVERAGED, k=2)
 _e2w2_tpnl, _e2w2_n = _window("2020-01-01", "2020-06-30",
                               entries=_universe.LEVERAGED, k=2)
+
+# Engine v2 (C1 2026-07-09): NAV-proportional cash-capped sizing path
+_v2w1_tpnl, _v2w1_n = _window("2019-01-01", "2019-06-30", size_on_nav=True)
 
 # --- REAL E1 references (M2.11), pinned 2026-07-09 -----------------------
 # E1 = full 29-ETF universe, next-open, 5bps/side. These are the deterministic
@@ -67,6 +71,8 @@ REFERENCES = [
     Case("E2_2019H1_closed", _e2w1_n,    31,        "",   0),
     Case("E2_2020H1_tpnl",   _e2w2_tpnl, 60.397839, "pp", 4),
     Case("E2_2020H1_closed", _e2w2_n,    56,        "",   0),
+    Case("E1v2_2019H1_tpnl",   _v2w1_tpnl, 9.016509, "pp", 4),
+    Case("E1v2_2019H1_closed", _v2w1_n,    134,      "",   0),
 ]
 
 # --- Invariants (non-numeric asserts) -----------------------------------
