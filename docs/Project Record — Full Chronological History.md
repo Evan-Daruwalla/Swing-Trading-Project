@@ -66,6 +66,7 @@ the dated entry, not the digest.
 - [AA — E4 leverage rotation: pre-reg (313d88a), engine, VERDICT = PASS; STOP at live gate](#appendix-aa---e4-leverage-rotation-pre-reg-313d88a-engine-verdict--pass-stop-at-live-gate-2026-07-09) (07-09)
 - [AB — E5 regime test: E4 loses 93% in 2000-2013; VERDICT = FAIL; E4 de-authorized for paper](#appendix-ab---e5-regime-test-e4-loses-93-in-2000-2013-verdict--fail-e4-de-authorized-for-paper-2026-07-09) (07-09)
 - [AC — E6 de-leveraged rotation VERDICT = PASS (robust drawdown overlay, not high-return)](#appendix-ac---e6-de-leveraged-rotation-verdict--pass-robust-drawdown-overlay-not-high-return-2026-07-09) (07-09)
+- [AD — Full E1→E6 program write-up (option 1); program complete](#appendix-ad---full-e1e6-program-write-up-option-1-program-complete-2026-07-09) (07-09)
 
 ---
 
@@ -1297,3 +1298,32 @@ tests remain green (12 refs).
 
 **Next action:** Evan's option 1 -- write up the full E1->E6 falsification +
 one-robust-overlay program as the deliverable.
+
+---
+
+# Appendix AD - Full E1->E6 program write-up (option 1); program complete (2026-07-09, ~18:45 local)
+
+**WHAT:** Evan's option 1. Rewrote `docs/findings_2026-07-09_experiment_arc.md`
+from the E1->B4 partial into the COMPLETE E1->E6 program deliverable: abstract,
+method/discipline, the one-table results summary (%/mo per experiment), the two
+families (mean reversion; leverage rotation with the E4-pass -> E5-regime-fail
+-> E6-deleveraged-pass subplot), the two through-lines (execution + regime kill
+retail edges; the only survivor is risk-management not return), honest
+limitations, the process-as-deliverable meta-point, and reproducibility
+(all prereg/commit hashes).
+
+**Final honest conclusion (stated in the doc):** no robust, regime-independent,
+cost-surviving HIGH-RETURN EOD strategy was found; the goal is unmet and the
+evidence says that is the base rate at this scale. One deployable result
+emerged -- 1x 200-MA rotation (E6) -- but it is risk-management (halves index
+drawdown for ~the same long-run return), not a return engine. The portfolio
+value is the falsification program itself: it caught E4 (a 33%-CAGR-looking
+false positive) via a pre-registered out-of-regime test before any capital
+was risked.
+
+**PROGRAM COMPLETE.** Nothing live. Frozen tests green (12 refs). Open,
+Evan-gated: deploy E6 (1x) to paper as a risk-managed core; open a genuinely
+new family (stocks/events, needs E3 survivorship-safe universe); or close on
+this write-up.
+
+**Next action:** none autonomous -- program is at a clean terminal state.

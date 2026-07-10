@@ -12,24 +12,24 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — E4 PASSED backtest but FAILED regime test (E5); de-authorized for paper
+## Current state — E1→E6 program COMPLETE; one robust result (1× rotation, risk-mgmt); nothing live
 
 **Last updated: 2026-07-09** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-09 — E5 regime test = FAIL; E4 de-authorized (record Appendix
-> AB).** Hardened E4 before paper (prereg `09a3a31`): synthesized 3x Nasdaq
-> from QQQ back to 1999 (validated vs real TQQQ: drag 4%/yr, corr 0.9989),
-> tested the 200-MA rotation over the UNSEEN 2000-2013 (dot-com + 2008).
-> **Rotation lost 92.7% (maxDD) and −3.4% CAGR there — the 200-MA whipsawed
-> in choppy bears and 3x leverage did the rest.** E4's +2.45%/mo was purely a
-> 2014-2026 artifact. Per prereg, E4 is REGIME-DEPENDENT → NOT deployed to
-> paper. **Nothing is live.**
+> **2026-07-09 — Program complete (record Appendices AB–AD).** After E5
+> killed E4 (3× rotation = 92.7% DD in 2000-2013, a bull artifact), E6
+> (prereg `0526ea2`) tested the SAME rotation de-leveraged: **1× QQQ rotation
+> PASSES a regime-spanning test** — cuts QQQ's worst drawdown 83%→52%,
+> Sharpe ≥ buy-hold in all 3 regimes — but full-period CAGR 8.04% ≈ buy-hold
+> 7.92%, so its value is DRAWDOWN REDUCTION, NOT return (+0.65%/mo). 2× worse
+> than 1×. **The full E1→E6 write-up is the deliverable:**
+> `docs/findings_2026-07-09_experiment_arc.md`.
 >
-> **Project meta:** both families tried — mean reversion (E1/E1b/E2/A3/B1)
-> and leverage rotation (E4/E5) — are now honestly falsified for a robust,
-> regime-independent, cost-surviving executable retail edge. The rigor
-> process caught E4 BEFORE any capital was risked. Next direction is Evan's.
+> **Honest bottom line:** no robust high-return EOD edge found (goal unmet);
+> one deployable result = 1× 200-MA rotation as RISK MANAGEMENT. The value is
+> the falsification program (caught E4 before any capital). Nothing live;
+> frozen tests green (12 refs).
 
 > **2026-07-09 — C1 + three screens (record Appendices W–Y).** Engine v2
 > (`size_on_nav=True`: NAV-proportional, cash-capped; v1 refs intact; 10
@@ -110,9 +110,10 @@ lives in the record.
 | E1 IBS backtest | M2 | **Done — E1 FAILED** | Engine (`415c527`), verdict (`d28f899`), frozen refs pinned. E1b OOS near-miss (Sharpe 0.4961, `1a71468`). M2.12 survivorship deferred |
 | E2 leveraged-ETF IBS (high-return arm) | M2b | **Done — E2 FAILED** | Prereg `865c09e`; CAGR 7.98%/maxDD 60.6% vs 15%/60% gates; refs pinned; **IBS family SHELVED (pre-committed stop)** |
 | E3 concentrated stocks | M2c | **Stub** | Different signal family; own prereg; survivorship caveat mandatory |
-| E4 leverage rotation | M2d | **Backtest PASS but REGIME-DEPENDENT** | Pre-reg `313d88a` PASS on 2014-26; E5 (`09a3a31`) FAIL on 2000-2013 (92.7% DD). De-authorized for paper |
-| Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — no passing regime-robust strategy** | E1/E2/E4 all failed the bar for going live; needs a new candidate |
-| Findings write-up | — | **Done** | `docs/findings_2026-07-09_experiment_arc.md` (E1→B4 synthesis deliverable) |
+| E4 leverage rotation (3×) | M2d | **PASS backtest, FAILED regime test** | `313d88a` PASS 2014-26; E5 `09a3a31` FAIL 2000-13 (92.7% DD). De-authorized |
+| E6 de-leveraged rotation (1×) | M2d | **PASS (robust, risk-mgmt)** | `0526ea2`; cuts DD 83→52%, Sharpe≥BH all regimes, but CAGR≈buy-hold. Not high-return. Paper candidate as risk-managed core (Evan-gated) |
+| Live paper | M3 | **BLOCKED — Evan go + Alpaca acct** | E6 (1×) is the only regime-robust candidate; explicitly risk-mgmt not the high-return goal |
+| Program write-up | — | **Done** | `docs/findings_2026-07-09_experiment_arc.md` — full E1→E6 falsification deliverable |
 | Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — gate not open** | E1 did NOT pass M2→M3; needs a new pre-registered strategy that passes + Evan go + Alpaca account |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
 | Expansion (deferred ideas) | M5 | **GATED** | On M3 stable |
