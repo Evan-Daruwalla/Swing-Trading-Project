@@ -1689,3 +1689,43 @@ Doc-only commit hash predates all runner code.
 
 **Next action:** commit preregs, write runners E10/E11/E12, run, frozen
 tests, results doc, verdicts. Cadence: this entry serves the record step.
+
+---
+
+# Appendix AP - E10/E11/E12 all FAIL; article-set arc closed; 0/13 across six families (2026-07-10, ~20:10 local)
+
+**WHAT:** Ran all three article-set experiments per prereg `129dc22`
+(doc-only before runners). Runners: `scripts/run_e10_earnings_drift.py`,
+`run_e11_volgated_breakout.py`, `run_e12_confirmed_capitulation.py`.
+E11/E12 reused the .e8e9_cache; E10 fetched 39 survivor stocks + earnings
+dates (yfinance get_earnings_dates, ~99 quarters/name back to ~2001).
+swing.db untouched; frozen tripwire GREEN after runs.
+
+**E11 (volume-gated breakout) FAIL:** gate 2000-13 CAGR -0.74% (n=46, win
+30.4%); secondary -0.25%. The a-priori RVOL>=1.5 gate the pros swear by did
+NOT give breakouts direction - it just thinned E8's directionless signal.
+
+**E12 (confirmed-capitulation MR) FAIL:** gate CAGR -4.71% (n=90, win
+35.6%), maxDD 55%. Waiting for the confirmed "right side of the V" did
+WORSE than E1's raw dip-buying: the confirmation bar surrenders the
+reversal pop, then the prior-bar-low trail whipsaws out.
+
+**E10 (PEAD) FAIL - clean under the asymmetric framing:** gate CAGR 5.93%
+vs 15% bar (n=272 entries, win 58.5%, maxDD 49.3%). NUANCE, honestly noted:
+E10 is the ONLY experiment in the whole program to BEAT both benchmarks in
+the hostile regime (5.93% vs EW-universe -0.47% and SPY 1.72% in 2000-13,
+Sharpe 0.39) - PEAD had a real risk-adjusted signature even before its
+survivorship flattery. But post-2014 it underperformed both (5.30% vs EW
+13.97% / SPY 11.98%) - consistent with the academic record that PEAD decayed
+after ~2010 as it was arbitraged. As a HIGH-RETURN strategy it fails
+decisively in every window; because the universe is bias-flattered, the FAIL
+is interpretable. PEAD closed for backtested high-return claims.
+
+**SCORE: 0 PASS / 13 pre-registered high-return attempts / 6 families**
+(mean reversion incl. E12 refinement, leveraged trend, stock momentum,
+breakout incl. E11 refinement, deep-dip, event-driven/PEAD). Every
+codifiable idea from the Reddit thread AND the 5-source article set is now
+tested and falsified. Cadence #42 satisfied by this entry.
+
+**Next action:** results doc, README/HANDOFF/memory sync, commit. Push only
+on Evan's word.

@@ -8,7 +8,7 @@
 
 A systematic-trading research project whose goal was a **high percentage
 return over short holds** with a small account. It did not find one — and the
-*discipline of how it failed* is the point. Ten strategies across five
+*discipline of how it failed* is the point. Thirteen strategies across six
 families were tested under strict **pre-registration** (rules committed to git
 *before* the code that produces results), honest kill-criteria (no re-tuning a
 failed run), and out-of-sample / out-of-regime tests — culminating in an
@@ -16,9 +16,10 @@ international test on five independent markets and a survivorship-aware stock
 test, neither used to design anything.
 
 **The honest conclusion:** no robust, regime-independent, cost-surviving
-high-return EOD strategy was found across five plausible families — index
+high-return EOD strategy was found across six plausible families — index
 mean reversion, leveraged trend, concentrated stock momentum, volatility
-breakout, and deep-dip accumulation (0 passes in 10 attempts). This
+breakout, deep-dip accumulation, and post-earnings drift (0 passes in 13
+attempts). This
 is backed by out-of-sample evidence from five international regimes (including
 the 1990s Japan secular bear) and a survivorship-*flattered* stock test that
 still failed. The one partly-deployable result — a 1× 200-day-MA rotation — is
@@ -47,6 +48,9 @@ before the market charged tuition for the same lesson.
 | E3 | Concentrated stock momentum (top-3) | FAIL (clean) — 6% vs 15% bar even bias-flattered; lost to buy-and-hold |
 | E8 | Volatility-compression breakout (squeeze) | FAIL — −1.4%/yr in 2000–13, +1.1%/yr even in the 2014–26 bull; compression predicts expansion, not direction |
 | E9 | "Never book a loss" deep-dip audit (Reddit's top claim) | FAIL — the claim is *literally true* (0/53 realized losses) and still bad: 3.5%/yr, a −80% unrealized position, a 17-year underwater hold |
+| E10 | Post-earnings drift (the pros' "catalyst continuation") | FAIL (clean) — 5.9% vs 15% bar even bias-flattered; the program's one real-but-small effect, and it decayed after ~2010 |
+| E11 | Volume-gated breakout (RVOL ≥ 1.5, the pros' rule) | FAIL — volume confirmation thinned E8's signal without giving it direction |
+| E12 | Confirmed-capitulation MR ("right side of the V") | FAIL — waiting for confirmation did *worse* than raw dip-buying; the confirmation bar surrenders the edge |
 
 ## Reproduce
 

@@ -12,10 +12,27 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — FIVE families falsified (0/10 pre-registered attempts); nothing live
+## Current state — SIX families falsified (0/13 pre-registered attempts); nothing live
 
 **Last updated: 2026-07-10** — this file is the only live snapshot; history
 lives in the record.
+
+> **2026-07-10 — E10/E11/E12 all FAIL; article-set arc closed (record
+> Appendices AO–AP).** Evan supplied a 5-source article set (Investopedia/
+> Schwab/TD/CapTrader/SMB + ex-Trillium trader) and said "try everything."
+> Three testable directions pre-registered together (`129dc22`, doc-only
+> before runners): **E11** volume-gated breakout (E8 + RVOL≥1.5, the pros'
+> rule) FAIL — gate CAGR −0.74%, volume thins the signal without giving it
+> direction; **E12** confirmed-capitulation MR ("right side of the V") FAIL —
+> gate CAGR −4.71%, waiting for confirmation does WORSE than raw dip-buying
+> (the confirmation bar surrenders the overnight pop that holds the edge);
+> **E10** post-earnings drift (PEAD, E3's survivor basket, asymmetric
+> framing) FAIL clean — gate CAGR 5.93% vs 15% bar. NUANCE: E10 is the only
+> experiment to beat both benchmarks in 2000-13 (vs EW −0.47%, SPY 1.72%) —
+> a real-but-small effect that decayed after ~2010. Results:
+> `docs/research/2026-07-10_E10_E11_E12_results.md`. Frozen tests green.
+> **Base rate now 0 PASS / 13 attempts / 6 families.** Every codifiable idea
+> from the Reddit thread and the article set is tested and falsified.
 
 > **2026-07-10 — E8 + E9 both FAIL; families four and five closed (record
 > Appendices AL–AM).** Evan supplied the r/swingtrading strategy thread; its
