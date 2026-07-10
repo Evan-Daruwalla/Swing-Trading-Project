@@ -17,8 +17,8 @@ deliverable, not a live document.
 
 I tried to build a systematic swing trader for a small account with the goal
 of a high percentage return over short holds. I did not find one — and the
-*way* I failed to find one is the result. Two strategy families were tested
-under strict pre-registration:
+*way* I failed to find one is the result. Three strategy families were
+tested under strict pre-registration. The first two:
 
 - **Mean reversion** (IBS on ETFs and leveraged ETFs) failed because over
   half its edge lives in the overnight gap an end-of-day bot cannot capture,
@@ -184,26 +184,6 @@ closed for a backtested high-return claim; only forward live paper
 
 ---
 
-## The two through-lines
-
-1. **Execution and regime are where retail edges die.** Every mean-reversion
-   result died on the overnight-execution gap and costs; the leverage winner
-   died on regime-dependence, confirmed on five independent international
-   markets. Neither failure was visible in a naive in-sample backtest — both
-   required a purpose-built test (the fill ablation; the international
-   out-of-sample reconstruction) to expose.
-2. **The one thing that partly survived is risk management, not return** —
-   and even it is market-dependent. Low-leverage trend-timing reduces
-   drawdown in some markets but not universally, and never adds return. That
-   is the honest, well-documented shape of this problem — the opposite of
-   what the "high percent return" goal wanted.
-3. **Extreme leverage is tail-fatal, not merely risky.** A single >33%
-   day (Hong Kong, 1987) drives any 3× daily fund to a permanent zero. No
-   amount of timing recovers from a one-day wipeout — an argument from
-   arithmetic, not from a backtest.
-
----
-
 ## Honest limitations
 
 - All results are **simulated fills**; the live divergence logger (built into
@@ -218,35 +198,53 @@ closed for a backtested high-return claim; only forward live paper
   preregs; it biases mildly against the buy-hold benchmarks, not the
   conclusions. International results use local-currency price indices
   (dividend-excluding → returns understated ~2–3%/yr).
-- **Survivorship bias** is eliminated for all ETF/index work but returns the
-  moment single stocks (the never-run E3) are tested.
+- **Survivorship bias** is eliminated for all ETF/index work but is inherent
+  to any stock test; E3 handled it by asymmetric falsification (a
+  bias-flattered universe that still failed), and only a live forward test is
+  truly survivorship-free.
 - E6 at 1× is **not** the stated high-return goal; that goal is unmet.
 
 ---
 
-## What this program demonstrates
+## Conclusion
 
-Seven pre-registered experiments; one false positive caught by an
-out-of-regime test; one refused p-hack; a self-pressure-test that retracted
-my own over-claim; and a final international out-of-sample test that closed
-the question on data never used to design anything. The headline is not a
-return number — it is a **process that falsified its own best-looking idea
-before risking a dollar**. For an engineering portfolio that is the harder,
-more valuable thing to show than a curve-fit equity curve: the ability to be
+No robust, regime-independent, cost-surviving *high-return* EOD strategy was
+found across **all three** plausible families — index mean reversion,
+leveraged trend, and concentrated stock momentum. That conclusion is backed by
+out-of-sample evidence from five independent international regimes and a
+survivorship-*flattered* stock test that still failed; it is the base-rate
+outcome at this scale, not a symptom of too few ideas.
+
+Three through-lines explain why:
+
+1. **Execution and regime are where retail edges die.** Every mean-reversion
+   result died on the overnight-execution gap and costs; the leverage winner
+   died on regime-dependence, confirmed on five independent international
+   markets. Neither failure was visible in a naive in-sample backtest — both
+   required a purpose-built test (the fill ablation; the international
+   out-of-sample reconstruction) to expose.
+2. **What partly survived is risk management, not return — and even it is
+   market-dependent.** Low-leverage trend-timing reduces drawdown in some
+   markets but not universally, and never adds return. The one partly-
+   deployable result — the 1× 200-MA rotation — is worth having as a
+   *market-dependent* risk-management overlay, not as the return engine the
+   goal asked for. That is the honest, well-documented shape of this problem.
+3. **Extreme leverage is tail-fatal, not merely risky.** A single >33% day
+   (Hong Kong, 1987) drives any 3× daily fund to a permanent zero. No amount
+   of timing recovers from a one-day wipeout — an argument from arithmetic,
+   not from a backtest.
+
+Eight pre-registered experiments; one false positive caught by an out-of-
+regime test; one refused p-hack; a self-pressure-test that retracted my own
+over-claim; and a final international out-of-sample test that closed the
+question on data never used to design anything. The headline is not a return
+number — it is a **process that falsified its own best-looking idea before
+risking a dollar**. For an engineering portfolio that is the harder, more
+valuable thing to show than a curve-fit equity curve: the ability to be
 rigorously, checkably wrong, and to know the difference between a real effect
-and a regime artifact.
-
-**Bottom line for the stated goal:** no robust, regime-independent, cost-
-surviving *high-return* EOD strategy was found across **all three** plausible
-families — index mean reversion, leveraged trend, and concentrated stock
-momentum — and this is backed by out-of-sample evidence from five independent
-international regimes and a survivorship-flattered stock test that still
-failed. That is the base-rate outcome at this scale. The project's one
-partly-deployable result — 1× 200-MA rotation — is worth having as a
-*market-dependent* risk-management overlay, not as the return engine that was
-asked for. The right lesson is not "try harder for a high-return bot"; it is
-that a rigorous process correctly told a builder his goal was unreachable with
-these tools — before the market charged tuition for the same lesson.
+and a regime artifact. A rigorous process correctly told the builder his goal
+was unreachable with these tools — before the market charged tuition for the
+same lesson.
 
 ---
 

@@ -1519,3 +1519,31 @@ pinned.
 
 **Next action:** none autonomous. Fold E3 into the write-up (below), then
 report the wall to Evan.
+
+---
+
+# Appendix AJ - Program conclusion written; findings-doc consolidation flagged (2026-07-10, ~04:45 local)
+
+**WHAT:** Evan asked to "write the conclusion for all the experiments so far."
+Produced a single canonical Conclusion synthesizing all 8 pre-registered
+experiments across 3 families (index mean reversion E1/E1b/E2/A3/B1;
+leveraged trend E4/E5/E7; concentrated stock momentum E3), the pre-registration
+method, the one demoted survivor (1x MA rotation = market-dependent
+risk-management overlay), and the honest bottom line. Delivered in-chat.
+
+**HONEST FLAG (not a yes-man pass):** the findings doc
+(`docs/findings_2026-07-09_experiment_arc.md`) ALREADY contains the concluding
+material, but scattered across four sections (Abstract; "The two through-lines"
+- MISLABELED, it lists three; "What this program demonstrates"; "Bottom line
+for the stated goal"). Writing a fresh conclusion into the doc would duplicate.
+Offered Evan a choice: consolidate those four into one `## Conclusion` (and fix
+the two/three label bug) vs leave the doc as-is. Not done unilaterally
+(surgical-changes discipline).
+
+**STATE:** program still comprehensively falsified / terminal; nothing live;
+frozen tests green (12 refs). No code touched. Reddit-thread read request
+(prior prompt) abandoned by Evan via interrupt/compact - reddit.com blocked at
+host level for the fetch tools; not pursued.
+
+**Next action:** await Evan's choice on doc consolidation; otherwise no
+autonomous work remains (Alpaca deploy is Evan-gated). Cadence #30 satisfied.
