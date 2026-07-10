@@ -70,6 +70,7 @@ the dated entry, not the digest.
 - [AE — Pressure-test: buy-hold-TQQQ claim retracted; clean test data exhausted](#appendix-ae---pressure-test-buy-hold-tqqq-claim-retracted-clean-test-data-exhausted-2026-07-10) (07-10)
 - [AF — E7 international validation: BOTH arms FAIL; high-return-robust question CLOSED](#appendix-af---e7-international-validation-both-arms-fail-high-return-robust-question-closed-2026-07-10) (07-10)
 - [AG — Write-up updated to E7 + M6 packaging; at the deploy wall](#appendix-ag---write-up-updated-to-e7--m6-packaging-readme-tag-at-the-deploy-wall-2026-07-10) (07-10)
+- [AH — Evan opens E3 (stock momentum); survivorship-bias design problem](#appendix-ah---evan-opens-e3-stock-momentum-survivorship-bias-design-problem-2026-07-10) (07-10)
 
 ---
 
@@ -1449,3 +1450,37 @@ nothing live; frozen tests green (12 refs).
 
 **Next action:** none autonomous. Evan-gated: deploy E6-1x to paper (Alpaca +
 go) / open a new family / consider the project closed on the write-up.
+
+---
+
+# Appendix AH - Evan opens E3 (stock momentum); survivorship-bias design problem (2026-07-10, ~01:30 local)
+
+**WHAT:** Evan chose option 2 — open a genuinely new family: E3, concentrated
+single-stock momentum (K=1-3), the natural home for high return per the
+redefined goal.
+
+**THE LOAD-BEARING PROBLEM (design-first, before any run):** yfinance carries
+only CURRENTLY-LISTED names, so any stock backtest silently omits companies
+that went bankrupt/delisted — and those deaths CLUSTER in the crash regimes
+(2000-02, 2008) that decide robustness. So a stock momentum backtest is MOST
+survivorship-flattered exactly in the periods that matter most. Compounding
+it: using today's large-caps as the universe adds LOOKAHEAD bias (I'd be
+picking the names that became winners). No point-in-time constituent data is
+available (Trading's price_cache has the same yfinance limitation).
+
+**CONSEQUENCE:** a rigorous return-claim backtest of stock momentum is
+effectively impossible with available data. Honest design = ASYMMETRIC
+FALSIFICATION (same logic as the AE vol-gate probe): run concentrated
+momentum on a current liquid large-cap universe, fully disclose both biases,
+and interpret ONLY a FAILURE as clean (if momentum fails even with
+survivorship+lookahead+a tech bull ALL in its favor, stocks are closed too);
+a PASS is uninterpretable and routes to forward live paper (the only
+survivorship-free test) — which is Evan/Alpaca-gated.
+
+**PLAN:** (1) probe stock-data availability (yfinance rate-limited earlier);
+(2) if available, pre-register E3 (doc-only) with the falsification-only
+interpretation baked in; (3) run a bounded 2014-2026 large-cap momentum
+backtest; (4) report per the asymmetric framing. Cadence #27 satisfied by
+this entry.
+
+**Next action:** stock-data probe, then E3 pre-registration.
