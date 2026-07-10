@@ -1654,3 +1654,38 @@ live, frozen tests green. Remaining work Evan-gated (Alpaca paper deploy of
 the 1x overlay, or close on the write-up).
 
 **Next action:** commit this entry, push main to origin.
+
+---
+
+# Appendix AO - E10/E11/E12 PRE-REGISTRATION (from swing-trading articles) before runners (2026-07-10, ~20:10 local)
+
+**WHAT:** Evan supplied a 5-source swing-trading article set (Investopedia,
+Schwab, TD, CapTrader, + long-form ex-Trillium YouTube trader & SMB Capital
+guide) and said "try everything." Assessment (in-chat): nearly all content
+reduces to already-falsified primitives (E1 MR, E8 breakout, E9 deep-dip,
+E4/E6 trend) or is intraday/discretionary (out of EOD scope). THREE genuinely
+testable directions extracted and pre-registered doc-only BEFORE runners:
+
+- **E10** = post-earnings-announcement drift (PEAD / catalyst continuation) -
+  the one edge named by 3 independent sources. Data probe (2026-07-10):
+  yfinance `get_earnings_dates(limit=100)` reaches ~2001-2002 for large caps
+  (100-row cap; earnings_history only 4 quarters; needs lxml, installed).
+  Single-stock => inherits E3 survivorship+lookahead => E3's asymmetric-
+  falsification framing (only a FAIL is clean). Same 39 survivor large-caps
+  as E3. Price-reaction signal (>=+3% earnings reaction -> buy, hold 40d).
+- **E11** = volume-gated breakout: E8 IDENTICAL rules + RVOL>=1.5 on the
+  breakout bar (the only change). Tests the pros' "volume confirms direction"
+  claim. Framed to avoid retuning-a-FAIL: gate specified a priori by sources,
+  not reverse-engineered from E8's losers. Weak prior.
+- **E12** = confirmed-capitulation MR ("right side of the V"): arm on >=15%
+  drop off 10d high WITH RVOL>=1.5 climax, enter on first close>prior high,
+  trail on prior-bar low. Distinct from E1 (waits for confirmation vs buying
+  the dip). 29-ETF universe (survivorship-clean).
+
+Prereg gates all fixed a priori (2000-13 gate, CAGR>=15% + DD ceiling +
+n_trades floor). Runners will NOT write swing.db (protects frozen refs);
+E11/E12 reuse the .e8e9_cache. Prior across the board: POOR (program 0/10).
+Doc-only commit hash predates all runner code.
+
+**Next action:** commit preregs, write runners E10/E11/E12, run, frozen
+tests, results doc, verdicts. Cadence: this entry serves the record step.
