@@ -65,6 +65,7 @@ the dated entry, not the digest.
 - [Z — Findings write-up (E1→B4 arc) produced; session close](#appendix-z---findings-write-up-e1b4-arc-produced-session-close-2026-07-09) (07-09)
 - [AA — E4 leverage rotation: pre-reg (313d88a), engine, VERDICT = PASS; STOP at live gate](#appendix-aa---e4-leverage-rotation-pre-reg-313d88a-engine-verdict--pass-stop-at-live-gate-2026-07-09) (07-09)
 - [AB — E5 regime test: E4 loses 93% in 2000-2013; VERDICT = FAIL; E4 de-authorized for paper](#appendix-ab---e5-regime-test-e4-loses-93-in-2000-2013-verdict--fail-e4-de-authorized-for-paper-2026-07-09) (07-09)
+- [AC — E6 de-leveraged rotation VERDICT = PASS (robust drawdown overlay, not high-return)](#appendix-ac---e6-de-leveraged-rotation-verdict--pass-robust-drawdown-overlay-not-high-return-2026-07-09) (07-09)
 
 ---
 
@@ -1259,3 +1260,40 @@ paper.
 this finding in hand (candidates: accept the falsification finding and write
 it up as the deliverable / try a genuinely different family from catalog v2 /
 test a de-leveraged 1x-2x rotation variant, each its own pre-registration).
+
+---
+
+# Appendix AC - E6 de-leveraged rotation VERDICT = PASS (robust drawdown overlay, not high-return) (2026-07-09, ~18:30 local)
+
+**WHAT:** Evan chose "do 2 then 1." E6 (option 2): pre-registered `0526ea2`
+(doc-only), then `scripts/run_e6_deleveraged.py` tested the 200-MA rotation
+at 1x (real QQQ, no synthesis) + 2x-synth across three windows. Results:
+`docs/research/2026-07-09_E6_deleveraged_results.md`.
+
+**VERDICT: E6 PASS (all 3 gates).** 1x QQQ rotation vs buy-hold QQQ:
+- 2000-2013: CAGR +2.66%, maxDD 52.2% vs 83.0%, Sharpe 0.24 vs 0.14
+- 2014-2026: CAGR +14.47%, maxDD 24.6% vs 35.6%, Sharpe 0.92 vs 0.89
+- 2000-2026: CAGR +8.04%, maxDD 52.2% vs 83.0%, Sharpe 0.54 vs 0.42
+Gates: maxDD >=10pp below BH in both crash windows PASS (31pp); Sharpe >= BH
+in all 3 windows PASS; CAGR>0 everywhere PASS.
+
+**THE HONEST READ:** this is the FIRST robust, regime-spanning result -- it
+passes the exact test E4 failed, because at 1x whipsaws don't compound into
+ruin. It roughly HALVES QQQ's worst drawdown (83->52%) and improves Sharpe in
+every regime. **BUT it is NOT the high-return goal:** full-period CAGR 8.04%
+~= buy-hold QQQ 7.92% -- the value is almost ENTIRELY drawdown reduction, not
+return (+0.65%/mo full, +1.13%/mo bull). In the bull it GAVE UP return (14.5
+vs 18.3% CAGR) to whipsaws -- the documented cost of trend overlays. 2x-synth
+does NOT beat 1x on risk-adjusted return (Sharpe 0.51<0.54, 80% DD) -- the
+sweet spot is 1x. Whole rotation arc in two lines: 3x (E4) = bull artifact
+that loses 93% in a real bear; 1x (E6) = real but modest, half the drawdown
+for ~the same long-run return as the index.
+
+**DISPOSITION:** E6 is a legitimate deployable RISK-MANAGEMENT overlay (not a
+return engine), Evan-gated for paper. Per prereg it is the last rotation-
+family experiment. E5/E6 are analysis scripts (fetch live pre-2014 history) --
+NOT pinned to the frozen tests (which cover the swing.db engines). Frozen
+tests remain green (12 refs).
+
+**Next action:** Evan's option 1 -- write up the full E1->E6 falsification +
+one-robust-overlay program as the deliverable.
