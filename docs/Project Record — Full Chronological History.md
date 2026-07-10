@@ -1547,3 +1547,66 @@ host level for the fetch tools; not pursued.
 
 **Next action:** await Evan's choice on doc consolidation; otherwise no
 autonomous work remains (Alpaca deploy is Evan-gated). Cadence #30 satisfied.
+
+---
+
+# Appendix AK - Project published public on GitHub (2026-07-10, ~04:52 local)
+
+**WHAT:** Evan authorized publishing the repo public as
+`Swing-Trading-Project`. Pre-publish secret scan first (git-tracked files
+only): no `.env`/`.key`/`.pem`, no keys/tokens in tracked text, `swing.db`
+and `*.env` correctly gitignored, no >1MB binaries. Clean.
+
+**REMOTE ALREADY EXISTED:** `gh repo create` failed ("Name already exists")
+— Evan had created `Evan-Daruwalla/Swing-Trading-Project` (public, default
+branch `main`) concurrently, containing only a placeholder `README.md`
+("Initial commit" `972d109`). Verified the remote tree held nothing but that
+throwaway README before overwriting.
+
+**PUBLISHED:** `git remote add origin` + renamed local `master`->`main` (matches
+convention) + `git push -u origin main --force` (replaced the placeholder
+`972d109` with full history head `46e3e0f`). Then `git push --tags`
+(`v1.0-program-complete`, `v1.1-all-families-closed`). Remote now: 38 commits,
+2 tags, full history. URL: https://github.com/Evan-Daruwalla/Swing-Trading-Project
+
+**STATE:** program terminal/falsified, nothing live. Repo is now the public
+portfolio artifact. Only remaining work is Evan-gated (Alpaca paper deploy of
+the 1x overlay). Cadence #33 satisfied (was overdue one prompt; logged, not
+hidden).
+
+**Next action:** none autonomous. This record entry itself is now an
+uncommitted local change (offer to commit+push).
+
+---
+
+# Appendix AL - Reddit thread analysis; Evan opens E8+E9 (new families) (2026-07-10, ~04:57 local)
+
+**WHAT:** Evan pasted the r/swingtrading thread "What Is Your Swing Trading
+Strategy (that you actually make consistent profit with?)" (reddit was
+host-blocked for fetch tools; content supplied manually) and asked for new
+ideas. Analysis delivered in-chat: most thread strategies are (a) already
+falsified by E1-E7/E3, (b) regime-flattered bull-market anecdotes (the
+"never book a loss" crowd = hidden unrealized drawdown, the E4 mistake with
+worse bookkeeping), or (c) unfalsifiable/intraday. Survivor selection noted
+(one commenter admits blowing 30 accounts). Thread's own median wisdom
+(write rules first, paper trade, consistent monthly profit doesn't exist)
+converges with this program's method and conclusion.
+
+**GENUINELY NEW families surfaced (never tested here):**
+- E8 = volatility-compression breakout (TTM-squeeze proxy: BB inside
+  Keltner -> breakout entry). Fourth family - reversion/trend/xs-momentum
+  never covered breakouts.
+- E9 = "never book a loss" audit: buy large-cap ETFs >=20% below ATH, +15%
+  target, NO stop - codifies the thread's most-upvoted claim to expose (or
+  refute) the hidden tail across 2000-13.
+- (Deferred: E10 pre-earnings run-up - needs earnings-date data probe.
+  Scale-in sizing study - requires Evan formally reopening shelved IBS.)
+
+**EVAN DECISION (2026-07-10): "do 1"** = pre-register E8+E9 together, run
+both, commit AK with the preregs. Stated priors (honest): both expected to
+FAIL the high-return gates per program base rate (0/8 so far); testing is
+information because the FAMILIES are new, not parameter fishing.
+
+**Next action:** write prereg_e8/e9 docs, doc-only commit BEFORE runners
+(the rigor claim), then runners via live fetch (NOT swing.db writes -
+protects frozen refs), run, results docs, verdicts. Cadence #36 satisfied.
