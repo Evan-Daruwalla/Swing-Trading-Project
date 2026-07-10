@@ -28,3 +28,5 @@ Thumbs.db
 .DS_Store
 .vscode/
 .idea/
+graphify-out/.graphify_python
+graphify-out/.graphify_root
