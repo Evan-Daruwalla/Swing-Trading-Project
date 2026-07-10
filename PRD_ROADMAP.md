@@ -138,7 +138,10 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 | M2 | E1 backtest | IBS MR engine, run vs pre-registered gates, pin frozen refs, survivorship bound (#27) |
 | M2b | E2: leveraged-ETF IBS — high-return arm (added by Evan's 2026-07-09 goal redefinition) | frozen leveraged universe, return-centric pre-reg, run vs gates, pin refs |
 | M2c | E3: concentrated mega-cap stocks (stub — designed after E2 readout) | liquidity-defined stock universe + survivorship caveat; own pre-reg |
-| M3 | Live paper (GATED on a passing pre-registered strategy + Evan approval) | daily loop, Alpaca mirror, divergence logging (#28), control + LLM-veto sleeves live from day one |
+| M2d | Rotation family (E4/E5/E6, done 2026-07-09) | 3× MA rotation PASS-then-regime-FAIL; 1× (E6) robust drawdown overlay |
+| M2e | E7: international validation (added 2026-07-10, record Appendix AF) | genuinely-unseen non-US regimes (Nikkei 1990s bear etc.): Arm 1 confirm E6 1×, Arm 2 a-priori-vol-gated 3× high-return shot |
+| M3 | Live paper (GATED on a passing pre-registered strategy + Evan approval) | deploy best E-series survivor; daily loop, Alpaca mirror, divergence logging (#28), control + LLM-veto sleeves |
+| M6 | Portfolio packaging | README → findings doc, record HTML twin, git tag; make the repo readable cold |
 | M4 | Overlay readout (GATED on pre-registered N/horizon) | evaluate veto vs control; continue, add cascade arm, or kill per pre-reg |
 | M5 | Expansion (GATED on M3 stable) | deferred ideas only: exit/stop ablations (#17/#18), sizing (#20), RSI comparison (#2), mega-cap pullback (#5), VIX gate (#11) |
 
@@ -265,6 +268,30 @@ reads out and Evan directs)
 Liquidity-defined large/mega-cap universe (defined by dollar-volume floor,
 NOT by picking today's winners), survivorship-bias caveat mandatory in every
 result, own dated pre-registration. Signal family chosen after E2 evidence.
+
+### M2e — E7: international validation (added 2026-07-10; the clean-data unlock)
+
+**WHY:** US backtest data is exhausted — its two crash regimes (2000-02,
+2008) have been used to judge the rotation family, so further US tweaks are
+hindsight-contaminated (record Appendix AE). Non-US indices (Nikkei back to
+1985, DAX/FTSE/HSI/ASX) supply GENUINELY UNSEEN, independent regimes — above
+all the 1990s-2000s Japan secular bear, the most hostile trend-rotation
+environment in modern history. This is the honest way to test a high-return
+idea without live paper.
+
+- **E7.1 pre-register** (`docs/prereg_E7_international.md`, doc-only commit
+  BEFORE the runner). Two arms, both a-priori (no fitting on non-US data):
+  Arm 1 = confirm E6's 1× MA-rotation drawdown-overlay value generalizes
+  across ≥5 non-US indices; Arm 2 = a-priori-VOL-GATED synthetic-3× rotation
+  (hold 3× only when index > 200d MA AND 20d annualized vol < 30% — the 30%
+  fixed from first principles: 3×·30% ≈ 90% position vol is the prudence
+  ceiling, NOT fit to any crash). Return-centric gates for Arm 2; drawdown-
+  overlay gates for Arm 1. Nikkei is the make-or-break market.
+- **E7.2 run** `scripts/run_e7_international.py` (local-index returns —
+  currency-neutral mechanics test; price indices understate return by
+  dividends, flagged). Verdict PLAINLY per arm, no tuning.
+- **E7.3 record** results doc + record entry. Frozen tests unaffected (E7 is
+  a live-fetch analysis script, not pinned).
 
 ### M3 — Live paper (gated)
 
