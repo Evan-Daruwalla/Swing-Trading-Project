@@ -1,12 +1,13 @@
-# Findings — A Falsification Program for a Small-Account Swing Trader (E1→E6)
+# Findings — A Falsification Program for a Small-Account Swing Trader (E1→E7)
 
-**Swing Trading project · written 2026-07-09 · Evan Daruwalla**
+**Swing Trading project · written 2026-07-09, updated 2026-07-10 · Evan Daruwalla**
 
-A complete synthesis of the project's first research program: six
-pre-registered strategies across two families, all EOD data, small capital
-($100–1,000), Alpaca paper target. Every number traces to a committed
-backtest; this reads from the append-only record (Appendices A–AC) and the
-per-experiment result docs. Point-in-time deliverable, not a live document.
+A complete synthesis of the project's first research program: seven
+pre-registered strategies across two families, closed out with an
+international out-of-sample test. All EOD data, small capital ($100–1,000),
+Alpaca paper target. Every number traces to a committed backtest; this reads
+from the append-only record (Appendices A–AF) and the per-experiment result
+docs. Point-in-time deliverable, not a live document.
 
 ---
 
@@ -25,6 +26,16 @@ under strict pre-registration:
   test on synthetic data back to 2000 showed it would have **lost 93%** in
   the dot-com and 2008 crashes. Its return was a 2014–2026 bull-market
   artifact.
+
+A final pre-registered test settled the leverage question on **genuinely
+unseen data** — five non-US indices back to 1985, including the 1990s–2000s
+Japan secular bear, the most hostile trend regime in modern history. Even an
+a-priori-volatility-gated 3× rotation (knobs fixed from first principles, no
+fitting) **failed every gate** across those markets: 4.55% mean return, 83–97%
+drawdowns, and the Hong Kong 3× was *mathematically wiped to zero* by the
+single-day 1987 crash. The high-return-AND-robust question is therefore
+closed not with "I ran out of data" but with "I found clean data and the idea
+failed on it."
 
 The single robust, deployable result to emerge is a **de-leveraged (1×)
 version of that same rotation** — but it is a *risk-management* tool
@@ -73,7 +84,9 @@ Every strategy followed the same protocol:
 | B1 | Gap-down at open | screen | +0.23% | dead |
 | E4 | 3× MA rotation | 2014–26 | +2.45% | **PASS** (then killed by E5) |
 | E5 | E4 across 2000–13 | unseen regime | **−0.28%** (DD 92.7%) | **FAIL** → E4 regime-dependent |
-| E6 | **1× MA rotation** | 2000–26 all regimes | +0.65% | **PASS** (robust, but risk-mgmt) |
+| E6 | **1× MA rotation** | 2000–26 all regimes | +0.65% | **PASS** (risk-mgmt; later downgraded) |
+| E7-A1 | E6 1× across 5 non-US markets | intl out-of-sample | — | **FAIL** 3/5 → E6 market-dependent |
+| E7-A2 | a-priori vol-gated 3× rotation | intl out-of-sample | +0.36% (mean) | **FAIL** all gates → question closed |
 
 ---
 
@@ -115,19 +128,49 @@ value is drawdown reduction, not return. At +0.65%/mo it is a risk-managed
 equity core, **not** a high-return strategy. (2× is worse risk-adjusted than
 1×; the sweet spot is no leverage.)
 
+## Family 2, continued — E7: the international out-of-sample close
+
+A pressure-test exposed that the US market only offers two independent crash
+regimes (2000–02, 2008), both now used — so further US backtesting is
+hindsight-contaminated. E7 reached for **genuinely unseen data**: five non-US
+indices back to 1985 (Nikkei, DAX, FTSE, Hang Seng, ASX), with the vol-gate
+threshold (30%) and leverage drag (5%/yr) **fixed a priori** so the non-US
+data was a true first test.
+
+- **Arm 1 (does E6's 1× overlay generalize?) — FAIL, 3/5.** It works
+  spectacularly in Japan (cuts the Nikkei's 82% buy-hold drawdown to 34%),
+  Germany, and Hong Kong; it *fails* in the UK and Australia, where the
+  timing whipsaw lowered risk-adjusted return. **E6 is downgraded from
+  "robust" to "market-dependent"** — real, but not a universal law.
+- **Arm 2 (a-priori vol-gated 3× — the last high-return candidate) — FAIL,
+  every gate.** Mean CAGR 4.55% (bar: 15%), drawdowns of 83–97%, the vol
+  gate barely improving on ungated leverage. And the Hong Kong 3× was
+  **mathematically wiped to zero by the single-day 1987 crash** (>33% in a
+  day destroys any 3× daily fund) — a mathematical, not statistical, verdict
+  on extreme leverage.
+
+E7 is the clean close: the one credible untested high-return idea, tested a
+priori on five independent unseen regimes, failed everything.
+
 ---
 
 ## The two through-lines
 
 1. **Execution and regime are where retail edges die.** Every mean-reversion
    result died on the overnight-execution gap and costs; the leverage winner
-   died on regime-dependence. Neither failure was visible in a naive
-   in-sample backtest — both required a purpose-built test (the fill ablation;
-   the synthetic regime reconstruction) to expose.
-2. **The one thing that survived is risk management, not return.** Low-
-   leverage trend-timing robustly reduces drawdown but does not add return.
-   That is the honest, well-documented shape of this problem — and it is the
-   opposite of what the "high percent return" goal wanted.
+   died on regime-dependence, confirmed on five independent international
+   markets. Neither failure was visible in a naive in-sample backtest — both
+   required a purpose-built test (the fill ablation; the international
+   out-of-sample reconstruction) to expose.
+2. **The one thing that partly survived is risk management, not return** —
+   and even it is market-dependent. Low-leverage trend-timing reduces
+   drawdown in some markets but not universally, and never adds return. That
+   is the honest, well-documented shape of this problem — the opposite of
+   what the "high percent return" goal wanted.
+3. **Extreme leverage is tail-fatal, not merely risky.** A single >33%
+   day (Hong Kong, 1987) drives any 3× daily fund to a permanent zero. No
+   amount of timing recovers from a one-day wipeout — an argument from
+   arithmetic, not from a backtest.
 
 ---
 
@@ -135,34 +178,44 @@ equity core, **not** a high-return strategy. (2× is worse risk-adjusted than
 
 - All results are **simulated fills**; the live divergence logger (built into
   the plan) is what would validate real costs. Nothing has traded.
-- E6's clean windows are partly **seen** (2000–2013 was viewed at 3× in E5),
-  so E6 is confirmatory-on-seen-data at a new leverage; live paper / other
-  markets remain the only truly clean forward test.
-- The synthetic 3×/2× series, though validated on overlap, **understate
-  pre-2014 financing costs** (rates were higher then) — flagged in the E5/E6
+- E6's US windows are partly **seen** (2000–2013 was viewed at 3× in E5);
+  the E7 international test is the cleaner out-of-sample check, and it
+  downgraded E6 to market-dependent. Live paper remains the only clean
+  *forward* test.
+- The synthetic 3×/2× series, though validated against real TQQQ on overlap,
+  **understate pre-2014 financing costs** and use an a-priori drag for non-US
+  (no deep-history international 3× fund exists to calibrate) — flagged in the
   preregs; it biases mildly against the buy-hold benchmarks, not the
-  conclusions.
-- **Survivorship bias** is eliminated for all ETF work but returns the moment
-  single stocks (the never-run E3) are tested.
+  conclusions. International results use local-currency price indices
+  (dividend-excluding → returns understated ~2–3%/yr).
+- **Survivorship bias** is eliminated for all ETF/index work but returns the
+  moment single stocks (the never-run E3) are tested.
 - E6 at 1× is **not** the stated high-return goal; that goal is unmet.
 
 ---
 
 ## What this program demonstrates
 
-Six pre-registered experiments; one false positive caught by an
-out-of-regime test; one refused p-hack; one honest, modest survivor. The
-headline is not a return number — it is a **process that falsified its own
-best-looking idea before risking capital**. For an engineering portfolio that
-is the harder and more valuable thing to show than a curve-fit equity curve:
-the ability to be rigorously, checkably wrong, and to know the difference
-between a real effect and a regime artifact.
+Seven pre-registered experiments; one false positive caught by an
+out-of-regime test; one refused p-hack; a self-pressure-test that retracted
+my own over-claim; and a final international out-of-sample test that closed
+the question on data never used to design anything. The headline is not a
+return number — it is a **process that falsified its own best-looking idea
+before risking a dollar**. For an engineering portfolio that is the harder,
+more valuable thing to show than a curve-fit equity curve: the ability to be
+rigorously, checkably wrong, and to know the difference between a real effect
+and a regime artifact.
 
 **Bottom line for the stated goal:** no robust, regime-independent, cost-
-surviving *high-return* EOD strategy was found, and the accumulated evidence
-argues that is the base-rate outcome at this scale. The project's one
-deployable result — 1× 200-MA rotation — is worth having as risk management,
-not as the return engine that was asked for.
+surviving *high-return* EOD strategy was found — and this is now backed by
+out-of-sample evidence from five independent international regimes, not just
+US in-sample falsification. That is the base-rate outcome at this scale. The
+project's one partly-deployable result — 1× 200-MA rotation — is worth having
+as a *market-dependent* risk-management overlay, not as the return engine
+that was asked for. The right lesson is not "try harder for a high-return
+bot"; it is that a rigorous process correctly told a builder his goal was
+unreachable with these tools — before the market charged tuition for the
+same lesson.
 
 ---
 
@@ -170,15 +223,17 @@ not as the return engine that was asked for.
 
 - Code: `swing_bot/` (`prices`, `universe`, `coverage_gate`, `signals`,
   `backtest`, `rotation`, `test_frozen`); `scripts/` (per-experiment runners,
-  incl. `run_e5_regime.py` / `run_e6_deleveraged.py` synthetic studies).
+  incl. `run_e5_regime.py` / `run_e6_deleveraged.py` / `run_e7_international.py`
+  synthetic + out-of-sample studies).
 - Data: `swing.db` (34 ETFs, split-adjusted / dividend-unadjusted, 2014–26);
-  E5/E6 fetch QQQ/TQQQ/QLD history to 1999 live (not pinned).
+  E5/E6/E7 fetch QQQ/TQQQ/QLD + non-US indices to 1985 live (not pinned).
 - Pre-registrations: E1 `8963e49`, E1b `0126ce3`, E2 `865c09e`, E4 `313d88a`,
-  E5 `09a3a31`, E6 `0526ea2`.
-- Result docs: `docs/research/2026-07-09_*` (E1/E1b/E2/screen/E4/E5/E6).
-- Full chronology with commit hashes: the project record, Appendices A–AC.
+  E5 `09a3a31`, E6 `0526ea2`, E7 `70ed2a1`.
+- Result docs: `docs/research/2026-07-09_*` and `2026-07-10_E7_*`.
+- Full chronology with commit hashes: the project record, Appendices A–AF.
 - Tripwire: `python -m swing_bot.test_frozen` (12 refs, d = ±0.0000pp).
 
-**Status:** program complete. Nothing live. Open, Evan-gated options: deploy
-E6 (1×) to paper as a risk-managed core; open a genuinely new family (stocks/
-events); or close the project on this write-up.
+**Status:** program complete, closed on international out-of-sample evidence.
+Nothing live. Open, Evan-gated options: deploy E6 (1×) to paper as a
+market-dependent risk-managed overlay; open a genuinely new family
+(stocks/events); or close the project on this write-up.

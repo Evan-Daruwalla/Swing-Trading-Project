@@ -69,6 +69,7 @@ the dated entry, not the digest.
 - [AD — Full E1→E6 program write-up (option 1); program complete](#appendix-ad---full-e1e6-program-write-up-option-1-program-complete-2026-07-09) (07-09)
 - [AE — Pressure-test: buy-hold-TQQQ claim retracted; clean test data exhausted](#appendix-ae---pressure-test-buy-hold-tqqq-claim-retracted-clean-test-data-exhausted-2026-07-10) (07-10)
 - [AF — E7 international validation: BOTH arms FAIL; high-return-robust question CLOSED](#appendix-af---e7-international-validation-both-arms-fail-high-return-robust-question-closed-2026-07-10) (07-10)
+- [AG — Write-up updated to E7 + M6 packaging; at the deploy wall](#appendix-ag---write-up-updated-to-e7--m6-packaging-readme-tag-at-the-deploy-wall-2026-07-10) (07-10)
 
 ---
 
@@ -1419,3 +1420,32 @@ wipeout. E7 is a live-fetch analysis script, NOT pinned to frozen tests
 **Next action (autonomous-continuable):** M6 portfolio packaging (README,
 record HTML twin, git tag) -- needs neither Evan nor more data. Then the wall:
 M3 deployment is BLOCKED-ON-EVAN (Alpaca account + go).
+
+---
+
+# Appendix AG - Write-up updated to E7 + M6 packaging (README, tag); at the deploy wall (2026-07-10, ~01:10 local)
+
+**WHAT:** Continued autonomously past E7. (1) Updated the deliverable
+`docs/findings_2026-07-09_experiment_arc.md` from E1->E6 to the full E1->E7
+program: added the international out-of-sample close, a third through-line
+(extreme leverage is tail-fatal -- HSI 1987), downgraded E6 to
+market-dependent, and strengthened the conclusion to rest on OOS
+international evidence. (2) M6 packaging: wrote `README.md` (cold-readable
+entry point -> findings doc / HANDOFF / record, experiment table, reproduce
+steps, honest conclusion). (3) git tag marking program-complete.
+
+**DELIBERATELY SKIPPED (reported, not silent):** the record HTML twin. This
+project never built a renderer (unlike Trading); building an anchor-checking
+renderer is disproportionate to the value now, and the markdown record reads
+fine on GitHub. Deferred; noted here so a future session doesn't assume one
+exists.
+
+**THE WALL.** Everything autonomously doable is done. The only remaining
+roadmap items are BLOCKED-ON-EVAN: M3 live-paper deployment needs an Alpaca
+paper account + Evan's explicit go; opening a new strategy family (E3 stocks)
+needs Evan's direction. Per "keep going until you can't anymore" -- this is
+where I can't without Evan. Program is at a clean, packaged terminal state;
+nothing live; frozen tests green (12 refs).
+
+**Next action:** none autonomous. Evan-gated: deploy E6-1x to paper (Alpaca +
+go) / open a new family / consider the project closed on the write-up.

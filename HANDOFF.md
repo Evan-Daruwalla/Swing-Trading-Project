@@ -12,24 +12,25 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — E1→E6 program COMPLETE; one robust result (1× rotation, risk-mgmt); nothing live
+## Current state — E1→E7 program COMPLETE, closed on international OOS evidence; packaged; nothing live
 
-**Last updated: 2026-07-09** — this file is the only live snapshot; history
+**Last updated: 2026-07-10** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-09 — Program complete (record Appendices AB–AD).** After E5
-> killed E4 (3× rotation = 92.7% DD in 2000-2013, a bull artifact), E6
-> (prereg `0526ea2`) tested the SAME rotation de-leveraged: **1× QQQ rotation
-> PASSES a regime-spanning test** — cuts QQQ's worst drawdown 83%→52%,
-> Sharpe ≥ buy-hold in all 3 regimes — but full-period CAGR 8.04% ≈ buy-hold
-> 7.92%, so its value is DRAWDOWN REDUCTION, NOT return (+0.65%/mo). 2× worse
-> than 1×. **The full E1→E6 write-up is the deliverable:**
-> `docs/findings_2026-07-09_experiment_arc.md`.
+> **2026-07-10 — Program closed + packaged (record Appendices AF).** E7
+> (prereg `70ed2a1`) tested on genuinely-unseen non-US regimes (Nikkei 1985+,
+> DAX/FTSE/HSI/ASX). **Both arms FAIL:** Arm 1 — E6's 1× overlay generalizes
+> to only 3/5 markets (works Japan/Germany/HK, fails UK/Australia) → **E6
+> downgraded to market-dependent**; Arm 2 — even a-priori-vol-gated 3×
+> rotation fails every gate (mean CAGR 4.55%, 83–97% DDs; HSI 3× mathematically
+> wiped out by the 1987 crash). **The high-return-robust question is CLOSED
+> with out-of-sample evidence.** Findings write-up updated to E1→E7; README
+> added (`M6` packaging). Frozen tests green (12 refs).
 >
-> **Honest bottom line:** no robust high-return EOD edge found (goal unmet);
-> one deployable result = 1× 200-MA rotation as RISK MANAGEMENT. The value is
-> the falsification program (caught E4 before any capital). Nothing live;
-> frozen tests green (12 refs).
+> **Bottom line:** no high-return-robust EOD edge exists in what was tested
+> (now OOS-confirmed). One partly-deployable result: 1× MA rotation as a
+> market-dependent risk-management overlay. Deliverable =
+> `docs/findings_2026-07-09_experiment_arc.md`.
 
 > **2026-07-09 — C1 + three screens (record Appendices W–Y).** Engine v2
 > (`size_on_nav=True`: NAV-proportional, cash-capped; v1 refs intact; 10
@@ -111,9 +112,10 @@ lives in the record.
 | E2 leveraged-ETF IBS (high-return arm) | M2b | **Done — E2 FAILED** | Prereg `865c09e`; CAGR 7.98%/maxDD 60.6% vs 15%/60% gates; refs pinned; **IBS family SHELVED (pre-committed stop)** |
 | E3 concentrated stocks | M2c | **Stub** | Different signal family; own prereg; survivorship caveat mandatory |
 | E4 leverage rotation (3×) | M2d | **PASS backtest, FAILED regime test** | `313d88a` PASS 2014-26; E5 `09a3a31` FAIL 2000-13 (92.7% DD). De-authorized |
-| E6 de-leveraged rotation (1×) | M2d | **PASS (robust, risk-mgmt)** | `0526ea2`; cuts DD 83→52%, Sharpe≥BH all regimes, but CAGR≈buy-hold. Not high-return. Paper candidate as risk-managed core (Evan-gated) |
-| Live paper | M3 | **BLOCKED — Evan go + Alpaca acct** | E6 (1×) is the only regime-robust candidate; explicitly risk-mgmt not the high-return goal |
-| Program write-up | — | **Done** | `docs/findings_2026-07-09_experiment_arc.md` — full E1→E6 falsification deliverable |
+| E6 de-leveraged rotation (1×) | M2d | **PASS, later downgraded** | `0526ea2`; robust in US, but E7 showed market-dependent (3/5). Risk-mgmt overlay, not high-return |
+| E7 international validation | M2e | **Both arms FAIL** | `70ed2a1`; closed the high-return-robust question on 5 unseen non-US regimes |
+| Live paper | M3 | **BLOCKED — Evan go + Alpaca acct** | E6 (1×) the only candidate, market-dependent risk-mgmt; deploy is Evan's call |
+| Program write-up + packaging | M6 | **Done** | Findings doc updated to E1→E7; `README.md` added; git tag |
 | Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — gate not open** | E1 did NOT pass M2→M3; needs a new pre-registered strategy that passes + Evan go + Alpaca account |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
 | Expansion (deferred ideas) | M5 | **GATED** | On M3 stable |
