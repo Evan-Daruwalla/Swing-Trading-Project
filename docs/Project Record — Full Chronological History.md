@@ -1729,3 +1729,53 @@ tested and falsified. Cadence #42 satisfied by this entry.
 
 **Next action:** results doc, README/HANDOFF/memory sync, commit. Push only
 on Evan's word.
+
+---
+
+# Appendix AQ - graphify knowledge graph built (2026-07-10, ~20:25 local)
+
+**WHAT:** Ran /graphify on the project. 69 files / ~56.6k words ->
+281-node / 511-edge graph, 13 communities. AST (26 py files) = 156 nodes;
+semantic extraction (43 docs via 2 parallel general-purpose subagents,
+no Gemini key so host-LLM path) = 125 nodes. Outputs in graphify-out/
+(graph.html, GRAPH_REPORT.md, graph.json, manifest.json, cost.json).
+
+**HEALTH WARNING (surfaced, not hidden):** 87 dangling-endpoint edges
+(~14% of 601 raw) from cross-chunk node-id mismatch - chunk 1 anchored
+E8-E12 to handoff_* ids, chunk 2 created docs_prereg_* / research_* ids for
+the same experiments; edges across the seam dangle. Graph still built (511
+valid edges). Fixable with `graphify extract --force` + single-chunk or a
+shared id map if a cleaner graph is wanted.
+
+**God nodes** (as expected): HANDOFF (23), PRD_ROADMAP (18), Project Record
+(17), findings write-up (15) - the doc system is the spine. Communities map
+cleanly to the experiment arc (IBS core, leverage rotation E4-E7, article-set
+E8-E12, stock momentum E3, engine/gates). graphify-out/ is a generated
+artifact, currently UNCOMMITTED and not gitignored.
+
+**Next action:** none required; offer to commit or gitignore graphify-out.
+Cadence #45 satisfied.
+
+---
+
+# Appendix AR - Research brief: exhaustive swing-strategy catalog (2026-07-10, ~20:40 local)
+
+**WHAT:** Ran /research-brief on "every swing-trading idea with merit,"
+cross-referenced against the 13 falsified experiments. ~40 documented ideas
+catalogued with primary sources (de Groot 2012, Frazzini-Lamont 2007,
+George-Hwang 2004, Hong-Li-Ni 2015, McConnell-Xu 2008, Greenwood-Sammon 2025,
+Moskowitz-Ooi-Pedersen 2012, etc.). Doc: docs/research/2026-07-10_swing_strategy_catalog.md.
+
+**FINDING:** vast majority are KILLED-HERE, ADJACENT-KILLED, DECAYED,
+OUT-OF-SCOPE, or OVERLAY. Only FIVE are genuinely untested-here + merit +
+in-scope: (1) cross-sectional short-term reversal (weekly, large-cap,
+cost-opt; de Groot); (2) earnings-ANNOUNCEMENT premium (buy PRE-earnings;
+distinct from FAILED E10 post-drift; reuses E10 infra); (3) short-interest/
+days-to-cover screen; (4) DIVERSIFIED sector momentum (concentrated E3
+already FAILED); (5) turn-of-month overlay. Honest caveat recorded: 4 of 5
+are diversified/cross-sectional, not the concentrated high-return bet the
+goal wanted; the fill-timing ablation is direct counter-evidence vs the
+reversal candidates. High-return-robust-retail-EOD cell still empty.
+
+**Next action:** none unless Evan picks a candidate to pre-register. This is
+an informational brief, not an experiment.
