@@ -1779,3 +1779,17 @@ reversal candidates. High-return-robust-retail-EOD cell still empty.
 
 **Next action:** none unless Evan picks a candidate to pre-register. This is
 an informational brief, not an experiment.
+
+---
+
+# Appendix AS - Push of E10-E12 arc + catalog + graph; next-steps planning (2026-07-10, ~21:13 local)
+
+**WHAT:** Evan authorized push ("push then plan the next steps"). Pushing 4
+pending commits (129dc22 E10-E12 prereg, 46cc68b E10-E12 results, c95800f
+catalog+graph, edf7991 path-leak cleanup) plus this entry to the public repo.
+
+**STATE at push:** 0 PASS / 13 attempts / 6 families; strategy-catalog brief
+identifies 5 untested-with-merit candidates (x-sectional reversal,
+earnings-announcement premium, days-to-cover, diversified sector momentum,
+turn-of-month overlay); knowledge graph committed. Next-steps plan to follow
+in-chat. Cadence #48 satisfied.
