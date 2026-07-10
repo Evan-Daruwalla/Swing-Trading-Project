@@ -68,6 +68,7 @@ the dated entry, not the digest.
 - [AC — E6 de-leveraged rotation VERDICT = PASS (robust drawdown overlay, not high-return)](#appendix-ac---e6-de-leveraged-rotation-verdict--pass-robust-drawdown-overlay-not-high-return-2026-07-09) (07-09)
 - [AD — Full E1→E6 program write-up (option 1); program complete](#appendix-ad---full-e1e6-program-write-up-option-1-program-complete-2026-07-09) (07-09)
 - [AE — Pressure-test: buy-hold-TQQQ claim retracted; clean test data exhausted](#appendix-ae---pressure-test-buy-hold-tqqq-claim-retracted-clean-test-data-exhausted-2026-07-10) (07-10)
+- [AF — E7 international validation: BOTH arms FAIL; high-return-robust question CLOSED](#appendix-af---e7-international-validation-both-arms-fail-high-return-robust-question-closed-2026-07-10) (07-10)
 
 ---
 
@@ -1375,3 +1376,46 @@ frozen tests green.
 (exploratory, contaminated); (b) forward-test a candidate via live paper
 (needs Alpaca + go); (c) new independent-market data; (d) close on the
 write-up.
+
+---
+
+# Appendix AF - E7 international validation: BOTH arms FAIL; high-return-robust question CLOSED (2026-07-10, ~00:45 local)
+
+**WHAT:** Evan said "go / continue the roadmap." Executed E7 (PRD M2e), the
+clean-data unlock from Appendix AE: test on genuinely-unseen non-US regimes.
+yfinance rate limit had cleared; fetched Nikkei (1985+), DAX, FTSE, HSI, ASX,
++ S&P cross-check. Pre-reg `70ed2a1` (doc-only, a-priori vol=30% + drag=5%/yr
+fixed from first principles). Runner `scripts/run_e7_international.py`.
+Results: `docs/research/2026-07-10_E7_international_results.md`.
+
+**ARM 1 (does E6 1x overlay generalize?): FAIL, 3/5 (need >=4).** Works in
+Japan/Germany/HK/US (big DD cuts incl. Nikkei 82%->34%!, higher Sharpe);
+FAILS in UK (barely cut DD, Sharpe 0.39->0.20) and Australia (cut DD but
+Sharpe 0.43->0.30). E6 DOWNGRADED: real but MARKET-DEPENDENT, not a universal
+law -- in choppy trending markets the whipsaw cost exceeds the drawdown
+benefit risk-adjusted.
+
+**ARM 2 (a-priori vol-gated 3x high-return shot): FAIL, all 4 gates.** Mean
+CAGR 4.55% (bar 15%); FTSE -1.34% & 97.3% DD; Nikkei +6.93% but 83.3% DD;
+vol gate barely beat plain-3x (Nikkei 83.3 vs 85.1). **HSI 3x is degenerate:
+the 1987 Hang Seng >33%-one-day crash mathematically WIPES OUT any 3x daily
+fund to zero permanently (buy-hold-3x = -100%)** -- a mathematical, not
+statistical, argument against extreme leverage. Verdict holds on multiple
+independent gates without HSI.
+
+**THE DEFINITIVE CLOSE:** the one credible untested high-return idea
+(a-priori-vol-gated leverage rotation) was tested on 5 genuinely independent
+unseen regimes with fixed knobs (no fitting) and FAILED every gate. The
+conclusion upgrades from "ran out of US data" to "found clean data and the
+idea failed on it." **No high-return-AND-robust EOD strategy found -- now
+backed by out-of-sample international evidence, not just US in-sample.** Even
+the one risk-mgmt survivor (E6 1x) is market-dependent.
+
+**Engine/data notes:** synthetic floored at 0 (real funds can't go negative);
+rotation can't buy a dead (o=0) fund; stats() guards 0/0 daily returns post-
+wipeout. E7 is a live-fetch analysis script, NOT pinned to frozen tests
+(which stay green, 12 refs). PRD updated: M2e (E7) done, M6 (packaging) added.
+
+**Next action (autonomous-continuable):** M6 portfolio packaging (README,
+record HTML twin, git tag) -- needs neither Evan nor more data. Then the wall:
+M3 deployment is BLOCKED-ON-EVAN (Alpaca account + go).
