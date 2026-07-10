@@ -12,12 +12,22 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — E1→E7 program COMPLETE, closed on international OOS evidence; packaged; nothing live
+## Current state — ALL THREE families falsified (E3 stocks closed too); nothing live
 
 **Last updated: 2026-07-10** — this file is the only live snapshot; history
 lives in the record.
 
-> **2026-07-10 — Program closed + packaged (record Appendices AF).** E7
+> **2026-07-10 — E3 stock momentum FAIL; third family closed (record
+> Appendix AI).** Evan opened E3 (concentrated stock momentum). Prereg
+> `87bc8d9` with asymmetric-falsification framing (survivorship+lookahead bias
+> → only a FAIL is clean). Result: 2000-2013 gate CAGR 6.27% (FAIL vs 15%),
+> and momentum UNDERPERFORMED equal-weight buy-hold of its own survivor
+> universe in every window (2014-26: 4.79% vs 14.94%). Clean close. **All
+> three high-return routes — index mean reversion, leveraged trend, stock
+> momentum — now falsified under pre-registration.** Write-up updated to E1→E7
+> + E3.
+
+> **2026-07-10 — Program closed + packaged (record Appendices AF-AG).** E7
 > (prereg `70ed2a1`) tested on genuinely-unseen non-US regimes (Nikkei 1985+,
 > DAX/FTSE/HSI/ASX). **Both arms FAIL:** Arm 1 — E6's 1× overlay generalizes
 > to only 3/5 markets (works Japan/Germany/HK, fails UK/Australia) → **E6
@@ -110,7 +120,7 @@ lives in the record.
 | Pre-registration & fill ablation | M1 | **Done** | M1.6 power (`2a9edde`) + M1.7 prereg (`8963e49`) + M1.8 ablation; next-open keeps ~64% |
 | E1 IBS backtest | M2 | **Done — E1 FAILED** | Engine (`415c527`), verdict (`d28f899`), frozen refs pinned. E1b OOS near-miss (Sharpe 0.4961, `1a71468`). M2.12 survivorship deferred |
 | E2 leveraged-ETF IBS (high-return arm) | M2b | **Done — E2 FAILED** | Prereg `865c09e`; CAGR 7.98%/maxDD 60.6% vs 15%/60% gates; refs pinned; **IBS family SHELVED (pre-committed stop)** |
-| E3 concentrated stocks | M2c | **Stub** | Different signal family; own prereg; survivorship caveat mandatory |
+| E3 concentrated stock momentum | M2c | **FAIL (clean)** | `87bc8d9`; 2000-13 CAGR 6.27% vs 15%, < buy-hold. Stocks closed for a backtested high-return claim |
 | E4 leverage rotation (3×) | M2d | **PASS backtest, FAILED regime test** | `313d88a` PASS 2014-26; E5 `09a3a31` FAIL 2000-13 (92.7% DD). De-authorized |
 | E6 de-leveraged rotation (1×) | M2d | **PASS, later downgraded** | `0526ea2`; robust in US, but E7 showed market-dependent (3/5). Risk-mgmt overlay, not high-return |
 | E7 international validation | M2e | **Both arms FAIL** | `70ed2a1`; closed the high-return-robust question on 5 unseen non-US regimes |

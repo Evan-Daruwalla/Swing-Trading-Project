@@ -8,19 +8,22 @@
 
 A systematic-trading research project whose goal was a **high percentage
 return over short holds** with a small account. It did not find one — and the
-*discipline of how it failed* is the point. Seven strategies were tested under
-strict **pre-registration** (rules committed to git *before* the code that
-produces results), honest kill-criteria (no re-tuning a failed run), and
-out-of-sample and out-of-regime tests — culminating in an international test
-on five independent markets never used to design anything.
+*discipline of how it failed* is the point. Eight strategies across three
+families were tested under strict **pre-registration** (rules committed to git
+*before* the code that produces results), honest kill-criteria (no re-tuning a
+failed run), and out-of-sample / out-of-regime tests — culminating in an
+international test on five independent markets and a survivorship-aware stock
+test, neither used to design anything.
 
 **The honest conclusion:** no robust, regime-independent, cost-surviving
-high-return EOD strategy was found, backed by out-of-sample evidence from
-five international regimes (including the 1990s Japan secular bear). The one
-partly-deployable result — a 1× 200-day-MA rotation — is a *market-dependent
-risk-management overlay*, not a return engine. A rigorous process correctly
-told the builder his goal was unreachable with these tools, before the market
-charged tuition for the same lesson.
+high-return EOD strategy was found across all three plausible families —
+index mean reversion, leveraged trend, and concentrated stock momentum. This
+is backed by out-of-sample evidence from five international regimes (including
+the 1990s Japan secular bear) and a survivorship-*flattered* stock test that
+still failed. The one partly-deployable result — a 1× 200-day-MA rotation — is
+a *market-dependent risk-management overlay*, not a return engine. A rigorous
+process correctly told the builder his goal was unreachable with these tools,
+before the market charged tuition for the same lesson.
 
 ## Read this first
 
@@ -40,6 +43,7 @@ charged tuition for the same lesson.
 | E5 | …E4 across the 2000–13 crashes | FAIL — 93% drawdown; a bull-market artifact |
 | E6 | 1× MA rotation | PASS — robust drawdown overlay, but ≈ index return (risk-mgmt, not high return) |
 | E7 | International out-of-sample (5 non-US indices) | FAIL — even a-priori-vol-gated 3× fails everywhere; E6 downgraded to market-dependent |
+| E3 | Concentrated stock momentum (top-3) | FAIL (clean) — 6% vs 15% bar even bias-flattered; lost to buy-and-hold |
 
 ## Reproduce
 

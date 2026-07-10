@@ -2,12 +2,14 @@
 
 **Swing Trading project · written 2026-07-09, updated 2026-07-10 · Evan Daruwalla**
 
-A complete synthesis of the project's first research program: seven
-pre-registered strategies across two families, closed out with an
-international out-of-sample test. All EOD data, small capital ($100–1,000),
-Alpaca paper target. Every number traces to a committed backtest; this reads
-from the append-only record (Appendices A–AF) and the per-experiment result
-docs. Point-in-time deliverable, not a live document.
+A complete synthesis of the project's first research program: eight
+pre-registered strategies across **three** families — index mean reversion,
+leveraged trend rotation, and concentrated stock momentum — closed out with
+an international out-of-sample test and a survivorship-aware stock test. All
+EOD data, small capital ($100–1,000), Alpaca paper target. Every number
+traces to a committed backtest; this reads from the append-only record
+(Appendices A–AI) and the per-experiment result docs. Point-in-time
+deliverable, not a live document.
 
 ---
 
@@ -37,8 +39,15 @@ single-day 1987 crash. The high-return-AND-robust question is therefore
 closed not with "I ran out of data" but with "I found clean data and the idea
 failed on it."
 
+Finally, the last plausible route to high return — **concentrated single-
+stock momentum** — was tested with the survivorship problem confronted head-on
+(a stock backtest omits the companies that went bankrupt, biasing it upward).
+Even on a bias-*flattered* universe of survivor large-caps, momentum
+**failed** the return gate (6% vs 15%) and, damningly, **underperformed simply
+buying and holding the same stocks**. All three families are now falsified.
+
 The single robust, deployable result to emerge is a **de-leveraged (1×)
-version of that same rotation** — but it is a *risk-management* tool
+version of the trend rotation** — but it is a *risk-management* tool
 (roughly halves the index's worst drawdown for about the same long-run
 return), **not** the high-return strategy the goal asked for. That goal
 remains unmet, and the evidence now argues it is genuinely hard to meet with
@@ -86,7 +95,8 @@ Every strategy followed the same protocol:
 | E5 | E4 across 2000–13 | unseen regime | **−0.28%** (DD 92.7%) | **FAIL** → E4 regime-dependent |
 | E6 | **1× MA rotation** | 2000–26 all regimes | +0.65% | **PASS** (risk-mgmt; later downgraded) |
 | E7-A1 | E6 1× across 5 non-US markets | intl out-of-sample | — | **FAIL** 3/5 → E6 market-dependent |
-| E7-A2 | a-priori vol-gated 3× rotation | intl out-of-sample | +0.36% (mean) | **FAIL** all gates → question closed |
+| E7-A2 | a-priori vol-gated 3× rotation | intl out-of-sample | +0.36% (mean) | **FAIL** all gates → leverage closed |
+| E3 | concentrated stock momentum (top-3) | 2000–13 gate, bias-flattered | +0.51% | **FAIL** (6% vs 15%; < buy-hold) → stocks closed |
 
 ---
 
@@ -149,8 +159,28 @@ data was a true first test.
   day destroys any 3× daily fund) — a mathematical, not statistical, verdict
   on extreme leverage.
 
-E7 is the clean close: the one credible untested high-return idea, tested a
-priori on five independent unseen regimes, failed everything.
+E7 is the clean close for leverage: the one credible untested high-return
+idea, tested a priori on five independent unseen regimes, failed everything.
+
+## Family 3 — Concentrated stock momentum (E3): the survivorship trap, confronted
+
+Single stocks are the natural home for high return — but a stock backtest on
+freely-available data is quietly rigged: it omits the companies that went
+bankrupt or delisted (Enron, Lehman, WorldCom…), and those deaths cluster in
+the very crash regimes that decide robustness. So the backtest is *most*
+flattered exactly where honesty matters most.
+
+E3 confronted this with an **asymmetric-falsification** design: run
+concentrated momentum (hold the top 3 large-caps by trailing 3-month return,
+rebalanced fortnightly) on a universe of *survivor* stocks — a universe whose
+biases can only inflate the result — and treat only a FAILURE as meaningful.
+It failed, decisively: **6.3% CAGR in 2000–2013 versus the 15% bar**, and —
+the tell — it **underperformed simply equal-weight buying and holding the same
+39 stocks** in every window (4.8% vs 14.9% in 2014–2026). The momentum
+*selection itself destroyed value*. Because the biases could only have helped,
+the failure is interpretable in a way a pass never could have been. Stocks are
+closed for a backtested high-return claim; only forward live paper
+(survivorship-free) could say more, on a poor prior.
 
 ---
 
@@ -207,15 +237,16 @@ rigorously, checkably wrong, and to know the difference between a real effect
 and a regime artifact.
 
 **Bottom line for the stated goal:** no robust, regime-independent, cost-
-surviving *high-return* EOD strategy was found — and this is now backed by
-out-of-sample evidence from five independent international regimes, not just
-US in-sample falsification. That is the base-rate outcome at this scale. The
-project's one partly-deployable result — 1× 200-MA rotation — is worth having
-as a *market-dependent* risk-management overlay, not as the return engine
-that was asked for. The right lesson is not "try harder for a high-return
-bot"; it is that a rigorous process correctly told a builder his goal was
-unreachable with these tools — before the market charged tuition for the
-same lesson.
+surviving *high-return* EOD strategy was found across **all three** plausible
+families — index mean reversion, leveraged trend, and concentrated stock
+momentum — and this is backed by out-of-sample evidence from five independent
+international regimes and a survivorship-flattered stock test that still
+failed. That is the base-rate outcome at this scale. The project's one
+partly-deployable result — 1× 200-MA rotation — is worth having as a
+*market-dependent* risk-management overlay, not as the return engine that was
+asked for. The right lesson is not "try harder for a high-return bot"; it is
+that a rigorous process correctly told a builder his goal was unreachable with
+these tools — before the market charged tuition for the same lesson.
 
 ---
 
@@ -228,12 +259,13 @@ same lesson.
 - Data: `swing.db` (34 ETFs, split-adjusted / dividend-unadjusted, 2014–26);
   E5/E6/E7 fetch QQQ/TQQQ/QLD + non-US indices to 1985 live (not pinned).
 - Pre-registrations: E1 `8963e49`, E1b `0126ce3`, E2 `865c09e`, E4 `313d88a`,
-  E5 `09a3a31`, E6 `0526ea2`, E7 `70ed2a1`.
-- Result docs: `docs/research/2026-07-09_*` and `2026-07-10_E7_*`.
-- Full chronology with commit hashes: the project record, Appendices A–AF.
+  E5 `09a3a31`, E6 `0526ea2`, E7 `70ed2a1`, E3 `87bc8d9`.
+- Result docs: `docs/research/2026-07-09_*` and `2026-07-10_*` (E7, E3).
+- Full chronology with commit hashes: the project record, Appendices A–AI.
 - Tripwire: `python -m swing_bot.test_frozen` (12 refs, d = ±0.0000pp).
 
-**Status:** program complete, closed on international out-of-sample evidence.
-Nothing live. Open, Evan-gated options: deploy E6 (1×) to paper as a
-market-dependent risk-managed overlay; open a genuinely new family
-(stocks/events); or close the project on this write-up.
+**Status:** program complete — all three strategy families falsified (mean
+reversion, leveraged trend, stock momentum), closed on out-of-sample and
+survivorship-aware evidence. Nothing live. Open, Evan-gated options: deploy
+E6 (1×) to paper as a market-dependent risk-managed overlay; or close the
+project on this write-up.

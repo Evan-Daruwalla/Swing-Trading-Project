@@ -71,6 +71,7 @@ the dated entry, not the digest.
 - [AF — E7 international validation: BOTH arms FAIL; high-return-robust question CLOSED](#appendix-af---e7-international-validation-both-arms-fail-high-return-robust-question-closed-2026-07-10) (07-10)
 - [AG — Write-up updated to E7 + M6 packaging; at the deploy wall](#appendix-ag---write-up-updated-to-e7--m6-packaging-readme-tag-at-the-deploy-wall-2026-07-10) (07-10)
 - [AH — Evan opens E3 (stock momentum); survivorship-bias design problem](#appendix-ah---evan-opens-e3-stock-momentum-survivorship-bias-design-problem-2026-07-10) (07-10)
+- [AI — E3 stock momentum FAIL (clean); all three families now falsified](#appendix-ai---e3-stock-momentum-fail-clean-all-three-families-now-falsified-2026-07-10) (07-10)
 
 ---
 
@@ -1484,3 +1485,37 @@ backtest; (4) report per the asymmetric framing. Cadence #27 satisfied by
 this entry.
 
 **Next action:** stock-data probe, then E3 pre-registration.
+
+---
+
+# Appendix AI - E3 stock momentum FAIL (clean); all three families now falsified (2026-07-10, ~01:55 local)
+
+**WHAT:** Ran E3 per prereg `87bc8d9` (`scripts/run_e3_stock_momentum.py`,
+background run, 39/39 survivor large-caps fetched). Concentrated momentum:
+top-3 by 63-day return, 10-day rebalance, next-open, 5bps/side. Results:
+`docs/research/2026-07-10_E3_stock_momentum_results.md`.
+
+**VERDICT: E3 FAIL — clean.** 2000-2013 gate: CAGR 6.27% (FAIL vs 15%),
+maxDD 61.8% (pass). Per the prereg's asymmetric framing, a FAIL is
+interpretable: momentum lost even with survivorship+lookahead+favorable
+universe all helping. And it failed BADLY, two ways:
+- 6.27% vs the 15% bar (wide miss, not marginal).
+- **Momentum was WORSE than passive:** it underperformed equal-weight
+  buy-hold of its OWN survivor universe in every window (2014-26: E3 4.79%
+  vs EW-universe 14.94%). The selection itself destroyed value.
+
+**THE COMPREHENSIVE CLOSE:** all three plausible high-return routes are now
+falsified under pre-registration — index mean reversion (E1/E1b/E2/A3/B1),
+leveraged trend (E4/E5/E7), and concentrated stock momentum (E3). Nothing
+went live. A single pre-registered momentum spec was tested; hunting a
+passing parameterization would be hindsight fishing (not done). The search is
+comprehensively closed; only forward live paper (survivorship-free, Evan-
+gated) could test any stock idea further, with a poor prior.
+
+**WALL AGAIN.** Autonomous avenues exhausted. Remaining work is Evan-gated
+(deploy E6-1x to Alpaca paper) or accept the falsification program as the
+deliverable. Frozen tests green (12 refs); E3 is a live-fetch script, not
+pinned.
+
+**Next action:** none autonomous. Fold E3 into the write-up (below), then
+report the wall to Evan.
