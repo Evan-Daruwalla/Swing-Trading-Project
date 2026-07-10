@@ -12,10 +12,24 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — ALL THREE families falsified (E3 stocks closed too); nothing live
+## Current state — FIVE families falsified (0/10 pre-registered attempts); nothing live
 
 **Last updated: 2026-07-10** — this file is the only live snapshot; history
 lives in the record.
+
+> **2026-07-10 — E8 + E9 both FAIL; families four and five closed (record
+> Appendices AL–AM).** Evan supplied the r/swingtrading strategy thread; its
+> two genuinely-new families were pre-registered together (`9b49190`,
+> doc-only before runners) and run. **E8 squeeze breakout: FAIL** — gate
+> 2000-13 CAGR −1.43%, only +1.10%/yr even in the 2014-26 bull (compression
+> predicts expansion, not direction). **E9 "never book a loss" deep-dip
+> audit: FAIL with both a-priori predictions CONFIRMED** — the Reddit claim
+> is literally true (0/53 realized losses, 100% win rate) AND bad (gate CAGR
+> 3.46%, a −79.7% unrealized position, a ~17-year underwater hold, cash idle
+> 38% of days): the win rate measures bookkeeping, not performance. Results:
+> `docs/research/2026-07-10_E8_E9_results.md`. Frozen tests green. **Base
+> rate now 0 PASS / 10 attempts / 5 families.** Repo published PUBLIC at
+> https://github.com/Evan-Daruwalla/Swing-Trading-Project (Appendix AK).
 
 > **2026-07-10 — E3 stock momentum FAIL; third family closed (record
 > Appendix AI).** Evan opened E3 (concentrated stock momentum). Prereg

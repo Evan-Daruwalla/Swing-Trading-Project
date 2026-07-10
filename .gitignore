@@ -7,6 +7,9 @@ swing.db-journal
 swing.db-wal
 swing.db-shm
 
+# E8/E9 live-fetch scratch cache (data, never committed)
+.e8e9_cache/
+
 # secrets (Alpaca keys etc.)
 *_keys.env
 *.env

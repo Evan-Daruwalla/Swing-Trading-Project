@@ -1610,3 +1610,31 @@ information because the FAMILIES are new, not parameter fishing.
 **Next action:** write prereg_e8/e9 docs, doc-only commit BEFORE runners
 (the rigor claim), then runners via live fetch (NOT swing.db writes -
 protects frozen refs), run, results docs, verdicts. Cadence #36 satisfied.
+
+---
+
+# Appendix AM - E8 FAIL + E9 FAIL (both predictions confirmed); 0/10 across five families (2026-07-10, ~05:15 local)
+
+**WHAT:** Ran E8 (squeeze breakout) and E9 (deep-dip "never book a loss"
+audit) per prereg `9b49190` (doc-only commit BEFORE runners, per
+discipline). Runners `scripts/run_e8_squeeze.py` / `run_e9_deepdip.py`;
+live-fetch scratch cache (`.e8e9_cache/`, gitignored); swing.db untouched;
+frozen tripwire GREEN after (12 refs, d=+/-0.0000pp). Results doc:
+`docs/research/2026-07-10_E8_E9_results.md`.
+
+**E8 VERDICT: FAIL.** Gate 2000-13 CAGR -1.43% (bar +15%), win 31%,
+n=187; even 2014-26 bull only +1.10%/yr. Compression predicts expansion,
+not direction. Breakout family (the fourth) falsified and closed.
+
+**E9 VERDICT: FAIL (high-return gate); BOTH a-priori predictions
+CONFIRMED.** 0/53 realized losses - the Reddit claim is literally TRUE -
+and gate CAGR 3.46%, worst unrealized position -79.7%, longest hold ~17
+YEARS to reach +15%, cash idle 38% of days. The 100% win rate measures
+bookkeeping, not performance. Fifth family closed.
+
+**PROGRAM BASE RATE: 0 PASS / 10 pre-registered attempts / 5 families.**
+E1-E7+E3 findings doc stays point-in-time; E8/E9 results doc extends the
+evidence to the same conclusion. Nothing live; remaining work Evan-gated.
+
+**Next action:** sync README (add E8/E9 rows - repo is now PUBLIC), touch
+HANDOFF status, update auto-memory, commit. Push only on Evan's word.
