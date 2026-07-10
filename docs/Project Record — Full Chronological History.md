@@ -1638,3 +1638,19 @@ evidence to the same conclusion. Nothing live; remaining work Evan-gated.
 
 **Next action:** sync README (add E8/E9 rows - repo is now PUBLIC), touch
 HANDOFF status, update auto-memory, commit. Push only on Evan's word.
+
+---
+
+# Appendix AN - Evan authorizes push of E8/E9 arc to public repo (2026-07-10, ~19:43 local)
+
+**WHAT:** Evan: "1" = push the three pending commits (46e3e0f findings
+Conclusion consolidation, 9b49190 E8/E9 prereg, 9f372b7 E8/E9 results) to
+the public GitHub repo. This entry appended per cadence #39, committed with
+the push so the remote lands fully current (no trailing local-only record
+state).
+
+**STATE:** unchanged otherwise - 0 PASS / 10 attempts / 5 families, nothing
+live, frozen tests green. Remaining work Evan-gated (Alpaca paper deploy of
+the 1x overlay, or close on the write-up).
+
+**Next action:** commit this entry, push main to origin.
