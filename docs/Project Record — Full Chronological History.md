@@ -67,6 +67,7 @@ the dated entry, not the digest.
 - [AB — E5 regime test: E4 loses 93% in 2000-2013; VERDICT = FAIL; E4 de-authorized for paper](#appendix-ab---e5-regime-test-e4-loses-93-in-2000-2013-verdict--fail-e4-de-authorized-for-paper-2026-07-09) (07-09)
 - [AC — E6 de-leveraged rotation VERDICT = PASS (robust drawdown overlay, not high-return)](#appendix-ac---e6-de-leveraged-rotation-verdict--pass-robust-drawdown-overlay-not-high-return-2026-07-09) (07-09)
 - [AD — Full E1→E6 program write-up (option 1); program complete](#appendix-ad---full-e1e6-program-write-up-option-1-program-complete-2026-07-09) (07-09)
+- [AE — Pressure-test: buy-hold-TQQQ claim retracted; clean test data exhausted](#appendix-ae---pressure-test-buy-hold-tqqq-claim-retracted-clean-test-data-exhausted-2026-07-10) (07-10)
 
 ---
 
@@ -1327,3 +1328,50 @@ new family (stocks/events, needs E3 survivorship-safe universe); or close on
 this write-up.
 
 **Next action:** none autonomous -- program is at a clean terminal state.
+
+---
+
+# Appendix AE - Pressure-test: buy-hold-TQQQ claim retracted; clean test data exhausted (2026-07-10, ~00:10 local)
+
+**WHAT:** Evan asked to pressure-test the chat claim "buy-hold TQQQ beats my
+bots, and no pre-registerable tweak has a genuine shot at high-return AND
+regime-robust." Tried to break it; it half-broke.
+
+**CRACK 1 (my error, RETRACTED):** "buy-hold TQQQ beats my bots" is itself
+regime-flattered -- true only for 2014-2026. Over the full cycle (E5
+synthetic) buy-hold 3x = -2.74% CAGR / -100% drawdown (wiped out in
+2000-2002). I made the exact bull-only-quote mistake I criticized in E4. Over
+a full regime cycle E6 (1x) and even E4's rotation beat buy-hold TQQQ; the
+"buy-hold wins" statement only holds if you assume a 2014-26-like future.
+
+**CRACK 2 (claim too strong, but reframed):** a volatility-gated leverage
+rotation (hold 3x only when trend up AND realized vol low) is a
+mechanistically credible UNTESTED idea -- 2000-02/2008 were high-vol, exactly
+when leverage+whipsaw kills you, so a vol gate has a real reason to help.
+BUT: 2000-2013 is now SEEN twice, so any vol threshold chosen to survive
+those crashes is hindsight-fit. Asymmetric info: only a hindsight FAIL would
+be informative. Empirical probe `scripts/pt_volgate.py` written but BLOCKED
+on yfinance rate-limiting (4 attempts, all 429; pre-2014 QQQ not cached, only
+2014+ is in swing.db) -- NaN output; not hammering the API further.
+
+**THE DEEPER, OPERATIVE FINDING:** the binding constraint is no longer "no
+more ideas" -- it is EXHAUSTED CLEAN TEST DATA. The two independent US crash
+regimes (2000-02, 2008) have now been used to judge the rotation family, so
+any further high-return backtest tweak tested on them is contaminated. Honest
+validation of any NEW high-return idea must be (a) forward live paper, or
+(b) genuinely independent markets/regimes -- in-sample backtesting on the
+same crashes has hit negative returns to rigor. This SHARPENS rather than
+softens the conclusion: no high-return-AND-robust strategy has been
+demonstrated, and the cheap way to keep looking has been used up.
+
+**NET:** claim was half-wrong (buy-hold TQQQ is not robust) but the practical
+bottom line stands and is better-grounded: to chase high-return-robust from
+here requires forward testing or new data, not more backtests. Nothing live;
+frozen tests green.
+
+**Cadence:** pm-cadence fired at prompt #24; this entry satisfies it.
+
+**Next action:** Evan's call -- (a) run the vol-gate probe when the API cools
+(exploratory, contaminated); (b) forward-test a candidate via live paper
+(needs Alpaca + go); (c) new independent-market data; (d) close on the
+write-up.
