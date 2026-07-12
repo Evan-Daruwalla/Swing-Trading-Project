@@ -2085,3 +2085,34 @@ barely touch capital, compound to 0.6%/yr and go NEGATIVE post-2014
 
 **Next action:** commit E20, then M7b task 34 (E19 insider/EDGAR) - the
 heavy one; STARTS with a scoped Form-4 ingestion probe per PRD.
+
+---
+
+# Appendix BF - E19 EDGAR probe: FEASIBLE-BUT-DEFERRED; M7/M7b arcs complete; autonomous wall (2026-07-11, ~22:35 CST)
+
+**WHAT:** M7b task 34 probe (per PRD, no prereg). SEC EDGAR Form-4 probe for
+the 39-stock universe: 39/39 CIKs resolved, healthy recent Form-4 volume
+(AAPL 42, JPM 132, WMT 215, GE 51/yr). BUT three hazards for a 2000-2013
+build: (1) CIK changes over time (XOM's history is under a prior CIK -
+current map misses it), (2) primaryDocument is the XSL/HTML render not raw
+XML, (3) recent-submissions API caps ~1000 filings so historical years need
+archive pagination (JPM has 25,342 filings). Probe doc:
+docs/research/2026-07-11_E19_edgar_probe.md.
+
+**VERDICT: FEASIBLE-BUT-DEFERRED (not blocked - data exists & parses).** Full
+gate-window ingestion is the heaviest build in the project (hours, tens of
+thousands of fetches + CIK-history + raw-XML hazards); E19 is
+survivorship-flattered (asymmetric, only FAIL clean); base rate 0 PASS-HR/19.
+Committing that effort autonomously for a near-certain interpretable-FAIL is
+a poor trade -> deferred pending explicit Evan authorization or a vendor feed.
+
+**M7 + M7b COMPLETE.** Catalog arc E13-E17 (4 FAIL + 1 blocked); data-type
+arc E18 (weak PASS-RA, VIX-TS, forward-paper candidate only), E20 (FAIL),
+E19 (deferred). **PROGRAM: 0 PASS-HR / 1 weak PASS-RA / 20 attempts /
+7 families.** AUTONOMOUS WALL: remaining work is all Evan-gated (M3 Alpaca
+paper deploy of E6-1x [+ the caveated VIX-TS candidate]; E19 full ingestion
+authorization; a paid data budget to unblock HY-OAS/short-interest).
+
+**Next action:** final HANDOFF + memory sync; then report the full session
++ pending push (~18 commits ahead) + the two Evan decisions. Nothing
+autonomous remains.
