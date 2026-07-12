@@ -1793,3 +1793,100 @@ identifies 5 untested-with-merit candidates (x-sectional reversal,
 earnings-announcement premium, days-to-cover, diversified sector momentum,
 turn-of-month overlay); knowledge graph committed. Next-steps plan to follow
 in-chat. Cadence #48 satisfied.
+
+---
+
+# Appendix AT - M7 plan: catalog arc E13-E17 written into PRD (2026-07-10, ~21:20 local)
+
+**WHAT:** Evan asked to "plan out the experiments and next steps for the new
+proposed strategies." Added milestone M7 to PRD_ROADMAP.md (table row +
+full task section, tasks 28-32): E13 turn-of-month overlay, E14 diversified
+sector momentum (survivorship-clean - only M7 candidate where a PASS would
+be fully interpretable), E15 earnings-announcement premium (reuses E10
+earnings infra; survivor-stock asymmetric framing + scheduled-date caveat),
+E16 x-sectional weekly reversal (fill-timing-ablation counter-evidence
+disclosed), E17 days-to-cover (data probe first; BLOCKED-ON-DATA likely).
+Execution order = build cost x interpretability; one per sitting; rigor
+discipline unchanged.
+
+**D1 - NEW DECISION, BLOCKED-ON-EVAN:** the plan's honest premise is that
+none of the five plausibly clears the 15% CAGR bar; three plausibly clear a
+risk-adjusted bar. Proposed pre-registered SECONDARY verdict tier (PASS-RA:
+net Sharpe >= 0.80 in gate window AND > SPY Sharpe both windows AND positive
+net CAGR both windows) alongside the UNCHANGED primary PASS-HR gate. This is
+a goal amendment vs the 2026-07-09 return-centric decision, so it requires
+Evan's dated approval; declined => M7 runs primary-gate-only with the stated
+near-certain-FAIL prior. M7 exit conditions + M3 feed-forward defined in the
+PRD. PRD/record currently UNCOMMITTED.
+
+**Next action:** Evan decides D1, then M7 task 28 (E13 prereg) is the
+default next sitting.
+
+---
+
+# Appendix AU - Data-type exploration started (2026-07-12, ~00:45 local)
+
+**WHAT:** Evan asked to "explore strategies based on other sources of
+data/data types" - the data axis, complementing the strategy-space catalog
+(Appendix AR). Plan: probe actual availability (no invented claims) of
+non-OHLCV data usable at retail: VIX complex, self-computed breadth,
+dividend calendars, FRED macro/credit spreads, EDGAR insider filings, short
+interest history, Google Trends, options/IV history, news/LLM sentiment;
+source the load-bearing anomaly papers; write a ranked brief with honest
+BLOCKED-ON-DATA tags. M7 (E13-E17) remains the standing plan; this may add
+candidates or a second decision point. Cadence #51 satisfied.
+
+**Next action:** probes + brief, then report.
+
+---
+
+# Appendix AV - Data-type brief done: 6 available, 3 blocked, E18-E20 proposed (2026-07-12, ~01:05 local)
+
+**WHAT:** Completed the data-type exploration (Appendix AU). All availability
+claims PROBED live (probe_datatypes.py): VIX 1990+, VIX3M 2006+, VVIX/SKEW,
+dividends full history, FRED keyless (T10Y2Y 1976+, ICSA 1967+, HY OAS needs
+cosd param), breadth self-computable from 107 cached tickers. BLOCKED at $0:
+options/IV history, short-interest history (E17 probe still owns it),
+point-in-time news archives; Google Trends REJECTED on reproducibility
+(resampled per request). Doc: docs/research/2026-07-12_data_type_exploration.md.
+
+**PROPOSED (not pre-registered):** E18 regime-gate bake-off (VIX term
+structure vs HY-OAS vs breadth vs 200DMA as overlays on E6 criteria -
+recommended; upgrades the one surviving artifact); E19 insider
+opportunistic-buy drift (Cohen-Malloy-Pomorski 82bps/mo - strongest new-type
+anomaly, gated behind a scoped EDGAR Form 4 ingestion probe); E20 dividend
+capture falsification (cheap, low prior). Honest through-line: available new
+data types skew to OVERLAYS, not return engines - same shape as 0/13.
+Depends on D1 (risk-adjusted tier) which remains BLOCKED-ON-EVAN; declining
+D1 guts E18's point.
+
+**Next action:** Evan decides D1 + whether E18-E20 join M7 (as M7b or after
+E13-E17). Docs uncommitted.
+
+---
+
+# Appendix AW - D1 APPROVED (risk-adjusted verdict tier); M7b added (2026-07-12, ~01:15 local)
+
+**EVAN DECISION (2026-07-12, dated goal amendment):** approved D1 - a
+pre-registered SECONDARY verdict tier alongside the unchanged primary
+high-return gate, for all M7/M7b catalog-arc experiments:
+- PASS-HR (primary, unchanged): net CAGR >= 15% AND maxDD <= 60% in the
+  2000-2013 gate window, confirmed 2014->end.
+- PASS-RA (NEW): net Sharpe >= 0.80 in the gate window AND Sharpe > SPY
+  buy-hold in BOTH windows AND positive net CAGR in both.
+- FAIL: neither. All three fixed in each prereg before running.
+This amends the 2026-07-09 return-centric decision (record Appendix R). Per
+project rules, risk-appetite gate numbers change only by a new dated Evan
+decision - this is that decision. PASS-RA does NOT authorize live capital;
+a PASS-RA survivor is an M3 paper-deploy candidate (Alpaca+go still gated).
+
+**ALSO:** added M7b to PRD (tasks 33-35): E18 regime-gate bake-off, E19
+insider opportunistic-buy drift (EDGAR-probe-gated), E20 dividend capture.
+Runs after M7's E13-E17.
+
+**INSTRUCTION:** Evan said continue the roadmap, check work, append memory
+docs at natural stopping points, keep going until blocked. Executing M7 in
+order starting task 28 (E13). One experiment per sitting: prereg doc-only
+commit -> runner -> run -> results doc -> record -> commit.
+
+**Next action:** commit+push this planning batch, then E13 prereg.

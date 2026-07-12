@@ -144,6 +144,8 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 | M6 | Portfolio packaging | README → findings doc, record HTML twin, git tag; make the repo readable cold |
 | M4 | Overlay readout (GATED on pre-registered N/horizon) | evaluate veto vs control; continue, add cascade arm, or kill per pre-reg |
 | M5 | Expansion (GATED on M3 stable) | deferred ideas only: exit/stop ablations (#17/#18), sizing (#20), RSI comparison (#2), mega-cap pullback (#5), VIX gate (#11) |
+| M7 | Catalog arc E13–E17 (added 2026-07-10, record Appendix AT) | the five untested-with-merit ideas from the strategy-catalog brief: turn-of-month, sector momentum, earnings-announcement premium, x-sectional reversal, days-to-cover; dual-bar verdicts (D1 APPROVED 2026-07-12) |
+| M7b | Data-type arc E18–E20 (added 2026-07-12, record Appendix AV) | new-data-type ideas from the data-type brief: E18 regime-gate bake-off (VIX-TS/HY-OAS/breadth/200DMA), E19 insider opportunistic-buy drift (EDGAR, probe-gated), E20 dividend capture; same D1 dual-bar verdicts |
 
 Order is deliberate: infrastructure before science (council 5/5); thresholds
 provably precede results (M1 before M2); nothing goes live on an unvalidated
@@ -357,6 +359,124 @@ idea without live paper.
     (#20) → 25. RSI(2) comparison arm (#2, backtest only) → 26. Mega-cap
     pullback (#5) as second strategy → 27. VIX gate (#11). Each gets its own
     pre-registration section before running.
+
+### M7 — Catalog arc: E13–E17 (added 2026-07-10; sourced from
+`docs/research/2026-07-10_swing_strategy_catalog.md`)
+
+**Why this exists:** after 0/13, the catalog brief identified exactly five
+ideas that are (a) genuinely untested here, (b) evidenced by peer-reviewed
+sources, (c) EOD-codifiable at retail scale. Honest prior, stated up front:
+none plausibly clears the 15% CAGR high-return bar; three plausibly clear a
+risk-adjusted bar. Running them under the primary bar alone is theater —
+hence D1 below. Rigor discipline is unchanged: doc-only prereg commit before
+each runner, no tuning a FAIL, frozen tripwire green after every run, no
+swing.db writes from live-fetch runners.
+
+**D1 — APPROVED by Evan 2026-07-12 (record Appendix AW).** A pre-registered
+SECONDARY verdict tier now runs alongside the unchanged primary high-return
+gate. Every M7/M7b prereg fixes ALL THREE labels before running:
+- **PASS-HR** (unchanged primary): net CAGR ≥ 15% AND maxDD ≤ 60% in the
+  2000–2013 gate window, confirmed in 2014→end.
+- **PASS-RA** (new secondary): net Sharpe ≥ 0.80 in the gate window AND
+  Sharpe strictly above SPY buy-hold's in BOTH windows AND positive net
+  CAGR in both windows.
+- **FAIL**: neither.
+This is a dated goal AMENDMENT to the 2026-07-09 return-centric decision
+(per project rules, risk-appetite gate numbers change only by a new dated
+Evan decision). PASS-RA does NOT authorize live capital by itself — a
+PASS-RA survivor becomes an M3 paper-deploy candidate alongside E6-1×,
+still gated on Alpaca account + Evan go.
+
+Execution order = build cost × interpretability (cleanest, cheapest first).
+One experiment per sitting; prereg → runner → run → results doc → record →
+commit. All ETF experiments are interpretable in BOTH directions; the two
+stock experiments inherit E3's survivor universe and therefore its
+asymmetric-falsification framing (only a FAIL is clean).
+
+28. **E13 — Turn-of-the-month overlay** (McConnell-Xu 2008). Hold SPY only
+    during the 4-session turn window (last trading day of month through the
+    first three of the next), cash otherwise; signal at close, execute next
+    open; 5 bps/side; data = .e8e9_cache (already fetched). Windows/gates
+    per D1; primary metric additionally reported as return-per-day-in-market
+    vs SPY's. Done-check: runner output + frozen tests green + results doc.
+    Build: trivial (one sitting including prereg).
+29. **E14 — Diversified sector momentum** (Moskowitz-Grinblatt 1999). The 11
+    SPDR sectors (frozen universe, cached): hold top-3 by trailing 126-day
+    return, rebalance every 21 sessions, next-open fills, 5 bps/side,
+    NAV/3 sizing. Fully survivorship-clean → a PASS would be the program's
+    first interpretable pass of any tier. Benchmarks: SPY and equal-weight
+    11 sectors. Done-check as #28. Build: low.
+30. **E15 — Earnings-announcement premium** (Frazzini-Lamont 2007). E3's 39
+    survivor large-caps + cached earnings dates (E10 infra): buy at open 5
+    sessions before each scheduled announcement, sell at open the session
+    after it; K=5; 5 bps/side. DISCLOSED BIASES: survivor universe
+    (asymmetric framing) + scheduled-date lookahead is mild but real
+    (date changes correlate with bad news — flag in prereg). Done-check as
+    #28. Build: low (infra exists).
+31. **E16 — Cross-sectional short-term weekly reversal** (de Groot-Huij-Zhou
+    2012). Same 39 survivor large-caps: each Friday close rank by trailing
+    5-session return, buy the bottom 4 at Monday open, hold 5 sessions;
+    5 bps/side (paper says the edge survives costs only in large caps —
+    this is the direct test). COUNTER-EVIDENCE DISCLOSED in prereg: our
+    fill-timing ablation (54% of MR edge in the overnight gap) argues the
+    next-open version underperforms the paper's close-based construct.
+    Asymmetric framing. Build: medium.
+32. **E17 — Days-to-cover data probe → experiment** (Hong-Li-Ni). STEP 1 is
+    a data probe only: free point-in-time HISTORICAL short-interest series
+    (FINRA/exchange files) back to ≥2010 — if unavailable, E17 is recorded
+    BLOCKED-ON-DATA and closed without a prereg (the E10 probe pattern).
+    If available: long low-SI-decile / avoid high-DTC screen, monthly.
+    Build: unknown until probed; do the probe last, after 28–31.
+
+**M7 exit conditions:** every experiment has a committed prereg hash, a
+verdict (PASS-HR / PASS-RA / FAIL / INCONCLUSIVE / BLOCKED-ON-DATA), and a
+results doc; findings write-up + README + memory updated with the arc.
+**Feed-forward:** any PASS-RA survivor joins E6-1× as an M3 paper-deploy
+candidate (M3 remains gated on Alpaca account + Evan go). If all five fail
+both tiers, the program's terminal claim upgrades to "the documented,
+evidenced swing-strategy space is exhausted at retail EOD scale" — a
+stronger portfolio statement than 0/13.
+
+### M7b — Data-type arc: E18–E20 (added 2026-07-12; sourced from
+`docs/research/2026-07-12_data_type_exploration.md`)
+
+**Why this exists:** the data-type brief found six free non-OHLCV data types
+(all availability probed live 2026-07-12) but they skew to regime gates and
+overlays, not return engines. Three carry enough merit to pre-register.
+Runs AFTER M7's E13–E17 unless Evan reorders. Same D1 dual-bar verdicts;
+same discipline (prereg doc committed before runner, no swing.db writes,
+tripwire green after).
+
+33. **E18 — Regime-gate bake-off.** Four a-priori risk-on/off gates on the
+    E6 1× equity sleeve, judged head-to-head as drawdown overlays (E6
+    criteria: cut maxDD ≥10pp vs buy-hold AND Sharpe ≥ buy-hold): (a) VIX/
+    VIX3M term structure < 1; (b) HY OAS (FRED BAMLH0A0HYM2) below its
+    trailing median; (c) self-computed breadth (% of 29-ETF universe >200DMA
+    > 50%); (d) price >200DMA (the existing E6 gate = the benchmark to beat).
+    Data all in hand / probed. Window caveat: VIX3M starts 2006 → gate window
+    for the VIX arm is 2006→, disclosed in prereg. This is an OVERLAY test:
+    PASS-RA is the only reachable pass (overlays can't clear PASS-HR); if D1
+    had been declined this task would be pointless. Done-check: runner +
+    tripwire green + results doc. Build: low–medium.
+34. **E19 — Insider opportunistic-buy drift** (Cohen-Malloy-Pomorski 2012).
+    STEP 1 = scoped EDGAR probe ONLY: ingest one year of Form 4 filings for
+    the 39-stock survivor universe, classify routine vs opportunistic
+    (pattern-break heuristic), confirm parseability + coverage. If the probe
+    is messy or coverage is poor → record BLOCKED-ON-DATA and close (E10/E17
+    pattern). If clean → STEP 2 prereg: long opportunistic-buy names, hold
+    ~40 sessions, K per D1 sizing. Survivor + price-side survivorship →
+    asymmetric framing (only a FAIL clean). Build: HIGH (heaviest ingestion
+    the project has attempted) — do the probe before committing effort.
+35. **E20 — Dividend-capture falsification.** Buy each frozen-universe ETF
+    at close the session before its ex-date, sell at next open; yfinance
+    dividend calendar + our dividend-UNADJUSTED closes (the convention is
+    finally correct FOR the measurement). 5 bps/side. Low prior (drop ≈
+    dividend). One sitting. Done-check as #33.
+
+**M7b exit conditions:** as M7 — every experiment has a committed prereg
+hash (or a BLOCKED-ON-DATA record), a D1-tier verdict, and a results doc;
+findings/README/memory updated. E18 feeds the M3 overlay directly if any
+gate beats the 200DMA benchmark on PASS-RA.
 
 ## 7. HANDOFF NOTES
 
