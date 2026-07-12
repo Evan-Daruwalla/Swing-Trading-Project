@@ -8,7 +8,7 @@
 
 A systematic-trading research project whose goal was a **high percentage
 return over short holds** with a small account. It did not find one — and the
-*discipline of how it failed* is the point. Thirteen strategies across six
+*discipline of how it failed* is the point. Seventeen strategies across seven
 families were tested under strict **pre-registration** (rules committed to git
 *before* the code that produces results), honest kill-criteria (no re-tuning a
 failed run), and out-of-sample / out-of-regime tests — culminating in an
@@ -16,10 +16,14 @@ international test on five independent markets and a survivorship-aware stock
 test, neither used to design anything.
 
 **The honest conclusion:** no robust, regime-independent, cost-surviving
-high-return EOD strategy was found across six plausible families — index
-mean reversion, leveraged trend, concentrated stock momentum, volatility
-breakout, deep-dip accumulation, and post-earnings drift (0 passes in 13
-attempts). This
+high-return EOD strategy was found across seven plausible families — index
+mean reversion, leveraged trend, concentrated stock/sector momentum,
+volatility breakout, deep-dip accumulation, event-driven (post-earnings drift
+& earnings-announcement premium), and calendar/reversal effects (0 passes in
+17 attempts; 1 more blocked on data). The single strategy that ever cleared
+the 15%/yr return bar (E16 weekly reversal, 16.8%) did so only on a
+survivorship-flattered universe and a 66% drawdown — a textbook artifact, not
+an edge. This
 is backed by out-of-sample evidence from five international regimes (including
 the 1990s Japan secular bear) and a survivorship-*flattered* stock test that
 still failed. The one partly-deployable result — a 1× 200-day-MA rotation — is
@@ -51,6 +55,11 @@ before the market charged tuition for the same lesson.
 | E10 | Post-earnings drift (the pros' "catalyst continuation") | FAIL (clean) — 5.9% vs 15% bar even bias-flattered; the program's one real-but-small effect, and it decayed after ~2010 |
 | E11 | Volume-gated breakout (RVOL ≥ 1.5, the pros' rule) | FAIL — volume confirmation thinned E8's signal without giving it direction |
 | E12 | Confirmed-capitulation MR ("right side of the V") | FAIL — waiting for confirmation did *worse* than raw dip-buying; the confirmation bar surrenders the edge |
+| E13 | Turn-of-the-month overlay | FAIL — 1.4%/yr; matches SPY in the flat 2000s at 19% exposure, loses the bull |
+| E14 | Diversified sector momentum | FAIL — *survivorship-clean*, and lost to equal-weight buy-hold of the same sectors every window |
+| E15 | Earnings-announcement premium | FAIL (clean) — beat benchmarks in 2000–13, decayed after ~2010 (E10's twin) |
+| E16 | Cross-sectional weekly reversal | FAIL (clean) — cleared 15%/yr *once* (16.8%) but on a 66% drawdown, the expected survivorship artifact of dip-buying survivors |
+| E17 | Days-to-cover / short interest | BLOCKED-ON-DATA — no free exchange-listed short-interest history |
 
 ## Reproduce
 

@@ -12,10 +12,30 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — SIX families falsified (0/13 pre-registered attempts); nothing live
+## Current state — SEVEN families; 0 PASS / 17 attempts (16 run + 1 blocked); nothing live
 
-**Last updated: 2026-07-10** — this file is the only live snapshot; history
-lives in the record.
+**Last updated: 2026-07-11 (CST)** — this file is the only live snapshot;
+history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
+the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-11 — M7 catalog arc E13–E17 all closed (record Appendices
+> AX–BC); D1 dual-bar verdict adopted (Appendix AW).** Evan approved D1: a
+> pre-registered risk-adjusted tier (PASS-RA: gate Sharpe ≥ 0.80 AND > SPY
+> both windows AND positive CAGR both) alongside the unchanged PASS-HR
+> (CAGR ≥ 15%, maxDD ≤ 60%). Then ran the five catalog candidates:
+> **E13** turn-of-month FAIL (1.4%/yr; matched SPY in the flat decade at 19%
+> exposure but lost the bull); **E14** diversified sector momentum FAIL —
+> survivorship-CLEAN, the program's cleanest negative, momentum lost to
+> equal-weight buy-hold of the same sectors every window; **E15** earnings-
+> announcement premium FAIL (clean; the decayed-anomaly twin of E10 — beat
+> benchmarks in 2000–13, faded post-2014); **E16** weekly reversal FAIL
+> (clean) — the notable one: gate CAGR **16.76%** cleared the 15% return bar
+> (first ever) but on **66% drawdown** (breaches ceiling) + Sharpe 0.61, and
+> the headline is the expected survivorship artifact of dip-buying survivors;
+> **E17** days-to-cover **BLOCKED-ON-DATA** (no free exchange-listed short-
+> interest history). Results in `docs/research/2026-07-11_E13..E17_*`.
+> **Program 0 PASS / 17 attempts / 7 families.** Next: M7b (E18 regime-gate
+> bake-off, E19 insider-EDGAR-probe-gated, E20 dividend capture).
 
 > **2026-07-10 — E10/E11/E12 all FAIL; article-set arc closed (record
 > Appendices AO–AP).** Evan supplied a 5-source article set (Investopedia/
