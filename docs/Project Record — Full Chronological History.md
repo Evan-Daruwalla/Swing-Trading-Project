@@ -2009,3 +2009,28 @@ counter-evidence also held (next-open long-only = lossy version). NOT tuned
 
 **Next action:** commit E16, then M7 task 32 (E17 days-to-cover) - which
 STARTS with a short-interest history data probe; likely BLOCKED-ON-DATA.
+
+---
+
+# Appendix BC - E17 days-to-cover BLOCKED-ON-DATA; M7 catalog arc complete (2026-07-11, ~21:45 CST)
+
+**WHAT:** M7 task 32 probe step (per PRD, no prereg - the probe gates it).
+Free historical short interest for our EXCHANGE-LISTED universe over the
+2000-2013 gate window does NOT exist: yfinance = snapshot only; FINRA free
+data is OTC-only before June 2021 (archives from 2014, OTC), exchange-listed
+history is paid-vendor only. Endpoint probe confirmed (FINRA otcMarket
+dataset, 400 on AAPL/MSFT). Probe doc: docs/research/2026-07-11_E17_data_probe.md.
+
+**VERDICT: BLOCKED-ON-DATA** - recorded and closed without a prereg, nothing
+run/stubbed/fabricated (E10-probe pattern). Unblock = paid SI feed (Evan
+budget decision) or a >=2021 forward window (too short; not adopted).
+
+**M7 CATALOG ARC COMPLETE:** E13 turn-of-month FAIL, E14 sector momentum
+FAIL (survivorship-clean, cleanest negative), E15 earnings premium FAIL
+(clean; E10 twin), E16 weekly reversal FAIL (clean; cleared 15% return but
+66% DD on survivor flattery), E17 BLOCKED. Program 0 PASS / 17 attempts
+(16 run + 1 blocked) / 7 families.
+
+**Next action:** natural stopping point - sync HANDOFF + README + memory to
+0/17, commit, then continue roadmap into M7b (E18 regime-gate bake-off next;
+data in hand).
