@@ -1912,3 +1912,26 @@ a same-return-lower-exposure overlay still isn't a Sharpe-beater in both
 regimes). Program 0/14 primary.
 
 **Next action:** commit E13, then M7 task 29 (E14 sector momentum).
+
+---
+
+# Appendix AY - E14 sector momentum FAIL (survivorship-CLEAN; lost to passive) (2026-07-12, ~01:35 local)
+
+**WHAT:** M7 task 29. Ran E14 per prereg f922f1f (doc-only first). Runner
+run_e14_sector_momentum.py; 11 SPDR sectors from cache; swing.db untouched;
+tripwire GREEN. Results: docs/research/2026-07-12_E14_results.md.
+
+**VERDICT: FAIL (both D1 tiers).** Gate 2000-13 CAGR 2.42%/Sharpe 0.22;
+secondary 6.99%/0.48. PASS-HR fails (2.4% vs 15%), PASS-RA fails (Sharpe
+0.22<0.80, loses SPY in bull).
+
+**SIGNIFICANCE:** this is the program's CLEANEST negative to date because
+the 11 SPDR sectors are SURVIVORSHIP-CLEAN (no delisting bias) - so unlike
+E3 the result is fully interpretable both directions, no asymmetric framing
+needed. And momentum UNDERPERFORMED equal-weight buy-hold of the same
+sectors in EVERY window (gate 2.42% vs 4.13%, sec 6.99% vs 10.53%) - the
+same value-destruction as E3, now on unriggable data. Concentrated momentum
+does not survive at this horizon net of cost, cleanly demonstrated.
+
+**Next action:** commit E14, then M7 task 30 (E15 earnings-announcement
+premium; reuses E10 earnings-date infra).
