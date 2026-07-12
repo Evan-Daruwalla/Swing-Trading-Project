@@ -2147,3 +2147,14 @@ verdict -> results doc -> record -> commit. Nothing else autonomous until it
 finishes. swing.db untouched; prices from .e8e9_cache.
 
 **Next action:** await ingestion completion notification, then run E19.
+
+---
+
+# Appendix BI - E19 ingestion restarted (2026-07-12, ~15:27 CST)
+
+**WHAT:** Evan paused the EDGAR ingestion (~20:45 CST 07-11, mid-MSFT, 0/39
+tickers fully cached - cache is per-ticker-on-completion so nothing
+persisted) then prompted restart now. Relaunching scripts/ingest_edgar_form4.py
+in background; resumable (skips completed tickers, currently none -> starts at
+MSFT). Same ~104k-doc / ~4h scope. On completion -> run_e19_insider.py ->
+verdict -> results -> record -> commit. swing.db untouched. Cadence #57.
