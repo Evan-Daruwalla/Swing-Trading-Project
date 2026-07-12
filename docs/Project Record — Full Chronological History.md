@@ -1890,3 +1890,25 @@ order starting task 28 (E13). One experiment per sitting: prereg doc-only
 commit -> runner -> run -> results doc -> record -> commit.
 
 **Next action:** commit+push this planning batch, then E13 prereg.
+
+---
+
+# Appendix AX - E13 turn-of-month FAIL (both D1 tiers) (2026-07-12, ~01:25 local)
+
+**WHAT:** M7 task 28. Ran E13 per prereg 0324196 (doc-only commit first).
+Runner run_e13_turn_of_month.py; SPY from cache; swing.db untouched; frozen
+tripwire GREEN. Results: docs/research/2026-07-12_E13_results.md.
+
+**VERDICT: FAIL (both tiers).** In-market 19.1% of sessions. Gate 2000-13:
+CAGR 1.41%, Sharpe 0.20 (vs SPY-BH 1.72%/0.19). Secondary 2014-: 1.44%/0.23
+vs SPY 11.98%/0.74. PASS-HR fails (nowhere near 15%); PASS-RA fails (gate
+Sharpe 0.20<0.80, and loses to SPY in the bull window - must beat both).
+
+**NUANCE recorded:** TOM matched SPY's return in the FLAT 2000-13 decade
+while holding cash 81% of the time (real McConnell-Xu concentration), but
+that's risk-reduction not edge; the 2014 bull exposed it. First experiment
+under the D1 dual-bar verdict; the RA tier worked as intended (caught that
+a same-return-lower-exposure overlay still isn't a Sharpe-beater in both
+regimes). Program 0/14 primary.
+
+**Next action:** commit E13, then M7 task 29 (E14 sector momentum).
