@@ -1982,3 +1982,30 @@ anomaly, twice. Not a live edge, but the cleanest positive-in-one-regime
 signal the program has produced. Program 0/16 primary, 0/3 D1-tiered.
 
 **Next action:** commit E15, then M7 task 31 (E16 x-sectional weekly reversal).
+
+---
+
+# Appendix BB - E16 weekly reversal FAIL (clean); cleared 15% return but blew DD ceiling on survivor flattery (2026-07-11, ~21:35 CST)
+
+**WHAT:** M7 task 31. Ran E16 per prereg a090294 (doc-only first). Runner
+run_e16_weekly_reversal.py; 39 survivor large-caps; swing.db untouched;
+tripwire GREEN. Results: docs/research/2026-07-11_E16_results.md.
+
+**VERDICT: FAIL (clean).** THE NOTABLE ONE: gate 2000-13 CAGR 16.76% -
+first experiment in 16 to CLEAR the 15% return bar - but maxDD 65.9%
+(breaches 60% ceiling) and Sharpe 0.61; secondary 10.68%/64%DD. PASS-HR
+fails on drawdown + secondary; PASS-RA fails (Sharpe 0.61<0.80, loses SPY).
+
+**WHY IT'S NOT A DISCOVERY:** reversal/dip-buying is the strategy MOST
+flattered by survivorship - buying biggest losers only works if losers
+recover, and these 39 are all still alive (no Lehman/Enron). The 16.76% is
+the expected survivorship artifact, which is exactly why the prereg fixed
+asymmetric framing (only FAIL clean) beforehand. It IS a FAIL (66% DD +
+sub-0.80 Sharpe), so interpretable: even with maximal survivorship flattery
+weekly reversal couldn't clear the risk-controlled bar. Fill-timing-ablation
+counter-evidence also held (next-open long-only = lossy version). NOT tuned
+(a DD-cutting stop would be tuning-a-FAIL; refused). Program 0/17 primary,
+0/4 D1-tiered.
+
+**Next action:** commit E16, then M7 task 32 (E17 days-to-cover) - which
+STARTS with a short-interest history data probe; likely BLOCKED-ON-DATA.
