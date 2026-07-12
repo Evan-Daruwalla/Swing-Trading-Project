@@ -8,7 +8,7 @@
 
 A systematic-trading research project whose goal was a **high percentage
 return over short holds** with a small account. It did not find one — and the
-*discipline of how it failed* is the point. Seventeen strategies across seven
+*discipline of how it failed* is the point. Twenty strategies across seven
 families were tested under strict **pre-registration** (rules committed to git
 *before* the code that produces results), honest kill-criteria (no re-tuning a
 failed run), and out-of-sample / out-of-regime tests — culminating in an
@@ -19,11 +19,12 @@ test, neither used to design anything.
 high-return EOD strategy was found across seven plausible families — index
 mean reversion, leveraged trend, concentrated stock/sector momentum,
 volatility breakout, deep-dip accumulation, event-driven (post-earnings drift
-& earnings-announcement premium), and calendar/reversal effects (0 passes in
-17 attempts; 1 more blocked on data). The single strategy that ever cleared
-the 15%/yr return bar (E16 weekly reversal, 16.8%) did so only on a
-survivorship-flattered universe and a 66% drawdown — a textbook artifact, not
-an edge. This
+& earnings-announcement premium), and calendar/reversal/regime effects
+(**0 passes of the high-return bar in 20 attempts**; one weak risk-adjusted
+pass — VIX term structure, forward-paper only; one blocked on data, one
+deferred). The single strategy that ever cleared the 15%/yr return bar
+(E16 weekly reversal, 16.8%) did so only on a survivorship-flattered universe
+and a 66% drawdown — a textbook artifact, not an edge. This
 is backed by out-of-sample evidence from five international regimes (including
 the 1990s Japan secular bear) and a survivorship-*flattered* stock test that
 still failed. The one partly-deployable result — a 1× 200-day-MA rotation — is
@@ -60,6 +61,9 @@ before the market charged tuition for the same lesson.
 | E15 | Earnings-announcement premium | FAIL (clean) — beat benchmarks in 2000–13, decayed after ~2010 (E10's twin) |
 | E16 | Cross-sectional weekly reversal | FAIL (clean) — cleared 15%/yr *once* (16.8%) but on a 66% drawdown, the expected survivorship artifact of dip-buying survivors |
 | E17 | Days-to-cover / short interest | BLOCKED-ON-DATA — no free exchange-listed short-interest history |
+| E18 | Regime-gate bake-off (VIX term structure, credit, breadth vs 200-DMA) | no gate beats plain 200-DMA robustly; VIX-TS clears the risk-adjusted tier but *weakly* (one-crash window, worse drawdown in the bull) — forward-paper candidate only |
+| E19 | Insider opportunistic buys (SEC Form 4) | DEFERRED — data parses but the historical ingestion is heavy with 3 hazards; Evan-gated |
+| E20 | Dividend capture | FAIL — a real +0.10%/trade ex-date effect that doesn't compound and is eaten by tax |
 
 ## Reproduce
 

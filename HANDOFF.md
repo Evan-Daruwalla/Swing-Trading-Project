@@ -12,11 +12,30 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — SEVEN families; 0 PASS / 17 attempts (16 run + 1 blocked); nothing live
+## Current state — SEVEN families; 0 PASS-HR / 1 weak PASS-RA / 20 attempts; nothing live
 
 **Last updated: 2026-07-11 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-11 — M7b data-type arc done (record Appendices BD–BF); autonomous
+> wall.** **E18 regime-gate bake-off:** no new gate (VIX-TS / HY-OAS /
+> breadth) beats the plain 200-DMA overlay on the robust both-windows
+> criterion (confirms E6/E7) — BUT per the pre-registered D1, the VIX/VIX3M<1
+> gate cleared **PASS-RA, the program's first tier-pass**. It is flagged
+> **WEAK**: 2006–13 window (VIX3M starts 2006) has one crash, so the pass
+> largely = dodging 2008, and it has *worse* drawdown than buy-hold in the
+> 2014→ bull. Per D1 it is a **forward-paper candidate only**, not a validated
+> edge; PASS-HR stays 0. (HY-OAS arm inconclusive — FRED free data only
+> ~2023+.) **E20 dividend capture:** FAIL — a real but tiny ex-date edge
+> (+0.10%/trade) that doesn't compound (0.6%/yr, negative post-2014) and is
+> pre-tax. **E19 insider/EDGAR:** FEASIBLE-BUT-DEFERRED — Form-4 data parses
+> (39/39 CIKs) but the historical build is the project's heaviest with three
+> hazards (CIK changes, XSL-vs-raw-XML, ~1000-filing API cap); deferred vs a
+> near-certain-FAIL prior, Evan-gated. **Remaining work is ALL Evan-gated:**
+> M3 Alpaca paper deploy of E6-1× (+ the caveated VIX-TS candidate); E19 full
+> ingestion authorization; a paid data budget (unblocks HY-OAS, short
+> interest / the never-run days-to-cover E17).
 
 > **2026-07-11 — M7 catalog arc E13–E17 all closed (record Appendices
 > AX–BC); D1 dual-bar verdict adopted (Appendix AW).** Evan approved D1: a
