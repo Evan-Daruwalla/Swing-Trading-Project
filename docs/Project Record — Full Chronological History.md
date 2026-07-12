@@ -1935,3 +1935,28 @@ does not survive at this horizon net of cost, cleanly demonstrated.
 
 **Next action:** commit E14, then M7 task 30 (E15 earnings-announcement
 premium; reuses E10 earnings-date infra).
+
+---
+
+# Appendix AZ - TIMEZONE CORRECTION: record stamps were UTC, adopt CST (UTC-5) (2026-07-11, ~20:55 CST)
+
+**WHAT / CORRECTION (Evan flagged 2026-07-11):** every prior appendix labeled
+"local" actually carries the UTC (Z) time copied from the /project-memory
+cadence hook, NOT local time. The project's timezone is **CST (UTC-5)**.
+Adopted going forward; this and all later entries use CST.
+
+**Conversion for prior entries:** subtract 5 hours from the labeled time; the
+DATE rolls back one day when that crosses midnight. Notably:
+- Appendices AU-AY are headed "2026-07-12, ~00:45-01:35" (UTC) -> correct CST
+  is **2026-07-11, ~19:45-20:35**. Their header DATE (07-12) is wrong; true
+  work date is 2026-07-11.
+- Appendices AK-AM ("2026-07-10 ~04:52-05:15" UTC) -> 2026-07-09 ~23:52 to
+  2026-07-10 ~00:15 CST. All other "local" stamps: -5h, same-day unless the
+  UTC time is < 05:00 (then prior day).
+
+Prior committed entries are NOT rewritten in place (append-only discipline;
+several predate this session and their exact source times can't be verified).
+This note is the authoritative correction. A standing convention added to
+project CLAUDE.md so it does not recur.
+
+**Next action:** resume M7 - E15 runner (task 30 in progress).

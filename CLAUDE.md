@@ -22,6 +22,10 @@ task is the default work.
 - PRD next-task (§4): on request; default idle action once a PRD exists.
 - Codebase-memory bins (§5): same session as any fact-changing change.
 - Misses are logged in the record, not hidden.
+- TIMEZONE: record/doc timestamps in **CST (UTC-5)**. The /project-memory
+  cadence hook reports UTC (Z) — subtract 5h before stamping an entry
+  (date rolls back if UTC time < 05:00). Set 2026-07-11 (record Appendix AZ)
+  after earlier entries were mislabeled UTC-as-local.
 
 ## Definition of done (additive to global standards)
 - No test suite exists yet (2026-07-08). Once a backtest engine lands, port
