@@ -2065,3 +2065,23 @@ Unblock = working FRED fetch/API key. Program now 1 weak PASS-RA / 18.
 
 **Next action:** commit E18, then M7b task 35 (E20 dividend capture, cheap);
 E19 insider/EDGAR is the heavy probe - attempt after E20.
+
+---
+
+# Appendix BE - E20 dividend capture FAIL (real but sub-scale + tax-eaten) (2026-07-11, ~22:25 CST)
+
+**WHAT:** M7b task 35. Ran E20 per prereg d0642ad (doc-only first). Runner
+run_e20_dividend_capture.py; 29 ETFs + yfinance dividends, dividend credited
+to P&L; swing.db untouched; tripwire GREEN. Results:
+docs/research/2026-07-11_E20_results.md.
+
+**VERDICT: FAIL (both tiers).** Gate 2000-13 CAGR 0.62%/Sharpe 0.18;
+secondary -1.15%. Mean net per-trade +0.10% (win 57.7%) - a REAL tiny
+ex-date edge (drop ~10bps < dividend) but sub-scale: ~90 1-session trades/yr
+barely touch capital, compound to 0.6%/yr and go NEGATIVE post-2014
+(decayed). Pre-tax; dividends taxed as income would flip the +0.10% negative
+(disclosed). Dividend capture closed. Program 0 PASS-HR / 1 weak PASS-RA /
+19 attempts.
+
+**Next action:** commit E20, then M7b task 34 (E19 insider/EDGAR) - the
+heavy one; STARTS with a scoped Form-4 ingestion probe per PRD.
