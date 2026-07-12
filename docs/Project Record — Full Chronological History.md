@@ -2116,3 +2116,13 @@ authorization; a paid data budget to unblock HY-OAS/short-interest).
 **Next action:** final HANDOFF + memory sync; then report the full session
 + pending push (~18 commits ahead) + the two Evan decisions. Nothing
 autonomous remains.
+
+---
+
+# Appendix BG - Pushed M7/M7b arc to public repo (2026-07-11, ~20:26 CST)
+
+**WHAT:** Evan authorized push. Shipping the M7+M7b batch (E13-E20 preregs +
+runners + results, D1 approval, timezone correction, doc syncs) to
+origin/main. State at push: 0 PASS-HR / 1 weak PASS-RA (VIX-TS, forward-paper
+only) / 20 attempts / 7 families; autonomous wall (remaining work Evan-gated:
+M3 Alpaca, E19 ingestion authorization, paid-data budget). Cadence #54.
