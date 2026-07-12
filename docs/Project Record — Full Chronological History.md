@@ -1960,3 +1960,25 @@ This note is the authoritative correction. A standing convention added to
 project CLAUDE.md so it does not recur.
 
 **Next action:** resume M7 - E15 runner (task 30 in progress).
+
+---
+
+# Appendix BA - E15 earnings-announcement premium FAIL (clean); the decayed-anomaly twin of E10 (2026-07-11, ~21:15 CST)
+
+**WHAT:** M7 task 30. Ran E15 per prereg 9b0aeb3 (doc-only first). Runner
+run_e15_earnings_premium.py; reused E10 earnings-date + OHLCV cache;
+swing.db untouched; tripwire GREEN. Results: docs/research/2026-07-11_E15_results.md.
+
+**VERDICT: FAIL (clean).** Gate 2000-13 CAGR 6.36%/Sharpe 0.49; secondary
+2.50%/0.25. PASS-HR fail (6.4% vs 15%); PASS-RA fail (Sharpe 0.49<0.80,
+loses SPY in bull). Asymmetric framing (survivor+lookahead) makes the FAIL
+clean.
+
+**PATTERN (worth remembering):** E15 is the twin of E10 - both earnings
+anomalies BEAT both benchmarks in the hostile 2000-13 decade (E15 6.36% &
+Sharpe 0.49 while EW-universe -0.47%, SPY 1.72%) and both DECAYED after ~2010
+(E15 2.5% vs SPY 12% post-2014). Textbook real-but-small-then-arbitraged
+anomaly, twice. Not a live edge, but the cleanest positive-in-one-regime
+signal the program has produced. Program 0/16 primary, 0/3 D1-tiered.
+
+**Next action:** commit E15, then M7 task 31 (E16 x-sectional weekly reversal).
