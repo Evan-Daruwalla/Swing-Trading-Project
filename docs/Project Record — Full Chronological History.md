@@ -2126,3 +2126,24 @@ runners + results, D1 approval, timezone correction, doc syncs) to
 origin/main. State at push: 0 PASS-HR / 1 weak PASS-RA (VIX-TS, forward-paper
 only) / 20 attempts / 7 families; autonomous wall (remaining work Evan-gated:
 M3 Alpaca, E19 ingestion authorization, paid-data budget). Cadence #54.
+
+---
+
+# Appendix BH - E19 authorized + launched: EDGAR Form-4 ingestion running (2026-07-11, ~20:45 CST)
+
+**WHAT:** Evan authorized the full E19 EDGAR build ("1"). Sized it first:
+104,496 Form-4s across the 39 names (~4h fetch at 7/s), structured-XML floor
+~2003 (gate window becomes 2003-2013), XOM/DIS need former-CIK map (XOM
+0000034088, DIS 0001001039). Prereg ebf54a4 committed doc-only. Parser
+validated on BAC samples (raw XML fetch OK, codes {M,D,P,S,J} extracted,
+9 P-buys/8 samples). Ingester (scripts/ingest_edgar_form4.py, resumable
+per-ticker cache, .edgar_cache gitignored) launched in BACKGROUND (task
+benymlwy5). Backtest (scripts/run_e19_insider.py: CMP opportunistic
+classification, 40-session hold, K=5, D1 + asymmetric verdict) written and
+ready. Prior: near-certain FAIL (survivorship, 0-PASS-HR/19).
+
+**STATE:** ingestion in progress (~4h); on completion -> run backtest ->
+verdict -> results doc -> record -> commit. Nothing else autonomous until it
+finishes. swing.db untouched; prices from .e8e9_cache.
+
+**Next action:** await ingestion completion notification, then run E19.
