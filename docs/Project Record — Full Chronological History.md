@@ -2034,3 +2034,34 @@ FAIL (survivorship-clean, cleanest negative), E15 earnings premium FAIL
 **Next action:** natural stopping point - sync HANDOFF + README + memory to
 0/17, commit, then continue roadmap into M7b (E18 regime-gate bake-off next;
 data in hand).
+
+---
+
+# Appendix BD - E18 regime-gate bake-off: nothing beats 200DMA; VIX-TS is a weak first PASS-RA (2026-07-11, ~22:05 CST)
+
+**WHAT:** M7b task 33. Ran E18 per prereg f32b008 (doc-only first). Runner
+run_e18_regime_gates.py; QQQ/ETFs from cache, VIX/VIX3M via yfinance, HY-OAS
+via FRED; swing.db untouched; tripwire GREEN. Results:
+docs/research/2026-07-11_E18_results.md.
+
+**BAKE-OFF VERDICT (primary question): NO new regime gate beats the plain
+200-DMA overlay** on the robust criterion (maxDD cut>=10pp AND Sharpe>=BH
+BOTH windows). Only gate (d) 200-DMA qualifies both windows - confirms
+E6/E7: trend-timing is the robust overlay, VIX-TS/credit/breadth don't
+improve on it across regimes.
+
+**FIRST PASS-RA (reported per pre-registered D1, with heavy caveats):** the
+VIX/VIX3M<1 gate cleared PASS-RA - gate(2006-13) Sharpe 0.80, >SPY both
+windows, +CAGR both. BUT WEAK/FRAGILE: (1) 2006-13 window has only ONE crash
+(2008; VIX3M starts 2006, misses dot-com) - the pass largely = dodging 2008;
+(2) in 2014+ it had WORSE drawdown than buy-hold (44% vs 35.6%), whipsawing
+the bull; secondary Sharpe 0.79 barely > SPY 0.74. Not robust, not a return
+engine. Per D1 -> forward-paper candidate alongside E6-1x, nothing more.
+NOT tuned. PASS-HR column still 0.
+
+**DATA LIMIT:** HY-OAS arm INCONCLUSIVE - FRED fredgraph.csv returned
+BAMLH0A0HYM2 only from ~2023 despite cosd=1996; no gate-window history.
+Unblock = working FRED fetch/API key. Program now 1 weak PASS-RA / 18.
+
+**Next action:** commit E18, then M7b task 35 (E20 dividend capture, cheap);
+E19 insider/EDGAR is the heavy probe - attempt after E20.
