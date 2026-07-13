@@ -2378,3 +2378,40 @@ healthy. No backtests started. swing.db untouched.
 
 **Next action:** commit the 4 briefs; await E19 ingestion completion, then run E19
 and close M7b.
+
+---
+
+# Appendix BP - M9 added to PRD: research-batch-2 experiments designed (2026-07-13, ~13:25 CST)
+
+**WHAT:** Evan: "update the roadmap and design experiments for the new possible
+strategies." Appended milestone M9 (tasks 43-51) to PRD_ROADMAP.md + milestones-table
+row, per the ADD-by-appending rule. Contents:
+- Task 43 discipline adoptions (prereg template: tiered costs 1/5/15-25bps +
+  ADV>=$5M/price>=$5 floor, decomposition ladder in every results doc, time-stop
+  baseline arm, capped fractional-Kelly defaults).
+- Task 44 EX-DECOMP diagnostic (Rungs A/B/C retrofit on E13-E16/E20 FAILs ->
+  classify SIGNAL-DEAD / GAP-DWELLER / COST-GATED).
+- X-candidates: X1 conditional vol-targeting (E6xE18 interaction, gate 2006-2013,
+  PASS-RA ceiling, verdict labeled descriptive per low-N), X2 E17-free days-to-cover
+  (FINRA official SI 2021+, publication-date honesty), X3 Reg SHO short-volume drift
+  (2009+, MM-hedging contamination disclosed), X4 MOC close-entry probe (CLS
+  availability conflict between agents -> probe first; forward-paper arm; M3-adjacent),
+  X5 analyst recommendation-change drift (BLOCKED-ON-EVAN $22 FMP), X6 crypto BTC/ETH
+  20d/100d trend pilot (BLOCKED-ON-EVAN scope; 25bps/side crypto fees; gate 2018-2022
+  = two bears; must beat HODL Sharpe), task 51 LLM forward-only arc + M3 amendment
+  (pinned model ID, decision-log tripwire, trend-blind ablation, fidelity-reframed
+  forward-paper criterion per RK4).
+- TWO NEW DESIGN RULES adopted for M9: (1) modified-window rule — short-window data
+  (2021+/2009+/crypto) cannot claim PASS-HR/RA; best verdict = "PROMISING - needs
+  forward confirmation"; only full-window experiments claim D1 tiers. (2) LLM
+  overlays are forward-only (training-cutoff look-ahead makes LLM backtests
+  uninterpretable) — never M9 backtests.
+Ordering: 43-45 data-in-hand (may interleave with M8 cheapest-first), 46-47 free
+downloads, 48-51 gated. All after E19 closes. Cadence #72 was satisfied by BO; this
+entry logs prompt ~#73's work.
+
+**STATE:** PRD updated (uncommitted); E19 ingestion ~30/39 running. No backtests
+started; swing.db untouched.
+
+**Next action:** commit the M9 roadmap update on Evan's word; await E19 completion ->
+run E19 -> close M7b -> M8/M9 become the open queue.

@@ -151,6 +151,7 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 | M7 | Catalog arc E13–E17 (added 2026-07-10, record Appendix AT) — **DONE 2026-07-11** | the five untested-with-merit ideas from the strategy-catalog brief: turn-of-month, sector momentum, earnings-announcement premium, x-sectional reversal, days-to-cover; dual-bar verdicts (D1 APPROVED 2026-07-12). Outcome: E13/E14/E15/E16 all FAIL both tiers, E17 BLOCKED-ON-DATA |
 | M7b | Data-type arc E18–E20 (added 2026-07-12, record Appendix AV) — **E18/E20 DONE 2026-07-11; E19 RUNNING 2026-07-12** | new-data-type ideas from the data-type brief: E18 regime-gate bake-off (VIX-TS/HY-OAS/breadth/200DMA) — VIX-TS cleared the program's first (weak) PASS-RA; E19 insider opportunistic-buy drift (EDGAR) — full ingestion authorized + running (task `b2wzwj9gb`), verdict pending; E20 dividend capture FAIL; same D1 dual-bar verdicts |
 | M8 | Full-method-survey candidates C1–C7 (added 2026-07-12, record Appendix BK) | seven residual candidates after reconciling ~90 methods (8 families) against E1–E20: residual reversal, dividend-initiation drift, one volatility-breakout kill-shot, vol-targeting overlay, Reg SHO short-volume drift, even-week FOMC overlay, SVXY carry — all carry strong-FAIL priors per the survey's structural finding (concentration destroys diversified-decile edges) |
+| M9 | Research-batch-2 arc X1–X6 + discipline adoptions (added 2026-07-13, record Appendices BN–BP) | candidates + process upgrades from the LLM brief and the four-topic batch (execution/risk/data/crypto): prereg-template discipline (tiered costs, decomposition ladder, time-stop baseline, capped fractional-Kelly), conditional vol-targeting (E6×E18), E17-free days-to-cover (FINRA 2021+), Reg SHO short-volume drift, MOC close-entry probe, analyst recommendation-change drift ($22-gated), crypto BTC/ETH trend pilot (scope-gated), LLM forward-only arc (M3-attached) |
 
 Order is deliberate: infrastructure before science (council 5/5); thresholds
 provably precede results (M1 before M2); nothing goes live on an unvalidated
@@ -647,6 +648,158 @@ account + Evan go). If all seven fail every tier, the program's terminal
 claim upgrades once more: not just the strategy-catalog space but the
 **entire documented, evidenced swing-method space surveyed 2026-07-12** is
 exhausted at retail EOD, K=1–3, $100–1,000 scale.
+
+### M9 — Research-batch-2 arc: X1–X6 + discipline adoptions (added 2026-07-13;
+sourced from `docs/research/2026-07-13_{llm_driven_strategies,
+execution_microstructure, risk_and_sizing, data_sources, crypto_feasibility}.md`)
+
+**Why this exists:** the 2026-07-13 research batch produced (a) process upgrades
+that should bind every future prereg, (b) five new testable candidates, and
+(c) two structural findings that change experiment DESIGN itself:
+
+- **Short-window data breaks the D1 gate protocol.** Several candidates' data
+  starts after 2000 (FINRA SI = 2021+, Reg SHO = 2009+, crypto ≈ 2015+ liquid).
+  The 2000–2013 hostile-regime gate is unusable there. Rule adopted for M9:
+  each prereg fixes a MODIFIED window a priori, discloses the reduced
+  confidence, and **caps the best achievable verdict** — a short-window PASS is
+  recorded as "PROMISING — needs forward confirmation," never PASS-HR/PASS-RA.
+  Only full-window experiments can claim D1 tiers.
+- **LLM overlays cannot be backtested honestly, period.** Training-cutoff
+  look-ahead (Profit Mirage: 50–72% post-cutoff decay; Levy 2026) means any
+  LLM scoring historical dates is partly recalling outcomes. So the LLM
+  shortlist (red-team veto, meta-labeler, exit-supervisor, trend-blind
+  ablation) is **forward-only** — treatment arms on the M3 live-paper control,
+  never M9 backtests. See task 51.
+
+Same discipline as M7/M7b/M8: doc-only prereg before each runner, no tuning a
+FAIL, tripwire green after, no swing.db writes from live-fetch runners.
+**Ordering:** M9's data-in-hand tasks (43–45) are cheaper than most of M8 and
+may interleave with it at the executor's discretion, cheapest-first; 46–47 are
+free-data downloads; 48–51 are gated. All run AFTER E19 closes.
+
+43. **Discipline adoptions — prereg-template amendment (one sitting, doc-only).**
+    Fold the research-batch process findings into a standing
+    `docs/prereg_TEMPLATE.md` that every future prereg copies:
+    (a) **tiered cost model** — 1 bp/side broad ETFs, 5 bps/side single
+    stocks/sector ETFs, 15–25 bps or exclude below the floor; liquidity floor
+    formalized as ADV ≥ $5M AND price ≥ $5; participation cap declared
+    non-binding at this AUM; 15 bps/side stress leg reported alongside;
+    (b) **execution-vs-signal decomposition ladder** required in every results
+    doc — Rung A frictionless close-to-close 0 bps / Rung B next-open 0 bps /
+    Rung C next-open + costs (graded rung);
+    (c) **time-stop baseline** — every strategy reports a "time-stop-only"
+    exit arm as the honest baseline; any price-stop variant must beat it;
+    (d) **sizing defaults** — capped fractional-Kelly (λ ≤ ½), fixed-risk
+    r = 1–2%/trade, anti-martingale only, no leverage; λ/r frozen per prereg.
+    Done-check: template committed; next prereg uses it.
+44. **EX-DECOMP — decomposition-ladder retrofit (diagnostic, no D1 verdict).**
+    Run Rungs A/B/C on the closed FAILs whose runners are in-repo (E13, E14,
+    E15, E16, E20; E8/E9 where the runner permits). Output: one table
+    classifying each FAIL as SIGNAL-DEAD (fails Rung A), GAP-DWELLER (passes A,
+    edge dies A→B), or COST-GATED (passes B, dies at C — candidate for the
+    turnover-reduction diagnostic). Expected: most land SIGNAL-DEAD, per the
+    execution brief. Done-check: results doc + record entry + tripwire green.
+    Build: low (three passes of existing runners).
+45. **X1 — Conditional volatility targeting (E6×E18 interaction).** The one
+    regime idea mechanistically distinct from the survivors (FAJ 2020: +0.16
+    Sharpe, −7.4 pp maxDD on momentum): de-risk ONLY when vol is elevated AND
+    trend is broken, stay invested when vol spikes inside an intact uptrend.
+    Three prereg'd arms on SPY: (a) E6 alone, (b) E18 alone (both exist —
+    baselines), (c) conditional: exposure 0 iff VIX/VIX3M > 1 AND close <
+    200-DMA, else 1. Windows: gate 2006–2013 (VIX3M floor, disclosed — same
+    caveat as E18), secondary 2014→. OVERLAY test → PASS-RA is the only
+    reachable tier, and per the low-effective-N finding (~3–5 independent
+    stress episodes in the whole sample) the prereg must label ANY verdict
+    "descriptive — forward paper is the real grade." Data in hand. Build: low.
+46. **X2 — E17-free: days-to-cover on FINRA official SI (2021–2026).** The
+    E17 wall is partly gone: FINRA publishes FREE official exchange-listed
+    consolidated short interest biweekly from June 2021 (record Appendix BO).
+    Step 1 = data probe (download the biweekly CSVs, verify coverage of a
+    liquid universe, confirm publication-date field). Step 2 prereg: DTC =
+    SI/ADV; long the lowest-DTC quintile of the liquid universe, rebalance on
+    each file's PUBLICATION date (settlement date + ~8 business days —
+    using settlement date is look-ahead; disclose). Window: 2021-06→2026 as a
+    single OOS window — **modified-window rule applies: best verdict =
+    PROMISING, never PASS-HR/RA**; floor ≥ 30 rebalances. Prior: FAIL/weak
+    (decayed anomaly, long-only leg is its weak side, liquid universe).
+    Build: medium.
+47. **X3 — Reg SHO daily short-volume drift (2009+).** Free FINRA/exchange
+    daily short-sale-volume files (Boehmer-Jones-Zhang / Diether-Lee-Werner
+    lineage). Step 1 = probe (file availability 2009→, decide off-exchange-only
+    vs consolidated — disclose whichever). Step 2 prereg: short-volume ratio =
+    ShortVolume/TotalVolume; long the lowest-SVR quintile of the liquid
+    universe, weekly rebalance, 5 bps/side. Windows: gate 2009–2013 (partial
+    overlap with the standard gate — modified-window rule: verdict capped at
+    PROMISING), secondary 2014→. Disclosed contamination: market-maker hedging
+    shorts inflate SVR (FINRA Information Notice 05/10/19); long-only leg is
+    the weaker side of the documented effect. Prior: FAIL/weak. Build: medium.
+48. **X4 — MOC close-entry probe → forward arm (execution experiment).** The
+    only fill positioned to capture the ~54% overnight component is a
+    market-on-close entry; the backtest upper bound already exists (the c2c
+    ablation numbers — E2's c2c would have PASSED). What's genuinely untested
+    is IMPLEMENTATION: (step 1, probe) verify CLS/LOC availability on the
+    actual Alpaca paper account — the two execution agents disagreed on
+    whether CLS is Elite-Smart-Router-gated; if unavailable → record
+    BLOCKED-ON-BROKER-TIER and close. (Step 2, forward) if available: a
+    forward-paper close-entry arm (signal on a frozen 15:50 snapshot — using
+    the 16:00 close for a 15:50 order is look-ahead; measure the 15:50→16:00
+    stub as a residual) alongside the next-open control, measuring realized
+    overnight capture net of costs. Prior: confirms the kill (NightShares
+    failure + NY-Fed flat-since-2021 drift). M3-adjacent: needs the Alpaca
+    account → BLOCKED-ON-EVAN.
+49. **X5 — Analyst recommendation-change drift (Womack).** Cheapest clean
+    event-driven unblock: upgrades/downgrades are EVENT-DATED, so a cheap feed
+    avoids the point-in-time consensus trap that gates estimate-revision
+    drift. Step 1 = **BLOCKED-ON-EVAN: authorize FMP Starter (~$22, one month,
+    then cancel)**. Step 2 = probe FMP grade-history depth (unknown until
+    pulled). Step 3 prereg: long-only on upgrades in the liquid universe, buy
+    next open, hold ~20 sessions, K=5; windows per actual data depth
+    (modified-window rule if < the standard gate). Prior: FAIL (the buy side
+    is the documented-weak side; decayed post-Reg-FD). Build: low once data
+    is in hand.
+50. **X6 — Crypto pilot: BTC/ETH time-series trend (paper-first).**
+    **BLOCKED-ON-EVAN: scope expansion to a new asset class.** If authorized:
+    universe = BTC + ETH only (majors — kills survivorship + the liquidity
+    wall); UTC-00:00 daily bar (no gap by construction); ONE signal fixed a
+    priori = 20d/100d MA crossover, long-or-flat (the Grayscale
+    survivorship-free spec; Sharpe 1.7 vs 1.3 HODL); **fees pre-registered at
+    25 bps/side taker** (Alpaca crypto Tier 1 — 5× the equity model; an edge
+    that only clears at 5 bps is a FAIL); data = Kraken free OHLCV archive.
+    Windows: gate 2018-01→2022-12 (contains the 2018 AND 2022 bears —
+    the honest hostile window), secondary 2023→2026. Verdict: D1 numbers PLUS
+    an explicit vs-buy-hold requirement (must beat BTC HODL Sharpe in both
+    windows — 15% CAGR alone is trivial in crypto). Disclose the 2022–23
+    negative-trend stretch as an expected failure mode, not a tuning target.
+    Backtest first (free); Alpaca crypto paper forward only after a
+    backtest verdict. The custody tail (uninsured exchange balances) is
+    disclosed as the deciding LIVE-money risk — irrelevant to paper. Build:
+    medium (new data pipe + fee model).
+51. **LLM forward-only arc + M3 protocol amendment (doc task now; execution
+    Evan-gated with M3).** Per the LLM brief, the shortlist overlays (B9
+    red-team veto — which IS the existing e1_llm_veto design; D3
+    triple-barrier meta-labeler; D2 confidence-sizer; D6 exit-supervisor; D15
+    trend-blind-vs-trend-aware ablation) are FORWARD-ONLY treatment arms on
+    the M3 live-paper control. Amend the M3 spec (tasks 14/18) with the
+    non-negotiable gates: pinned model ID + version (an upgrade =
+    re-prereg); every verdict logged to an immutable `overlay_log`; the
+    frozen tripwire pinned on the DETERMINISTIC REPLAY of that log, never on
+    a live model call; ticker anonymization in prompts; the D15 trend-blind
+    arm required as the ablation; Tier 0/1 infra (no API key needed — nightly
+    runbook). Also fold in the RK4 forward-paper reframe: the M3 success
+    criterion for the E6∩E18 sleeve is **implementation fidelity vs a shadow
+    backtest over a pre-committed 6–12-month window** (MinTRL is unreachable
+    for slow signals — claiming statistical edge from the window would break
+    our own rigor rules). Done-check: M3 section amended by appending; record
+    entry.
+
+**M9 exit conditions:** tasks 43–44 completed (they upgrade every later
+experiment); each X-candidate either has a committed prereg hash + verdict +
+results doc, or a BLOCKED-ON-{EVAN, BROKER-TIER, DATA} record; findings/
+README/memory updated. **Feed-forward:** any full-window PASS-RA joins the M3
+candidate list; short-window "PROMISING" results queue for forward paper only.
+If the arc closes with no new tier-pass, the terminal claim extends to the
+2026-07-13 research batch: execution, risk, data, and crypto paths were
+surveyed, designed, and honestly closed.
 
 ## 7. HANDOFF NOTES
 
