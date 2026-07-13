@@ -2415,3 +2415,86 @@ started; swing.db untouched.
 
 **Next action:** commit the M9 roadmap update on Evan's word; await E19 completion ->
 run E19 -> close M7b -> M8/M9 become the open queue.
+
+---
+
+# Appendix BQ - E19 ingestion ~31/39; ABT P-buy anomaly flagged (2026-07-13, ~13:40 CST)
+
+**WHAT:** M9 committed (f66a9d6). E19 EDGAR ingestion (b2wzwj9gb) at 31/39, UNH in
+progress; 7 left (GE CAT BA MMM HON T VZ). DATA ANOMALY to carry into the E19 results
+doc: ABT cached **388 P-buys** vs a typical name's 10-90 (HD 69, PFE 52, MSFT 53).
+388 open-market "P" transactions on one large-cap over ~20yr is implausibly high for
+discretionary insider buying - almost certainly dividend-reinvestment-plan / ESPP /
+automatic-accumulation purchases mis-coded as transactionCode "P". The CMP routine-vs-
+opportunistic classifier SHOULD absorb most of these (regular monthly/quarterly DRIP
+buys are the definition of "routine" - same calendar month each year -> classified
+routine -> excluded from the opportunistic set E19 trades). But it must be VERIFIED in
+the results doc: report per-ticker opportunistic counts, and if ABT (or any name)
+dominates the opportunistic set with mechanical-looking cadence, hand-inspect and note
+it. This is exactly the kind of survivorship/data-quality artifact the asymmetric
+framing anticipates - it can only inflate a spurious PASS, so it strengthens a clean
+FAIL. Cadence #75.
+
+**STATE:** ingestion 31/39, healthy; swing.db untouched; no backtests started.
+
+**Next action:** await INGEST COMPLETE -> run run_e19_insider.py (verify opportunistic
+counts per ticker, watch ABT) -> D1 verdict -> tripwire -> results doc -> record ->
+commit -> close M7b.
+
+---
+
+# Appendix BR - E19 RUN: FAIL (clean, robust to de-junk); M7b CLOSED (2026-07-13, ~13:45 CST)
+
+**WHAT:** EDGAR ingestion completed (task b2wzwj9gb, exit 0, 39/39 tickers, INGEST
+COMPLETE; VZ was the 7,669-Form-4 tail). Ran `scripts/run_e19_insider.py` (via
+`.venv` python - pythoncore-3.14 lacks yfinance). **E19 = FAIL per D1 prereg
+`ebf54a4`.** Numbers: P-buys 6435; opportunistic 6138; entries 6138; gate entries
+279. Gate 2003-2013 CAGR 4.68% / maxDD 53.6% / Sharpe 0.31; secondary 2014- CAGR
+4.91% / maxDD 42.6% / Sharpe 0.35. **Underperforms SPY buy-hold on BOTH CAGR and
+Sharpe in BOTH windows** (SPY 6.65%/0.42 and 11.98%/0.74). PASS-HR fail (needs >=15%),
+PASS-RA fail (gate Sharpe 0.31 < 0.80). Frozen tripwire GREEN afterward (12 refs,
+d=+/-0.0000pp). Full writeup: `docs/research/2026-07-13_E19_insider_results.md`.
+
+**DATA-QUALITY (carries + CORRECTS Appendix BQ):** the P-buy set is contaminated far
+beyond the ABT flag. BAC = **2851 P-buys (44% of all 6435)**, dominated by owner CIK
+0000070858 which is **BAC's own ISSUER CIK** (not an insider), including **1-share
+lots at $0.01-0.02** (impossible as real open-market buys - DRIP/fractional/accounting
+artifacts mis-coded transactionCode "P"). GS 728, ABT 388, JPM 353, GE 310 similar.
+**BQ's prediction that the CMP classifier would absorb these as "routine" is
+FALSIFIED** - 95% (6138/6435) passed through as opportunistic. **BQ's claim that
+contamination "can only inflate a spurious PASS" is imprecise** - signal-free buys
+dilute TOWARD beta, which is bidirectional and could equally MASK a real edge (the
+genuine threat to a FAIL).
+
+**SENSITIVITY (post-hoc, NOT prereg; scratch script, uncommitted):** re-ran the cache
+with de-junk filters to resolve the masking risk. price>=$1 -> FAIL (4.66%/4.96%);
+price>=$1 + same-owner/day dedup (entries 6119->2675) -> FAIL (4.54%/4.91%);
+price>=$5 + dedup -> FAIL (3.66%/4.67%). Every variant stays flat sub-beta (gate
+Sharpe 0.27-0.31); gate entries stable ~279 because a K=5/40-session book SATURATES.
+**Cleaning reveals no masked edge -> the FAIL is ROBUST, a clean falsification, not a
+contamination artifact.** Per doctrine any flip here would have been "PROMISING /
+fresh-prereg-required," never a PASS - moot, nothing flipped.
+
+**INTERPRETATION:** consistent with the program's structural null - K-concentrated,
+liquidity-floored, survivor-universe versions of diversified anomalies collapse to a
+slightly-worse-than-market long-only sleeve; the documented insider-buy alpha
+(Cohen-Malloy-Pomorski, Lakonishok-Lee) lives in small/illiquid names the floor
+excludes, and next-open EOD surrenders the announcement pop. Survivorship could only
+help; contamination could only have hurt (ruled out) - clean in both directions.
+
+**SNAPSHOT / TALLY:** **0 PASS-HR / 1 weak PASS-RA / 21 attempts / 8 families**
+(E19 = insider-transaction / informed-positioning, the 8th family; the never-run E17
+short-interest probe would sit in the same family). **M7b CLOSED** (E18 done, E20
+done, E19 done). All families the research has surfaced are now falsified or
+Evan-gated. Autonomous wall stands: remaining work = M3 Alpaca paper deploy (E6-1x
+[+ caveated VIX-TS]); M8/M9 experiments that are BLOCKED-ON-EVAN (paid data budgets
+X2/X3/X5, crypto scope X6) or startable-but-low-value; all require Evan's go.
+
+**STATE:** swing.db untouched (E19 reads .edgar_cache + price caches only, no writes);
+tripwire GREEN; working tree = new results doc + this record entry + HANDOFF/memory
+sync, about to commit. Cadence #77.
+
+**Next action:** commit E19 (results doc + record + HANDOFF + memory). Then the open
+queue is M8/M9, all Evan-gated - report the autonomous wall and await Evan's
+direction (deploy, fund a data probe, or accept the falsification program as the
+deliverable).

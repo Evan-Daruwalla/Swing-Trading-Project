@@ -12,11 +12,29 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — SEVEN families; 0 PASS-HR / 1 weak PASS-RA / 20 attempts; nothing live
+## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 21 attempts; nothing live
 
-**Last updated: 2026-07-12 (CST)** — this file is the only live snapshot;
+**Last updated: 2026-07-13 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-13 — E19 insider-buy drift = FAIL (clean); M7b CLOSED (record
+> Appendix BR).** EDGAR Form-4 ingestion completed (39/39). Ran
+> `scripts/run_e19_insider.py` (opportunistic buys, CMP classification,
+> next-open, 40-session hold, K=5, survivor universe). **FAIL per D1
+> `ebf54a4`:** gate 2003–13 CAGR 4.68% / DD 53.6% / Sharpe 0.31; secondary
+> 2014→ CAGR 4.91% / DD 42.6% / Sharpe 0.35 — **underperforms SPY on CAGR AND
+> Sharpe in BOTH windows**; both pass tiers fail. Frozen tripwire GREEN (12
+> refs, d=±0.0000pp). **Data-quality:** heavy transactionCode-"P"
+> contamination (BAC = 44% of all P-buys, dominated by BAC's own issuer CIK,
+> incl. $0.01 1-share artifacts); the CMP classifier passed 95% through
+> (Appendix-BQ "routine will absorb it" prediction **falsified**). A post-hoc
+> de-junk sensitivity (price ≥ $1/$5, same-owner-day dedup cutting entries
+> 6,119→2,675) leaves the verdict unchanged and flat sub-beta → **cleaning
+> reveals no masked edge; FAIL is robust, not a contamination artifact.**
+> Writeup `docs/research/2026-07-13_E19_insider_results.md`. E19 = the 8th
+> family (insider/informed-positioning). **Autonomous wall stands** — remaining
+> work (M3 Alpaca deploy; M8/M9) is Evan-gated.
 
 > **2026-07-12 — E19 ingestion RUNNING + full method survey delivered (record
 > Appendices BI–BK).** **E19:** Evan authorized + restarted the full EDGAR

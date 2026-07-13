@@ -149,7 +149,7 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 | M4 | Overlay readout (GATED on pre-registered N/horizon) | evaluate veto vs control; continue, add cascade arm, or kill per pre-reg |
 | M5 | Expansion (GATED on M3 stable) | deferred ideas only: exit/stop ablations (#17/#18), sizing (#20), RSI comparison (#2), mega-cap pullback (#5), VIX gate (#11) |
 | M7 | Catalog arc E13–E17 (added 2026-07-10, record Appendix AT) — **DONE 2026-07-11** | the five untested-with-merit ideas from the strategy-catalog brief: turn-of-month, sector momentum, earnings-announcement premium, x-sectional reversal, days-to-cover; dual-bar verdicts (D1 APPROVED 2026-07-12). Outcome: E13/E14/E15/E16 all FAIL both tiers, E17 BLOCKED-ON-DATA |
-| M7b | Data-type arc E18–E20 (added 2026-07-12, record Appendix AV) — **E18/E20 DONE 2026-07-11; E19 RUNNING 2026-07-12** | new-data-type ideas from the data-type brief: E18 regime-gate bake-off (VIX-TS/HY-OAS/breadth/200DMA) — VIX-TS cleared the program's first (weak) PASS-RA; E19 insider opportunistic-buy drift (EDGAR) — full ingestion authorized + running (task `b2wzwj9gb`), verdict pending; E20 dividend capture FAIL; same D1 dual-bar verdicts |
+| M7b | Data-type arc E18–E20 (added 2026-07-12, record Appendix AV) — **CLOSED 2026-07-13: E18/E20 DONE 2026-07-11; E19 FAIL 2026-07-13** | new-data-type ideas from the data-type brief: E18 regime-gate bake-off (VIX-TS/HY-OAS/breadth/200DMA) — VIX-TS cleared the program's first (weak) PASS-RA; E19 insider opportunistic-buy drift (EDGAR) — full ingestion authorized + running (task `b2wzwj9gb`), verdict pending; E20 dividend capture FAIL; same D1 dual-bar verdicts |
 | M8 | Full-method-survey candidates C1–C7 (added 2026-07-12, record Appendix BK) | seven residual candidates after reconciling ~90 methods (8 families) against E1–E20: residual reversal, dividend-initiation drift, one volatility-breakout kill-shot, vol-targeting overlay, Reg SHO short-volume drift, even-week FOMC overlay, SVXY carry — all carry strong-FAIL priors per the survey's structural finding (concentration destroys diversified-decile edges) |
 | M9 | Research-batch-2 arc X1–X6 + discipline adoptions (added 2026-07-13, record Appendices BN–BP) | candidates + process upgrades from the LLM brief and the four-topic batch (execution/risk/data/crypto): prereg-template discipline (tiered costs, decomposition ladder, time-stop baseline, capped fractional-Kelly), conditional vol-targeting (E6×E18), E17-free days-to-cover (FINRA 2021+), Reg SHO short-volume drift, MOC close-entry probe, analyst recommendation-change drift ($22-gated), crypto BTC/ETH trend pilot (scope-gated), LLM forward-only arc (M3-attached) |
 
@@ -517,8 +517,19 @@ tripwire green after).
     ~2003 → gate window 2003–2013). Full ingestion (104,496 Form-4s, ~7/s)
     launched in background, paused by Evan, **restarted 2026-07-12** (task
     `b2wzwj9gb`, resumable per-ticker cache); backtest runner
-    `scripts/run_e19_insider.py` written and ready. **Verdict PENDING** —
-    this is the only open task in M7/M7b as of 2026-07-12.)*
+    `scripts/run_e19_insider.py` written and ready. **STEP 2 VERDICT
+    (2026-07-13): FAIL (clean, robust) — M7b CLOSED.** Ingestion completed
+    39/39. Gate 2003–13 CAGR 4.68%/DD 53.6%/Sharpe 0.31; secondary 4.91%/42.6%/
+    0.35 — underperforms SPY on CAGR AND Sharpe in BOTH windows; both D1 tiers
+    fail; tripwire GREEN. Data heavily transactionCode-"P"-contaminated (BAC =
+    44% of P-buys, dominated by BAC's own issuer CIK, incl. $0.01 1-share
+    artifacts; CMP classifier passed 95% through — the Appendix-BQ "routine
+    absorbs it" prediction FALSIFIED), but a post-hoc de-junk sensitivity
+    (price floors + same-owner-day dedup, entries 6119→2675) left the FAIL
+    unchanged and flat sub-beta → clean falsification, not a contamination
+    artifact. E19 = the program's 8th family (insider/informed-positioning).
+    Results: `docs/research/2026-07-13_E19_insider_results.md`; record
+    Appendix BR.)*
 35. **E20 — Dividend-capture falsification.** Buy each frozen-universe ETF
     at close the session before its ex-date, sell at next open; yfinance
     dividend calendar + our dividend-UNADJUSTED closes (the convention is
@@ -530,7 +541,7 @@ tripwire green after).
     post-2014 (secondary −1.15% CAGR, Sharpe −0.39). Results:
     `docs/research/2026-07-11_E20_results.md`.)*
 
-**M7b exit conditions — E18/E20 MET 2026-07-11; E19 OPEN pending ingestion.**
+**M7b exit conditions — MET 2026-07-13 (E18/E20 2026-07-11; E19 FAIL 2026-07-13). M7b CLOSED.**
 As M7 — every experiment has a committed prereg hash (or a BLOCKED-ON-DATA
 record), a D1-tier verdict, and a results doc; findings/README/memory
 updated. E18 feeds the M3 overlay directly as a forward-paper candidate (not
