@@ -2158,3 +2158,60 @@ persisted) then prompted restart now. Relaunching scripts/ingest_edgar_form4.py
 in background; resumable (skips completed tickers, currently none -> starts at
 MSFT). Same ~104k-doc / ~4h scope. On completion -> run_e19_insider.py ->
 verdict -> results -> record -> commit. swing.db untouched. Cadence #57.
+
+---
+
+# Appendix BJ - E19 ingestion ~17% + research-brief on swing methods kicked off (2026-07-12, ~23:04 CST)
+
+**WHAT:** Two threads. (1) E19 EDGAR ingestion (task b2wzwj9gb) healthy at
+~17%: 6/39 tickers cached (MSFT 53 / INTC 92 / CSCO 14 / ORCL 35 / IBM 43 /
+AAPL 22 P-buys), QCOM in progress. ~17.7k/104.5k docs fetched, ~7/s, no
+throttle. ETA ~3h. Runs unattended; E19 backtest fires on INGEST COMPLETE.
+(2) Evan requested a full in-depth /research-brief on every possible swing-
+trading method. Launching that as a parallel deliverable (survey doc under
+docs/research/, does NOT touch swing.db or the ingestion). Scope: catalog +
+mechanism + evidence + testability for the full method space, superset of the
+2026-07-10 catalog and 2026-07-12 data-type briefs. Cadence #60 (soft cadence,
+on time).
+
+**STATE:** ingestion 17% and climbing; research-brief in progress. swing.db
+untouched. No new backtests started (autonomous wall holds - this is research
+output, not a strategy run).
+
+**Next action:** produce the research brief; keep E19 ingestion running to
+completion, then run E19.
+
+---
+
+# Appendix BK - Full swing-method survey delivered (research-brief, 2026-07-12, ~23:25 CST)
+
+**WHAT:** Ran /research-brief on "every possible swing-trading method" as a
+superset of the 2026-07-10 catalog. 8 parallel research agents (one per family:
+mean-reversion, trend/momentum, chart-pattern TA, event/catalyst, seasonality/
+overnight, sentiment/flow/alt-data, volatility/options, factor/ML), primary-
+source-graded (~90 methods). Compiled to
+docs/research/2026-07-12_swing_method_full_survey.md. Web-research only - no
+backtests, swing.db untouched, E19 ingestion (b2wzwj9gb) unaffected.
+
+**KEY RESULT:** the reconciliation layer is the payload. Agents flagged several
+"untested" ideas that the project ALREADY KILLED: diversified sector momentum
+(E14 FAIL 2.4%), turn-of-month (E13 FAIL 1.4%), earnings-announcement premium
+(E15 FAIL 6.4%), raw weekly reversal (E16 FAIL - 16.76% gate CAGR but 65.9%
+DD), dividend capture (E20 FAIL). After reconciliation only a short list is
+genuinely open, all with strong-FAIL priors: (1) short-term RESIDUAL reversal
+(Blitz 2013, the fix for E16's DD), (2) dividend-INITIATION drift (distinct
+from E20 capture), (3) one consolidated volatility-breakout kill-shot,
+(4) Moreira-Muir vol-targeting sizing overlay, (5) free Reg SHO daily short-
+volume drift, (6) even-week FOMC-cycle overlay, (7) SVXY carry gated by VIX-TS.
+Structural conclusion (4 independent literatures): concentration to K=1-3
+destroys diversified-decile edges; edges live in illiquid names the floor
+excludes (Hou-Xue-Zhang 65-82% fail VW; Avramov-Cheng-Metzker; McLean-Pontiff
+26-58% decay). The 0-for-20 record is what an honest retail-EOD program should
+produce. Null H0 (residual space = overlays + kill-shots, not high-return
+engines) survives; strong H1 rejected.
+
+**STATE:** brief committed-pending; E19 ingestion ~7/39 tickers (QCOM in
+progress), healthy. Cadence #60 (record done). Nothing else autonomous until
+ingestion completes -> run E19.
+
+**Next action:** commit the brief; await ingestion completion; run E19.

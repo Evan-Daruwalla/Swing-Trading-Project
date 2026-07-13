@@ -14,9 +14,32 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 
 ## Current state — SEVEN families; 0 PASS-HR / 1 weak PASS-RA / 20 attempts; nothing live
 
-**Last updated: 2026-07-11 (CST)** — this file is the only live snapshot;
+**Last updated: 2026-07-12 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-12 — E19 ingestion RUNNING + full method survey delivered (record
+> Appendices BI–BK).** **E19:** Evan authorized + restarted the full EDGAR
+> Form-4 ingestion; background task `b2wzwj9gb` is ~7/39 tickers cached
+> (~104,496 docs, ~7/s, ~3h). On `INGEST COMPLETE` → run
+> `scripts/run_e19_insider.py` (opportunistic-buy drift, D1 + asymmetric
+> survivorship framing; prior = near-certain FAIL) → verdict → results → record
+> → commit. **Method survey:** ran /research-brief across ALL 8 method families
+> (~90 methods, primary-source-graded) →
+> `docs/research/2026-07-12_swing_method_full_survey.md`. Payload = the
+> reconciliation: literature's top "untested" ideas are ALREADY KILLED here
+> (sector momentum E14, turn-of-month E13, earnings premium E15, raw weekly
+> reversal E16, dividend capture E20). After reconciliation the genuinely-open
+> set is small + all strong-FAIL-prior: (1) short-term RESIDUAL reversal
+> (fixes E16's 65.9% DD), (2) dividend-INITIATION drift (≠ E20 capture),
+> (3) one consolidated volatility-breakout kill-shot, (4) Moreira-Muir
+> vol-targeting sizing overlay, (5) free Reg SHO daily short-volume drift,
+> (6) even-week FOMC overlay, (7) SVXY carry gated by VIX-TS. Structural
+> conclusion (Hou-Xue-Zhang / McLean-Pontiff / Avramov-Cheng-Metzker): K=1–3
+> concentration destroys diversified-decile edges + the edges live in illiquid
+> names the floor excludes — 0-for-20 is what an honest retail-EOD program
+> should produce. Tally UNCHANGED (survey is research, not a run): 0 PASS-HR /
+> 1 weak PASS-RA / 20 attempts / 7 families.
 
 > **2026-07-11 — M7b data-type arc done (record Appendices BD–BF); autonomous
 > wall.** **E18 regime-gate bake-off:** no new gate (VIX-TS / HY-OAS /
