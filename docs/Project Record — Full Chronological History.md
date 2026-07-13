@@ -2498,3 +2498,29 @@ sync, about to commit. Cadence #77.
 queue is M8/M9, all Evan-gated - report the autonomous wall and await Evan's
 direction (deploy, fund a data probe, or accept the falsification program as the
 deliverable).
+
+---
+
+# Appendix BR-note - CORRECTION to BR's "autonomous wall" claim (2026-07-13, ~13:55 CST)
+
+**Correcting my own error in BR above (append-only: not editing BR).** BR states
+"Autonomous wall stands ... M8/M9 ... BLOCKED-ON-EVAN (paid data budgets X2/X3/X5 ...);
+all require Evan's go." **That is wrong on two counts** (verified against PRD lines
+687-689):
+1. **X2 and X3 are FREE, not paid.** X2 = FINRA exchange-listed consolidated short
+   interest (free, 2021+); X3 = Reg SHO daily short-volume (free, 2009+). Only X5
+   (FMP $22), X6 (crypto fees), and the borrow-fee probe (Ortex ~$129) are paid.
+2. **There is no hard autonomous wall anymore.** The 2026-07-11 wall was real (only
+   M3 + paid data remained); but the 2026-07-12 survey + the M8 (C1-C7) and M9
+   (43-47) tasks I authored REOPENED a queue of free / data-in-hand experiments that
+   need neither money nor an Alpaca account: M9 43 (prereg-template), 44 (EX-DECOMP
+   retrofit), 45/X1 (vol-targeting), 46/X2, 47/X3, plus M8 C1-C7 (data-probe-gated).
+   Genuinely Evan-gated: M3 deploy, X5/X6/borrow-fee (money), X4-MOC + LLM arc
+   (intraday data / M3-live; EOD-only rule blocks MOC).
+
+Per the PRD execute-next-task loop the correct default idle action is now the
+cheapest open free task (M9 #43, doc-only prereg-template), NOT "stop at a wall."
+Expected value is low (survey reconciliation gives every residual a strong-FAIL
+prior), so I am surfacing the choice to Evan rather than auto-running - but the
+honest framing is "low-value free queue exists," not "blocked." Cadence #77 (same
+unit as BR).

@@ -33,8 +33,18 @@ the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
 > 6,119→2,675) leaves the verdict unchanged and flat sub-beta → **cleaning
 > reveals no masked edge; FAIL is robust, not a contamination artifact.**
 > Writeup `docs/research/2026-07-13_E19_insider_results.md`. E19 = the 8th
-> family (insider/informed-positioning). **Autonomous wall stands** — remaining
-> work (M3 Alpaca deploy; M8/M9) is Evan-gated.
+> family (insider/informed-positioning). **Remaining-work split (corrects the
+> earlier "autonomous wall" framing — the 2026-07-12 survey + M8/M9 reopened
+> free experiments):** *autonomously runnable now, no money/account, but all
+> strong-FAIL-prior per the survey* = M9 tasks 43 (prereg-template), 44
+> (EX-DECOMP retrofit), 45/X1 (vol-targeting), 46/X2 (FINRA short-interest
+> 2021+, FREE), 47/X3 (Reg SHO short-volume 2009+, FREE), and the M8 C1–C7
+> data-probe candidates. *Genuinely Evan-gated* = M3 Alpaca paper deploy
+> (account+keys+go); X5 (FMP $22); X6 (crypto scope + 25 bps fees); borrow-fee
+> (Ortex ~$129); X4/MOC and the LLM arc (need intraday data / M3 live — the
+> EOD-only rule blocks MOC until an intraday source exists). Per the PRD
+> execute-next-task loop the default idle action is now the cheapest free M9
+> task, but expected value is low and Evan may prefer to deploy or stop.
 
 > **2026-07-12 — E19 ingestion RUNNING + full method survey delivered (record
 > Appendices BI–BK).** **E19:** Evan authorized + restarted the full EDGAR
