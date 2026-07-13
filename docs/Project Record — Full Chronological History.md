@@ -2215,3 +2215,37 @@ progress), healthy. Cadence #60 (record done). Nothing else autonomous until
 ingestion completes -> run E19.
 
 **Next action:** commit the brief; await ingestion completion; run E19.
+
+---
+
+# Appendix BL - PRD_ROADMAP synced to actual outcomes; M8 added (2026-07-12, ~23:35 CST)
+
+**WHAT:** Evan: "commit this, then update the PRD and ROADMAP." (1) Committed
+the survey deliverable (docs/research/2026-07-12_swing_method_full_survey.md
++ HANDOFF + record + pm-cadence) as `8cc7c68`. (2) PRD_ROADMAP.md had not
+been synced since the M7/M7b tasks were written 2026-07-10/07-12 - the task
+breakdown still read as pending even though E13-E20 had all run. Per the
+established convention (task 13's "*(Outcome ...)*" pattern for E1), appended
+outcome annotations to tasks 28-35 (E13 FAIL, E14 FAIL, E15 FAIL, E16 FAIL,
+E17 BLOCKED-ON-DATA, E18 weak PASS-RA, E19 RUNNING/pending, E20 FAIL), closed
+out M7/M7b exit-condition text with actual results, and flagged E19 as "the
+one still-running experiment in the whole PRD." Added milestone M8 (tasks
+36-42): the 7 residual candidates (C1-C7) from today's full-method survey -
+residual reversal, dividend-initiation drift, one volatility-breakout
+kill-shot, vol-targeting overlay, Reg SHO short-volume drift, even-week FOMC
+overlay, SVXY carry - each with mechanism, disclosed counter-evidence, data
+status, and build cost; explicitly framed as lower-expected-value than
+M7/M7b per the survey's own structural finding, queued AFTER E19 closes.
+Milestones table (section 5) updated with DONE/RUNNING markers per the M2d
+row convention. No task text rewritten/deleted - pure ADD-by-appending per
+project rules. Frozen tripwire re-run post-edit: GREEN (12/12 refs,
+d=+/-0.0000pp) - confirms the doc-only change touched no code.
+
+**STATE:** E19 ingestion (b2wzwj9gb) still running, ~6-7/39 tickers cached,
+healthy. PRD_ROADMAP.md now accurately reflects 0 PASS-HR / 1 weak PASS-RA /
+20 attempts / 7 families, with M8 queued as the next milestone once E19
+closes. Cadence #63 folded into this entry.
+
+**Next action:** commit PRD_ROADMAP.md; await E19 ingestion completion, then
+run scripts/run_e19_insider.py -> verdict -> results -> record -> commit ->
+close M7b -> M8 becomes the default next-open-task per PRD cadence.
