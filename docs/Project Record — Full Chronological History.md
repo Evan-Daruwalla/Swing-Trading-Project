@@ -2316,3 +2316,65 @@ healthy. No new backtests started (autonomous wall holds). swing.db untouched.
 
 **Next action:** commit the LLM brief; await E19 ingestion completion, then run
 E19 and close M7b.
+
+---
+
+# Appendix BO - Four-topic research batch delivered (execution / risk / data / crypto, 2026-07-13, ~13:05 CST)
+
+**WHAT:** Evan: "continue with another set of research using /research-brief" ->
+asked which direction (execution / risk-sizing / alt-data / crypto) -> "do all."
+Ran 4 research briefs, 16 parallel agents (4/topic), ~64 findings, skeptically
+graded, mapped to constraints + prior kills. Deliverables:
+docs/research/2026-07-13_{execution_microstructure, risk_and_sizing, data_sources,
+crypto_feasibility}.md. Web-research only; no backtests; swing.db + E19 ingestion
+(b2wzwj9gb) untouched.
+
+**KEY RESULTS per topic:**
+- EXECUTION: 0-for-20 is GENUINE no-edge not execution artifact (project already
+  fills next-open + 5bps, surrendering the one-directional fake-alpha bias;
+  Chen-Velikov: ~93% of anomaly gross alpha dies under costs = the base rate).
+  Overnight gap CONFIRMED structural (NightShares ETF failed + liquidated 14mo; NY
+  Fed drift flat since 2021). ONE honest experiment left = a market-on-close (MOC)
+  entry variant (needs a frozen 15:50-snapshot signal to avoid look-ahead). Gave a
+  3-rung decomposition ladder (frictionless -> next-open-0bps -> next-open+5bps) to
+  settle execution-vs-signal per FAIL. 5bps fair-to-conservative (tier it). CORRECTION
+  surfaced: Alpaca fractional is NOT market-only since Mar-2024 -> supports
+  market/limit/stop, TIF=DAY, no fractional short (update HANDOFF/PRD note).
+- RISK/SIZING: at K=1-3 sizing IS the whole risk game -> capped fractional-Kelly
+  (1/4-1/2) never full (full-Kelly on a noisy edge is strictly dominated). Time-stop
+  (vertical barrier) is the robust exit backbone; tight price stops mostly hurt
+  (Kaminski-Lo) + DAY-TIF makes gap protection a SIZING not a stop problem. Only
+  conditional-vol-targeting (condition E6xE18 on each other) plausibly beats a lone
+  gate, but effective-N (~3-5 crises) means NO regime rule can be validated on
+  history -> forward-paper only. Deployable E6∩E18 sleeve = drawdown-reduction (=SPY
+  return, lower DD), NOT high-return; its slow signal means a forward test can prove
+  IMPLEMENTATION FIDELITY not statistical edge (reframe the success criterion).
+- DATA: E17 wall PARTLY GONE - FINRA free exchange-listed short interest exists from
+  June-2021 -> E17 runnable FREE now (2021-2026 OOS). Free Reg SHO daily short-volume
+  (2009+) = a BJZ-lineage drift test. Cheapest event test = analyst recommendation-
+  CHANGE drift via FMP Starter ($22, event-dated = no PIT trap). Strongest short-side
+  edge = loan-fee anomaly (4.01%/mo) via Ortex Advanced (~$129). Muravyev-Pearson-
+  Pollet 2025: option skew signals are ~2/3 a borrow-fee proxy -> die on liquid names.
+  Exotic alt-data = institutional-only (one satellite study documents RETAIL as the
+  harvested counterparty). Escalation path = a university WRDS login (free, unblocks
+  I/B/E/S + Compustat PIT).
+- CRYPTO: 24/7 RELOCATES-friction, does NOT dissolve the killer - closure IS what
+  manufactures the gap-reversal edge, so a continuous market never generates it; the
+  jump reappears as intraday liquidation cascades. ONE clean win: liquid BTC/ETH
+  bar-based bot has zero gap by construction + the prereg/tripwire ethos transfers
+  (Alpaca crypto paper). Recommend YES to a scoped paper-first liquid-only trend/
+  momentum pilot (Liu-Tsyvinski + Grayscale), BUT pre-register CRYPTO fees (25bps/side
+  Alpaca taker = 5x the 5bps model); custody (100% capital uninsured on-exchange) is
+  the deciding risk with no equity analog.
+
+CROSS-CUT: all four confirm the same wall - the high-return cell stays empty; the
+value is DISCIPLINE (honest cost model + decomposition ladder + capped-Kelly + a
+faithful forward-paper protocol) and a short list of cheap/free next tests (MOC entry,
+E17-2021+ free, Reg SHO, FMP recommendation drift, a crypto trend pilot). Tally
+UNCHANGED (research, not runs): 0 PASS-HR / 1 weak PASS-RA / 20 attempts.
+
+**STATE:** 4 briefs committed-pending; E19 ingestion ~29/39 (MRK in progress),
+healthy. No backtests started. swing.db untouched.
+
+**Next action:** commit the 4 briefs; await E19 ingestion completion, then run E19
+and close M7b.

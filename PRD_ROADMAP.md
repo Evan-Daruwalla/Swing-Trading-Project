@@ -105,8 +105,12 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
   capital as a parameter so this never hard-codes).
 - Data: EOD only. Signals at close; fills per the model the ablation
   validates. No intraday logic. `next_open` comes from cache, never invented.
-- Alpaca PAPER only. Fractional orders are DAY-TIF only (no GTC stops —
-  exits re-armed daily or software-managed). Do NOT read
+- Alpaca PAPER only. Fractional/notional orders support market **and**
+  limit/stop/stop-limit (confirmed 2026-07-13, record Appendix BO; already
+  noted in the 2026-07-08 small-account brief) — the binding constraint is
+  **TIF = DAY only** (no GTC — exits re-armed daily or software-managed) and
+  **no fractional shorting** (long-only unless whole shares). "DAY-TIF" here
+  never meant market-only; use a marketable DAY limit to cap fill price. Do NOT read
   `pattern_day_trader` / `daytrade_count` / `daytrading_buying_power` —
   removed from the Alpaca API as of 2026-07-06 (PDT rule eliminated
   2026-06-04, FINRA 26-10).
@@ -660,7 +664,11 @@ record front-matter (`docs/Project Record — Full Chronological History.md`).
   module header; dividend-heavy ETFs understate long-hold returns, note it
   in result docs.
 - Alpaca: PDT fields are GONE from the API (2026-07-06); fractional orders
-  are DAY-TIF only; paper fills are simulated — caveat every slippage claim.
+  support market/limit/stop/stop-limit but TIF=DAY only + no fractional
+  shorting (record Appendix BO); paper fills are simulated at the quoted
+  half-spread with NO price improvement, NO slippage, and NO size check vs
+  depth — so paper will NOT surface the liquidity-floor problem; caveat every
+  slippage claim and cap fill size at the floor in the backtest.
 - The power calc (task 6) must never compute post-signal returns — that's
   peeking before pre-registration.
 - A FAILED experiment honestly recorded is a deliverable, not a setback —
