@@ -2249,3 +2249,70 @@ closes. Cadence #63 folded into this entry.
 **Next action:** commit PRD_ROADMAP.md; await E19 ingestion completion, then
 run scripts/run_e19_insider.py -> verdict -> results -> record -> commit ->
 close M7b -> M8 becomes the default next-open-task per PRD cadence.
+
+---
+
+# Appendix BM - E19 ingestion ~27/39; armed to run E19 on completion (2026-07-13, ~11:41 CST)
+
+**WHAT:** Evan: "Wait for ingestion to finish, then run E19." E19 EDGAR
+Form-4 ingestion (task b2wzwj9gb) is healthy at 27/39 tickers cached (JNJ in
+progress; remaining: PFE MRK ABT UNH GE CAT BA MMM HON T VZ). Both former-CIK
+names resolved: XOM cached; DIS merged current CIK 0001744489 + former
+0001001039 (22 P-buys). P-buy counts sane (HD 69, NKE 41, MCD 39, IBM 43).
+No throttle stalls. On INGEST COMPLETE -> run scripts/run_e19_insider.py
+(opportunistic-buy drift, CMP classification, 40-session hold, K=5, gate
+2003-2013, D1 dual-bar + asymmetric survivorship framing) -> frozen tripwire
+must stay GREEN -> results doc docs/research/2026-07-13_E19_results.md ->
+record entry -> commit. Prior per prereg ebf54a4: near-certain FAIL
+(survivorship-flattered, 0-PASS-HR/20 base rate); a FAIL closes the insider
+idea cleanly, a PASS routes to forward paper only (uninterpretable).
+Cadence #66.
+
+**STATE:** ingestion running (harness-tracked, will notify on completion -
+no polling). swing.db untouched; prices from .e8e9_cache. Nothing else
+autonomous until E19 closes.
+
+**Next action:** on ingestion completion, run E19 and close M7b.
+
+---
+
+# Appendix BN - LLM-driven strategy survey delivered (research-brief, 2026-07-13, ~12:15 CST)
+
+**WHAT:** Evan asked (in parallel with the E19 wait) for a /research-brief on
+LLM-driven swing-trading paths — "LLM making human-like decisions biased off
+stock trends," incl. ideas needing a live-platform connection or more compute,
+"as many as possible." 7 parallel agents (analyst / agentic / price-trend /
+overlay / feature-factor / macro-regime / pitfalls-infra), ~90 named idea
+variants, skeptical evidence grading. Compiled to
+docs/research/2026-07-13_llm_driven_strategies.md. Web-research only; no
+backtests; swing.db + E19 ingestion (b2wzwj9gb) untouched.
+
+**KEY RESULT:** H1 (LLM = real high-return engine) REJECTED; null H0 (published
+LLM alpha is look-ahead-contaminated + illiquid-concentrated + decaying; best
+use = a treatment overlay vs a mechanical control, provable only at a
+pre-registered N) SURVIVES every family. Four anchors: (1) re-testing the
+multi-agent showcases (FinMem/TradingAgents/FinAgent/FinCon) post-training-
+cutoff decays returns 50-72%, most fail to beat buy-hold (Profit Mirage 2025;
+StockBench 2026); (2) LLMs weak at the literal ask — chart-reading VLMs 49-53%
+(chance), best TS foundation models beat random-walk 2/10 tasks — collides with
+the project's chart-TA-dies prior; (3) the real residual edge (Lopez-Lira) is
+small, decays with adoption, and lives in small/negative-news names the
+liquidity floor excludes; (4) LLM non-determinism structurally conflicts with
+the frozen tripwire, with ONE clean fix — pin the tripwire on the deterministic
+replay of an immutable overlay_log, never on the model call (exactly the
+e1_llm_veto design). Ranked 8-item shortlist all at Tier 0/1 (no API key):
+E4 LLM offline hypothesis-generator (cleanest fit), D3 triple-barrier
+meta-labeler, D2/D16 confidence-sizer, D6 exit-supervisor, A7 LLM-surprise PEAD
+overlay, F11/C9 regime-gate vs E18 baseline, B9/B14 red-team/consensus veto,
+E11 weak-label→distilled classifier. Non-negotiable gates: strictly-post-cutoff
+eval, ticker anonymization, LAP/placebo audit, decision-log tripwire, LLM as
+treatment vs e1_control. Extends the 2026-07-12 survey's wall: LLM paths don't
+escape it and ADD two failure modes (contamination + non-determinism); ceiling
+= risk-adjusted overlay, same tier as E18's weak PASS-RA. Tally UNCHANGED
+(research, not a run): 0 PASS-HR / 1 weak PASS-RA / 20 attempts.
+
+**STATE:** brief committed-pending; E19 ingestion ~28/39 (PFE in progress),
+healthy. No new backtests started (autonomous wall holds). swing.db untouched.
+
+**Next action:** commit the LLM brief; await E19 ingestion completion, then run
+E19 and close M7b.
