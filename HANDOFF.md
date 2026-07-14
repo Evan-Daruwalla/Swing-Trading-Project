@@ -12,11 +12,26 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 23 attempts; nothing live
+## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 24 attempts; nothing live
 
 **Last updated: 2026-07-13 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-13 — CAPSTONE written; X1 = FAIL; X3 interrupted (record Appendices
+> BX–BZ).** Evan: "do 2 then 1 and 3." **(2) Capstone:**
+> `docs/CAPSTONE_program_synthesis.md` — the standing full-program synthesis
+> (methodology-as-deliverable + 8-family/24-attempt ledger + structural WHY +
+> the one uncatchable anomaly). **(1) X1 conditional vol-targeting = FAIL**
+> (`prereg 07c22cb` → `run_x1_vol_targeting.py`): the E6×E18 interaction on SPY
+> doesn't beat the plain 200-DMA — gate 2006–13 (a) E6 Sharpe 0.58/DD 19.9% is
+> best, (c) conditional 0.42 ties VIX-TS and loses to E6; H1 rejected, confirms
+> E18. Attempt 24. **(3) X3 Reg SHO short-volume: INCOMPLETE** — ingester
+> `ingest_regsho_short_volume.py` (parser tested 3 eras, browser-UA fix for
+> Cloudflare) launched, but the background fetch was interrupted at ~2010-05
+> (193/~4300 days in `.regsho_cache/`, gitignored, resumable). X3 deferred
+> (strong FAIL-prior; won't change the terminal claim). Tripwire GREEN
+> throughout. **All session work pushed to origin/main.**
 
 > **2026-07-13 — X2b short-side = FAIL; X2's "strongest anomaly" was a
 > frictionless mirage (record Appendix BW).** Evan said "do 1" (pursue the

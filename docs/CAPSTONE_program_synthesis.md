@@ -7,8 +7,11 @@ https://github.com/Evan-Daruwalla/Swing-Trading-Project**
 > out to do, how it was run, what it found, and why. The append-only
 > `docs/Project Record — Full Chronological History.md` remains ground truth for
 > dated detail; this synthesizes it. Counts current at **0 PASS-HR / 1 weak PASS-RA /
-> 23 pre-registered attempts / 8 strategy families**, with two final free experiments
-> (X1 conditional vol-targeting, X3 Reg SHO short-volume) running as confirmation.
+> 24 pre-registered attempts / 8 strategy families**. X1 (conditional
+> vol-targeting) has since run — FAIL, folded in below. X3 (Reg SHO short-volume)
+> is the one remaining free experiment; its data ingestion was interrupted
+> mid-fetch (resumable) and it is deferred — its strong FAIL-prior means it will
+> not change the terminal claim.
 
 ---
 
@@ -94,10 +97,10 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 | Breakout / volatility | E8, E11 | FAIL — compression predicts expansion, not direction; volume gating adds nothing |
 | Deep-dip accumulation | E9 | FAIL — the "never book a loss" claim is literally true (0/53 realized losses) and still bad (3.46% CAGR, −79.7% unrealized) |
 | Event-driven (earnings) | E10, E15 | FAIL — a real but small effect (only experiment to beat both benchmarks in 2000–13) that **decayed post-2010** |
-| Seasonality / cross-sectional / overlay | E13, E14, E16, E18, E20 | FAIL, except **E18 VIX-term-structure cleared the program's only (weak) PASS-RA**; E14 is the cleanest negative (lost to equal-weight every window); E16 cleared 15% return but on 66% DD + survivorship |
+| Seasonality / cross-sectional / overlay | E13, E14, E16, E18, E20, X1 | FAIL, except **E18 VIX-term-structure cleared the program's only (weak) PASS-RA**; E14 is the cleanest negative (lost to equal-weight every window); E16 cleared 15% return but on 66% DD + survivorship; **X1** conditional vol-targeting FAIL — no vol gate beats the plain 200-DMA (E18 confirmed) |
 | Informed positioning | E19, X2, X2b | FAIL — insider opportunistic-buys close cleanly; short-interest days-to-cover is real on the *short* side but **uncapturable** (see §5) |
 
-**Tally: 0 PASS-HR, 1 weak PASS-RA (E18 VIX-TS, forward-paper candidate only), 23
+**Tally: 0 PASS-HR, 1 weak PASS-RA (E18 VIX-TS, forward-paper candidate only), 24
 pre-registered attempts, 8 families.** Full per-experiment detail: the append-only
 record and `docs/research/`.
 
@@ -182,7 +185,8 @@ cleanly is the result.
 - This capstone supersedes the earlier partial write-up
   (`docs/findings_2026-07-09_experiment_arc.md`, E1–E7) as the complete synthesis.
 
-*Pending finalization: X1 (conditional volatility targeting) and X3 (Reg SHO daily
-short-volume drift) are the last two free experiments; their FAIL-priors are strong and
-their verdicts will update the counts above from 23 to 25 without changing the terminal
-claim.*
+*Status: X1 (conditional volatility targeting) ran — FAIL (no vol gate beats the plain
+200-DMA; record Appendix BY), included above (24 attempts). X3 (Reg SHO daily
+short-volume drift) is the one remaining free experiment; its FINRA ingestion was
+interrupted mid-fetch (resumable from `.regsho_cache/`), and it is deferred with a
+strong FAIL-prior that will not change the terminal claim.*

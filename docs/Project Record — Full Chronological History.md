@@ -2839,3 +2839,38 @@ after X3). Cadence #82 (cont.).
 
 **Next action:** commit X1; await X3 ingest; build X3 -> verdict; then finalize capstone
 23->25 + HANDOFF/memory.
+
+---
+
+# Appendix BZ - Session wrap: X3 ingest interrupted; docs finalized to 24; pushed (2026-07-13, ~23:58 CST)
+
+**WHAT:** Evan: "commit the uncommitted changes and push." Session-boundary event: the
+X3 background ingest (b5354bdhf) was STOPPED between sessions (no completion record) -
+`.regsho_cache/short_volume.json` holds only 193 days, 2009-08-03..2010-05-07 (~5% of
+the ~4300-day range). So **X3 is INCOMPLETE, not run**; "do 3" is unfinished.
+
+**Corrected the doc drift** before pushing (would not push knowingly-stale docs): the
+capstone + HANDOFF said "23 (+2 pending -> 25)". Reality = **24 attempts** (X1 ran =
+FAIL, attempt 24; Appendix BY), X3 deferred/incomplete. Updated CAPSTONE (header,
+ledger row, tally, status footer) and HANDOFF (header 23->24 + a 2026-07-13 snapshot
+folding in X1-FAIL and X3-interrupted).
+
+**FINAL TALLY: 0 PASS-HR / 1 weak PASS-RA / 24 attempts / 8 families.** The whole
+"do 2 then 1 and 3" arc: (2) capstone DONE, (1) X1 DONE=FAIL, (3) X3 INCOMPLETE
+(ingest interrupted, resumable from cache, strong FAIL-prior, deferred).
+
+**PUSH:** all session commits (E19 results through X1 results, ~20 commits) pushed to
+origin/main (public repo) on Evan's explicit instruction. Only prior uncommitted item
+was `.claude/pm-cadence.json` (transient hook state), folded into this wrap commit.
+
+**X3 RESUME NOTE (for a future session):** re-run
+`.venv\Scripts\python.exe scripts/ingest_regsho_short_volume.py` - it is per-day
+resumable (skips cached dates); on INGEST COMPLETE, write prereg_x3 (from TEMPLATE) ->
+runner -> verdict. Prior = FAIL/weak (noisy executed-flow, same short-side family X2/X2b
+already closed).
+
+**STATE:** swing.db untouched; tripwire GREEN (last run after X1); working tree clean
+after this commit; pushed. Cadence #84.
+
+**Next action (future session):** resume X3 ingest -> run -> verdict (attempt 25), OR
+treat the program as complete at 24 attempts with the capstone as the deliverable.
