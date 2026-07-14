@@ -592,6 +592,12 @@ Execution order = data-already-in-hand first, new-data-probe-required last
     liquidity provision, so next-open execution likely bleeds the same gap
     that killed the IBS family. Data in hand (`.e8e9_cache` + French
     library). Build: medium (factor-regression step is new).
+    *(Outcome 2026-07-14: FAIL — but the program's CLOSEST-EVER HR near-miss
+    (attempt 28, record Appendix CB). Gate 19.08%/DD 57.7%/Sh 0.69 — beats
+    E16's return AND fixes its DD (both PASS-HR legs clear in the gate, a
+    first) — but secondary collapses to 2.92%/0.24 (dead post-2014), and
+    survivorship upper-bounds the gate anyway. 15bps kills it. Results
+    `docs/research/2026-07-14_C1_residual_reversal_results.md`.)*
 37. **C2 — Dividend-initiation drift** (Michaely-Thaler-Womack 1995).
     Long-only: on a stock's first-ever dividend initiation (not resumption),
     buy at next open, hold ~12 months (this stretches "swing" — disclose in
@@ -602,6 +608,11 @@ Execution order = data-already-in-hand first, new-data-probe-required last
     history for false positives (resumptions, special dividends) before
     pre-registering. Low base rate (thin event flow) is a disclosed risk for
     a K=1–3 book. Build: medium (needs the initiation-flag probe first).
+    *(Outcome 2026-07-14: probe found only THREE first-ever in-window
+    initiations in 26 years among the 39 survivors (MSFT 2003, ORCL 2009,
+    CSCO 2011; AAPL-2012 is a resumption) — n=3 cannot clear any event floor →
+    **closed BLOCKED-BY-DESIGN, no prereg/runner** (the E17 pattern). Record
+    Appendix CC; probe detail in the C7 results doc.)*
 38. **C3 — Consolidated volatility-breakout kill-shot** (Donchian ≈
     Bollinger-squeeze ≈ ATR-channel ≈ Keltner, collapsed into ONE spec to
     avoid multiple-testing snooping). E.g., buy a 20-session closing high
@@ -612,6 +623,11 @@ Execution order = data-already-in-hand first, new-data-probe-required last
     and Bajgrowicz-Scaillet (2012) predict it dies on single equities after
     snoop-correction + realistic costs. Pre-register as an honest kill-shot,
     not a hopeful engine. Data in hand. Build: low.
+    *(Outcome 2026-07-14: FAIL as predicted (attempt 25, record Appendix CB).
+    Gate 3.62%/Sh 0.37 (n=607). Key finding: the time-stop-only arm BEATS the
+    channel exit (6.19% vs 3.62%) — the 10d-low exit is a whipsaw tax.
+    Breakout family = 3 consistent kills (E8/E11/C3). Results
+    `docs/research/2026-07-14_C3_vol_breakout_results.md`.)*
 39. **C4 — Vol-targeting sizing overlay** (Moreira-Muir 2017). Scale
     position size inversely to trailing realized volatility on the best
     existing PASS-RA sleeve (E18's VIX-TS gate on E6-1×), A/B'd against the
@@ -620,6 +636,12 @@ Execution order = data-already-in-hand first, new-data-probe-required last
     counter-evidence: Cederburg-O'Doherty-Wang-Yan (2020) found the effect
     largely fails to survive real-time out-of-sample testing — pre-register
     expecting that. Zero new data (reuses E6/E18 sleeve returns). Build: low.
+    *(Outcome 2026-07-14: FAIL on the bar, but a real DD-cutter (attempt 26,
+    record Appendix CB). Managed beats base Sharpe both windows on BOTH bases
+    (E6 gate DD 53.7→25.1%; E18 sec 43.6→27.0%, Sh 0.82→0.94) yet best gate
+    Sharpe 0.77 < 0.80 → FAIL, not tuned. The natural deployment shape if the
+    E6/E18 forward-paper candidate ever goes live. Vol-overlay family closed
+    (X1+C4). Results `docs/research/2026-07-14_C4_vol_sizing_results.md`.)*
 40. **C5 — Free Reg SHO daily short-volume drift** (Boehmer-Jones-Zhang 2008
     lineage). Rank the 39 survivor large-caps by daily executed short volume
     (FINRA/Cboe Reg SHO files, free, 2009+) as a degraded free proxy for the
@@ -629,6 +651,11 @@ Execution order = data-already-in-hand first, new-data-probe-required last
     volume is a different, unblocked free feed. Probe data availability/
     coverage for the full 2009–2026 window before pre-registering (the
     E17/E19 pattern). Build: medium (new data source, probe first).
+    *(2026-07-14: C5 is the SAME signal as M9's X3 — covered there. X3's
+    ingester is built (`ingest_regsho_short_volume.py`, parser verified on all
+    3 file-format eras, Cloudflare UA fix) and the full 2009–2026 fetch is
+    running; prereg+runner follow on INGEST COMPLETE. C5 will not be run
+    separately.)*
 41. **C6 — Even-week FOMC-cycle overlay** (Cieslak-Morse-Vissing-Jorgensen
     2019). Risk-on/off gate computed purely from the FOMC meeting calendar
     (free) — long the base equity sleeve only in even weeks (0,2,4,6) of the
@@ -637,6 +664,13 @@ Execution order = data-already-in-hand first, new-data-probe-required last
     calendar-day rule; this is a meeting-cycle rule) — different mechanism,
     same "overlay not engine" family. Data in hand (need to fetch/cache the
     FOMC meeting-date calendar, free, one-time). Build: low.
+    *(Outcome 2026-07-14: FAIL — the cleanest decay exhibit yet (attempt 27,
+    record Appendix CB). Calendar compiled from federalreserve.gov primary
+    sources → `data/fomc_announcement_dates.json` (260 dates 1994–2026). Gate
+    replicates CMVJ exactly (+5.62bps/day even vs −3.15 odd) then INVERTS
+    post-2014 (+3.69 vs +6.60) — died at publication. Overlay gate Sh 0.34;
+    1585 toggles → 15bps negative. Third decayed-calendar exhibit (E13/E15/C6).
+    Results `docs/research/2026-07-14_C6_fomc_cycle_results.md`.)*
 42. **C7 — SVXY short-vol carry gated by VIX term structure.** Hold SVXY
     (−0.5× VIX-futures ETF) only when VIX/VIX3M < 1 (contango — reuses E18's
     exact gate signal), flat otherwise; 5 bps/side. The only EOD-equity-proxy
@@ -647,11 +681,25 @@ Execution order = data-already-in-hand first, new-data-probe-required last
     backtested past. Needs new data: SVXY/VXX EOD prices are not yet in
     `.e8e9_cache` — probe coverage/history first. Build: medium (new data +
     the kill-switch mechanic is new engine logic).
+    *(Outcome 2026-07-14: FAIL despite the program's highest-ever full-window
+    CAGR (attempt 29, record Appendix CC). MAIN 26.45%/DD 55.4%/Sh 0.76 loses
+    Sharpe to SPY 0.82 (pre-registered CAGR-AND-Sharpe bar), and the headline
+    is an artifact of the dead −1× instrument (era split 47.33%/0.99 pre-2018
+    vs 13.18%/0.55 on today's −0.5× SVXY). VIX-TS gate dodged Volmageddon by
+    ONE session — effective-N=1, not safety; kill-switch fired once (Brexit).
+    VRP family fully surveyed (E18/X1/C4/C7): real regime classifier, no
+    engine. Results `docs/research/2026-07-14_C7_svxy_carry_results.md`.)*
 
 **M8 exit conditions:** every candidate that clears its data probe gets a
 committed prereg hash, a D1-tier verdict, and a results doc; candidates that
 fail their probe are recorded BLOCKED-ON-DATA and closed without a prereg
-(C2, C5, C7 all need a probe step first). Findings write-up + README +
+(C2, C5, C7 all need a probe step first).
+**(STATUS 2026-07-14: MET except C5→X3. C1 FAIL, C2 closed-on-probe, C3 FAIL,
+C4 FAIL, C6 FAIL, C7 FAIL; C5 is covered by M9's X3, whose data fetch is
+running. All seven failed every tier → per the paragraph above, the terminal
+claim upgrades to: the entire documented, evidenced swing-method space
+surveyed 2026-07-12 is exhausted at retail EOD, K=1–3, $100–1,000 scale —
+pending only X3's confirmation.)** Findings write-up + README +
 memory updated with the arc. **Feed-forward:** any PASS-RA survivor (C4/C6/
 C7's ceiling; C1/C2/C3 could in principle reach PASS-HR) joins E6-1× and any
 E18 survivor as an M3 paper-deploy candidate (M3 remains gated on Alpaca

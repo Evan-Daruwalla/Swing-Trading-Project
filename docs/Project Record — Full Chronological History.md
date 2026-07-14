@@ -2874,3 +2874,114 @@ after this commit; pushed. Cadence #84.
 
 **Next action (future session):** resume X3 ingest -> run -> verdict (attempt 25), OR
 treat the program as complete at 24 attempts with the capstone as the deliverable.
+
+---
+
+# Appendix CA - Post-crash health check ALL GREEN; X3 ingest resumed (2026-07-14, ~00:10 CST)
+
+**WHAT:** Evan's machine crashed several times over ~3h; he asked for a full health
+check, then said "start the ingestion."
+
+**HEALTH CHECK (all green):** git tree clean + fully pushed, no .lock files, fsck
+clean, no crash junk files; **180/180 JSON caches parse** (no corrupt mid-writes);
+swing.db `integrity_check: ok` (bars = 105,396 rows); **frozen tripwire GREEN** (12
+refs d=0, end-to-end engine+data proof); no orphaned/zombie Swing processes; no
+scheduled tasks. Also verified (read-only) the separate Trading repo's streamlit
+dashboard pair (PIDs 13180/13212) is the normal launcher+server, listening :8501,
+health HTTP 200 - healthy, untouched. Crashes left NO damage.
+
+**X3 INGEST RESUMED (background bfdabqndy):** re-ran ingest_regsho_short_volume.py;
+resume verified - worker alive accruing CPU, live CDN fetch of a 2010 file returns
+HTTP 200 w/ correct 5-col header; flat disk count was the 200-fetch flush buffer, not
+a stall. ~70min ETA (per-venue era slow, CNMS era fast). Checkpoints every 200 days ->
+crash-safe. On INGEST COMPLETE: prereg_x3 from TEMPLATE -> runner -> verdict
+(attempt 25). Cadence #87.
+
+**STATE:** tally 0 PASS-HR / 1 weak PASS-RA / 24 attempts / 8 families; X3 data
+in flight; tree clean; pushed through 76602cb.
+
+**Next action:** X3 on ingest completion; Evan asked "what experiments are left" -
+answering from the PRD open queue.
+
+---
+
+# Appendix CB - FREE SWEEP part 1: C3/C4/C6/C1 all FAIL (2026-07-14, ~01:20 CST)
+
+**WHAT:** Evan authorized "run the Free + autonomous ones just for good measure" =
+C1/C2/C3/C4/C6/C7 (+X3 already ingesting). Order cheapest-first. Each: prereg
+committed doc-only BEFORE runner -> run -> tripwire GREEN -> results doc -> commit.
+FOMC calendar compiled by a background agent from federalreserve.gov primary sources
+(260 scheduled announcement dates 1994-2026, unscheduled/emergency excluded,
+spot-checked) -> committed as `data/fomc_announcement_dates.json` (curated data, not
+gitignored cache). FF3 daily factors fetched from Ken French library (cached,
+gitignored).
+
+**C3 vol-breakout kill-shot (attempt 25) = FAIL.** Gate 3.62%/Sh 0.37 (n=607), sec
+1.37%/0.19. Killer detail: the TIME-STOP-ONLY arm BEATS the channel exit (6.19% vs
+3.62% gate) - the 10d-low exit is a whipsaw tax; "cut losses at the recent low" is
+measurably value-destroying. Breakout family = 3 consistent kills (E8, E11, C3).
+
+**C4 Moreira-Muir vol-sizing (attempt 26) = FAIL (bar), real DD-cutter.** Managed
+beats base Sharpe both windows on BOTH bases and cuts DD hard (E6 gate 53.7->25.1%;
+E18 sec 43.6->27.0%, Sh 0.82->0.94) but best gate Sharpe 0.77 < 0.80 bar -> FAIL, not
+tuned. Best-behaved overlay variant tested; natural deployment shape if E6/E18
+forward-paper ever goes live. Vol-overlay family closed (X1 + C4).
+
+**C6 FOMC even-week (attempt 27) = FAIL; cleanest decay exhibit.** Gate replicates
+CMVJ exactly (+5.62bps/day even vs -3.15 odd) then INVERTS post-2014 (+3.69 vs +6.60)
+- died at publication. Overlay gate Sh 0.34 vs SPY 0.19, nowhere near RA; 1585
+toggles -> 15bp stress negative. Third decayed-calendar exhibit (E13, E15, C6).
+
+**C1 residual reversal (attempt 28) = FAIL; CLOSEST-EVER HR NEAR-MISS.** E16's exact
+engine, ranking swapped to FF3-residual (126d betas, 21d formation): gate
+19.08%/DD 57.7%/Sh 0.69 - beats E16's 16.76% AND pulls DD under the 60% ceiling ->
+**first time both PASS-HR legs clear in the gate window** (28 attempts). FAIL on the
+both-windows bar: secondary collapses to 2.92%/0.24 (dead post-2014); survivorship
+upper-bounds the gate number anyway; 15bps kills it (gate 7.28%, sec negative).
+BHLV mechanism real; regime+survivorship artifact. THE DISCIPLINE HELD on the most
+tempting result yet - no tuning, no window-shopping.
+
+**TALLY: 0 PASS-HR / 1 weak PASS-RA / 28 attempts / 8 families.** Tripwire GREEN
+after each. X3 ingest ~958/4300 days (2013-05). Cadence #88.
+
+**Next action:** C2 probe (dividend-initiation flag; expect ~0 events in 39
+dividend-aristocrat-ish survivors -> BLOCKED-ON-DATA close), C7 probe (SVXY/VXX
+coverage + Volmageddon kill-switch prereg), X3 on INGEST COMPLETE; then final doc
+sync (capstone counts, HANDOFF, memory, PRD outcomes) + push on Evan's word.
+
+---
+
+# Appendix CC - FREE SWEEP part 2: C2 closed on probe; C7 = FAIL despite 26% CAGR; M8 effectively closed (2026-07-14, ~02:00 CST)
+
+**C2 dividend-initiation = CLOSED BLOCKED-BY-DESIGN (no prereg).** Probe (yfinance
+full dividend histories, 39 survivors): only THREE first-ever in-window initiations in
+26 years - MSFT 2003-02-19, ORCL 2009-04-06, CSCO 2011-03-29 (AAPL-2012 is a
+resumption; everyone else initiated 1962-1999). n=3 clears no pre-registerable floor ->
+closed for insufficient event flow, the honest E17 pattern. The initiation-drift
+literature lives in small/mid-caps the liquidity floor excludes.
+
+**C7 SVXY carry (attempt 29) = FAIL - the program's highest-ever full-window CAGR and
+still a clean kill.** Prereg (doc-only) -> probe SVXY 2011-10-04+ (3713 bars) ->
+runner. MAIN (VIX/VIX3M<1 gate + kill-switch day<=-20% -> exit+21d stand-down):
+**26.45% CAGR / DD 55.4% / Sharpe 0.76** vs SPY 13.04%/0.82 -> loses the
+pre-registered CAGR-AND-Sharpe bar on Sharpe. Era split (descriptive): the -1x era
+(2012..2018-02) did 47.33%/0.99; **today's -0.5x SVXY does 13.18%/0.55** - the
+headline rides a dead instrument. Volmageddon trace: gate flipped at 2018-02-02 close
+-> exit 02-05 OPEN -> dodged -32%/-83% BY ONE SESSION (effective-N=1 tail-dodging, not
+safety; XIV died in the identical trade). Kill-switch fired once in 14.5yr (Brexit
+2016-06-24, -26.4%); verdict not KS-sensitive (no-KS arm Sh 0.81 also < 0.82).
+15bps stress 24.91%/0.74. Tripwire GREEN. VRP family fully surveyed
+(E18 gate / X1 conditioning / C4 sizing / C7 harvest): VIX-TS is a real regime
+classifier, NOT an engine. Results `docs/research/2026-07-14_C7_svxy_carry_results.md`
+(C2 close documented in the same doc).
+
+**PRD SYNC:** M8 outcomes annotated (C1-C7); M8 exit conditions marked MET-except-
+C5->X3. All seven survey residuals failed every tier -> per M8's own exit paragraph,
+the terminal claim upgrades to "the entire documented, evidenced swing-method space
+(survey 2026-07-12) is exhausted at retail EOD / K=1-3 / $100-1,000" - pending X3.
+
+**TALLY: 0 PASS-HR / 1 weak PASS-RA / 29 attempts / 8 families.** X3 ingest
+~1150/4300 days (2014-02). Cadence #88 (cont).
+
+**Next action:** X3 on INGEST COMPLETE (prereg -> runner -> verdict = attempt 30);
+then final doc sync (capstone counts 24->30, HANDOFF, memory) + push on Evan's word.
