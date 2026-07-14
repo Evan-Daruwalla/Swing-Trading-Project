@@ -3212,3 +3212,29 @@ distinction, not a deployable edge. Cadence #93 (cont).
 **Next action:** commit M10-1; sync capstone/HANDOFF (the tally nuance); then M10-2
 (gap-amortized stress IBS) remains the other panel survivor to run, OR report to Evan
 that the one thing that would make M10-1 real is M3 forward paper (Evan-gated).
+
+---
+
+# Appendix CJ - M10-2 gap-amortized stress IBS: building the panel's 2nd survivor (2026-07-14, ~18:30 CST)
+
+**WHAT:** Evan "do 1 then push" = run M10-2 (panel design D5, judge 6/RUN), then push.
+Directly attacks the EX-DECOMP recurring assassin (the overnight gap that killed the IBS
+family): E2's >half-the-edge-lives-in-the-close-to-next-open-gap is fixed by two
+mechanical levers (NOT tunes): (a) 5-session HOLD amortizes the lost first-night gap over
+days 2-5 of the reversion (E2's 1-day hold made the gap ~100% of the capture window); (b)
+enter only in STRESS (VIX>20), where Nagel documents liquidity-provision pay is largest.
+Index-level QQQ @1bp so the B->C cost killer is also absent. Tests whether E2's c2c 18.15%
+"mirage" is reachable at all.
+
+**SPEC:** QQQ synthetic-2x (E6's synth/calib machinery, drag~2%/yr QLD-calibrated) for the
+MR play; state machine top-down at each close, exec next open, 1bp/side: (1) IN-TRADE(2x):
+exit next open on IBS>=0.80 OR 5 sessions since entry; (2) ENTRY when flat: VIX>20 AND
+IBS<=0.20 -> buy 2x; (3) FALLBACK flat + VIX<=20: QQQ if >200DMA else cash; (4) flat +
+VIX>20 not-oversold: cash. No same-day re-entry. Reuses swing_bot.signals.ibs, E6 synth/
+calib, VIX macro_close. Full window (gate 2000-13, sec 2014-), D1 dual-bar. IN-SAMPLE-
+COMPOSED (M10 cap: pass = forward-paper-required). Honest prior (judges): gate ~7-11%
+(likely <15%), sec ~13-14% -> FAIL/PROMISING most likely; program value high either way
+(directly measures the reachable share of the E2 gap edge).
+
+**Next action:** commit M10-2 prereg (doc-only) -> runner -> verdict -> results/record ->
+commit -> PUSH. Cadence #96.
