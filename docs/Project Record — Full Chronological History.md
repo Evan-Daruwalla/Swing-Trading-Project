@@ -3095,3 +3095,76 @@ runner+results+this entry+capstone/HANDOFF/PRD/memory sync. Cadence #90 (cont).
 
 **Next action:** commit X6; sync capstone/HANDOFF 30->31; then remaining work is
 Evan-gated only (M3 deploy; X5 needs FMP; live crypto needs custody call) - or push.
+
+---
+
+# Appendix CG - M10 SYNTHESIS ARC opened: evidence-informed combos vs BOTH tiers (2026-07-14, ~13:05 CST)
+
+**WHAT:** Evan: "using all the data and experiments done come up with different
+strategies to see if those can meet both criteria" (= PASS-HR CAGR>=15%/DD<=60% both
+windows AND PASS-RA gate Sharpe>=0.80/>SPY both/+CAGR both). Opening **M10 = the
+synthesis arc** (attempts 32+): compose the surviving PROPERTIES (E6 trend-gate DD
+control; E18 VIX-TS Sharpe 0.80; C4 vol-sizing Sharpe lift 0.69->0.77/0.82->0.94; C1
+gate-window reversal alpha; E10 PEAD; synthetic-2x machinery w/ 2%/yr drag calib from
+E6/E5) into candidate return ENGINES.
+
+**STANDING DISCLOSURE (binds every M10 prereg):** these designs are made AFTER seeing
+31 results on the SAME two windows -> severe data-snooping/multiple-testing prior.
+In-window passes are WEAKER evidence than E1-X6's falsifications were. Every M10
+prereg carries this disclosure; any pass is labeled **"IN-SAMPLE-COMPOSED - forward
+paper REQUIRED"**, never a live claim. Rigor otherwise unchanged: prereg-before-code
+w/ fixed rules+criteria, no tuning a FAIL, tripwire GREEN, tiered costs + financing
+drag modeled (2%/yr synthetic-leverage calib), 5bps/side equities.
+
+**PROCESS:** multi-agent design panel (ultracode workflow) over the full evidence
+ledger - designer lenses (leverage-composer / ensemble-architect / regime-conditioner
+/ signal-resurrector / red-team) -> adversarial feasibility+rigor judging -> top ~3-4
+specs -> individual preregs (doc-only commits) -> runners -> verdicts. Honest prior:
+FAIL remains most likely (composing Sharpe-0.77 streams can't clear 0.80 without a
+mechanism; 15% gate CAGR must survive two crashes). Cadence #93.
+
+**Next action:** run the design workflow; prereg the survivors; build+run.
+
+---
+
+# Appendix CH - M10 design panel: Nagel Switch is the one non-empty path (2026-07-14, ~13:35 CST)
+
+**WHAT:** Ran the multi-agent design panel (workflow wic64yxkx, 5 designer lenses x
+adversarial math+rigor judges). It hit the session rate-limit at the final synthesis
+step (20/28 agents done) - recovered 11 designs + 16 judge verdicts from the journal
+and did the synthesis chair's job myself.
+
+**KEY RESULT - the red-team PROVED the static-blend impossibility:** PASS-HR from any
+FIXED-weight combo is arithmetically EMPTY. Gate>=15% forces C1-weight w>=0.66; sec>=15%
+forces w<=0.29 (C1 is gate-alive 19.08%/sec-dead 2.92%; trend is gate-weak/sec-alive).
+Disjoint by ~0.37 weight (~4-5pp CAGR shortfall in one window). Rebalancing bonus
+(~0.5-1pp) can't close it; any time-varying weight = forbidden era-switching. So the ONLY
+escape is state-conditioning on a CAUSAL variable.
+
+**THE SURVIVOR (highest scores 7/7.5, multiple lenses converged):** the **NAGEL SWITCH** -
+VIX-gated regime switch: residual-reversal (C1) when VIX>20, trend (E6/C4) when VIX<=20.
+Escapes the impossibility because Nagel (RFS 2012) documents reversal alpha = liquidity-
+provision compensation that SCALES with VIX - a published pre-2012 MECHANISM (not a date),
+using VIX (1990+, full gate coverage, NO PROMISING cap). It's the only design with expected
+CAGR near BOTH 15% bars (gate 14-18%, sec 11-16%). **Honest judge consensus prior:** gate-HR
+plausible PASS but DD razor-thin (inherits C1's 57.7% vs 60% ceiling) + semi-in-sample +
+survivorship; **secondary-HR is the likely FAIL leg** - IF C1's reversal is TEMPORALLY dead
+(McLean-Pontiff) not just VIX-state-dead, VIX-conditioning can't resurrect it and sec lands
+~10-13%. Most likely outcome = gate pass + sec near-miss = PROMISING, not a clean double.
+
+**CHOSEN TO RUN (2, mechanistically distinct):** M10-1 = Nagel Switch (best shot at both
+tiers). M10-2 = Gap-Amortized Stress IBS (D5, judge 6/RUN): multi-day-hold 2x QQQ IBS
+mean-reversion, VIX-gated, trend fallback - directly attacks the overnight-gap killer (the
+EX-DECOMP recurring assassin) + tests whether E2's c2c 18.15% "mirage" is reachable via
+hold-amortization. **NOT run:** D2 vol-managed-2x-trend (judge 1/KILL - analytic bound:
+at trend Sharpe 0.37, max geo excess = S^2/2 ~= 6.9%/yr, so gate<=8% - PASS-HR formally
+unreachable for trend-family, statable without running); D8/D7 ensembles (KILL - dead
+sleeves drag sec-RA below SPY); braked-2x family (gate Sharpe capped ~0.71<0.80).
+
+**BINDING:** every M10 prereg carries the data-snooping disclosure; any in-window pass is
+capped **"IN-SAMPLE-COMPOSED - forward paper REQUIRED"**, never a live/clean claim (C1's
+own prereg already declared its survivor-universe passes UNINTERPRETABLE - the Nagel Switch
+inherits that). Cadence #93 (cont).
+
+**Next action:** prereg M10-1 Nagel Switch (doc-only) -> runner (reuse C1 residual_series +
+E6 trend + VIX macro_close) -> verdict; then M10-2.
