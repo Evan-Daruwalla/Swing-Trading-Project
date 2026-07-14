@@ -3168,3 +3168,47 @@ inherits that). Cadence #93 (cont).
 
 **Next action:** prereg M10-1 Nagel Switch (doc-only) -> runner (reuse C1 residual_series +
 E6 trend + VIX macro_close) -> verdict; then M10-2.
+
+---
+
+# Appendix CI - M10-1 Nagel Switch = program's FIRST PASS-HR (but IN-SAMPLE, forward-only) (2026-07-14, ~14:05 CST)
+
+**WHAT:** Ran M10-1 (prereg committed doc-only before runner). Nagel Switch: VIX>20 ->
+C1 residual reversal (reused verbatim), VIX<=20 -> E6 QQQ-200DMA trend; weekly decision,
+next-open exec, 5bps stk/1bp QQQ. **FIRST NUMERICAL PASS-HR IN 32 ATTEMPTS.** Main C:
+gate 2000-13 17.87% CAGR / DD 59.9518% / Sh 0.66; sec 2014- 15.94% / DD 39.68% / Sh 0.78.
+Both windows clear CAGR>=15% AND DD<=60%. PASS-RA fails (gate Sharpe 0.66<0.80). Tripwire
+GREEN. Writeup docs/research/2026-07-14_M10-1_nagel_switch_results.md.
+
+**BUG FIXED before the result was trusted:** first run showed sec -100% (NAV->0). Traced
+to a mark-to-market boundary bug: QQQ cache ends 2026-07-09 but a stock trades 2026-07-10
+(in master), so a held QQQ was marked 0 on the last day. Fixed with carry-forward marks
+(last close <= d; PAST-only, no look-ahead). Gate was already clean; only the sec final
+mark was broken.
+
+**THIS IS NOT A WIN - the discipline says so (7 caveats, all in the results doc):**
+(1) IN-SAMPLE-COMPOSED - designed after 31 results on these exact windows, components
+chosen because they were the gate/sec survivors. (2) SURVIVOR-FLATTERED - reversal leg
+buys worst-residual names among 39 KNOWN survivors in exactly the 2000-02/2008 crashes;
+C1's own prereg declared such passes UNINTERPRETABLE; this inherits that cap. (3) Gate DD
+59.95% clears the 60% ceiling by 0.05pp - razor-thin, exactly as the prereg predicted.
+(4) THRESHOLD-FRAGILE: VIX>18 -> gate 14.83% (HR FAIL); passes only at 20/22. (5) COST/
+EXEC-FRAGILE: c2c 22.82% -> next-open 17.87% (~5pp in the overnight gap C1 always leaked);
+15bps -> 12.40% (FAIL). (6) PASS-RA fails (Sh 0.66) - high-return/high-variance riding a
+~60% DD. (7) Nagel's 1998-2010 sample overlaps the gate (mechanism partly in-sample).
+
+**VERDICT LABEL (per M10 cap): "PROMISING / FORWARD PAPER REQUIRED" - never a clean pass
+or live authorization.** The honest headline: the ONLY way to numerically clear HR was to
+compose two known survivors on a survivor universe with hindsight, and even then it passes
+by 0.05pp DD and fails at a nearby VIX threshold. The structural null is REINFORCED, not
+broken: no clean, OOS, robust high-return edge exists; M10-1 is the closest, and it is a
+forward-paper HYPOTHESIS, not a result.
+
+**TALLY (attempt 32):** 1 IN-SAMPLE-COMPOSED PASS-HR (forward-paper-required,
+uninterpretable) + 1 weak PASS-RA (E18) / 0 clean-OOS high-return edges / 32 attempts.
+The "0 PASS-HR" headline is now "1 in-sample-composed PASS-HR" - a meaningful, honest
+distinction, not a deployable edge. Cadence #93 (cont).
+
+**Next action:** commit M10-1; sync capstone/HANDOFF (the tally nuance); then M10-2
+(gap-amortized stress IBS) remains the other panel survivor to run, OR report to Evan
+that the one thing that would make M10-1 real is M3 forward paper (Evan-gated).

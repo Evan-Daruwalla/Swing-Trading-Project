@@ -12,11 +12,29 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 8 equity families + crypto pilot; 0 PASS-HR / 1 weak PASS-RA / 31 attempts; nothing live
+## Current state — 1 IN-SAMPLE-COMPOSED PASS-HR + 1 weak PASS-RA / 0 clean edges / 32 attempts; nothing live
 
 **Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-14 — M10 synthesis arc: Nagel Switch = the program's FIRST PASS-HR,
+> but IN-SAMPLE-COMPOSED / forward-paper-only (record Appendices CG–CI).** Evan:
+> compose the evidence into strategies vs both tiers. A multi-agent design panel
+> proved fixed-weight PASS-HR is arithmetically empty (gate needs C1-weight ≥0.66,
+> sec ≤0.29) → the only escape is state-conditioning on a causal variable. **M10-1
+> Nagel Switch** (VIX>20 → C1 residual reversal, VIX≤20 → E6 trend; Nagel 2012
+> mechanism; VIX 1990+ full window) **clears PASS-HR: gate 17.87% CAGR / DD 59.95%
+> / Sh 0.66, sec 15.94% / 39.68% / 0.78** — both windows ≥15% CAGR & ≤60% DD.
+> **NOT a win, by the program's own discipline:** IN-SAMPLE-COMPOSED (built after
+> 31 results), survivor-flattered (reversal buys known survivors in crashes — C1's
+> passes were declared UNINTERPRETABLE), gate DD passes by **0.05 pp**, fails at
+> VIX>18 (14.83%), fails PASS-RA (Sh 0.66), 15 bps breaks it. Per the M10 cap it's
+> **"PROMISING / forward paper REQUIRED,"** not clean/deployable. Tripwire GREEN;
+> fixed a carry-forward mark bug (no look-ahead). Attempt 32. Writeup
+> `docs/research/2026-07-14_M10-1_nagel_switch_results.md`. **The one thing that
+> makes it real = M3 forward paper (Evan-gated).** Other panel survivor still to
+> run: M10-2 gap-amortized stress IBS.
 
 > **2026-07-14 — X6 crypto pilot = FAIL; E6's lesson generalizes to crypto
 > (record Appendix CF).** Evan "do 2" → authorized the crypto scope (X5 stays
