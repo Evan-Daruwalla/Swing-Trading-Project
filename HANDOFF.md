@@ -12,11 +12,32 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 21 attempts; nothing live
+## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 22 attempts; nothing live
 
 **Last updated: 2026-07-13 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-13 — X2 days-to-cover = FAIL (deployable), but short-interest
+> anomaly is REAL & non-deployable (record Appendix BU).** Ran the
+> data-unblocked E17 on FINRA consolidated short interest (public REST API, no
+> auth, 205 biweekly dates 2017-12-29→2026-06-30, 39/39 coverage; scout Appendix
+> BU verified access). Prereg `prereg_x2_days_to_cover.md` (`4094889`, doc-only,
+> first use of the new TEMPLATE); MODIFIED-WINDOW CAP (single 2018–2026 →
+> PROMISING max). **Deployable long-only lowest-DTC leg FAILS:** net 13.32%
+> CAGR / Sharpe 0.60 beats SPY on CAGR (12.53%) but loses Sharpe (0.60<0.71) →
+> fails the pre-committed CAGR-AND-Sharpe bar. **But the anomaly is alive &
+> correctly signed:** long-short spread +18.39% / Sharpe 0.98, high-DTC leg
+> −2.63% (most-shorted mega-caps underperform SPY ~15pp/yr) — Boehmer-Huszar-
+> Jordan alive on the modern tape. The alpha is **entirely on the non-deployable
+> SHORT leg** (no fractional shorting at $100–1,000), exactly as the prereg
+> predicted a priori. The program's strongest real anomaly is one it
+> structurally cannot trade. Ladder A 15.93%→B 16.07% (gap flat)→C 13.32% (pure
+> cost). Tripwire GREEN. PASS-HR stays 0. Writeup
+> `docs/research/2026-07-13_X2_days_to_cover_results.md`. **X3** (Reg SHO
+> short-volume) = feasible-deferred (access proven, noisier build). **Free queue
+> open:** X3, X1 (vol-targeting); the short-side finding is an Evan-gated
+> capital/scope question (shorting needs a bigger account).
 
 > **2026-07-13 — EX-DECOMP (M9 #44) done: closed FAILs decomposed (record
 > Appendix BS).** Diagnostic (no D1 verdict; tally unchanged). Ran an A/B/C

@@ -754,6 +754,22 @@ free-data downloads; 48–51 are gated. All run AFTER E19 closes.
     PROMISING, never PASS-HR/RA**; floor ≥ 30 rebalances. Prior: FAIL/weak
     (decayed anomaly, long-only leg is its weak side, liquid universe).
     Build: medium.
+    *(Outcome 2026-07-13: DONE — data even better than assumed (FINRA REST API,
+    no auth, history to **2017-12-29** not 2021; precomputed DTC; scout record
+    Appendix BU). Prereg `prereg_x2_days_to_cover.md` (`4094889`, doc-only,
+    first use of the new TEMPLATE); ingester + `scripts/run_x2_days_to_cover.py`;
+    205 biweekly dates, 39/39 coverage, entry 10 sessions post-settlement.
+    **VERDICT = FAIL (deployable long-only leg):** net 13.32% CAGR / Sharpe 0.60
+    beats SPY on CAGR (12.53%) but LOSES Sharpe (0.60<0.71) → fails the
+    pre-committed CAGR-AND-Sharpe-vs-both bar. Ladder: A 15.93% → B 16.07% (gap
+    flat) → C 13.32% (pure cost); 15bps→8.01%. **PAYLOAD: the short-interest
+    anomaly is REAL + correctly signed — long-short spread +18.39%/Sharpe 0.98,
+    high-DTC leg −2.63% (underperforms SPY ~15pp/yr) — but the alpha is ENTIRELY
+    on the non-deployable SHORT leg (no fractional shorting at this capital),
+    exactly as the prereg predicted a priori.** The program's strongest real
+    anomaly is one it structurally cannot trade. PASS-HR stays 0; tally 22
+    attempts. Results `docs/research/2026-07-13_X2_days_to_cover_results.md`;
+    record Appendix BU.)*
 47. **X3 — Reg SHO daily short-volume drift (2009+).** Free FINRA/exchange
     daily short-sale-volume files (Boehmer-Jones-Zhang / Diether-Lee-Werner
     lineage). Step 1 = probe (file availability 2009→, decide off-exchange-only
@@ -764,6 +780,14 @@ free-data downloads; 48–51 are gated. All run AFTER E19 closes.
     PROMISING), secondary 2014→. Disclosed contamination: market-maker hedging
     shorts inflate SVR (FINRA Information Notice 05/10/19); long-only leg is
     the weaker side of the documented effect. Prior: FAIL/weak. Build: medium.
+    *(Step-1 probe DONE 2026-07-13, record Appendix BU: **data access proven** —
+    CDN daily files at `cdn.finra.org/equity/regsho/daily/CNMSshvol{YYYYMMDD}.txt`
+    (consolidated 2018-08+; per-venue FNYX/FNSQ/FNRA sum for 2009-08+), pipe-
+    delimited, trailer line = record count, schema changed 2011-02-28, volumes
+    now fractional. **FEASIBLE-DEFERRED, not blocked** — deferred behind X2 (the
+    clean short-INTEREST signal ran first); X3 is noisier executed-FLOW and needs
+    the heavier per-venue+schema-break daily-file build. Remains an open free
+    task.)*
 48. **X4 — MOC close-entry probe → forward arm (execution experiment).** The
     only fill positioned to capture the ~54% overnight component is a
     market-on-close entry; the backtest upper bound already exists (the c2c

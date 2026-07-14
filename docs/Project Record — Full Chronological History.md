@@ -2623,3 +2623,66 @@ pending the scout. Cadence #79.
 
 **Next action:** commit #43; await scout; build X2/X3 probe -> prereg(TEMPLATE)+run or
 BLOCKED-ON-DATA.
+
+---
+
+# Appendix BU - FINRA access VERIFIED; X2 days-to-cover = FAIL (short-side anomaly REAL but non-deployable); X3 feasible-deferred (2026-07-13, ~23:15 CST)
+
+**FINRA ACCESS (scout, both datasets green, no auth):** (A) Reg SHO daily short-VOLUME
+- open CDN `cdn.finra.org/equity/regsho/daily/CNMSshvol{YYYYMMDD}.txt` (consolidated
+2018-08+; per-venue FNYX/FNSQ/FNRA sum for 2009-08+); pipe-delimited, trailer line =
+record count, schema changed 2011-02-28, volumes now fractional; it is EXECUTED short
+FLOW (MM-hedging-contaminated), noisy. (B) Consolidated short INTEREST - public REST
+`POST api.finra.org/data/group/otcMarket/name/consolidatedShortInterest` (Accept:
+text/plain -> CSV), partitions endpoint enumerates settlement dates, history to
+2017-12-29 (not just 2021!), daysToCoverQuantity PRECOMPUTED, 5000-row cap so filter
+to symbols. Both FEASIBLE for an unattended ingester.
+
+**X2 BUILT + RUN (the data-unblocked E17):** ingester
+`scripts/ingest_finra_short_interest.py` (205 biweekly settlement dates 2017-12-29..
+2026-06-30, 39/39 coverage; .finra_cache gitignored; CSV parse bug fixed - issueName
+has commas -> used csv.DictReader). Prereg `prereg_x2_days_to_cover.md` committed
+doc-only 4094889 BEFORE the runner (first prereg using the new TEMPLATE). Runner
+`scripts/run_x2_days_to_cover.py`. Window 2018-01-16..2026-07-10, 2132 sessions, 204
+cycles, K=5, entry 10 sessions after settlement (dissemination-lag lookahead guard).
+
+**VERDICT: FAIL (deployable long-only leg), per prereg PROMISING-cap.** Long-only
+lowest-DTC C(next-open+5bps) = 13.32% CAGR / DD 34.9% / Sharpe 0.60; beats SPY on CAGR
+(12.53%) + EW-39 (9.59%) but LOSES Sharpe to SPY (0.60 < 0.71) -> fails the
+pre-committed "CAGR AND Sharpe vs BOTH" bar. Decomposition ladder: A c2c 15.93% -> B
+next-open 16.07% (gap FLAT - not a gap-dweller) -> C 13.32% (-2.75pp pure turnover
+cost); 15bps stress collapses to 8.01%. Tripwire GREEN.
+
+**THE PAYLOAD (honest + notable):** the short-interest anomaly is REAL, correctly
+signed, and STRONG on the modern liquid large-cap tape - long-short SPREAD +18.39%
+CAGR / Sharpe 0.98 / DD 26%, decomposing into low-DTC +15.77% vs HIGH-DTC -2.63% (the
+most-shorted mega-caps underperformed SPY by ~15pp/yr). This is Boehmer-Huszar-Jordan /
+Asquith-Pathak-Ritter ALIVE - the first strong correctly-signed anomaly the program has
+surfaced. BUT the alpha is ENTIRELY on the SHORT (high-DTC) leg = NON-DEPLOYABLE (no
+fractional shorting at $100-1,000; long-only can't convert a short leg's -15pp into
+profit; the deployable long leg is exactly the one that FAILED). Survivorship works
+AGAINST the short leg (delisted shorted-crashers excluded) -> the -2.63% is a LOWER
+bound, strengthening "real." This is EXACTLY what the prereg predicted a priori ("long
+leg tests the weak side; alpha is on the short leg, not deployable") - clean
+falsification + validated reasoning. Writeup
+`docs/research/2026-07-13_X2_days_to_cover_results.md`.
+
+**X3 (Reg SHO short-volume drift) = FEASIBLE-DEFERRED:** access proven (CDN daily
+files), but it's noisy executed-flow (not short interest), needs a heavier build
+(per-venue summing + 2011 schema break + ~4300 daily files) and a separate signal. Not
+run this sitting (scoped X2 = the clean canonical signal first). Data access is
+recorded; X3 is a future free task, NOT blocked.
+
+**TALLY:** X2 does not add a family (short-interest = the informed-positioning family,
+same as E19; the E17 concept finally run). **0 PASS-HR / 1 weak PASS-RA / 22 attempts /
+8 families.** PASS-HR stays 0 (X2 deployable FAIL; the spread is PROMISING-capped +
+non-deployable, not a PASS). Notable: the program's strongest real anomaly is one it
+structurally cannot trade.
+
+**STATE:** swing.db untouched; tripwire GREEN; committed #43 (e8548dd) + X2 prereg/
+ingester (4094889); about to commit X2 runner + results + this entry + PRD/HANDOFF/
+memory. Cadence #79 (cont.).
+
+**Next action:** commit X2; then open free queue = X3 (Reg SHO, feasible), X1
+(vol-targeting), or Evan redirects (the short-side finding is an Evan-gated
+capital/scope question - shorting needs a bigger account).
