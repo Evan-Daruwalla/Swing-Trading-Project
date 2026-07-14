@@ -2772,3 +2772,35 @@ commit runner + results + this entry + HANDOFF/memory/PRD. Cadence #81 (cont.).
 
 **Next action:** commit X2b; free queue = X1 (vol-targeting, different family), X3 (Reg
 SHO, same short-side family - lower value now X2/X2b closed it), or Evan redirects/stops.
+
+---
+
+# Appendix BX - CAPSTONE written (option 2); X3 ingest launched; X1 next (2026-07-13, ~01:15 CST)
+
+**WHAT:** Evan said "do 2 then 1 and 3" (2=package/capstone, 1=X1 vol-targeting, 3=X3
+Reg SHO). Flagged the ordering tradeoff to Evan (capstone-before-X1/X3 makes its count
+stale) and chose to respect his order: wrote the capstone now with X1/X3 framed as the
+final two confirming experiments, will bump counts 23->25 after.
+
+**CAPSTONE (option 2 DONE):** `docs/CAPSTONE_program_synthesis.md` - the standing
+single-doc synthesis of the whole program (supersedes the E1-E7 findings doc). Sections:
+what it is + terminal claim; **methodology as the deliverable** (prereg-before-code,
+asymmetric falsification, D1 dual-bar, frozen tripwire, decomposition ladder, liquidity
+floor + window caps, append-only record); 8-family/23-attempt results ledger; the
+structural WHY (Hou-Xue-Zhang / McLean-Pontiff / Avramov-Cheng-Metzker + the gap/cost
+executioners from EX-DECOMP); the one real anomaly (short-side, uncapturable, with the
+X2->X2b self-correction preserved); what's deployable (E6-1x overlay only) + nothing
+live; what it demonstrates. Portfolio-quality; honest; self-correcting.
+
+**X3 INGEST LAUNCHED (background b5354bdhf):** `scripts/ingest_regsho_short_volume.py` -
+Reg SHO daily short-VOLUME, 39 names, CNMS consolidated 2018-08+ / per-venue
+(FNYX+FNSQ+FNRA) sum for 2009-08+. Parser self-tested across all 3 format eras (pre-2011
+5-col, post-2011 6-col, CNMS) = 39/39 names, plausible SVR 0.33-0.59. FIXED: Cloudflare
+403s urllib's default UA -> added a browser User-Agent. ~9k file fetches, ~50min. Runs
+while I build X1.
+
+**STATE:** swing.db untouched; tripwire GREEN; capstone + regsho ingester + gitignore
+about to commit; X3 fetching; X1 next. Tally still 23 (X1/X3 pending). Cadence #82.
+
+**Next action:** commit capstone; build X1 (prereg from TEMPLATE -> runner -> verdict);
+then X3 when its data lands; then finalize capstone counts 23->25.
