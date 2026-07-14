@@ -2804,3 +2804,38 @@ about to commit; X3 fetching; X1 next. Tally still 23 (X1/X3 pending). Cadence #
 
 **Next action:** commit capstone; build X1 (prereg from TEMPLATE -> runner -> verdict);
 then X3 when its data lands; then finalize capstone counts 23->25.
+
+---
+
+# Appendix BY - X1 conditional vol-targeting = FAIL; plain 200-DMA still wins (2026-07-13, ~01:40 CST)
+
+**WHAT:** Built + ran X1 (option 1) per prereg (07c22cb, doc-only, predated runner
+`scripts/run_x1_vol_targeting.py`). SPY binary overlay, 3 arms: (a) E6 200-DMA, (b) E18
+VIX-TS, (c) conditional = flat iff (VIX/VIX3M>1 AND SPY<200DMA). Reused macro_close /
+sma from the E18 runner. **VERDICT: FAIL (descriptive, overlay).** Tripwire GREEN.
+
+**RESULT:** gate 2006-2013 - (a) E6 is the BEST: 6.16%/DD 19.9%/Sharpe 0.58 (vs SPY
+4.83%/56.5%/0.32); (b) VIX-TS 5.28%/36.5%/0.42; (c) conditional 5.48%/37.3%/0.42.
+The conditional interaction TIES (b) and LOSES to (a) -> fails the PASS-RA bar
+(gate Sharpe 0.42<0.80; must beat both plain overlays, doesn't). Secondary all 3 trail
+SPY on CAGR in the bull. Cost-robust (1/5/15bp barely move it). **H1 rejected, null
+survives - confirms E18: no vol gate beats the plain 200-DMA.** Mechanism: requiring
+BOTH vol-bad AND trend-bad keeps it invested 89% (vs E6 70%), so it barely de-risks;
+the binding 2008 drawdown is exactly when trend IS broken, so the extra vol condition
+just removes E6's protective exits in choppy downtrends. Writeup
+`docs/research/2026-07-13_X1_vol_targeting_results.md`.
+
+**TALLY:** X1 = attempt 24 (seasonality/overlay family). **0 PASS-HR / 1 weak PASS-RA /
+24 attempts / 8 families.** The one weak PASS-RA (E18 VIX-TS) is itself shown dominated
+by plain E6 on drawdown here. Reconfirms E6-1x 200-DMA as the single deployable risk
+overlay.
+
+**X3 STATUS:** background ingest b5354bdhf still running (~2010, per-venue era is slow);
+will build X3 on INGEST COMPLETE.
+
+**STATE:** swing.db untouched; tripwire GREEN; X1 prereg committed 07c22cb; about to
+commit runner+results+this entry+PRD. Capstone count still 23 (will finalize 23->25
+after X3). Cadence #82 (cont.).
+
+**Next action:** commit X1; await X3 ingest; build X3 -> verdict; then finalize capstone
+23->25 + HANDOFF/memory.

@@ -742,6 +742,15 @@ free-data downloads; 48–51 are gated. All run AFTER E19 closes.
     reachable tier, and per the low-effective-N finding (~3–5 independent
     stress episodes in the whole sample) the prereg must label ANY verdict
     "descriptive — forward paper is the real grade." Data in hand. Build: low.
+    *(Outcome 2026-07-13: DONE — FAIL. Prereg `07c22cb`; runner
+    `run_x1_vol_targeting.py`; record Appendix BY. Gate 2006–13: (a) E6 200-DMA
+    is BEST (6.16%/DD 19.9%/Sharpe 0.58 vs SPY 4.83%/56.5%/0.32); (c) conditional
+    5.48%/0.42 TIES (b) VIX-TS and LOSES to (a) → fails PASS-RA (gate Sharpe
+    0.42<0.80; must beat both plain overlays, doesn't). Conditioning on vol keeps
+    it invested 89% (vs E6 70%) so it barely de-risks. **H1 rejected, null
+    survives — confirms E18: no vol gate beats the plain 200-DMA.** Cost-robust.
+    Descriptive (low N). Attempt 24; PASS-HR still 0. Results
+    `docs/research/2026-07-13_X1_vol_targeting_results.md`.)*
 46. **X2 — E17-free: days-to-cover on FINRA official SI (2021–2026).** The
     E17 wall is partly gone: FINRA publishes FREE official exchange-listed
     consolidated short interest biweekly from June 2021 (record Appendix BO).
