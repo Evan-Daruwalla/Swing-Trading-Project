@@ -2584,3 +2584,42 @@ only) + new run_ex_decomp.py + results doc + this entry, about to commit. M9 #44
 
 **Next action:** commit EX-DECOMP; then M9 #43 (prereg-template, doc-only, free) is the
 next cheapest open task, or Evan redirects (deploy / free signal queue X1-X3 / stop).
+
+---
+
+# Appendix BT - M9 #43 prereg-template adopted + X2/X3 data probe launched (2026-07-13, ~22:20 CST)
+
+**WHAT:** Evan said "do 1 and 2 in parallel" (option 1 = X2/X3 free short-side
+experiments; option 2 = M9 #43 prereg-template). Parallelized: (a) wrote #43
+`docs/prereg_TEMPLATE.md` inline; (b) spawned a background scout agent to nail the
+exact FINRA data-access mechanics for X2/X3 before building an ingester.
+
+**#43 DONE (doc-only):** `docs/prereg_TEMPLATE.md` is now the standing template every
+future prereg copies, modeled on the E19 prereg house format. Folds the M9 research-
+batch discipline into fixed [STANDING] sections: tiered cost model (1bp broad ETF /
+5bp single-stock+sector / 15-25bp-or-exclude below floor / 25bp crypto + a 15bp stress
+leg), liquidity floor formalized (ADV>=$5M AND price>=$5), decomposition-ladder
+required in every results doc (Rung A/B/C, the EX-DECOMP method), time-stop baseline
+arm (price-stops must beat it), capped fractional-Kelly sizing (lambda<=1/2, r=1-2%,
+anti-martingale, no leverage), plus the existing standing rules baked in: D1 dual-bar
+verdict, asymmetric framing for survivor universes, prereg-before-code committed hash,
+frozen-tripwire-GREEN done-check, the modified-window cap (short-window data ->
+"PROMISING" max, never PASS-HR/RA), and LLM-overlays-forward-only. Done-check: template
+committed; next prereg copies it.
+
+**X2/X3 PROBE (in flight):** background agent (general-purpose) scouting exact fetch
+recipes for Dataset A = FINRA Reg SHO daily short-sale VOLUME (~2009+, deep, daily,
+executed-short-volume = MM-hedging-contaminated, per-day CDN files) and Dataset B =
+FINRA consolidated exchange-listed short INTEREST (2021+, biweekly, the real
+days-to-cover input) - specifically whether B is direct-HTTP/API downloadable or
+portal/auth-gated (the make-or-break for an unattended ingester). On its return: build
+the probe (fetch+parse+coverage on the 39-name universe), then prereg via the new
+TEMPLATE + run, or record BLOCKED-ON-DATA. Per the modified-window rule, X2 (2021+) and
+X3 (2009+) can at best reach "PROMISING," not PASS-HR/RA.
+
+**STATE:** swing.db untouched; tripwire GREEN (unchanged since EX-DECOMP); working tree
+= prereg_TEMPLATE.md + this entry + PRD #43 outcome, about to commit #43. X2/X3
+pending the scout. Cadence #79.
+
+**Next action:** commit #43; await scout; build X2/X3 probe -> prereg(TEMPLATE)+run or
+BLOCKED-ON-DATA.

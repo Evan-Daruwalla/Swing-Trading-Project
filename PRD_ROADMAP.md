@@ -703,6 +703,12 @@ free-data downloads; 48–51 are gated. All run AFTER E19 closes.
     (d) **sizing defaults** — capped fractional-Kelly (λ ≤ ½), fixed-risk
     r = 1–2%/trade, anti-martingale only, no leverage; λ/r frozen per prereg.
     Done-check: template committed; next prereg uses it.
+    *(Outcome 2026-07-13: DONE — `docs/prereg_TEMPLATE.md`, record Appendix BT.
+    Standing template modeled on the E19 prereg format; all of (a)–(d) folded
+    into fixed [STANDING] sections plus the existing standing rules (D1 dual-bar,
+    asymmetric framing, prereg-before-code hash, tripwire-GREEN done-check,
+    modified-window "PROMISING" cap, LLM-forward-only). Every future prereg
+    copies it.)*
 44. **EX-DECOMP — decomposition-ladder retrofit (diagnostic, no D1 verdict).**
     Run Rungs A/B/C on the closed FAILs whose runners are in-repo (E13, E14,
     E15, E16, E20; E8/E9 where the runner permits). Output: one table
