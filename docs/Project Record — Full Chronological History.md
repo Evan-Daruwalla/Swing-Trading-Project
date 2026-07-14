@@ -2686,3 +2686,40 @@ memory. Cadence #79 (cont.).
 **Next action:** commit X2; then open free queue = X3 (Reg SHO, feasible), X1
 (vol-targeting), or Evan redirects (the short-side finding is an Evan-gated
 capital/scope question - shorting needs a bigger account).
+
+---
+
+# Appendix BV - "do 1" = pursue short-side; INTERPRETATION + X2b design (2026-07-13, ~23:45 CST)
+
+**Evan said "do 1"** (pursue the short-side, the X2 finding). **INTERPRETATION +
+BOUNDARY (stated to Evan):** I read this as *rigorously test whether the short-side
+edge is real + robust enough to justify sizing up* - NOT "open a margin/shorting
+account or place short trades" (prohibited / Evan-only; I can't execute it, and
+nothing goes live without Evan + an Alpaca account). The actionable engineering =
+a properly-costed, pre-registered SHORT / LONG-SHORT experiment (X2b) that turns
+X2's 0-cost existence spread into a realistically-executed strategy and answers the
+deployability question honestly.
+
+**KEY RIGOR POINT driving the design:** the X2 spread (+18.39%) used 0 cost + daily
+c2c. A real short strategy pays (a) 5bps trading, (b) BORROW FEES on the short
+notional. Muravyev-Pearson-Pollet 2025: short-side predictability is largely a
+BORROW-FEE PROXY - so borrow may eat the edge. Real per-name borrow data is PAID
+(Ortex ~$129/mo, Evan-gated). So X2b uses a BORROW-COST SWEEP (0/2/5/10/20%
+annualized on short notional) to find the breakeven - honest + free (brackets the
+unknown). Note: these are large-cap names, generally cheap to borrow (~GC), so a
+2-5% sweep is realistic; if the edge dies at 3% it's borrow-illusory (MPP confirmed),
+if it survives 5%+ it's a genuine (PROMISING-capped) market-neutral sleeve.
+
+**STRATEGIC-PIVOT FLAG (no-yes-man):** a market-neutral long-short short-interest
+sleeve is a DIFFERENT strategy class from the stated goal (HIGH % return, concentrated
+K=1-3, long-biased). Lower absolute return, higher Sharpe, needs shorting infra.
+Pursuing it is a real pivot; flagged to Evan; the numbers will inform whether it's
+worth it. Still MODIFIED-WINDOW-CAPPED (single 2018-2026 -> PROMISING max).
+
+**PLAN:** prereg X2b (short + long-short, next-open, 5bps + borrow sweep, robustness:
+sub-period stability + short-leg name-concentration) doc-only BEFORE runner -> build
+`run_x2b_short_side.py` reusing the X2 cache/engine -> verdict -> results/record/
+commit. Evan-gated remainders: real borrow data (Ortex), a shorting-capable account,
+the pivot decision. Cadence #81.
+
+**Next action:** write + commit X2b prereg (doc-only), then build the runner.
