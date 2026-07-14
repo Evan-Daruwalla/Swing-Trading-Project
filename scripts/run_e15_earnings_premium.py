@@ -100,6 +100,7 @@ def main():
     print(f"closed trades {len(trades)}; win {100*wins/max(1,len(trades)):.1f}%")
 
     rows = {}
+    ewrows = {}          # EX-DECOMP hook (M9 #44): honest null = EW-survivor-univ
     print(f"\n{'window':12}{'E15 CAGR':>10}{'%/mo':>8}{'maxDD':>8}{'Sharpe':>8}"
           f"{'EWuniv':>9}{'SPY':>8}")
     for wn, (s, e) in [("2000-2013", GATE), ("2014-", SEC), ("2000-", FULL)]:
@@ -117,6 +118,7 @@ def main():
         mew = stats(ewnav)
         msp = stats([spy[d] for d in sorted(spy) if s <= d <= e])
         rows[wn] = (m, msp)
+        ewrows[wn] = (m, mew)
         print(f"{wn:12}{m['cagr']*100:>9.2f}%{m['mo']*100:>7.2f}%"
               f"{m['mdd']*100:>7.1f}%{m['sharpe']:>8.2f}"
               f"{mew['cagr']*100:>8.2f}%{msp['cagr']*100:>7.2f}%")
@@ -142,6 +144,7 @@ def main():
     else:
         verdict = "FAIL (clean - earnings premium closed)"
     print(f"\n  E15 VERDICT: {verdict}")
+    return {"rows": ewrows, "n_gate": n_gate, "bench": "EW-univ"}
 
 
 if __name__ == "__main__":

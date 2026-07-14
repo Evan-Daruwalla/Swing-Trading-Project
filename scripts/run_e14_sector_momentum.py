@@ -129,6 +129,11 @@ def main():
     verdict = ("INCONCLUSIVE" if not floor else
                "PASS-HR" if hr else "PASS-RA" if ra else "FAIL")
     print(f"\n  E14 VERDICT: {verdict}")
+    # EX-DECOMP hook (M9 #44): honest null = EW-sectors buy-hold; additive only.
+    ewrows = {name: (rows[name][0], stats(ew(lo, hi)))
+              for name, (lo, hi) in [("GATE 2000-2013", GATE),
+                                     ("SECONDARY 2014-", SEC), ("FULL 2000-", FULL)]}
+    return {"rows": ewrows, "n_gate": n_gate, "bench": "EW-sectors"}
 
 
 if __name__ == "__main__":

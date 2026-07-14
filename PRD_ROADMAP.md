@@ -711,6 +711,20 @@ free-data downloads; 48–51 are gated. All run AFTER E19 closes.
     turnover-reduction diagnostic). Expected: most land SIGNAL-DEAD, per the
     execution brief. Done-check: results doc + record entry + tripwire green.
     Build: low (three passes of existing runners).
+    *(Outcome 2026-07-13: DONE — `scripts/run_ex_decomp.py`, results
+    `docs/research/2026-07-13_EX-DECOMP_results.md`, record Appendix BS. Rung A
+    obtained with zero execution-logic edits via an open:=prior-close feed
+    wrapper (fill-at-next-open → fill-at-signal-close = c2c); one additive
+    `return` hook per runner; regression GREEN (Rung C reproduces E13 1.41%,
+    E16 16.76%, E20 +0.10%/trade); frozen tripwire GREEN. **The PRD's "most
+    SIGNAL-DEAD" expectation was WRONG — only E14 is signal-dead.** E13 =
+    COST-GATED (real calendar edge, turnover-killed); E15 = SURVIVES-NULL gate /
+    decays OOS; E16 = SURVIVES-NULL gate but SURVIVORSHIP + fails null 2014→;
+    E20 = REAL-BUT-SUBSCALE, gap-loaded overnight edge, negative after cost
+    post-2014. Payload: two recurring killers (overnight gap A→B, cost/turnover
+    B→C), not one flat null — a stronger terminal statement. E8/E9 not run
+    (their runners don't cleanly expose the A/B rung split; the five with
+    (open,close) fills covered the diagnostic).)*
 45. **X1 — Conditional volatility targeting (E6×E18 interaction).** The one
     regime idea mechanistically distinct from the survivors (FAJ 2020: +0.16
     Sharpe, −7.4 pp maxDD on momentum): de-risk ONLY when vol is elevated AND

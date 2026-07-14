@@ -18,6 +18,20 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
 
+> **2026-07-13 — EX-DECOMP (M9 #44) done: closed FAILs decomposed (record
+> Appendix BS).** Diagnostic (no D1 verdict; tally unchanged). Ran an A/B/C
+> execution ladder (A=c2c 0bps, B=next-open 0bps, C=next-open 5bps) on
+> E13/E14/E15/E16/E20; `scripts/run_ex_decomp.py`, writeup
+> `docs/research/2026-07-13_EX-DECOMP_results.md`. Regression GREEN (Rung C
+> reproduces recorded FAILs), tripwire GREEN. **The PRD's "most signal-dead"
+> guess was wrong — only E14 is SIGNAL-DEAD.** E13 = COST-GATED (real calendar
+> edge, turnover-killed); E15 = SURVIVES-NULL gate / decays OOS; E16 =
+> SURVIVES-NULL gate but survivorship + fails null 2014→; E20 = real-but-
+> subscale gap-loaded overnight edge, negative after cost post-2014. Two
+> recurring killers — overnight gap (A→B) and cost/turnover (B→C) — not one flat
+> null; reconfirms E6-1× (low turnover) as the only sane M3 deploy candidate.
+> **Next open:** M9 #43 (prereg-template, doc-only, free), or Evan redirects.
+
 > **2026-07-13 — E19 insider-buy drift = FAIL (clean); M7b CLOSED (record
 > Appendix BR).** EDGAR Form-4 ingestion completed (39/39). Ran
 > `scripts/run_e19_insider.py` (opportunistic buys, CMP classification,

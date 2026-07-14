@@ -94,6 +94,7 @@ def main():
     print(f"master {master[0]}..{master[-1]} ({len(master)}); "
           f"week-ends {len(weekend)}; entries {len(entries)}")
     rows = {}
+    ewrows = {}          # EX-DECOMP hook (M9 #44): honest null = EW-survivor-univ
     print(f"\n{'window':12}{'E16 CAGR':>10}{'%/mo':>8}{'maxDD':>8}{'Sharpe':>8}"
           f"{'EWuniv':>9}{'SPY':>8}")
     for wn, (s, e) in [("2000-2013", GATE), ("2014-", SEC), ("2000-", FULL)]:
@@ -110,6 +111,7 @@ def main():
                     ewnav.append(acc / kk)
         msp = stats([spy[d] for d in sorted(spy) if s <= d <= e])
         rows[wn] = (m, msp)
+        ewrows[wn] = (m, stats(ewnav))
         print(f"{wn:12}{m['cagr']*100:>9.2f}%{m['mo']*100:>7.2f}%"
               f"{m['mdd']*100:>7.1f}%{m['sharpe']:>8.2f}"
               f"{stats(ewnav)['cagr']*100:>8.2f}%{msp['cagr']*100:>7.2f}%")
@@ -135,6 +137,7 @@ def main():
     else:
         verdict = "FAIL (clean - weekly reversal closed)"
     print(f"\n  E16 VERDICT: {verdict}")
+    return {"rows": ewrows, "n_gate": n_gate, "bench": "EW-univ"}
 
 
 if __name__ == "__main__":

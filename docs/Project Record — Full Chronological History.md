@@ -2524,3 +2524,63 @@ Expected value is low (survey reconciliation gives every residual a strong-FAIL
 prior), so I am surfacing the choice to Evan rather than auto-running - but the
 honest framing is "low-value free queue exists," not "blocked." Cadence #77 (same
 unit as BR).
+
+---
+
+# Appendix BS - EX-DECOMP (M9 #44): closed FAILs decomposed; only E14 signal-dead (2026-07-13, ~21:50 CST)
+
+**WHAT:** Evan picked option 1 (EX-DECOMP). Ran the execution/signal decomposition
+ladder on the five closed FAILs with in-repo runners (E13/E14/E15/E16/E20). Three
+rungs: A = frictionless close-to-close 0bps (raw signal); B = next-open 0bps (removes
+overnight gap); C = next-open 5bps (as-run). Runner: `scripts/run_ex_decomp.py`;
+writeup `docs/research/2026-07-13_EX-DECOMP_results.md`. Diagnostic only - no D1
+verdict, no tuning, tally UNCHANGED.
+
+**IMPLEMENTATION (surgical):** got Rung A WITHOUT editing any runner's execution
+logic - wrapped the price feed so each bar's open := prior close, turning "fill at
+next open" into "fill at signal-day close" = c2c. B/C differ only by COST
+(monkeypatched to 0 for A/B). Benchmarks read closes -> identical across rungs. Each
+runner (E13/E14/E15/E16) got ONE additive `return {rows,n_gate,bench}` tagged
+"EX-DECOMP hook (M9 #44)"; __main__ ignores it, behavior unchanged. E20 (entry is
+already a close -> transform degenerates) computed directly from its per-trade
+formula reusing divs(). Null per strategy = its honest baseline: SPY-BH (E13),
+EW-sectors (E14), EW-survivor-univ (E15/E16), absolute per-trade sign (E20).
+
+**REGRESSION GREEN:** Rung C reproduces recorded FAILs exactly - E13 gate 1.41%
+(rec 1.40%), E16 gate 16.76% (rec 16.76%), E20 full-sample mean-net = weighted
+gate/sec (+24.5bps*1067 + -5.0bps*1151)/2218 = +9.2bps ~= recorded +0.10%/trade.
+Frozen tripwire GREEN (12 refs d=0) after the additive edits.
+
+**RESULT (PRD expected "most SIGNAL-DEAD" - WRONG, only E14 is):**
+- E13 turn-of-month = **COST-GATED**: A 3.40% > SPY 1.72%, B 2.64% > 1.72%, C 1.41% <
+  1.72% -> real gross calendar edge, killed only by turnover cost (-1.23pp). Not "matched
+  SPY by luck."
+- E14 sector-momentum = **SIGNAL-DEAD**: A 4.06% < EW-sectors 4.13% -> no alpha even
+  frictionless. The cleanest true negative.
+- E15 earnings-premium = **SURVIVES-NULL gate, decays OOS**: gate C 6.36% > EW-univ
+  -0.47% (real gate alpha; A->B GAINS +2.45pp, run-up is overnight-gap-loaded), but
+  sec C 2.50% < null 13.97% -> real-but-decayed.
+- E16 weekly-reversal = **SURVIVES-NULL gate (SURVIVORSHIP), fails null OOS**: gate A
+  27.97% is the survivorship artifact (buy biggest 5d losers on survivors we know
+  recovered); decomposition can't launder it, and sec C 10.68% < null 13.97% confirms.
+  Heavy weekly-turnover cost -6.25pp + gap -4.96pp gate.
+- E20 dividend-capture = **REAL-BUT-SUBSCALE, gap-loaded**: B(open) +34.5bps >> A(c2c)
+  +16.9bps -> the ex-date deficiency is an OVERNIGHT effect that reverts by close;
+  survives cost in gate (+24.5bps) but negative post-2014 (-5.0bps); too small to
+  compound (0.62% CAGR); pre-tax.
+
+**PAYLOAD:** two recurring killers (overnight GAP A->B, and COST/turnover B->C), not
+one flat "no signal." Momentum/timing (E13,E16) LOSE to the gap; MR/event overnight
+trades (E15,E20) GAIN from it then pay it back in cost. Cost scales with turnover and
+is decisive (Chen-Velikov ~93%-die mechanism observed in-repo). Terminal statement
+UPGRADES: "real gross structure exists in 4 of 5, but converts to zero deployable
+high-return edge once passed through gap + cost + OOS decay" is stronger + more honest
+than "no signal anywhere." Reconfirms E6-1x (low-turnover overlay) as the only sane M3
+deploy candidate; the gap is uncapturable at EOD.
+
+**STATE:** swing.db untouched; tripwire GREEN; edited E13/E14/E15/E16 (additive returns
+only) + new run_ex_decomp.py + results doc + this entry, about to commit. M9 #44 DONE;
+#43 (prereg-template) still open. Cadence #78.
+
+**Next action:** commit EX-DECOMP; then M9 #43 (prereg-template, doc-only, free) is the
+next cheapest open task, or Evan redirects (deploy / free signal queue X1-X3 / stop).

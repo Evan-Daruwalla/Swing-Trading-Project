@@ -119,6 +119,8 @@ def main():
     verdict = ("INCONCLUSIVE" if not floor else
                "PASS-HR" if hr else "PASS-RA" if ra else "FAIL")
     print(f"\n  E13 VERDICT: {verdict}")
+    # EX-DECOMP hook (M9 #44): benchmark = SPY-BH (rows[*][1]); additive only.
+    return {"rows": rows, "n_gate": n_gate, "bench": "SPY-BH"}
 
 
 if __name__ == "__main__":
