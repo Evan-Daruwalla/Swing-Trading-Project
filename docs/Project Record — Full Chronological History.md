@@ -3025,3 +3025,32 @@ out-of-sample evidence; X5 analyst-revision drift ($22 FMP); X6 crypto pilot (sc
 
 **Next action:** push on Evan's word; otherwise the capstone is the deliverable and the
 program stands complete.
+
+---
+
+# Appendix CE - "do 2" = X6 crypto pilot (X5 blocked-on-purchase); scope opened (2026-07-14, ~12:40 CST)
+
+**GROUNDING (post-compaction integrity check):** verified the 30-attempt program is
+REAL, not summary drift - HEAD 95b83a5, tree clean, all C1/C3/C4/C6/C7 + X3 runners +
+preregs + result docs present on disk; git log shows their RESULTS commits (8ab182c C7,
+3176364 C1, etc.). No fabrication; the cited numbers (C1 19.08%, C7 26.45%) trace to
+real result docs. 14 commits unpushed. Stale FOMC-agent stop notice ignored (C6 landed).
+
+**"do 2" INTERPRETATION + BOUNDARY:** offered bucket = X5 (analyst-revision, $22 FMP) /
+X6 (crypto pilot). **X5 stays BLOCKED-ON-EVAN:** I cannot purchase the FMP feed, and the
+free yfinance alternative silently backfills/restates ratings -> look-ahead
+contamination (data-sources brief warned this), so a free X5 would violate rigor -
+better blocked than contaminated. **X6 is the executable half:** free data (yfinance
+BTC-USD/ETH-USD), paper-first (no real money/account), and an existing Evan-authored PRD
+task (50) that was only SCOPE-gated. Reading "do 2" as authorizing that crypto scope.
+
+**X6 = attempt 31, a NEW DOMAIN (crypto), extends - does not contradict - the "equity
+method space exhausted at 30" claim.** Per PRD 50 + crypto brief: BTC/ETH time-series
+trend (e.g. 100d / 20-100d MA), 24-7 daily bars (signal at UTC close, next-bar exec =
+zero gap by construction), **25 bps/side (5x equity, the governing economic fact)**,
+gate 2018-2022 + secondary 2023-> MODIFIED-WINDOW CAP (PROMISING max), vs HODL. Disclose
+the 2022-23 trend drawdown as an EXPECTED failure mode. Paper-first: a PROMISING routes
+to paper only; live-money crypto (custody = the deciding risk) stays Evan-gated. Cadence #90.
+
+**Next action:** prereg_x6 (from TEMPLATE) doc-only -> fetch BTC/ETH -> runner -> verdict
+-> results/record/commit. Then report X6 + the blocked-X5 status.
