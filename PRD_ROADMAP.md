@@ -769,7 +769,14 @@ free-data downloads; 48–51 are gated. All run AFTER E19 closes.
     exactly as the prereg predicted a priori.** The program's strongest real
     anomaly is one it structurally cannot trade. PASS-HR stays 0; tally 22
     attempts. Results `docs/research/2026-07-13_X2_days_to_cover_results.md`;
-    record Appendix BU.)*
+    record Appendix BU. **X2b follow-on (Evan "do 1" = pursue short-side; prereg
+    `e718f6f`; runner `run_x2b_short_side.py`; record Appendix BW): FAIL — real
+    short accounting + borrow sweep (0/2/5/10/20%) + delta-turnover show the
+    +18.39% spread was a FRICTIONLESS MIRAGE (LS → 9.24%/Sharpe 0.56 at 5%
+    borrow, 5/9 years positive; pure short negative at every borrow level;
+    breakeven borrow 13.8% ≫ real large-cap borrow → fails on risk-adjusted
+    return + lumpiness, not borrow supply). Short-side lead CLOSED; sizing up a
+    shorting account NOT justified. Attempt 23; PASS-HR still 0.)*
 47. **X3 — Reg SHO daily short-volume drift (2009+).** Free FINRA/exchange
     daily short-sale-volume files (Boehmer-Jones-Zhang / Diether-Lee-Werner
     lineage). Step 1 = probe (file availability 2009→, decide off-exchange-only

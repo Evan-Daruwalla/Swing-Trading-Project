@@ -12,14 +12,31 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 22 attempts; nothing live
+## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 23 attempts; nothing live
 
 **Last updated: 2026-07-13 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
 
-> **2026-07-13 — X2 days-to-cover = FAIL (deployable), but short-interest
-> anomaly is REAL & non-deployable (record Appendix BU).** Ran the
+> **2026-07-13 — X2b short-side = FAIL; X2's "strongest anomaly" was a
+> frictionless mirage (record Appendix BW).** Evan said "do 1" (pursue the
+> short-side). Read as *rigorously test it*, not "open a shorting account"
+> (Evan-only). Prereg `prereg_x2b_short_side.md` (`e718f6f`); runner
+> `scripts/run_x2b_short_side.py` with real short accounting + a **borrow-fee
+> sweep** (0/2/5/10/20%/yr) + delta-turnover trading (caught + fixed a
+> full-churn cost over-charge first). **FAIL:** LS gross 17.13%/Sharpe 0.92
+> (= X2 spread, edge exists) decays to **9.24%/Sharpe 0.56 at 5% borrow**, only
+> **5/9 years positive**; **pure short is negative at every borrow level**
+> (high-DTC basket is a mix — IBM/TXN/ORCL rallied — + vol drag + bull tape).
+> Breakeven borrow 13.8% ≫ real large-cap borrow, so it fails on risk-adjusted
+> return + lumpiness, not borrow supply. **Answer to "pursue the short-side":
+> DON'T** — not a deployable market-neutral sleeve; sizing up a margin/shorting
+> account isn't justified. The short-side lead is CLOSED. Tripwire GREEN. Writeup
+> `docs/research/2026-07-13_X2b_short_side_results.md`. Tally 23 attempts.
+
+> **2026-07-13 — X2 days-to-cover = FAIL (deployable), short-interest anomaly
+> real short-side but does NOT survive honest costs (see X2b above; record
+> Appendix BU).** Ran the
 > data-unblocked E17 on FINRA consolidated short interest (public REST API, no
 > auth, 205 biweekly dates 2017-12-29→2026-06-30, 39/39 coverage; scout Appendix
 > BU verified access). Prereg `prereg_x2_days_to_cover.md` (`4094889`, doc-only,
@@ -31,9 +48,11 @@ the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
 > −2.63% (most-shorted mega-caps underperform SPY ~15pp/yr) — Boehmer-Huszar-
 > Jordan alive on the modern tape. The alpha is **entirely on the non-deployable
 > SHORT leg** (no fractional shorting at $100–1,000), exactly as the prereg
-> predicted a priori. The program's strongest real anomaly is one it
-> structurally cannot trade. Ladder A 15.93%→B 16.07% (gap flat)→C 13.32% (pure
-> cost). Tripwire GREEN. PASS-HR stays 0. Writeup
+> predicted a priori. *(NB: the +18.39% spread is a frictionless gross number;
+> X2b above shows it does NOT survive realistic trading+borrow costs — FAIL. The
+> earlier "strongest real anomaly" framing is corrected there.)* Ladder A
+> 15.93%→B 16.07% (gap flat)→C 13.32% (pure cost). Tripwire GREEN. PASS-HR stays
+> 0. Writeup
 > `docs/research/2026-07-13_X2_days_to_cover_results.md`. **X3** (Reg SHO
 > short-volume) = feasible-deferred (access proven, noisier build). **Free queue
 > open:** X3, X1 (vol-targeting); the short-side finding is an Evan-gated

@@ -2723,3 +2723,52 @@ commit. Evan-gated remainders: real borrow data (Ortex), a shorting-capable acco
 the pivot decision. Cadence #81.
 
 **Next action:** write + commit X2b prereg (doc-only), then build the runner.
+
+---
+
+# Appendix BW - X2b short-side = FAIL; X2's "strongest anomaly" was a frictionless mirage (2026-07-13, ~00:40 CST)
+
+**WHAT:** Built + ran X2b per prereg (e718f6f, doc-only, predated runner
+`scripts/run_x2b_short_side.py`). Properly costs X2's short-side finding: real short
+accounting (proceeds + daily-marked liability) + a BORROW SWEEP (0/2/5/10/20%/yr) +
+5bps trading. **VERDICT: FAIL** against the pre-registered market-neutral bar
+(at 5% borrow: +CAGR AND Sharpe>=0.80 AND >=70% positive years). Tripwire GREEN.
+
+**SELF-CORRECTION (2 layers):** (1) my FIRST X2b runner over-charged trading by fully
+churning the book every rebalance (liquidate+re-establish even continuers). Caught it,
+rewrote to DELTA turnover (trade only position changes) - fair cost is ~2.3pp not
+5.5pp. Did NOT report the inflated-cost FAIL. (2) MORE IMPORTANT: X2's headline
+("strongest real anomaly", spread +18.39%/Sharpe 0.98) was TOO GENEROUS - that was
+frictionless. Honest costing kills it; correcting the record here.
+
+**NUMBERS (delta-turnover):** LS gross 17.13%/Sharpe 0.92 (= X2 spread, confirms edge
+exists) -> LS @0% borrow 14.81%/0.82 -> @2% 12.55%/0.71 -> @5% 9.24%/0.56 -> @10%
+3.92%/0.30 -> @20% -5.98%. Breakeven borrow 13.8%/yr. PURE SHORT negative at EVERY
+level (-2.10% @0%, -6.90% @5%). Robustness: only 5/9 years positive (2018/21/22/24
+lose ~-6 to -9%; 2019/23/25/26 carry it +23 to +35%). Name concentration: high-DTC
+"short" basket is a MIX - IBM +7.2%/TXN +17.8%/ORCL +23.7% RALLIED while held, only
+MMM/T/ABT/HD fell -> shorting the most-shorted doesn't work standalone (mixed basket +
+volatility drag + bull tape). Writeup `docs/research/2026-07-13_X2b_short_side_results.md`.
+
+**WHY IT FAILS (not the MPP borrow-proxy story):** breakeven borrow 13.8% >> actual
+large-cap GC borrow (~0.3-3%), so borrow SUPPLY isn't the killer here (unlike MPP's
+illiquid-name mechanism). It fails on RISK-ADJUSTED return + LUMPINESS: a market-neutral
+factor bet that clears no deployable Sharpe/robustness bar once realistically costed.
+The long-short only "works" gross because the LONG low-DTC leg carries it; the short leg
+is dead weight.
+
+**ANSWER to "pursue the short-side": DON'T.** Rigorously tested, the edge isn't a
+deployable market-neutral sleeve and the pure short is negative. Sizing up a
+shorting/margin account is NOT justified. Residual (real borrow data + broader window +
+the illiquid names where the effect actually lives) is Evan-gated + unreachable within
+the floor. The short-side lead is CLOSED. Better found via a $0 borrow sweep than after
+funding Ortex + a margin account.
+
+**TALLY:** X2b = attempt 23 (informed-positioning family, same as E19/X2). **0 PASS-HR /
+1 weak PASS-RA / 23 attempts / 8 families.** No family added.
+
+**STATE:** swing.db untouched; tripwire GREEN; X2b prereg committed e718f6f; about to
+commit runner + results + this entry + HANDOFF/memory/PRD. Cadence #81 (cont.).
+
+**Next action:** commit X2b; free queue = X1 (vol-targeting, different family), X3 (Reg
+SHO, same short-side family - lower value now X2/X2b closed it), or Evan redirects/stops.
