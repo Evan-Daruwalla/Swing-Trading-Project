@@ -12,11 +12,27 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 30 attempts; nothing live
+## Current state — 8 equity families + crypto pilot; 0 PASS-HR / 1 weak PASS-RA / 31 attempts; nothing live
 
 **Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-14 — X6 crypto pilot = FAIL; E6's lesson generalizes to crypto
+> (record Appendix CF).** Evan "do 2" → authorized the crypto scope (X5 stays
+> BLOCKED — can't buy the $22 FMP feed, free ratings = look-ahead). Prereg
+> `prereg_x6_crypto_trend.md` → `run_x6_crypto_trend.py`: BTC/ETH dual-MA
+> (SMA20>SMA100) long-or-flat, next-bar, **25 bps/side**, vs HODL. **FAIL
+> (PROMISING-capped):** combined gate 2018–22 29.6% CAGR / DD 60.6% / Sharpe
+> 0.76 **crushes HODL** 4.3% / 82.3% / 0.43, but sec 2023– Sharpe 0.76 < HODL
+> **1.01** (bull) → fails the beat-HODL-both-windows bar. **Cost-robust** (33
+> toggles/5yr — the "25 bps kills it" worry was wrong for a slow overlay).
+> **Same lesson as equity E6:** MA trend = drawdown control, not a return-
+> enhancer over buy-and-hold in bulls — the structural conclusion generalizes to
+> a new asset class. Attempt 31 (30 equity + 1 crypto). Paper-first; nothing
+> live; live-money crypto Evan-gated (custody). Tripwire GREEN. Writeup
+> `docs/research/2026-07-14_X6_crypto_trend_results.md`. **No free experiment
+> remains; all further work Evan-gated (M3 deploy; X5 FMP; live crypto).**
 
 > **2026-07-14 — FREE SWEEP COMPLETE: M8 (C1–C7) + X3 all done; program at 30
 > attempts (record Appendices CB–CD).** Evan: "run the Free + autonomous ones."

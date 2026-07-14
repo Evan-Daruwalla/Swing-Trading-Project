@@ -901,6 +901,19 @@ free-data downloads; 48–51 are gated. All run AFTER E19 closes.
     backtest verdict. The custody tail (uninsured exchange balances) is
     disclosed as the deciding LIVE-money risk — irrelevant to paper. Build:
     medium (new data pipe + fee model).
+    *(Outcome 2026-07-14: scope AUTHORIZED via Evan "do 2"; DONE — FAIL
+    (attempt 31, first crypto domain; record Appendix CF). Prereg
+    `prereg_x6_crypto_trend.md`; runner `run_x6_crypto_trend.py`; data
+    yfinance BTC/ETH (not Kraken — free + sufficient for daily trend). Combined
+    dual-MA @25bps: gate 2018-22 29.61% CAGR/DD 60.6%/Sh 0.76 CRUSHES HODL
+    4.34%/82.3%/0.43, but sec 2023- Sh 0.76 < HODL 1.01 (bull) → fails the
+    beat-HODL-Sharpe-BOTH-windows bar. **Cost-robust** (33 toggles/5yr; 25bps
+    barely bites — the fee worry was wrong for a slow overlay). **Same lesson as
+    equity E6:** MA trend = drawdown control (82%→61% DD), not a return-enhancer
+    over HODL in bulls — the structural conclusion generalizes to crypto. 100d
+    sensitivity looked better but still < HODL bull; verdict NOT switched (no
+    tuning). Paper-first; nothing live; custody stays Evan-gated. Results
+    `docs/research/2026-07-14_X6_crypto_trend_results.md`.)*
 51. **LLM forward-only arc + M3 protocol amendment (doc task now; execution
     Evan-gated with M3).** Per the LLM brief, the shortlist overlays (B9
     red-team veto — which IS the existing e1_llm_veto design; D3

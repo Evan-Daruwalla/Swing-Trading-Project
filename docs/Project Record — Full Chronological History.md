@@ -3054,3 +3054,44 @@ to paper only; live-money crypto (custody = the deciding risk) stays Evan-gated.
 
 **Next action:** prereg_x6 (from TEMPLATE) doc-only -> fetch BTC/ETH -> runner -> verdict
 -> results/record/commit. Then report X6 + the blocked-X5 status.
+
+---
+
+# Appendix CF - X6 crypto trend = FAIL; E6's trend-overlay lesson generalizes to crypto (2026-07-14, ~13:20 CST)
+
+**WHAT:** Built + ran X6 (crypto scope, Evan "do 2") per prereg
+`prereg_x6_crypto_trend.md` (doc-only, predated runner `scripts/run_x6_crypto_trend.py`).
+BTC/ETH dual-MA (SMA20>SMA100) long-or-flat, next-bar, 25bps/side, vs HODL. Data
+yfinance BTC-USD (2014-09+) / ETH-USD (2017-11+), 24-7 daily, .crypto_cache gitignored.
+**VERDICT: FAIL (PROMISING-capped).** Tripwire GREEN (new domain, doesn't touch swing.db).
+
+**RESULT (combined K=2, 25bps):** gate 2018-22 sleeve 29.61% CAGR/DD 60.6%/Sharpe 0.76
+CRUSHES HODL 4.34%/82.3%/0.43; but sec 2023- sleeve 23.09%/41.5%/0.76 LOSES HODL's raw
+Sharpe 44.31%/53.7%/**1.01**. Fails the pre-registered beat-HODL-Sharpe-in-BOTH-windows
+bar (0.76<1.01 in the bull). Per-asset same shape (BTC/ETH both win gate, lose sec-bull).
+
+**TWO FINDINGS > the FAIL:** (1) **COST-ROBUST** - 33 toggles/5yr -> 25bps barely bites
+(gate 30.26%@10bps -> 28.55%@50bps); the brief's "25bps=5x-equity kills it" worry is
+WRONG for a slow trend overlay (it's right for HF crypto). (2) **Same lesson as equity
+E6, new domain:** MA trend = drawdown control (cuts 82%->61% DD in bears, triples
+return) that LOSES to buy-and-hold in bulls. Stepping outside equities did NOT escape
+the structural conclusion (trend = market-dependent risk overlay, not high-return
+engine). 100d-single-MA sensitivity looked better (BTC Sh 0.90/0.95) but still <HODL in
+the bull; did NOT switch verdict to it (would be tuning a FAIL). Results
+`docs/research/2026-07-14_X6_crypto_trend_results.md`.
+
+**X5 STATUS: BLOCKED-ON-EVAN** (unchanged) - can't buy the $22 FMP feed; free yfinance
+ratings = silent restatement/look-ahead -> a free X5 would violate rigor. Stays blocked
+until Evan provides clean PIT analyst-revision data.
+
+**TALLY:** X6 = attempt 31 = 30 equity + 1 crypto domain. **0 PASS-HR / 1 weak PASS-RA /
+31 attempts / 8 equity families + 1 crypto pilot.** Crypto pilot EXTENDS (does not
+contradict) the terminal claim: even in a new asset class the only thing that "works"
+is trend-as-drawdown-control, and HODL wins the bull. Paper-first; nothing live;
+live-money crypto stays Evan-gated (custody).
+
+**STATE:** swing.db untouched; tripwire GREEN; X6 prereg committed; about to commit
+runner+results+this entry+capstone/HANDOFF/PRD/memory sync. Cadence #90 (cont).
+
+**Next action:** commit X6; sync capstone/HANDOFF 30->31; then remaining work is
+Evan-gated only (M3 deploy; X5 needs FMP; live crypto needs custody call) - or push.
