@@ -31,3 +31,4 @@ Thumbs.db
 graphify-out/.graphify_python
 graphify-out/.graphify_root
 .edgar_cache/
+.finra_cache/
