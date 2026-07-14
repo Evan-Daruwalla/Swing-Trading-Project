@@ -852,6 +852,14 @@ free-data downloads; 48–51 are gated. All run AFTER E19 closes.
     clean short-INTEREST signal ran first); X3 is noisier executed-FLOW and needs
     the heavier per-venue+schema-break daily-file build. Remains an open free
     task.)*
+    *(Outcome 2026-07-14: DONE — FAIL (attempt 30, the program's final
+    experiment; record Appendix CD). Full ingest 4,260 sessions 2009-08→2026-07,
+    39/39 coverage. Long-only lowest-SVR K=5 weekly: gate 13.00%/Sh 0.75 LOSES
+    SPY 14.80%/0.91. **Existence spread +1.24%/Sh 0.16 = essentially ZERO signal**
+    (low-SVR 14.74% vs high-SVR 12.05%) — executed short volume is MM-hedging
+    noise, the clean contrast to X2's real +18.39% short-INTEREST spread. 15bps
+    kills it. Informed-positioning family complete. Results
+    `docs/research/2026-07-14_X3_regsho_svr_results.md`.)*
 48. **X4 — MOC close-entry probe → forward arm (execution experiment).** The
     only fill positioned to capture the ~54% overnight component is a
     market-on-close entry; the backtest upper bound already exists (the c2c

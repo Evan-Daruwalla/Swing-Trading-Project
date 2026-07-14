@@ -2985,3 +2985,43 @@ the terminal claim upgrades to "the entire documented, evidenced swing-method sp
 
 **Next action:** X3 on INGEST COMPLETE (prereg -> runner -> verdict = attempt 30);
 then final doc sync (capstone counts 24->30, HANDOFF, memory) + push on Evan's word.
+
+---
+
+# Appendix CD - X3 = FAIL (SVR is noise); FREE SWEEP + program COMPLETE at 30 (2026-07-14, ~02:40 CST)
+
+**WHAT:** X3 ingest completed (bfdabqndy, exit 0): 4,260 sessions 2009-08-03..
+2026-07-10, 39/39 coverage (2265 venue-sum + 1995 CNMS days). Prereg
+`prereg_x3_regsho_svr.md` committed doc-only BEFORE runner
+`scripts/run_x3_regsho_svr.py`. **VERDICT: FAIL** (attempt 30, the program's LAST
+experiment). Tripwire GREEN.
+
+**RESULT:** long-only lowest-SVR K=5 weekly, next-open, 5bps: gate 13.00%/DD 27.1%/
+Sh 0.75 LOSES SPY 14.80%/0.91 (both CAGR and Sharpe); sec 10.85%/0.64. Decomposition:
+B(next-open 0bps) 19.03% >> A(c2c) 15.40% (low-SVR basket has favorable overnight
+drift) >> C(+5bps) 13.00% (weekly-turnover cost -6pp); 15bps collapses to 1.83%/gate,
+negative/sec. **KEY: existence spread low-SVR minus high-SVR = +1.24%/Sh 0.16 =
+essentially ZERO** (low 14.74% vs high 12.05%) -> executed short VOLUME carries no
+cross-sectional signal, confirming the MM-hedging-contamination prior. **Clean X2/X3
+contrast:** short-INTEREST (X2, settlement positions) = real +18.39% short-side
+spread; short-VOLUME (X3, executed flow) = noise. Both FAIL, different reasons, now
+documented. Results `docs/research/2026-07-14_X3_regsho_svr_results.md`.
+
+**PROGRAM COMPLETE. TERMINAL TALLY: 0 PASS-HR / 1 weak PASS-RA / 30 attempts /
+8 families.** The free-sweep arc (this session): C1/C3/C4/C6/C7 run + C2 closed +
+X1/X2/X2b/X3 = the documented, evidenced swing-method space (survey 2026-07-12) is
+EXHAUSTED at retail EOD / K=1-3 / $100-1,000. One weak risk-mgmt overlay (E18 VIX-TS),
+one real-but-uncapturable anomaly (short interest), zero high-return engines.
+
+**FINAL DOC SYNC (this entry):** CAPSTONE finalized 24->30 (ledger rows for C/X
+experiments, near-miss narrative, status=COMPLETE); HANDOFF header 24->30 + 2026-07-14
+snapshot; memory updated; PRD #47/#36-42 outcomes annotated; M8 exit MET. All committed;
+awaiting Evan's push call.
+
+**REMAINING WORK = EVAN-GATED ONLY:** M3 Alpaca paper deploy of the E6-1x (+ E18-VIX-TS,
++ the C4 vol-managed shape) forward-paper candidate = the SOLE path to genuinely new
+out-of-sample evidence; X5 analyst-revision drift ($22 FMP); X6 crypto pilot (scope +
+25bps fees). No free autonomous experiment remains. Cadence #88 (cont).
+
+**Next action:** push on Evan's word; otherwise the capstone is the deliverable and the
+program stands complete.

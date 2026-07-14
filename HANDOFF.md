@@ -12,11 +12,30 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 24 attempts; nothing live
+## Current state — EIGHT families; 0 PASS-HR / 1 weak PASS-RA / 30 attempts; nothing live
 
-**Last updated: 2026-07-13 (CST)** — this file is the only live snapshot;
+**Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-14 — FREE SWEEP COMPLETE: M8 (C1–C7) + X3 all done; program at 30
+> attempts (record Appendices CB–CD).** Evan: "run the Free + autonomous ones."
+> Ran the full residual queue, each prereg-committed-before-runner, tripwire
+> GREEN after each. **All FAIL/closed:** C3 vol-breakout (time-stop beats the
+> channel exit — whipsaw tax); C4 M-M vol-sizing (real DD-cutter, best Sharpe
+> 0.77 < 0.80); C6 FOMC even-week (replicates CMVJ then INVERTS post-2014 —
+> cleanest decay exhibit); **C1 residual reversal (CLOSEST-EVER: gate 19.08%
+> CAGR/DD 57.7% clears both HR legs in-window, dies post-2014 + survivorship)**;
+> C2 dividend-initiation (closed on probe, 3 events/26yr); **C7 SVXY carry
+> (highest CAGR ever 26.45% and still FAIL — Sharpe 0.76 < SPY 0.82, rides the
+> dead −1× instrument, dodged Volmageddon by 1 session = N=1 luck)**; **X3 Reg
+> SHO short-volume (FAIL — SVR spread +1.24%/Sh 0.16 = noise; clean contrast to
+> X2's real +18.39% short-INTEREST spread)**. Meta-result: the sweep produced
+> the program's most *tempting* numbers (C1/C7/C4) and the pre-registered
+> both-windows/risk-adjusted/era-honest bars killed every one — the discipline
+> demonstrating itself. **Capstone finalized to 30 attempts. No free experiment
+> remains; the documented method space is exhausted. Remaining work is
+> Evan-gated only (M3 deploy; X5 $22 / X6 crypto).**
 
 > **2026-07-13 — CAPSTONE written; X1 = FAIL; X3 interrupted (record Appendices
 > BX–BZ).** Evan: "do 2 then 1 and 3." **(2) Capstone:**

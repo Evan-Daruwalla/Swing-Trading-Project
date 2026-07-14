@@ -6,12 +6,11 @@ https://github.com/Evan-Daruwalla/Swing-Trading-Project**
 > This is the standing capstone: the single-document account of what the program set
 > out to do, how it was run, what it found, and why. The append-only
 > `docs/Project Record — Full Chronological History.md` remains ground truth for
-> dated detail; this synthesizes it. Counts current at **0 PASS-HR / 1 weak PASS-RA /
-> 24 pre-registered attempts / 8 strategy families**. X1 (conditional
-> vol-targeting) has since run — FAIL, folded in below. X3 (Reg SHO short-volume)
-> is the one remaining free experiment; its data ingestion was interrupted
-> mid-fetch (resumable) and it is deferred — its strong FAIL-prior means it will
-> not change the terminal claim.
+> dated detail; this synthesizes it. **Final counts: 0 PASS-HR / 1 weak PASS-RA /
+> 30 pre-registered attempts / 8 strategy families.** The M8 full-method-survey sweep
+> (C1/C3/C4/C6/C7 run, C2 closed on probe) and the M9 free experiments
+> (X1/X2/X2b/X3) are all complete — the entire documented, evidenced swing-method
+> space is exhausted.
 
 ---
 
@@ -86,7 +85,7 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 
 ---
 
-## 3. Results ledger — 8 families, 23 attempts, 0 high-return passes
+## 3. Results ledger — 8 families, 30 attempts, 0 high-return passes
 
 | Family | Experiments | Verdict |
 |---|---|---|
@@ -94,13 +93,14 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 | Leveraged trend rotation | E4, E5, E7 | E4 passed 2014–26 backtest, **E5 killed it** (92.7% DD in unseen 2000–13); E7 closed it OOS on 5 non-US regimes |
 | De-leveraged trend (1×) | E6, E7 | **PASS then downgraded** — robust in US, market-dependent (3/5 regions); a risk-management overlay, *not* high-return |
 | Single-stock momentum | E3 | FAIL — 6.27% gate CAGR, underperformed equal-weight buy-hold of its own survivor universe |
-| Breakout / volatility | E8, E11 | FAIL — compression predicts expansion, not direction; volume gating adds nothing |
+| Breakout / volatility | E8, E11, C3 | FAIL — compression predicts expansion, not direction; volume gating adds nothing; **C3** consolidated kill-shot confirms it, and shows the "cut at the recent low" exit is a whipsaw tax (time-stop beats it) |
 | Deep-dip accumulation | E9 | FAIL — the "never book a loss" claim is literally true (0/53 realized losses) and still bad (3.46% CAGR, −79.7% unrealized) |
 | Event-driven (earnings) | E10, E15 | FAIL — a real but small effect (only experiment to beat both benchmarks in 2000–13) that **decayed post-2010** |
-| Seasonality / cross-sectional / overlay | E13, E14, E16, E18, E20, X1 | FAIL, except **E18 VIX-term-structure cleared the program's only (weak) PASS-RA**; E14 is the cleanest negative (lost to equal-weight every window); E16 cleared 15% return but on 66% DD + survivorship; **X1** conditional vol-targeting FAIL — no vol gate beats the plain 200-DMA (E18 confirmed) |
-| Informed positioning | E19, X2, X2b | FAIL — insider opportunistic-buys close cleanly; short-interest days-to-cover is real on the *short* side but **uncapturable** (see §5) |
+| Seasonality / cross-sectional / overlay | E13, E14, E16, E18, E20, X1, C1, C4, C6, C7 | FAIL, except **E18 VIX-TS cleared the program's only (weak) PASS-RA**. **C1** residual reversal is the *closest-ever HR near-miss* — gate 19.08% CAGR / DD 57.7% clears both HR legs in-window, then dies post-2014 (survivorship + regime); **C7** SVXY carry posts the highest CAGR ever (26.45%) and still FAILs (Sharpe < SPY; rides the dead −1× instrument); **C4** vol-sizing is a real DD-cutter that misses the 0.80 bar; **C6** FOMC even-week replicates the published effect then *inverts* post-2014; **X1** confirms no vol gate beats the plain 200-DMA |
+| Informed positioning | E19, X2, X2b, X3 | FAIL — insider opportunistic-buys close cleanly; short-**interest** days-to-cover is real on the *short* side but **uncapturable** (see §5); short-**volume** (X3) carries no cross-sectional signal at all (executed-flow MM-hedging noise — the clean X2/X3 contrast) |
+| *(closed on probe)* | C2 dividend-initiation | Only 3 first-ever initiations in 26 years among the survivors → insufficient event flow, no runner |
 
-**Tally: 0 PASS-HR, 1 weak PASS-RA (E18 VIX-TS, forward-paper candidate only), 24
+**Tally: 0 PASS-HR, 1 weak PASS-RA (E18 VIX-TS, forward-paper candidate only), 30
 pre-registered attempts, 8 families.** Full per-experiment detail: the append-only
 record and `docs/research/`.
 
@@ -168,11 +168,14 @@ preserves both.)*
 A working model of honest quantitative research at small scale: falsifiable
 pre-registration, bias-aware experiment design, a regression tripwire, direct
 cost/execution decomposition, and a documentation trail that records — and
-corrects — its own errors. Twenty-three pre-registered falsifications across eight
-strategy families, zero high-return passes, and a terminal claim that is *stronger*
+corrects — its own errors. **Thirty pre-registered falsifications across eight
+strategy families, zero high-return passes**, and a terminal claim that is *stronger*
 for being negative: the retail-EOD, K=1–3, liquidity-floored swing-trading space
 does not contain a robust high-return edge, and the discipline to prove that
-cleanly is the result.
+cleanly is the result. The tell is in the near-misses — the program's most tempting
+numbers (C1's in-window 19% CAGR, C7's 26%, C4's drawdown cuts) were each produced
+*and then killed* by the pre-registered both-windows / risk-adjusted / era-honest
+bars. A weaker process would have shipped one of them.
 
 ## 8. Reproducibility & artifacts
 
@@ -185,8 +188,10 @@ cleanly is the result.
 - This capstone supersedes the earlier partial write-up
   (`docs/findings_2026-07-09_experiment_arc.md`, E1–E7) as the complete synthesis.
 
-*Status: X1 (conditional volatility targeting) ran — FAIL (no vol gate beats the plain
-200-DMA; record Appendix BY), included above (24 attempts). X3 (Reg SHO daily
-short-volume drift) is the one remaining free experiment; its FINRA ingestion was
-interrupted mid-fetch (resumable from `.regsho_cache/`), and it is deferred with a
-strong FAIL-prior that will not change the terminal claim.*
+*Status (2026-07-14): COMPLETE. All M8 survey candidates (C1/C3/C4/C6/C7 run, C2 closed
+on probe) and all M9 free experiments (X1/X2/X2b/X3) are finished — 30 attempts, all
+FAIL/closed. The remaining PRD items are Evan-gated only: M3 Alpaca paper deploy of the
+E6-1× / E18-VIX-TS forward-paper candidates (the sole path to genuinely new,
+out-of-sample evidence), and the paid/scope-gated probes (X5 analyst-revision $22, X6
+crypto pilot). No free autonomous experiment remains; the documented method space is
+exhausted.*
