@@ -12,7 +12,7 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 1 IN-SAMPLE-COMPOSED PASS-HR + 1 weak PASS-RA / 0 clean edges / 32 attempts; nothing live
+## Current state — 1 IN-SAMPLE-COMPOSED PASS-HR + 1 weak PASS-RA / 0 clean edges / 33 attempts; nothing live
 
 **Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
@@ -35,6 +35,19 @@ the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
 > `docs/research/2026-07-14_M10-1_nagel_switch_results.md`. **The one thing that
 > makes it real = M3 forward paper (Evan-gated).** Other panel survivor still to
 > run: M10-2 gap-amortized stress IBS.
+
+> **2026-07-14 — M10-2 gap-amortized stress IBS = FAIL; closes the E2 "c2c
+> mirage" (record Appendix CK).** 2× QQQ MR on VIX>20 & IBS≤0.20, 5-session hold,
+> trend fallback. Gate 2.99% CAGR / **83.3% DD** / Sh 0.28 (fails HR badly); sec
+> 28.95% / 1.08 (one-window bull artifact). **Payload in the FAIL:** the 5-day
+> hold neutralized the overnight gap (c2c 3.18% ≈ next-open 2.99%), isolating the
+> reversion's gap-free economics — catastrophic in the gate. This **permanently
+> closes the E2 c2c 18.15% "mirage"**: the gap was hiding the *drawdown* (2× into
+> 2000–02/2008 crashes), not alpha. Sharpens M10-1: unlevered cross-sectional
+> reversal passes, 2× index MR is an 83%-DD engine — M10-1's pass is a
+> cross-sectional-survivor effect. **M10 arc COMPLETE** (both panel survivors
+> run). Tripwire GREEN. Attempt 33. The only lever left to validate M10-1 = M3
+> forward paper (Evan-gated).
 
 > **2026-07-14 — X6 crypto pilot = FAIL; E6's lesson generalizes to crypto
 > (record Appendix CF).** Evan "do 2" → authorized the crypto scope (X5 stays

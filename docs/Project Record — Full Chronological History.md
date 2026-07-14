@@ -3238,3 +3238,37 @@ COMPOSED (M10 cap: pass = forward-paper-required). Honest prior (judges): gate ~
 
 **Next action:** commit M10-2 prereg (doc-only) -> runner -> verdict -> results/record ->
 commit -> PUSH. Cadence #96.
+
+---
+
+# Appendix CK - M10-2 = FAIL; closes the E2 "c2c mirage" permanently (2026-07-14, ~18:55 CST)
+
+**WHAT:** Ran M10-2 (prereg committed doc-only before runner). Gap-amortized stress IBS:
+2x QQQ MR on VIX>20 & IBS<=0.20, 5-session/IBS>=0.8 exit, trend fallback. **VERDICT:
+FAIL.** Main C next-open 1bp: gate 2.99% CAGR / DD 83.3% / Sh 0.28; sec 28.95% / 40.1% /
+1.08. Gate fails HR on BOTH legs (2.99%<15%, 83.3%>60%); PASS-RA fails (Sh 0.28). Tripwire
+GREEN. 255 gate MR entries. Writeup docs/research/2026-07-14_M10-2_gap_amortized_ibs_results.md.
+
+**THE PAYLOAD (high program value in the FAIL):** the gap-amortization WORKED - c2c 3.18%
+~= next-open 2.99% in the gate (the 5-day hold neutralized the overnight gap, unlike E2's
+1-day hold where the gap was ~half the edge). That ISOLATES the reversion's gap-free
+economics and they are catastrophic in the gate. **This CLOSES the E2 c2c "mirage"
+permanently:** E2's tantalizing c2c 18.15% (vs executable 7.98%) had left open "was there
+real alpha behind the gap?" - answer NO. Best case (stress-concentrated, gap-removed,
+1bp index) still gives 2.99% on an 83% DD. Buying 2x QQQ into 2000-02/2008 oversold prints
+and holding 5 days catches more cascade than bounce. **The overnight gap was hiding the
+DRAWDOWN, not the alpha.**
+
+**SHARPENS M10-1:** M10-1 (Nagel Switch) passed HR with UNLEVERED cross-sectional reversal
+on survivors; M10-2 FAILs with 2x INDEX MR (83% DD). Same VIX-stress conditioning, opposite
+outcome -> the killer is 2x-leverage-into-index-crashes, and M10-1's "pass" is specifically
+a cross-sectional-survivor effect (further reason it's survivor-flattered, forward-only).
+
+**TALLY:** M10-2 = attempt 33 (FAIL). **1 IN-SAMPLE-COMPOSED PASS-HR (M10-1, forward-only)
++ 1 weak PASS-RA (E18) / 0 clean-OOS high-return edges / 33 attempts.** M10 SYNTHESIS ARC
+COMPLETE (both panel survivors run: M10-1 forward-paper candidate, M10-2 closes E2). The
+only untested lever that could validate M10-1 = M3 forward paper (Evan-gated). Cadence #96.
+
+**STATE:** swing.db untouched; tripwire GREEN; committing M10-2 + pushing per Evan.
+
+**Next action:** commit M10-2; push all M10 commits to origin/main.
