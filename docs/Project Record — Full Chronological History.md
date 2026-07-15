@@ -3919,3 +3919,37 @@ forced (LQD:IEF is a weaker gate than X7's HYG:IEF) -> declined, not theater.
 
 **Next action:** none -- corroboration logged. The credit-spread channel is exhausted +
 externally confirmed. Re-pull `high-yield-update---june-2026` only if its body was expected.
+
+# Appendix CY - Cross-project sleeve comparison (Swing 3 vs Trading momentum 27) written (2026-07-15, ~15:22 CST)
+
+**WHAT:** Evan: "analyze how the 3 alpaca sleeves in this project compare to the ones in the
+longer term (momentum) trading project" -> saved as a doc. Read Trading READ-ONLY (hard rule)
+-- `momentum_v2.py` (locked 2026-05-26) + `HANDOFF.md` (2026-07-11). Doc:
+`docs/research/2026-07-15_cross-project_sleeve_comparison.md`. Analysis, not an experiment;
+tally unchanged (35).
+
+**KEY FACTS (Trading, read-only 2026-07-15):** momentum_v2 = top-50, MONTHLY, factor
+momentum_12_1 (12-1), equal-weight, $100K/sleeve, 5bp half-spread, ~5,200-name universe;
+VALIDATED IS 2015-23 +21.0%/yr (mean-yr Sharpe 0.23, 1,925 trades) + OOS 2024-26 +26.5%/yr
+(Sharpe 0.87, 515 trades), robust both windows. 27 sleeves live (factor-variant cohort +
+LLM control-vs-treatment). Goal = build a track record before Evan turns 18.
+
+**THE FOUR ANALYTICAL POINTS:** (1) **Trading is the CONTROL for Swing's negative** -- it
+does the breadth (top-50) that Swing's own Hou-Xue-Zhang finding says a factor requires, and
+it validated -> proves Swing's 0-for-35 is about RETAIL CONSTRAINTS (K=1-4, $1K, liquidity
+floor), not factors failing. (2) **Near-opposite signals** -- m10 buys bottom-K residual
+REVERSAL (weekly), Trading buys top-50 MOMENTUM (12-1); opposite sign + horizon -> genuinely
+diversifying, not redundant. (3) **Overlay vs engine** -- e6/e18 are beta-TIMING overlays (no
+selection alpha; they'd bolt onto a return engine like Trading's momentum and de-risk it in a
+momentum crash), only m10 is a real selection strategy. (4) **Validation asymmetry** -- Swing
+= 3 distrusted hypotheses (m10 in-sample-composed, e18 weak PASS-RA, e6 market-dependent);
+Trading = a robust premium w/ a forward track record. Swing is the research instrument,
+Trading the track record. Skeptical note BOTH ways: Trading's IS Sharpe is only 0.23 (momentum-
+crash tail risk; 0.87 OOS is a bull-window artifact) and e6/e18 are exactly what would protect
+it in a crash; Swing's 3 are all forward-paper hypotheses. Synthesis: separate accounts, same
+era, near-orthogonal signals = a natural experiment across concentration / horizon / capital.
+
+**Cadence #114 satisfied.** STATE: committing the doc + record CY + pushing everything
+(includes the earlier unpushed record-notes commit 9930ccf) per Evan.
+
+**Next action:** commit + push; M3 task armed for 19:00 tonight.
