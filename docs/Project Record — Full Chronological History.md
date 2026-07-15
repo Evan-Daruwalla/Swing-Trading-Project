@@ -3746,3 +3746,46 @@ NextRun tonight 19:00. Keys never printed/committed.
 
 **Next action:** hands-off to the 7pm run; review var\daily_swing_paper.log after. All 3
 sleeves live from tonight (m10 activates Fri).
+
+# Appendix CU - Reset approved + re-verified; BlackRock systematic-HY report read + graded: corroborates the program, no new experiment opened (2026-07-15, ~02:56 CST)
+
+**WHAT:** Evan: "no that's fine, remove the E6 order and leave it clean for 7pm, then read
+this Blackrock report." The e6 cancel + clean reset was ALREADY DONE (Appendix CT);
+RE-VERIFIED read-only now: all 3 accounts cash=$1,000, buying_power=$1,000, 0 positions,
+0 open orders. Nothing re-executed; 7pm remains the synchronized launch.
+
+**REPORT** (`Downloads/systematic-high-yield-credit.md` -- BlackRock "A systematic approach
+to high yield credit," 2025 marketing doc BSYSH1225U. NOTE: the markdown conversion is
+PARTIAL -- pages 2-3 and 7 missing; substance = pp. 4-6 + disclosures):
+- **Claims:** (1) active HY managers 2005-2025 earn their excess in "Very Negative" months
+  (+0.39% top-quartile) and give it back in "Very Positive" ones (-0.30% avg / -0.11%
+  top-q); positive months outnumber negative 168:72 -> defensive-only tilts underperform
+  long-run. (2) BlackRock's fix = daily systematic security selection: Merton-style
+  probability-of-default signal (claims 77% of ICE HY index defaults flagged <=24mo ahead
+  since 2010) + quality screen (drop worst-PD quintile) + default-adjusted-spread value
+  screen -> multi-factor Sharpe 0.76 vs benchmark 0.53 (Fig 4, 2005-2025 in-house backtest).
+- **SKEPTICAL GRADE (it is marketing, not research):** eVestment manager data is
+  self-reported/opt-in (survivorship); "top quartile" is selected EX-POST on trailing
+  10-yr total return and then scored monthly (hindsight selection); the Fig-4 backtest is
+  BlackRock's own rerun of index data and EXPLICITLY excludes transaction costs -- in OTC
+  HY (spreads ~50-100bp+) a gross Sharpe edge is exactly the frictionless-mirage class this
+  program kills (X2 lesson); the 77% default-catch claim ships with NO false-positive rate
+  (base-rate omission -- a screen that flags half the index also "catches" most defaulters).
+- **VALUE TO THE PROGRAM (read against interest):** Fig 2/3 independently CORROBORATE the
+  structural finding in a THIRD domain -- defensive tilts = downside mitigation that costs
+  the snapback upside (equities E6/C4, crypto X6, now institutional HY credit). Logged as
+  corroboration of the terminal claim, not imported as a strategy.
+- **TRADEABILITY AT $100-1K:** individual HY bonds = untradeable (OTC, minimum lots, Alpaca
+  offers no bonds); the PD model needs paid balance-sheet/bond data. Adjacents graded:
+  HY-ETF regime gate (HYG 2007+ -> modified-window PROMISING cap; E18's HY-OAS arm already
+  inconclusive; X1/E18 lesson = no gate beat the plain 200DMA; ~5% base CAGR cannot reach
+  PASS-HR) = very low EV; ANGL fallen-angel premium (2012+, buy-hold allocation, not swing)
+  = out of scope; the one genuinely-new-data-channel unlock = a FREE credit-risk-appetite
+  gate via the HYG:IEF price ratio (one sitting, PROMISING-capped, strong reproduce-E6
+  prior) -- surfaced as an option, NOT opened without Evan's word.
+
+Tally unchanged (34). Cadence #108 satisfied by this entry. **STATE:** accounts flat, task
+Ready for 19:00; entry uncommitted (no commit instruction).
+
+**Next action:** 7pm launch, hands-off. If Evan wants the completeness kill: X7 = HYG-based
+credit-gate one-sitting test (prereg-first, PROMISING-capped).
