@@ -3417,3 +3417,48 @@ Tally 33 (no run yet).
 
 **Next action:** commit prereg doc-only -> build `run_m11_chart_patterns.py` (reuse
 cache_fetch/UNIV/stats/D1 from C1) -> run -> D1 verdict -> results doc + record + tripwire.
+
+# Appendix CO - M11 = FAIL (signal-dead); chart-pattern family closed; survivor bias DESTROYS the pattern edge (2026-07-14, ~22:55 CST)
+
+**WHAT:** Built `scripts/run_m11_chart_patterns.py` (prereg `9cb5ac5` predates it) and ran it.
+Causal close-based pivots (w=5, confirmed at j+5 -> no look-ahead), long reversal = double-
+bottom OR inverse-H&S, fresh neckline cross at close -> next open, time-stop 20d, K=3, 39
+survivors. 1,874 signal completions; 314 gate entries (>>30 floor). **VERDICT: FAIL both
+tiers.** Tripwire GREEN. Writeup `docs/research/2026-07-14_M11_chart_patterns_results.md`.
+
+**RESULTS (ladder):** MAIN C next-open 5bps gate **-0.14% CAGR / DD 50.4% / Sh 0.09**; sec
+1.67% / 0.19. Rung B (next-open 0bps) gate **+0.61% ~= 0**; Rung A (c2c) -0.06% ~= B ->
+**SIGNAL-DEAD** (no gross edge, and A~=B means no overnight-gap story either - unlike the IBS
+family). Loses SPY (gate 1.72%) AND survivorship-clean EW-39 (gate -0.47%). Hold 10/40 don't
+rescue (40d sec +6.06% = one-window bull artifact); NOT tuned. This is the E14 category
+(signal-dead), the cleanest kind of negative.
+
+**PAYLOAD - the survivor universe DESTROYS the one documented pattern edge (new, valuable):**
+the reported-not-gated short-side diagnostic (fwd-20-session close return, never traded):
+after a LONG-reversal (double-bottom/iH&S) completion = **+0.82%** (BELOW unconditional
+**+1.15%**); after a BEARISH (double-top/H&S) completion = **+1.70%** (ABOVE unconditional).
+That is the OPPOSITE in sign of Savin-Weller-Zvingelis (2007), who found H&S predicts
+underperformance. **WHY: survivorship removed exactly the names a bearish pattern predicts**
+- the stocks whose H&S correctly foretold a decline are the ones that fell out of the
+universe; on a survivor mega-cap set a "top" is just a pause in a name that (by construction)
+kept rising. So the survivor bias doesn't merely inflate long dip-buying (E16/C1) - it
+STRUCTURALLY ERASES the documented (bearish) pattern edge. Cleanest asymmetric-falsification
+illustration the program has produced.
+
+**Every M11.1-brief prediction held:** LMW "informative != profitable"; deployable long side
+weakest-supported; breakout kills (E8/E11/C3) + reversal decay (E16/C1) + overnight gap all
+pointed FAIL. Confirmed.
+
+**TALLY:** M11 = attempt 34, the **9th equity family** (chart-pattern geometry - first family
+to trade *shape* not a *number*). **1 IN-SAMPLE-COMPOSED PASS-HR (M10-1, forward-only) + 1
+weak PASS-RA (E18) / 0 clean high-return edges / 34 attempts.** Terminal claim upgraded: even
+the chart SHAPES retail traders are taught don't trade at retail EOD, K=1-3, $100-1k. The
+free autonomously-runnable backtest space is exhausted again; the one untested evidence lever
+is M3 forward paper (Evan-gated). Cadence #99 (prior entry CN); capstone §3/§7/§8 + PRD M11 +
+HANDOFF + memory updated.
+
+**STATE:** committing runner + results + doc updates (prereg already committed `9cb5ac5`).
+Tripwire GREEN. swing.db untouched.
+
+**Next action:** commit M11; on Evan's word, push. The only lever that could validate M10-1
+= M3 forward paper (Evan-gated: Alpaca paper account).

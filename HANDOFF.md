@@ -12,11 +12,32 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — research OPEN (not done): 33 attempts / 0 clean PASS-HR / 1 in-sample PASS-HR (M10-1) + 1 weak PASS-RA (E18); M11 chart-patterns = next; nothing live
+## Current state — 34 attempts / 0 clean PASS-HR / 1 in-sample PASS-HR (M10-1) + 1 weak PASS-RA (E18); M11 chart-patterns = FAIL; M3 forward paper = the open lever; nothing live
 
 **Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-14 — M11 chart-pattern detection = FAIL (signal-dead); 9th family closed;
+> survivor bias DESTROYS the pattern edge (record Appendices CL–CO).** Evan "1, then 3" →
+> finalized + committed the M10 reframe + brief, then ran the chart-pattern kill-shot.
+> Prereg `9cb5ac5` (doc-only, predates the runner) → `run_m11_chart_patterns.py`: causal
+> close-based pivots (w=5, no look-ahead — LMW's two-sided kernel avoided), long reversal =
+> **double-bottom + inverse-H&S**, fresh neckline break on close → next open, time-stop 20d,
+> K=3, 39 survivors. **FAIL (attempt 34, the 9th equity family — first to trade *shape* not
+> a *number*):** gate 2000–13 **−0.14% CAGR / 50.4% DD / Sh 0.09**, sec 1.67% / 0.19;
+> **SIGNAL-DEAD** — frictionless Rung B ≈ 0 and A≈B (no overnight-gap story, unlike IBS);
+> loses SPY (1.72%) AND survivorship-clean EW-39 (−0.47%). 314 gate entries; hold 10/40
+> don't rescue (not tuned). **Payload:** the reported short-side diagnostic shows fwd-20
+> after a bearish top/H&S completion is **+1.70%** (> unconditional +1.15%) — the OPPOSITE
+> of Savin (2007) — because **survivorship removed exactly the decliners a bearish pattern
+> predicts.** So the survivor universe doesn't merely flatter long dip-buying (E16/C1), it
+> **structurally erases the one documented (bearish) pattern edge** — the cleanest asymmetric-
+> falsification illustration yet. Every M11.1-brief prediction held. Tripwire GREEN.
+> **Terminal claim upgraded: even the chart SHAPES retail traders are taught don't trade at
+> retail EOD.** Free backtestable space exhausted again; the one untested *evidence* lever =
+> **M3 forward paper** (Evan-gated). Writeup
+> `docs/research/2026-07-14_M11_chart_patterns_results.md`.
 
 > **2026-07-14 — FINALIZED THROUGH M10; research OPEN, not done; new direction = M11
 > algorithmic chart patterns (record Appendix CL).** Evan: "finalize with M10 but DON'T

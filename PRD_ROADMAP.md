@@ -153,7 +153,7 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 | M8 | Full-method-survey candidates C1–C7 (added 2026-07-12, record Appendix BK) | seven residual candidates after reconciling ~90 methods (8 families) against E1–E20: residual reversal, dividend-initiation drift, one volatility-breakout kill-shot, vol-targeting overlay, Reg SHO short-volume drift, even-week FOMC overlay, SVXY carry — all carry strong-FAIL priors per the survey's structural finding (concentration destroys diversified-decile edges) |
 | M9 | Research-batch-2 arc X1–X6 + discipline adoptions (added 2026-07-13, record Appendices BN–BP) | candidates + process upgrades from the LLM brief and the four-topic batch (execution/risk/data/crypto): prereg-template discipline (tiered costs, decomposition ladder, time-stop baseline, capped fractional-Kelly), conditional vol-targeting (E6×E18), E17-free days-to-cover (FINRA 2021+), Reg SHO short-volume drift, MOC close-entry probe, analyst recommendation-change drift ($22-gated), crypto BTC/ETH trend pilot (scope-gated), LLM forward-only arc (M3-attached) |
 | M10 | Evidence-synthesis arc: state-conditioned strategies (added 2026-07-14, record Appendices CG–CK) — **DONE** | compose the 31 results into strategies vs BOTH D1 tiers; a design panel proved fixed-weight PASS-HR is arithmetically empty → the only escape is state-conditioning on a causal variable. M10-1 Nagel Switch = program's FIRST PASS-HR (IN-SAMPLE-COMPOSED, forward-paper-only); M10-2 gap-amortized stress IBS = FAIL (closes the E2 c2c mirage). Both panel survivors run |
-| M11 | Algorithmic chart-pattern detection (added 2026-07-14, Evan's direction; record Appendix CL) — **CURRENT OPEN DIRECTION, UNSTARTED** | the one untested mechanism family: rule-based (NOT LLM) detection of the chart *shapes* retail traders are taught (H&S, double top/bottom, triangles, flag breakouts), buy on pattern completion. Full-window D1-reachable; honest prior = FAIL (Lo-Mamaysky-Wang: modest info, not cost-surviving; STW / Bajgrowicz-Scaillet snoop-decay; the breakout family already 3× killed). The next honest experiment |
+| M11 | Algorithmic chart-pattern detection (added 2026-07-14, Evan's direction; record Appendices CL–CO) — **DONE 2026-07-14: FAIL** | the one untested mechanism family: rule-based (NOT LLM) detection of the chart *shapes* (double-bottom, inverse-H&S), buy on neckline break. **Attempt 34, the 9th equity family. FAIL — signal-dead** (gate −0.14% CAGR / Sh 0.09; frictionless ≈ 0; loses SPY + survivorship-clean EW-39). Payload: the survivor universe *destroyed* the documented bearish-pattern edge (fwd-20 after top/H&S +1.70% > unconditional +1.15%, opposite of Savin 2007). Prior held exactly |
 
 Order is deliberate: infrastructure before science (council 5/5); thresholds
 provably precede results (M1 before M2); nothing goes live on an unvalidated
@@ -1078,10 +1078,25 @@ tripwire GREEN after, no swing.db writes, tiered costs per `docs/prereg_TEMPLATE
     §8 frontier + HANDOFF + memory updated with the outcome. If FAIL → the terminal claim
     upgrades to include the chart-pattern family; if PROMISING → joins the M3 forward-paper
     candidate list (still Evan-gated).
+    *(Outcome 2026-07-14: DONE. Prereg `9cb5ac5` (doc-only, predates runner); runner
+    `scripts/run_m11_chart_patterns.py` (causal close-pivots w=5, double-bottom + inverse-H&S,
+    fresh neckline break → next open, time-stop 20d, K=3). **FAIL (attempt 34, the 9th equity
+    family) — SIGNAL-DEAD:** gate 2000–13 −0.14% CAGR / 50.4% DD / Sharpe 0.09; sec 1.67% /
+    0.19; frictionless Rung B +0.61% ≈ 0 (A≈B → not a gap story); loses SPY (1.72%) AND
+    survivorship-clean EW-39 (−0.47%). 314 gate entries ≫ 30 floor; hold 10/40 don't rescue
+    (not tuned). **Payload — the survivor universe DESTROYS the documented pattern edge:** the
+    reported short-side diagnostic shows fwd-20 after a bearish top/H&S completion is +1.70%
+    (> unconditional +1.15%) and after a bullish reversal is +0.82% (< unconditional) — the
+    OPPOSITE of Savin (2007), because survivorship removed exactly the decliners a bearish
+    pattern predicts. Terminal claim upgraded: even the chart shapes don't trade at retail
+    EOD. Results `docs/research/2026-07-14_M11_chart_patterns_results.md`; record Appendix CO;
+    tripwire GREEN.)*
 
-**M11 status: UNSTARTED.** Evan *suggested* this direction (2026-07-14); per one-task-per-
-sitting it is queued as the next experiment on his go. It is the program's designated
-default idle experiment — the one remaining free, autonomously-runnable mechanism.
+**M11 status: DONE 2026-07-14 — FAIL** (attempt 34, the 9th equity family; signal-dead). The
+free, autonomously-runnable backtest space is exhausted again; the one untested *evidence*
+lever is M3 forward paper (Evan-gated). Lower-priority untested levers all need new
+capital/data (pairs/stat-arb — shorting; LLM-forward — M3; short-interest-done-right — paid
+borrow; intraday/MOC — an intraday feed).
 
 ## 7. HANDOFF NOTES
 
