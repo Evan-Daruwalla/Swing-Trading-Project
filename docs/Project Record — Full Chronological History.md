@@ -3623,3 +3623,45 @@ alpaca_keys.env holds real keys locally, gitignored, will not be in any commit.
 
 **Next action:** on Evan's word, commit + push (keys excluded). Then either authorize the
 first `--execute` run / scheduling, or leave it staged for Evan to kick off.
+
+# Appendix CR - M3 committed+pushed; daily scheduled task registered (all 3 sleeves, live at 7pm) (2026-07-15, ~02:40 CST)
+
+**WHAT:** Evan: "commit and push it, the[n] set a task that should start all the sleeves at
+the same time."
+
+**COMMIT+PUSH:** the full M3 forward-paper build (CP+CQ work) committed `503b606`, pushed to
+origin/main. Secrets-guarded: `git status --porcelain | grep keys.env` returned nothing ->
+alpaca_keys.env NOT in the commit (gitignored); swing.db + var/ also excluded. 9 files
+(paper_sleeves.py, alpaca_client.py, daily_swing_paper.py, setup doc, .gitignore, HANDOFF,
+PRD, record, pm-cadence).
+
+**SCHEDULED TASK (task 19, finally done):**
+- `scripts/daily_swing_paper.bat` -- pure ASCII (cmd.exe hard rule), cd /d project root ->
+  `.venv\Scripts\python.exe scripts\daily_swing_paper.py --execute` -> append stdout+stderr
+  to `var\daily_swing_paper.log`. ONE invocation runs ALL 3 sleeves together (e6_1x/
+  e18_vixts/m10_1_nagel), so "all sleeves start at the same time" as Evan asked -- not 3
+  staggered tasks.
+- Registered via Register-ScheduledTask as **"SwingTradingDailyPaper"**: Weekly Mon-Fri at
+  **19:00 local (-05:00 confirmed = CDT, matches the project's CST convention)**,
+  StartWhenAvailable (catches up if the box was asleep), 30-min execution limit,
+  MultipleInstances=IgnoreNew. Verified: State=Ready, Action=`cmd.exe /c "...daily_swing_
+  paper.bat"`, Days=62 (=Mon+Tue+Wed+Thu+Fri bitmask), **NextRun = 2026-07-15 19:00** (TODAY).
+- Verified the .bat's cd+venv+script+log-redirect chain in a DRY-RUN (cmd /c, no --execute)
+  -> exit 0, correct per-sleeve output. Did NOT run --execute (no orders placed by me).
+
+**FIRST LIVE RUN = TODAY 2026-07-15 19:00 CDT.** That scheduled run is the acceptance test
+for the order-mirror path (flatten-then-enter), which is written but UNEXERCISED against real
+fills. At 7pm only e6_1x will act (QQQ>200DMA -> ~$1,000 market-notional DAY buy queuing for
+next open); e18_vixts waits on VIX3M availability, m10_1_nagel on Friday's weekly decision.
+Evan should review `var\daily_swing_paper.log` after 7pm; fill_divergence + the Alpaca order
+ids make the first fills auditable. Reset paper_* to a clean slate + fixed the script's now-
+stale "not scheduled" closing message so the 7pm run makes the first REAL decision.
+
+**Cadence #105 satisfied by this entry.** TALLY unchanged (34 -- infra). STATE: the .bat +
+script-message fix + these doc updates are a SECOND commit (below), pushed per Evan's "commit
+and push."
+
+**Next action:** commit+push the scheduler artifacts; then genuinely hands-off -- the task
+runs itself at 7pm. Watch the first run's log. If the order-mirror path errors, fix from the
+log and the accounts can be flattened (paper). The 20-day stabilization window (task 20)
+starts accumulating from tonight.

@@ -309,8 +309,8 @@ def main():
                 client.close()
 
     conn.close()
-    print("\nDone. No Windows Task Scheduler entry has been created -- this "
-          "script is not yet scheduled to run automatically (Evan's call).")
+    print("\nDone. Scheduled task 'SwingTradingDailyPaper' runs this daily on weekday "
+          "evenings (7pm local, --execute). Log: var\\daily_swing_paper.log.")
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 34 attempts, research phase parked; M3 forward-paper infra BUILT + 3 Alpaca paper accounts VERIFIED CONNECTED 2026-07-15; ready to run, nothing traded yet
+## Current state — 34 attempts, research phase parked; M3 forward paper LIVE-SCHEDULED 2026-07-15 (3 paper accounts, daily 7pm task); first real run tonight, nothing traded yet
 
 **Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
@@ -35,6 +35,13 @@ the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
 > order flow needs Evan's explicit setup); after-hours DAY-order queuing unverified until the
 > first live cycle. Account+keys gates from CP are DONE. Keys are PAPER, gitignored, never
 > committed. Setup notes: `docs/research/2026-07-15_M3_forward_paper_setup.md`.
+> **→ SCHEDULED (record Appendix CR):** committed+pushed (`503b606`); registered Windows
+> task **"SwingTradingDailyPaper"** — `scripts/daily_swing_paper.bat` (pure ASCII) runs all
+> 3 sleeves via `--execute` **weekday evenings 7pm local**, StartWhenAvailable. Verified
+> Ready, NextRun tonight. **FIRST LIVE RUN = 2026-07-15 19:00 CDT** = the acceptance test for
+> the (unexercised) order-mirror path; tonight only e6_1x acts (QQQ buy), e18 waits on VIX3M,
+> m10 on Friday. **Review `var\daily_swing_paper.log` after 7pm.** The 20-day stabilization
+> window (task 20) accrues from tonight.
 
 > **2026-07-15 — M3 forward-paper infrastructure BUILT; BLOCKED-ON-EVAN for Alpaca keys
 > (record Appendix CP).** Evan: "set up M3 forward paper and make a spot (file) to paste

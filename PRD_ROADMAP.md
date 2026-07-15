@@ -410,6 +410,13 @@ treatment arm. Setup notes: `docs/research/2026-07-15_M3_forward_paper_setup.md`
 19. **Scheduling.** Daily `.bat` (pure ASCII) → Task Scheduler, Trading's
     daily.bat pattern (refresh → loop → mirror → stamp log).
     Done: task fires on a test run; stamp log written.
+    *(Outcome 2026-07-15, record Appendix CR: DONE. `scripts/daily_swing_paper.bat`
+    (pure ASCII) → registered Windows task **"SwingTradingDailyPaper"**, Weekly
+    Mon–Fri 19:00 local (CDT/-05:00), StartWhenAvailable, 30-min limit. ONE
+    invocation runs all 3 sleeves together (--execute) → "all sleeves at the same
+    time" per Evan. Verified State=Ready, NextRun 2026-07-15 19:00; .bat cd+venv+
+    script+log chain dry-run exit 0. **First LIVE run = tonight 7pm** = the first
+    real exercise of the order-mirror path; log → `var\daily_swing_paper.log`.)*
 20. **Stabilization month.** ≥20 consecutive trading days unattended, both
     sleeves; misses/interventions logged honestly.
     Done: record entry with per-sleeve NAV table, divergence stats,
