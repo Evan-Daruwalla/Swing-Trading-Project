@@ -3665,3 +3665,84 @@ and push."
 runs itself at 7pm. Watch the first run's log. If the order-mirror path errors, fix from the
 log and the accounts can be flattened (paper). The 20-day stabilization window (task 20)
 starts accumulating from tonight.
+
+# Appendix CS - FIRST LIVE PAPER ORDER placed + verified; the order-mirror path + after-hours queuing WORK (2026-07-15, ~02:45 CST)
+
+**WHAT:** Evan ran `Start-ScheduledTask -TaskName SwingTradingDailyPaper` to fire the first
+live run immediately instead of waiting for 7pm. **It worked end-to-end** (LastTaskResult 0).
+This is the program's FIRST-EVER live (paper) order and the acceptance test for the
+previously-unexercised order-mirror path.
+
+**RESULT (from var\daily_swing_paper.log + a read-only order query):**
+- **e6_1x placed a real order:** BUY QQQ, notional $1,000, **market DAY -> status "accepted"**
+  (order e8f9238b) on its own paper account PA38ZZKY6WN0. cash still $1,000, **buying_power ->
+  $0** (Alpaca reserved the funds). "accepted" + funds-reserved = the order is QUEUED for the
+  next session open, NOT rejected.
+- e18_vixts: no order (VIX3M unavailable at this hour -> no decision -> nothing to mirror).
+- m10_1_nagel: no order (not Friday).
+
+**RESOLVES THE ONE STANDING CAVEAT (CP/CQ):** the after-hours DAY-order queuing assumption
+was explicitly disclosed as UNVERIFIED. It is now VERIFIED -- Alpaca accepts an after-hours
+market-notional DAY order and reserves the cash for the next open. The full M3 pipeline
+(daily loop -> per-sleeve --execute -> correct account -> accepted+queued) is proven.
+
+**TIMING NOTE (not a bug):** the run fired at ~02:43 CDT, before yfinance completed the 07-14/
+07-15 bars, so it correctly decided off the last COMPLETE session (07-13). e6's QQQ>200DMA
+signal is stable across those dates, so the order direction is unaffected; the normal 7pm
+cadence (complete data) avoids the staleness. The 7pm scheduled run today is SAFE and
+convergent: it will realize e6's pending in the DB at the latest-complete-session open, then
+find target==held -> no new pending -> nothing re-submitted (no double-buy); Alpaca will have
+filled the queued QQQ order at the 07-15 open by then, so DB and Alpaca converge on "e6 holds
+QQQ."
+
+**Known future refinement (logged, not blocking):** fill_divergence currently logs sim_price
++ the Alpaca order id at submit; it does not yet re-query the order's filled_avg_price to
+compute the actual sim-vs-real slippage. A later run can pull filled_avg_price by order id and
+complete the divergence row. Noted for the stabilization phase (task 20).
+
+**STATE:** e6 has one accepted QQQ order queued at Alpaca; DB e6 has pending {QQQ} (signal
+07-13), position to be recorded on the next DB run. Tripwire GREEN (no computation touched).
+This entry is doc-only + UNCOMMITTED. Keys never printed/committed.
+
+**Next action:** hands-off -- the 7pm task run (and every weekday after) carries it forward.
+Evan reviews var\daily_swing_paper.log as desired. M3 is LIVE (paper).
+
+# Appendix CT - e18 under-trading bug found (Evan's question) + fixed; clean synchronized restart (2026-07-15, ~02:50 CST)
+
+**WHAT:** Evan asked "only e6-1 has an order[,] is that buy [by] design?" Pressure-tested all
+three; the honest breakdown:
+- **e6_1x = BY DESIGN.** QQQ (711) > 200-DMA -> invested -> QQQ order. Correct.
+- **m10_1_nagel = BY DESIGN.** Weekly gate, decides only on ISO-week-end **Friday**; the run's
+  session was Monday 07-13 -> correctly idle. First decision **Fri 07-17**.
+- **e18_vixts = A REAL BUG (not by design).** It SKIPPED ("VIX3M unavailable") because
+  yfinance's ^VIX3M feed lags ^VIX by 1-3 sessions and the live code required an EXACT-date
+  VIX3M. But the regime is risk-ON: VIX(07-13)=17.16 / VIX3M(07-10, carry-fwd)=18.57 = **0.924
+  < 1 -> should HOLD QQQ.** The exact-date dependency made e18 silently under-trade.
+
+**FIX:** `daily_swing_paper.py` now carries forward the most-recent-available VIX & VIX3M
+reading <= today (bisect, PAST-ONLY, no look-ahead) instead of an exact-date lookup -- the
+same carry-forward m10_1_nagel already uses for VIX, and faithful to the E18 backtest which
+ran on complete aligned history. The VIX/VIX3M<1 signal CONDITION is unchanged; this is a
+disclosed live-vs-backtest data-availability accommodation, logged with the as-of dates in
+the run output (`VIX=.. (asof 07-13) VIX3M=.. (asof 07-10)`). Dry-run confirms e18 now
+decides target=QQQ; m10 still correctly idle; no runtime error.
+
+**CLEAN SYNCHRONIZED RESTART:** the earlier off-cycle manual run (Appendix CS) had placed a
+real e6 QQQ order and set a DB pending; the verifying dry-run of the fix also set DB pendings
+(no Alpaca orders). Left as-is, the 7pm run would have realized a dry-run-set e18 pending in
+the DB with no matching Alpaca order (ledger/broker divergence). So: **canceled e6's test
+order** (market still closed -> unfilled, cash+buying_power back to $1,000) and **reset the DB
+paper_* tables clean**. Verified all 3 accounts flat ($1,000 cash, 0 positions, 0 orders). The
+test order already served its purpose (Appendix CS proved after-hours DAY-order queuing
+works); starting clean keeps the evidentiary ledger and all 3 broker accounts in lockstep.
+
+**RESULT:** tonight's **7pm scheduled run** starts all sleeves synchronized off the complete
+07-15 session: **e6_1x buys QQQ, e18_vixts buys QQQ (now fixed), m10_1_nagel waits for Fri
+07-17.** No manual re-fire (7pm has fresh data vs the stale 07-13 an immediate re-run would
+use). Tripwire GREEN (no computation touched). TALLY unchanged (34 -- infra).
+
+**STATE:** e18 fix committed+pushed (below); all paper accounts flat; scheduled task Ready,
+NextRun tonight 19:00. Keys never printed/committed.
+
+**Next action:** hands-off to the 7pm run; review var\daily_swing_paper.log after. All 3
+sleeves live from tonight (m10 activates Fri).

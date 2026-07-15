@@ -38,6 +38,7 @@ paper_transactions/paper_nav/fill_divergence), tripwire-safe by construction.
 DATA CONVENTION: split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
 """
 import argparse
+import bisect
 import datetime as dt
 import io
 import sys
@@ -165,9 +166,24 @@ def main():
     print(f"  latest session: {today}")
     _, vclose, _ = series("^VIX", start="2015-01-01")
     _, v3close, _ = series("^VIX3M", start="2015-01-01")
-    vix_today = vclose.get(today)
-    vix3m_today = v3close.get(today)
-    print(f"  VIX={vix_today}  VIX3M={vix3m_today}")
+
+    # Carry-forward the most-recent-available reading <= today (PAST-ONLY, no
+    # look-ahead). Necessary live: yfinance's ^VIX3M feed lags ^VIX by 1-3
+    # sessions, so an exact-date lookup on the newest session returns None and
+    # e18_vixts would SKIP (silently under-trade). The E18 backtest aligned on
+    # complete cached history where every date already has a VIX3M value;
+    # carry-forward reproduces that "decide on the current term structure"
+    # intent at the live edge. m10_1_nagel already reads VIX via this same
+    # bisect carry-forward. Disclosed live-vs-backtest data-availability
+    # accommodation -- the VIX/VIX3M<1 signal CONDITION is unchanged.
+    def _asof(cmap, d):
+        ks = sorted(cmap)
+        i = bisect.bisect_right(ks, d) - 1
+        return (ks[i], cmap[ks[i]]) if i >= 0 else (None, None)
+
+    vix_dt, vix_today = _asof(vclose, today)
+    v3_dt, vix3m_today = _asof(v3close, today)
+    print(f"  VIX={vix_today} (asof {vix_dt})  VIX3M={vix3m_today} (asof {v3_dt})")
 
     conn = ps.connect()
 

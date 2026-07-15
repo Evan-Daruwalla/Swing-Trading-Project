@@ -12,7 +12,7 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 34 attempts, research phase parked; M3 forward paper LIVE-SCHEDULED 2026-07-15 (3 paper accounts, daily 7pm task); first real run tonight, nothing traded yet
+## Current state — 34 attempts, research phase parked; M3 forward paper LIVE-SCHEDULED 2026-07-15 (3 paper accounts, daily 7pm task); plumbing verified, e18 under-trade bug fixed; all 3 sleeves launch at tonight's 7pm run (accounts flat now)
 
 **Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
@@ -42,6 +42,22 @@ the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
 > the (unexercised) order-mirror path; tonight only e6_1x acts (QQQ buy), e18 waits on VIX3M,
 > m10 on Friday. **Review `var\daily_swing_paper.log` after 7pm.** The 20-day stabilization
 > window (task 20) accrues from tonight.
+> **→ FIRST LIVE RUN DONE (record Appendix CS):** Evan fired it early via
+> `Start-ScheduledTask`. **e6_1x placed its first real order — BUY QQQ $1,000 market DAY →
+> "accepted", buying_power→$0 (queued for next open)** on acct PA38ZZKY6WN0. This VERIFIES the
+> previously-unverified after-hours DAY-order queuing — the full mirror pipeline works. (Ran
+> at 2:43am off the last complete session 07-13 since 07-14/15 bars weren't posted yet; the
+> 7pm cadence avoids that, and tonight's run is convergent — no double-buy.) **M3 is LIVE
+> (paper).** Open refinement: fill_divergence doesn't yet re-query filled_avg_price for
+> actual slippage (task-20 phase).
+> **→ e18 UNDER-TRADE BUG FIXED + CLEAN RESTART (record Appendix CT):** Evan asked "only e6
+> has an order, by design?" — e6 (QQQ>200DMA) and m10 (weekly, Fridays only → first acts Fri
+> 07-17) were by design, but **e18 was skipping wrongly** — it required an exact-date VIX3M,
+> which yfinance posts 1–3 sessions late, so it under-traded (should hold QQQ: VIX/VIX3M=0.92
+> <1). Fixed: carry-forward the most-recent VIX/VIX3M ≤ today (past-only, no look-ahead; same
+> pattern m10 uses; log shows as-of dates). **Canceled the e6 test order + reset all state to
+> clean** ($1,000 cash × 3, DB empty) so tonight's 7pm run launches all sleeves **synchronized
+> off complete 07-15 data** (e6 QQQ, e18 QQQ, m10 waits Fri) with DB and broker in lockstep.
 
 > **2026-07-15 — M3 forward-paper infrastructure BUILT; BLOCKED-ON-EVAN for Alpaca keys
 > (record Appendix CP).** Evan: "set up M3 forward paper and make a spot (file) to paste
