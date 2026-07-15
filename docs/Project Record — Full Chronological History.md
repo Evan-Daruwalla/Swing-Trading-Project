@@ -3828,3 +3828,94 @@ attempts.** Not survivor-biased -> clean interpretable FAIL. Cadence #108/#109.
 armed for tonight 19:00 (unrelated to X7).
 
 **Next action:** commit X7; push per Evan. Completeness sweep now covers the credit channel.
+
+# Appendix CW - Morgan Stanley US Middle-Market HY brochure read + graded: 3rd-domain corroboration, NO free test (2026-07-15, ~03:13 CST)
+
+**WHAT:** Evan supplied a Morgan Stanley "US Middle Market High Yield Strategy" page
+(Ireland pooled vehicle, inception Feb 2012, bench Bloomberg US Corp HY). Read + graded, as
+with the BlackRock report (CU). **No experiment opened** -- unlike X7 there is no free
+retail-tradeable proxy.
+
+**WHAT IT IS:** a MARKETING brochure, not research -- **zero performance numbers** (no
+returns/Sharpe/backtest; thinner than BlackRock's CU, which at least had figures). Core idea =
+a middle-market HY **neglect premium**: issuers with $150M-$1B debt outstanding (80-85% of the
+book) get less coverage from rating agencies/underwriters/managers, so fundamental research
+can capture the extra yield their under-scrutinized credit offers. Process = top-down sector
+rotation + intensive fundamental credit research + bottom-up selection. Two PM departures
+(Hurley 2/2025, Cimarosa 10/2024).
+
+**SKEPTICAL GRADE:** (1) pure assertion of edge, no evidence. (2) The "extra yield" is an
+ILLIQUIDITY / complexity premium -- compensation for less-liquid, harder-to-analyze bonds --
+NOT free alpha. (3) Key-person risk on an analyst-judgment strategy (2 PM exits). (4) Needs
+fundamental analysis + OTC middle-market bond access + SMA minimums.
+
+**PROGRAM MAPPING (the payload):** this is a THIRD independent real-world confirmation of the
+program's central structural finding, and it confirms the OTHER half vs BlackRock. BlackRock
+(CU) corroborated "defensive tilts = downside-mitigation-not-alpha"; MS here corroborates
+"**the return premium lives in the illiquid, under-covered names the retail liquidity floor
+structurally excludes**" (Hou-Xue-Zhang / Avramov-Cheng-Metzker -- the program's cited WHY
+for 0 passes). MS is literally selling paid access to that illiquidity premium -> external
+confirmation of the terminal claim.
+
+**TRADEABILITY AT $100-1K: zero.** OTC middle-market HY bonds, fundamental/analyst-driven,
+SMA minimums -- even less accessible than BlackRock's systematic approach. **NO CLEAN FREE
+TEST** (contrast X7's HYG:IEF price proxy): the equity analog (neglected small-cap premium,
+Arbel-Strebel / Hong-Lim-Stein) is (a) excluded by the liquidity floor by definition, (b)
+NULL on the 39 survivor mega-caps (all heavily covered), (c) needs paid analyst-coverage data.
+Manufacturing a weak proxy test would be theater -> declined; logged as corroboration only.
+
+**TALLY unchanged** (35 -- this is a read, not a run). Tripwire untouched. Cadence #109-ish.
+
+**STATE:** doc-only note, uncommitted (no commit instruction). M3 task still armed for 19:00.
+
+**Next action:** none required -- corroboration logged. If Evan wants, the only forcible (weak,
+advised-against) angle is a neglected-small-cap equity screen, which the liquidity floor kills
+a priori.
+
+# Appendix CX - 5 Newfleet/Virtus HY reports read (3 parallel agents): corroboration, no new free signal, 1 broken file (2026-07-15, ~15:10 CST)
+
+**WHAT:** Evan supplied 5 fixed-income/HY reports (Downloads/New folder (2)). Fanned out to
+3 parallel general-purpose agents (grade skeptically, hunt for a FREE retail-tradeable signal
+like X7's HYG:IEF). Same read+grade pattern as BlackRock (CU) / Morgan Stanley (CW). **No
+experiment opened.** Tally unchanged (35 -- reads, not runs).
+
+**THE 5:**
+- `newfleet_high_yield_strategy_institutional_commentary_2056` = GIPS performance-disclosure
+  sheet (misnamed "commentary"). Composite net vs Bloomberg HY: 2022 -9.99 vs -11.18 (wins
+  the down year), 2016 13.73 vs 17.13 / 2017 6.56 vs 7.50 (loses up years). **<=5 accounts
+  every year**; AUM $45-73M -> $429M (2023, Stone Harbor MAC merger) -> $462M. -> corroborates
+  (b) downside-mitigation-not-alpha; no signal.
+- `newfleet_high_yield_strategy_institutional_factsheet_9138` = marketing factsheet w/ real
+  positioning. OAS 346 vs 317 index, **5y Sharpe 0.21 vs 0.12** (vol-driven: 6.31 vs 6.78),
+  233 holdings vs 1,926, up-in-quality BA3 vs B1, **$10M minimum**. Edge sits in 233 illiquid
+  junk CUSIPs (Acrisure/Medline/OneMain). -> corroborates (a) illiquidity premium + (b); only
+  codifiable var = HY OAS = already free (FRED BAMLH0A0HYM2) = the X7 credit family. No new
+  signal.
+- `newfleet_2026_fixed_income_market_outlook_5507` = narrative outlook. Notable UNBACKTESTED
+  claim: **"IG OAS >80bps -> forward excess returns historically negative."** Yields 5-7% in
+  bank loans/EM-HY. -> the one quasi-rule is IG-corp-bond-vs-Treasury EXCESS return (not
+  equity timing), unbacktested, same credit-spread-regime family as X7. No new free signal.
+- `newfleet_spotlight_on_global_credit_9553` = June-2026 monthly snapshot. HY OAS 270, YTW
+  7.16%, Lev Loan OAS 528; trimmed HY -1% / EM -1%, added Treasuries/cash at cycle-tight
+  spreads. -> discretionary spread-regime judgment, no codified rule/backtest. No signal.
+- `high-yield-update---june-2026` = **BROKEN EXTRACTION** -- only the Virtus/Newfleet cover
+  page + index definition + FINRA disclaimer survived the markdown conversion; the actual
+  June-2026 body is absent. Pure disclaimer. **Flag: re-pull the source if real content was
+  expected.**
+
+**SYNTHESIS:** all 5 are institutional marketing/disclosure collateral (now 5th-7th outside
+sources), NOT research. Unanimous: they CORROBORATE the program's two structural pillars --
+(a) the return premium lives in illiquid, hand-selected credit (233 junk CUSIPs / bank loans
+/ EM-HY behind a $10M minimum) the retail liquidity floor correctly excludes, and (b) the
+defensive/up-in-quality tilt = downside-mitigation-not-alpha (wins 2022, loses up-years,
+Sharpe edge is vol-driven). **ZERO new free retail-tradeable signals:** every codifiable
+variable (HY OAS / IG OAS / HYG:IEF / lev-loan spread) is the SAME credit-spread-regime
+family already tested and FAILED in X7 (beat 200-DMA in 2008, whipsawed in the bull). The one
+new quasi-rule (IG OAS>80bps -> negative forward EXCESS return) is a low-return IG-bond-timing
+claim, out of the equity swing scope, unbacktested, PROMISING-capped + near-certain FAIL if
+forced (LQD:IEF is a weaker gate than X7's HYG:IEF) -> declined, not theater.
+
+**Cadence #111 satisfied.** STATE: doc-only, uncommitted. M3 task armed for 19:00 tonight.
+
+**Next action:** none -- corroboration logged. The credit-spread channel is exhausted +
+externally confirmed. Re-pull `high-yield-update---june-2026` only if its body was expected.
