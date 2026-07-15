@@ -3789,3 +3789,42 @@ Ready for 19:00; entry uncommitted (no commit instruction).
 
 **Next action:** 7pm launch, hands-off. If Evan wants the completeness kill: X7 = HYG-based
 credit-gate one-sitting test (prereg-first, PROMISING-capped).
+
+# Appendix CV - X7 HYG:IEF credit gate = FAIL, but the FIRST gate to beat the 200-DMA in a window (2026-07-15, ~03:10 CST)
+
+**WHAT:** Evan "2" -> ran X7 (the completeness kill from the BlackRock report). Prereg
+`f4a4d34` (doc-only, predates runner) -> `run_x7_credit_gate.py`. Long QQQ iff HYG:IEF ratio
+> its 200-DMA (credit appetite on), else cash; next-open; the free credit-spread proxy E18's
+HY-OAS arm couldn't test (HYG 2007+ vs FRED OAS 2023+). Gate 2007-04..2013-12 (contains the
+GFC), MODIFIED-WINDOW -> PROMISING cap. **VERDICT: FAIL.** Tripwire GREEN. Writeup
+`docs/research/2026-07-15_X7_credit_gate_results.md`.
+
+**RESULTS:** GATE (GFC) credit **9.60% CAGR / DD 12.9% / Sh 0.98** vs plain-200DMA 8.30% /
+20.3% / **0.61** vs QQQ-BH 10.77% / 53.6% / 0.55. **-> X7 is the FIRST gate in the whole
+program to BEAT the plain 200-DMA overlay in-window** (E18 tested VIX-TS/HY-OAS/breadth, none
+beat it; X1 confirmed). Credit genuinely led equities into 2008 -> de-risked earlier -> cut
+the DD to 12.9%. **But SECONDARY (2014+) collapses: 3.81% / DD 47.6% / Sh 0.34** -- a WORSE
+drawdown than QQQ-BH (35.6%) and far behind the 200-DMA (0.93). It whipsaws on credit wobbles
+that never become equity drawdowns (221 switches vs 200-DMA's 172). **A crisis specialist
+that self-destructs in bulls.** Both-windows bar required -> FAIL. Cost-robust in the gate
+(A~=B~=C, 15bp barely bites). 50-day-MA descriptive arm even stronger in the gate (Sh 1.01)
+and still fails the sec -> not a window artifact.
+
+**PAYLOAD:** (1) H1 (credit-leads-equities) is REAL in crisis -- the mechanism works, and
+this is the sharpest gate result since E18. (2) Same ONE-WINDOW death as C7/X6/M10-2, just
+inverted (passes the crisis gate, dies in the bull) -- the pre-registered both-windows bar
+killed a 0.98 gate Sharpe, the discipline working again. (3) Corroborates the BlackRock
+report AGAINST ITSELF: their Fig 2/3 = defensive credit tilts mitigate crisis downside then
+miss the snapback; X7 is that exact dynamic on QQQ -> THIRD-domain confirmation (equities
+E6/C4, crypto X6, credit X7) of downside-mitigation-not-alpha. The plain 200-DMA remains the
+only robust overlay.
+
+**TALLY:** X7 = attempt 35 (FAIL), regime-gate/overlay family (E18 lineage, not a new
+family). **1 in-sample-composed PASS-HR (M10-1) + 1 weak PASS-RA (E18) / 0 clean / 35
+attempts.** Not survivor-biased -> clean interpretable FAIL. Cadence #108/#109.
+
+**STATE:** committing runner + results + capstone/HANDOFF/memory (prereg already committed
+`f4a4d34`). swing.db untouched; tripwire GREEN. Meanwhile the M3 forward-paper task remains
+armed for tonight 19:00 (unrelated to X7).
+
+**Next action:** commit X7; push per Evan. Completeness sweep now covers the credit channel.

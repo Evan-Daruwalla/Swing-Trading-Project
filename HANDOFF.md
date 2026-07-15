@@ -12,11 +12,27 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 34 attempts, research phase parked; M3 forward paper LIVE-SCHEDULED 2026-07-15 (3 paper accounts, daily 7pm task); plumbing verified, e18 under-trade bug fixed; all 3 sleeves launch at tonight's 7pm run (accounts flat now)
+## Current state — 35 attempts (X7 credit gate = FAIL); M3 forward paper LIVE-SCHEDULED 2026-07-15 (3 paper accounts, daily 7pm task); e18 bug fixed; all 3 sleeves launch at tonight's 7pm run (accounts flat now)
 
 **Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-15 — X7 HYG:IEF credit gate = FAIL, but the FIRST gate to beat the 200-DMA
+> in-window (record Appendix CV; results `docs/research/2026-07-15_X7_credit_gate_results.md`).**
+> Completeness kill from the BlackRock HY report. Prereg `f4a4d34` (doc-only, predates
+> runner) → `run_x7_credit_gate.py`: long QQQ iff HYG:IEF ratio > its 200-DMA (credit
+> appetite on), else cash — the free credit-spread proxy E18's HY-OAS arm couldn't test.
+> **Gate (2007-13, GFC): 9.60% CAGR / DD 12.9% / Sh 0.98 — beats the plain 200-DMA overlay
+> (0.61) and cuts QQQ-BH's 53.6% DD to 12.9%** (credit led 2008 → de-risked earlier; H1's
+> mechanism is real in crisis, the sharpest gate result since E18). **But secondary (2014+)
+> collapses: 3.81% / DD 47.6% / Sh 0.34** — worse DD than buy-hold, 221 whipsaw switches on
+> credit noise that never became equity drawdowns. **A crisis specialist that self-destructs
+> in bulls → FAIL both-windows.** Same one-window death as C7/X6/M10-2, inverted; the
+> pre-registered bar killed a 0.98 gate Sharpe. Corroborates BlackRock's own Fig 2/3
+> (defensive credit = downside-mitigation-not-alpha) → 3rd-domain confirmation (equities/
+> crypto/credit). Attempt 35; MODIFIED-WINDOW PROMISING-capped anyway; not survivor-biased
+> (clean FAIL). The plain 200-DMA remains the only robust overlay. Tripwire GREEN.
 
 > **2026-07-15 — M3 rewired to 3-account model; all 3 Alpaca paper accounts VERIFIED
 > CONNECTED (record Appendix CQ).** Evan made **3 separate Alpaca paper accounts, $1,000

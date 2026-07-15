@@ -8,7 +8,7 @@ https://github.com/Evan-Daruwalla/Swing-Trading-Project**
 > `docs/Project Record — Full Chronological History.md` remains ground truth for
 > dated detail; this synthesizes it. **Standing counts (2026-07-14): 0 CLEAN PASS-HR /
 > 1 IN-SAMPLE-COMPOSED PASS-HR (M10-1 Nagel Switch, forward-paper-only) / 1 weak PASS-RA
-> (E18) / 34 pre-registered attempts — 33 equity across 9 strategy families + a
+> (E18) / 35 pre-registered attempts — 34 equity across 9 strategy families + a
 > state-conditioned synthesis arc, plus 1 crypto pilot.** The fixed-single-strategy space
 > (E/C/X families) is exhausted and the M10 synthesis arc (composing the evidence into
 > state-conditioned strategies) is complete — but **the program is NOT concluded.** M10 found
@@ -85,7 +85,7 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 4. **Frozen-regression tripwire.** `swing_bot/test_frozen.py` pins 12 deterministic
    reference numbers to **exact** values (d = ±0.0000pp). It runs GREEN after every
    experiment; a silent drift from an "unrelated" change fails loud. It has stayed
-   GREEN across all 34 attempts.
+   GREEN across all 35 attempts.
 
 5. **Execution/signal decomposition ladder.** Every result is decomposed **Rung A**
    (frictionless close-to-close) → **Rung B** (next-open, 0 bps) → **Rung C**
@@ -104,7 +104,7 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 
 ---
 
-## 3. Results ledger — 9 equity families + a synthesis arc + 1 crypto pilot, 34 attempts, 0 clean high-return passes
+## 3. Results ledger — 9 equity families + a synthesis arc + 1 crypto pilot, 35 attempts, 0 clean high-return passes
 
 | Family | Experiments | Verdict |
 |---|---|---|
@@ -115,7 +115,7 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 | Breakout / volatility | E8, E11, C3 | FAIL — compression predicts expansion, not direction; volume gating adds nothing; **C3** consolidated kill-shot confirms it, and shows the "cut at the recent low" exit is a whipsaw tax (time-stop beats it) |
 | Deep-dip accumulation | E9 | FAIL — the "never book a loss" claim is literally true (0/53 realized losses) and still bad (3.46% CAGR, −79.7% unrealized) |
 | Event-driven (earnings) | E10, E15 | FAIL — a real but small effect (only experiment to beat both benchmarks in 2000–13) that **decayed post-2010** |
-| Seasonality / cross-sectional / overlay | E13, E14, E16, E18, E20, X1, C1, C4, C6, C7 | FAIL, except **E18 VIX-TS cleared the program's only (weak) PASS-RA**. **C1** residual reversal is the *closest-ever HR near-miss* — gate 19.08% CAGR / DD 57.7% clears both HR legs in-window, then dies post-2014 (survivorship + regime); **C7** SVXY carry posts the highest CAGR ever (26.45%) and still FAILs (Sharpe < SPY; rides the dead −1× instrument); **C4** vol-sizing is a real DD-cutter that misses the 0.80 bar; **C6** FOMC even-week replicates the published effect then *inverts* post-2014; **X1** confirms no vol gate beats the plain 200-DMA |
+| Seasonality / cross-sectional / overlay | E13, E14, E16, E18, E20, X1, C1, C4, C6, C7, X7 | FAIL, except **E18 VIX-TS cleared the program's only (weak) PASS-RA**. **C1** residual reversal is the *closest-ever HR near-miss* — gate 19.08% CAGR / DD 57.7% clears both HR legs in-window, then dies post-2014 (survivorship + regime); **C7** SVXY carry posts the highest CAGR ever (26.45%) and still FAILs (Sharpe < SPY; rides the dead −1× instrument); **C4** vol-sizing is a real DD-cutter that misses the 0.80 bar; **C6** FOMC even-week replicates the published effect then *inverts* post-2014; **X1** confirms no vol gate beats the plain 200-DMA; **X7** HYG:IEF credit gate is the *first gate ever to beat the plain 200-DMA in a window* (GFC gate Sharpe 0.98 vs 0.61 — credit led 2008) yet whipsaws to a 47.6% DD in the 2014+ bull → FAIL both-windows |
 | Informed positioning | E19, X2, X2b, X3 | FAIL — insider opportunistic-buys close cleanly; short-**interest** days-to-cover is real on the *short* side but **uncapturable** (see §5); short-**volume** (X3) carries no cross-sectional signal at all (executed-flow MM-hedging noise — the clean X2/X3 contrast) |
 | Crypto pilot *(new domain)* | X6 | FAIL — BTC/ETH dual-MA trend @ 25 bps **crushes HODL in the 2018–22 bears** (29.6% vs 4.3%, DD 82%→61%) but **loses HODL's Sharpe in the 2023+ bull** (0.76 < 1.01); cost-robust (slow overlay). Reproduces E6's lesson: trend = drawdown control, not a return-enhancer over buy-and-hold. Paper-first; nothing live |
 | *(closed on probe)* | C2 dividend-initiation | Only 3 first-ever initiations in 26 years among the survivors → insufficient event flow, no runner |
@@ -123,7 +123,7 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 | Chart-pattern geometry *(shape, not a number)* | M11 | **FAIL — signal-dead** (attempt 34, the 9th family). Rule-based (NOT LLM) causal detection of long-side reversal shapes (double-bottom + inverse-H&S), fresh neckline break → next open, on the 39 survivors: gate **−0.14% CAGR / 50.4% DD / Sh 0.09**, loses SPY *and* survivorship-clean EW-39; frictionless Rung B ≈ 0 → the shape carries no directional edge. **Payload:** the survivor universe *destroys* the one documented (bearish) pattern edge — fwd-20 after a bearish top/H&S is +1.70% (> unconditional +1.15%), the opposite of Savin (2007), because survivorship removed exactly the names a bearish pattern predicts. Closes the last untested mechanism gap |
 
 **Tally: 0 CLEAN PASS-HR, 1 IN-SAMPLE-COMPOSED PASS-HR (M10-1 Nagel Switch —
-forward-paper-only), 1 weak PASS-RA (E18 VIX-TS), 34 pre-registered attempts (33 equity
+forward-paper-only), 1 weak PASS-RA (E18 VIX-TS), 35 pre-registered attempts (34 equity
 across 9 families + a state-conditioned synthesis arc + 1 crypto pilot).** Full
 per-experiment detail: the append-only record and `docs/research/`.
 
@@ -191,7 +191,7 @@ preserves both.)*
 A working model of honest quantitative research at small scale: falsifiable
 pre-registration, bias-aware experiment design, a regression tripwire, direct
 cost/execution decomposition, and a documentation trail that records — and
-corrects — its own errors. **Thirty-four pre-registered attempts across nine equity
+corrects — its own errors. **Thirty-five pre-registered attempts across nine equity
 families, a state-conditioned synthesis arc, and a crypto pilot — zero CLEAN high-return
 passes**, and a terminal claim that is *stronger* for being negative: the retail-EOD,
 K=1–3, liquidity-floored swing-trading space does not contain a robust fixed-strategy
@@ -295,5 +295,5 @@ M10-1), the sole source of uncontaminated evidence (Evan-gated: account + go); t
 lower-priority untested levers need new capital/data (pairs/stat-arb — shorting; LLM-forward —
 M3; short-interest-done-right — paid borrow data; intraday/MOC — an intraday feed); X5
 analyst-revision drift (**BLOCKED — $22 FMP feed**); live-money crypto (custody gate).
-Standing at **34 attempts / 0 clean PASS-HR / 1 in-sample PASS-HR / 1 weak PASS-RA.** **The
+Standing at **35 attempts / 0 clean PASS-HR / 1 in-sample PASS-HR / 1 weak PASS-RA.** **The
 research phase is NOT declared done — M3 forward paper is the open lever.***
