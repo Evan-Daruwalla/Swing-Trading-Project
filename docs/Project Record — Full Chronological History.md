@@ -3388,3 +3388,32 @@ include committing the brief). Tripwire GREEN (no code touched since the last GR
 
 **Next action:** on Evan's go - commit the brief + M11 refinements, then **M11.2** (prereg
 the causal LONG-side inverse-H&S/double-bottom kill-shot) -> build -> run -> D1 verdict.
+
+# Appendix CN - M11.2 prereg committed doc-only (chart-pattern detector, params pinned) (2026-07-14, ~22:40 CST)
+
+**WHAT:** Evan "3" -> committed the brief+refinements (77f1f62, pushed), then wrote the M11
+prereg `docs/prereg_m11_chart_patterns.md` from the standing TEMPLATE. **Committing it
+DOC-ONLY BEFORE the runner exists** (the sacred prereg-before-code ordering = the program's
+core claim; this hash must predate `run_m11_chart_patterns.py`). Cadence #99 hit - this entry
+satisfies it.
+
+**DETECTOR SPEC (all params PINNED a priori, one consolidated long-side spec):** causal
+close-based pivots (half-window w=5, confirmed at j+5, no two-sided smoother = no look-ahead);
+signal = long reversal completion = **double-bottom** (two bottoms within 4%, intervening
+peak >=5%, span 10-90d, neckline=peak) OR **inverse-H&S** (head >=3% below both shoulders,
+shoulders within 6%, neckline=P1-P2 line); entry = **fresh upward neckline cross on close**
+(close[i]>neck & close[i-1]<=neck), trough within 30d recency, execute next open; exit =
+time-stop 20d baseline (10/40 descriptive); K=3, size NAV/K, oversub ranked by breakout
+strength w/ dropped-count reported; 5bps + 15bps stress; A/B/C ladder. 39 survivor mega-caps
+(asymmetric - only a FAIL clean). Full-window gate 2000-13 + sec 2014-> -> D1 tiers REACHABLE
+(not modified-window). Plus a REPORTED-not-gated short-side diagnostic (double-top/H&S forward
+returns) to document the Savin short-effect = non-deployable (X2 lesson).
+
+**PRIOR (fixed): FAIL** - deployable long side weakest support; program-internal analogues
+(E8/E11/C3 breakout kills, E16/C1 reversal decay, overnight gap) all point FAIL.
+
+**STATE:** prereg written; committing doc-only now; runner NOT yet written. Tripwire GREEN.
+Tally 33 (no run yet).
+
+**Next action:** commit prereg doc-only -> build `run_m11_chart_patterns.py` (reuse
+cache_fetch/UNIV/stats/D1 from C1) -> run -> D1 verdict -> results doc + record + tripwire.
