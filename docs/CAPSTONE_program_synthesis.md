@@ -232,7 +232,12 @@ don't trade at retail EOD" — with a small chance of a forward-paper 'PROMISING
 disciplined build: adopt LMW's *published* detector parameters (externally anchored, not
 fit), commit to ONE consolidated spec or a small pre-declared set with a snoop-adjustment
 (the C3 kill-shot model), full-window D1, survivor-universe asymmetric framing, next-open
-execution. Data is already in hand.
+execution. Data is already in hand. *(M11.1 brief,
+`docs/research/2026-07-14_chart_pattern_detection_brief.md`: evidence is mixed, and the
+best-supported pattern — head-and-shoulders — is a SHORT signal not profitable standalone
+(Savin et al. 2007), the same no-shorting wall as X2; so the deployable lead is the
+LONG-side reversal — inverse-H&S / double-bottom — and the detector must be causal, since
+LMW's kernel smoother is look-ahead.)*
 
 **(b) M3 forward paper — the only lever that produces UNCONTAMINATED evidence.** Every
 number in this document is upper-bound-biased (survivorship) or in-sample (M10). The one

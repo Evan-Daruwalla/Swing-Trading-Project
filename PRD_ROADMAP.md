@@ -1040,11 +1040,20 @@ last obvious gap in "trying everything."**
 Discipline unchanged (prereg-before-code hash, D1 dual-bar, asymmetric survivor framing,
 tripwire GREEN after, no swing.db writes, tiered costs per `docs/prereg_TEMPLATE.md`).
 
-54. **M11.1 — (optional) sourced brief.** Per the program's arc-opening pattern, a short
-    `/research-brief` on algorithmic chart-pattern detection (LMW detector definitions;
-    STW / Bajgrowicz-Scaillet snoop-decay; Bulkowski's *Encyclopedia* as a design source,
-    graded skeptically; the CNN-image adjacent-but-out-of-scope line). May be SKIPPED — the
-    capstone §8 already surveys the core sources — at the executor's/Evan's discretion.
+54. **M11.1 — sourced brief. DONE 2026-07-14.**
+    *(Outcome: `docs/research/2026-07-14_chart_pattern_detection_brief.md`. Evidence is
+    MIXED, not a clean FAIL — patterns carry modest statistical info (Lo-Mamaysky-Wang 2000)
+    and head-and-shoulders has real predictive power (Savin-Weller-Zvingelis 2007) — BUT that
+    H&S edge is ~5–7%/yr risk-adjusted **underperformance** (a SHORT signal) that is "not
+    profitable as a standalone strategy in rising markets" and works "only in hedged
+    portfolios" → the same no-fractional-shorting wall that made X2/X2b uncapturable; and
+    Sullivan-Timmermann-White 1999 / Bajgrowicz-Scaillet 2012 show data-snooping + even low
+    transaction costs erase technical-rule profits (Bajgrowicz-Scaillet: offset in-sample).
+    **Two design corrections fed to M11.2:** (1) the DEPLOYABLE lead is the LONG-side reversal
+    (**inverse-H&S / double-BOTTOM**), NOT H&S/double-TOP — that is the short/uncapturable
+    side, report it as an X2-style measurement only; (2) LMW's kernel smoother is
+    **NON-CAUSAL (look-ahead)** → the deployable detector must be causal, or confirm patterns
+    only AFTER the neckline/confirmation break.)*
 55. **M11.2 — prereg (doc-only, committed BEFORE the runner).** The discipline-critical
     task: chart patterns are parameter-rich (lookback, extremum prominence, neckline
     tolerance, breakout confirmation %), so the prereg must PIN every parameter a priori by
@@ -1055,9 +1064,13 @@ tripwire GREEN after, no swing.db writes, tiered costs per `docs/prereg_TEMPLATE
     (time-stop baseline per TEMPLATE, any price-stop must beat it); K sizing; full-window
     gate 2000–2013 + secondary 2014→; survivor-universe asymmetric framing (only a FAIL is
     clean); tiered costs + the 15 bps stress leg; the D1 dual-bar verdict labels; and the
-    a-priori FAIL-lean disclosure above. Recommended lead: the **LMW head-and-shoulders +
-    double-top/bottom reversal detector** as a single honest kill-shot (the reversal-side
-    analogue of C3's breakout kill-shot).
+    a-priori FAIL-lean disclosure above. **Recommended lead (per the M11.1 brief):** a
+    **causal** LMW-style detector on the **LONG-side reversal** spec (**inverse-head-and-
+    shoulders + double-BOTTOM**) as the deployable arm, WITH the bearish H&S / double-top
+    reported as a short-only (uncapturable) measurement — the reversal-side analogue of C3's
+    breakout kill-shot. **Look-ahead guard:** causal smoother, or confirm only AFTER the
+    neckline break (LMW's two-sided kernel is non-causal). Brief:
+    `docs/research/2026-07-14_chart_pattern_detection_brief.md`.
 56. **M11.3 — build + run.** Detector (kernel-smooth / rolling local-extrema geometry) +
     a runner reusing the survivor universe, coverage gate, and D1 stats. Run per prereg;
     state the verdict PLAINLY, **no tuning a FAIL.**

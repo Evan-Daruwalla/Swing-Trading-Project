@@ -3342,3 +3342,49 @@ when asked). Tripwire GREEN.
 **Next action:** on Evan's go - run **M11** (prereg the LMW chart-pattern kill-shot, then
 run; the one remaining free, autonomously-runnable experiment). The only lever that could
 validate M10-1 remains **M3 forward paper** (Evan-gated: Alpaca paper account).
+
+# Appendix CM - M11.1 chart-pattern research brief DONE; evidence MIXED; design sharpened (2026-07-14, ~22:10 CST)
+
+**WHAT:** Evan "1, then 3" -> (1) committed+pushed the finalization (04e8de4), then (3) the
+chart-pattern research brief. Executed the research-brief 10-stage process directly (skill
+already loaded this session; did NOT re-invoke the Skill tool per the "don't re-execute"
+caveat). 6 web searches (LMW 2000; Savin-Weller-Zvingelis 2007; STW 1999; Bajgrowicz-Scaillet
+2012; detection methods; modern 2021+) + targeted fetches (2 primaries paywalled 403/402 ->
+used CXO Advisory open summary for the Savin caveat). Brief:
+`docs/research/2026-07-14_chart_pattern_detection_brief.md`.
+
+**PAYLOAD - the evidence is MIXED, not a clean FAIL, and it sharpens the prior into an
+X2 echo:**
+- **LMW (2000):** patterns carry modest incremental statistical info, but "informative !=
+  profitable" (their own caveat).
+- **Savin-Weller-Zvingelis (2007)** = the strongest counter, and the decisive finding:
+  head-and-shoulders predicts ~5-7%/yr risk-adjusted **UNDERPERFORMANCE** (Russell 2000,
+  1990s) - a real signal, but a **SHORT** one that is "NOT profitable as a standalone
+  strategy in rising markets" and works "only in hedged portfolios." **=> the best-supported
+  chart pattern is bearish/market-neutral -> the SAME no-fractional-shorting wall that made
+  X2/X2b uncapturable at $100-1k.** The one pattern with strong evidence is one this project
+  structurally cannot trade.
+- **STW (1999) + Bajgrowicz-Scaillet (2012):** snooping + even low transaction costs erase
+  technical-rule profits (Bajgrowicz-Scaillet: offset IN-SAMPLE; no ex-ante persistence).
+- **Modern (Tsinaslanidis 2021):** 92.5% of experiments "profitable" but only "reduced to
+  parameter values aligned with TA" = exactly the ex-post parameter selection STW warns of;
+  signal-of-life, not a clean OOS claim.
+
+**TWO DESIGN CORRECTIONS (my earlier "lead with H&S/double-top" was WRONG):**
+1. **Deployable lead = LONG-side reversal (inverse-H&S / double-BOTTOM),** NOT H&S/double-top
+   (that's the short/uncapturable side -> report as an X2-style measurement only).
+2. **LMW's kernel smoother is NON-CAUSAL (look-ahead)** -> the deployable detector must be
+   causal, or confirm only AFTER the neckline break. Pinned this as an M11 prereg guard.
+Fed back into **PRD M11.1** (marked DONE) + **M11.2** (lead corrected + look-ahead guard +
+brief link) and **capstone §8(a)** (correction note + link).
+
+**VERDICT PRIOR unchanged for the DEPLOYABLE test = FAIL** (long-only side has the weakest
+support; the tradeable evidence is short/hedged/large-book; program-internal analogues
+E8/E11/C3 + E16/C1 all point to FAIL), but M11 is now a sharper, honest kill-shot rather
+than a naive one. Tally UNCHANGED (33; brief is research, not a run). Cadence #98.
+
+**STATE:** brief + M11/capstone refinements UNCOMMITTED (offering commit; "1 then 3" did not
+include committing the brief). Tripwire GREEN (no code touched since the last GREEN run).
+
+**Next action:** on Evan's go - commit the brief + M11 refinements, then **M11.2** (prereg
+the causal LONG-side inverse-H&S/double-bottom kill-shot) -> build -> run -> D1 verdict.
