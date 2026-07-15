@@ -3272,3 +3272,73 @@ only untested lever that could validate M10-1 = M3 forward paper (Evan-gated). C
 **STATE:** swing.db untouched; tripwire GREEN; committing M10-2 + pushing per Evan.
 
 **Next action:** commit M10-2; push all M10 commits to origin/main.
+
+# Appendix CL - Finalize THROUGH M10 (not "done"); full what-worked/what-might report; new M11 chart-pattern direction (2026-07-14, ~21:56 CST)
+
+**WHAT (Evan's directive, verbatim intent):** "finalize with M10 but DON'T call research
+done, give a full report on what didn't work and what might. This project is more about
+trying everything (including things biased off of different data)." Plus a new idea to add:
+**algorithmic (NOT LLM-driven) detection of the chart patterns traders teach** - the visual
+shapes (head-and-shoulders, double top/bottom, triangles, flag breakouts) that "suggest the
+market is about to go up or down," bought on pattern completion.
+
+**DOCS-ONLY TURN.** No experiment run, no code/strategy/factor file touched, swing.db
+untouched, tally UNCHANGED at 33 attempts. This is a finalization + reframing + roadmap-add,
+not a new attempt. Tripwire re-verified GREEN (docs-only, but confirmed).
+
+**REFRAMING (the "don't call research done" instruction, made structural):**
+- **Capstone** (`docs/CAPSTONE_program_synthesis.md`) rewritten from "COMPLETE / the
+  documented method space is exhausted" -> **"ONGOING - finalized THROUGH the M10 arc, not
+  closed."** Counts 31 -> **33** everywhere (header, tripwire line 23->33, §3 heading, tally,
+  §7 count); M10 folded into the §3 ledger as a new "Evidence synthesis (state-conditioned)"
+  row (M10-1 in-sample PASS-HR + M10-2 FAIL/E2-mirage-closed); terminal-claim §1 given a new
+  "Scope of the claim - and what it does NOT cover" paragraph (chart-pattern geometry never
+  tested -> claim is "no edge found in what was tested," not "no edge exists"); §7 sharpened
+  ("the sharpest demonstration is M10-1: the one design that CLEARED PASS-HR - and the
+  program still refused to call it a win").
+- **NEW capstone §8 "The open frontier - what has NOT been tested, and what might still
+  work"** (old §8 Reproducibility -> §9). This IS the "what might" half of Evan's report:
+  (a) **algorithmic chart-pattern detection** (the one untested mechanism family, honest
+  FAIL prior, PRD M11); (b) **M3 forward paper** = the only UNCONTAMINATED-evidence lever
+  (every number in the doc is survivor-biased or in-sample); (c) lower-priority untested
+  levers (pairs/stat-arb - same no-shorting wall; LLM-forward overlays - M3-attached;
+  short-interest-done-right - needs paid borrow data; intraday/MOC - EOD-rule-blocked).
+
+**THE NEW DIRECTION - M11 chart-pattern detection, scoped skeptically (pressure-test, per
+Evan's standing "no yes-man" rule):** It genuinely fits the constraints (EOD-native, K=1-3,
+and - being price-only with no data wall - FULL-WINDOW D1-reachable, unlike every post-2000
+experiment). But the **honest prior is FAIL**, stated before any run:
+- **Lo-Mamaysky-Wang (2000, J. Finance)** - the one rigorous algorithmic detector - found
+  patterns carry *modest incremental statistical information* but did NOT show cost-surviving
+  profitability. "Informative != tradeable."
+- **Sullivan-Timmermann-White (1999) + Bajgrowicz-Scaillet (2012):** technical-rule profits
+  vanish after data-snooping/FDR correction + realistic costs, OOS. **McLean-Pontiff:** a
+  pattern taught publicly for decades is a published, arb-eligible (decayed) signal.
+- **Program-internal mechanistic prediction:** continuation patterns (flags/triangles/
+  breakouts) ARE breakouts -> inherit the breakout family's 3 kills (E8/E11/C3); reversal
+  patterns (double-bottom/inverse-H&S) are cousins of the reversal near-miss that cleared
+  then decayed (E16/C1); next-open bleeds the same overnight gap. **Expected: FAIL, extending
+  the terminal claim to "even the chart SHAPES don't trade at retail EOD."** A FAIL adds a
+  genuine 9th equity family to the exhausted set; a small chance of a forward-paper PROMISING.
+- Out of scope (different ask): CNN chart-IMAGE classifiers (Jiang-Kelly-Xiu 2023) - ML-driven,
+  cross-sectional over thousands of names; Evan specified RULE-BASED, not LLM/ML.
+
+**PRD:** added **M10** (DONE; tasks 52-53 with outcomes) and **M11** (CURRENT OPEN DIRECTION,
+UNSTARTED; tasks 54-57: optional brief -> prereg pinning LMW's PUBLISHED params + ONE
+consolidated spec / snoop-adjustment -> build+run -> record) sections + milestone-table rows.
+Recommended M11 lead = the LMW head-and-shoulders + double-top/bottom reversal detector as a
+single honest kill-shot (the reversal-side analogue of C3's breakout kill-shot). Fork-safe:
+this is ADD-by-append (new milestones), not a pivot - no SUPERSEDED tree.
+
+**HANDOFF** header/top-block reframed to "research OPEN; M11 chart patterns = next honest
+experiment." Memory `swing-trading-project.md` updated (research ongoing + M11 frontier).
+
+**TALLY (unchanged):** 33 attempts / 0 CLEAN PASS-HR / 1 IN-SAMPLE-COMPOSED PASS-HR (M10-1,
+forward-only) / 1 weak PASS-RA (E18). Cadence #97.
+
+**STATE:** all edits pushed pending Evan's "commit/push" word (per standing rule, commit only
+when asked). Tripwire GREEN.
+
+**Next action:** on Evan's go - run **M11** (prereg the LMW chart-pattern kill-shot, then
+run; the one remaining free, autonomously-runnable experiment). The only lever that could
+validate M10-1 remains **M3 forward paper** (Evan-gated: Alpaca paper account).

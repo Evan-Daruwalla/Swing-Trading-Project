@@ -152,6 +152,8 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 | M7b | Data-type arc E18–E20 (added 2026-07-12, record Appendix AV) — **CLOSED 2026-07-13: E18/E20 DONE 2026-07-11; E19 FAIL 2026-07-13** | new-data-type ideas from the data-type brief: E18 regime-gate bake-off (VIX-TS/HY-OAS/breadth/200DMA) — VIX-TS cleared the program's first (weak) PASS-RA; E19 insider opportunistic-buy drift (EDGAR) — full ingestion authorized + running (task `b2wzwj9gb`), verdict pending; E20 dividend capture FAIL; same D1 dual-bar verdicts |
 | M8 | Full-method-survey candidates C1–C7 (added 2026-07-12, record Appendix BK) | seven residual candidates after reconciling ~90 methods (8 families) against E1–E20: residual reversal, dividend-initiation drift, one volatility-breakout kill-shot, vol-targeting overlay, Reg SHO short-volume drift, even-week FOMC overlay, SVXY carry — all carry strong-FAIL priors per the survey's structural finding (concentration destroys diversified-decile edges) |
 | M9 | Research-batch-2 arc X1–X6 + discipline adoptions (added 2026-07-13, record Appendices BN–BP) | candidates + process upgrades from the LLM brief and the four-topic batch (execution/risk/data/crypto): prereg-template discipline (tiered costs, decomposition ladder, time-stop baseline, capped fractional-Kelly), conditional vol-targeting (E6×E18), E17-free days-to-cover (FINRA 2021+), Reg SHO short-volume drift, MOC close-entry probe, analyst recommendation-change drift ($22-gated), crypto BTC/ETH trend pilot (scope-gated), LLM forward-only arc (M3-attached) |
+| M10 | Evidence-synthesis arc: state-conditioned strategies (added 2026-07-14, record Appendices CG–CK) — **DONE** | compose the 31 results into strategies vs BOTH D1 tiers; a design panel proved fixed-weight PASS-HR is arithmetically empty → the only escape is state-conditioning on a causal variable. M10-1 Nagel Switch = program's FIRST PASS-HR (IN-SAMPLE-COMPOSED, forward-paper-only); M10-2 gap-amortized stress IBS = FAIL (closes the E2 c2c mirage). Both panel survivors run |
+| M11 | Algorithmic chart-pattern detection (added 2026-07-14, Evan's direction; record Appendix CL) — **CURRENT OPEN DIRECTION, UNSTARTED** | the one untested mechanism family: rule-based (NOT LLM) detection of the chart *shapes* retail traders are taught (H&S, double top/bottom, triangles, flag breakouts), buy on pattern completion. Full-window D1-reachable; honest prior = FAIL (Lo-Mamaysky-Wang: modest info, not cost-surviving; STW / Bajgrowicz-Scaillet snoop-decay; the breakout family already 3× killed). The next honest experiment |
 
 Order is deliberate: infrastructure before science (council 5/5); thresholds
 provably precede results (M1 before M2); nothing goes live on an unvalidated
@@ -940,6 +942,133 @@ candidate list; short-window "PROMISING" results queue for forward paper only.
 If the arc closes with no new tier-pass, the terminal claim extends to the
 2026-07-13 research batch: execution, risk, data, and crypto paths were
 surveyed, designed, and honestly closed.
+
+### M10 — Evidence-synthesis arc: state-conditioned strategies (added 2026-07-14;
+Evan's direction "come up with different strategies … meet both criteria"; record
+Appendices CG–CK) — **DONE 2026-07-14**
+
+**Why this exists:** after 31 attempts (0 clean PASS-HR), Evan asked whether the
+*accumulated evidence* — not a new single signal — could be composed into a strategy that
+clears BOTH D1 tiers. This is explicitly a synthesis over prior results, so it carries a
+**data-snooping cap unique to M10: any pass is IN-SAMPLE-COMPOSED → "forward paper
+REQUIRED," never clean or live.** A multi-agent design panel (5 designer lenses ×
+adversarial judges, record Appendix CH) produced the load-bearing negative: a **fixed-weight
+blend of the surviving sleeves cannot clear PASS-HR** — the 2000–13 gate needs C1-reversal
+weight ≥ 0.66 while the 2014→ secondary needs ≤ 0.29, a contradiction. **The only escape is
+state-conditioning on a causal variable** (regime-switch the weights), which motivated M10-1.
+Same discipline as M7–M9 (doc-only prereg before runner, no tuning a FAIL, tripwire GREEN
+after, no swing.db writes).
+
+52. **M10-1 — Nagel Switch (VIX-regime state-switch).** VIX>20 → C1 residual reversal
+    (bottom-K survivors); VIX≤20 → E6 QQQ 200-DMA trend. Mechanism = Nagel (2012):
+    short-term-reversal alpha is liquidity-provision compensation that scales with VIX, so
+    the switch is causal, not fit. Full VIX window (1990+), D1 dual-bar, next-open, 1 bp.
+    *(Outcome 2026-07-14: **PASS-HR — the program's FIRST — but IN-SAMPLE-COMPOSED /
+    forward-paper-only** (attempt 32, record Appendix CI). Gate 17.87% CAGR / DD 59.95% /
+    Sh 0.66; sec 15.94% / 39.68% / 0.78 — both windows clear ≥15% CAGR & ≤60% DD. **NOT a
+    win by the program's own discipline:** composed after 31 results; survivor-flattered
+    (reversal buys known survivors in crashes — C1's in-window passes were declared
+    UNINTERPRETABLE); gate DD clears by 0.05 pp; breaks at VIX>18 (14.83% FAIL) and at
+    15 bps; fails PASS-RA (Sh 0.66 < 0.80). Per the M10 cap → "PROMISING / forward paper
+    REQUIRED." Fixed a carry-forward mark-to-market bug (bisect_right-1, past-only, no
+    look-ahead) that had shown a spurious −100% NAV on the final secondary bar; gate was
+    already clean. Prereg `docs/prereg_m10_1_nagel_switch.md`; runner
+    `scripts/run_m10_1_nagel_switch.py`; results
+    `docs/research/2026-07-14_M10-1_nagel_switch_results.md`.)*
+53. **M10-2 — Gap-amortized stress IBS (the E2 c2c-mirage kill-shot).** 2× QQQ
+    mean-reversion entered on VIX>20 & IBS≤0.20, held 5 sessions (to amortize the lost
+    first-night gap that killed the IBS family), trend fallback when VIX≤20. Attacks the
+    open question left by E2: *was there real alpha behind the overnight gap next-open
+    can't reach?*
+    *(Outcome 2026-07-14: **FAIL** (attempt 33, record Appendix CK). Gate 2.99% CAGR /
+    **83.3% DD** / Sh 0.28; sec 28.95% / 1.08 (one-window bull artifact). **Payload in the
+    FAIL:** the 5-day hold neutralized the gap (c2c 3.18% ≈ next-open 2.99%), isolating the
+    reversion's gap-free economics — catastrophic in the gate. This **permanently closes the
+    E2 c2c 18.15% "mirage":** the gap was hiding the *drawdown* (2× long into 2000–02/2008
+    cascades), not alpha. Sharpens M10-1: unlevered cross-sectional reversal passes HR, 2×
+    index MR is an 83%-DD engine → M10-1's pass is a cross-sectional-*survivor* effect, not
+    a general stress-reversion edge. Prereg `docs/prereg_m10_2_gap_amortized_ibs.md`; runner
+    `scripts/run_m10_2_gap_amortized_ibs.py`; results
+    `docs/research/2026-07-14_M10-2_gap_amortized_ibs_results.md`.)*
+
+**M10 exit conditions — MET 2026-07-14.** Both panel survivors have a committed prereg
+hash, a verdict, and a results doc; capstone/HANDOFF/record/memory updated. The arc's
+lasting outputs: (1) the fixed-weight-impossibility proof, (2) the first (in-sample)
+PASS-HR as a forward-paper hypothesis, (3) the E2 mirage closed. **M10 does NOT close the
+program** — see M11.
+
+### M11 — Algorithmic chart-pattern detection (added 2026-07-14; Evan's direction; record
+Appendix CL) — **CURRENT OPEN DIRECTION, UNSTARTED**
+
+**Why this exists (Evan, 2026-07-14):** "Many traders teach others by showing the graphs
+and certain patterns that suggest the market is about to go up or down, then buy when those
+patterns arise — algorithmic detection, NOT LLM-driven." This is the **one classical
+mechanism family the program has never tested.** Every prior attempt trades a *number*
+(IBS, residual rank, MA-cross, short-interest ratio); none trades *shape* — the
+head-and-shoulders, double top/bottom, triangle, wedge, cup-and-handle, and flag/breakout
+patterns of visual technical analysis. It fits every project constraint: EOD-native (daily
+bars, signal at close → next open), K=1–3 (scan the survivor universe, take top-K by a
+pre-registered pattern-strength score), and — because it is **price-only, no data wall —
+full-window D1-reachable** (it can claim a true tier, unlike every post-2000 experiment).
+
+**Honest prior = FAIL (stated before any run):**
+- **Lo, Mamaysky & Wang (2000, *J. Finance*)** — the one rigorous algorithmic detector
+  (kernel-smoothing + local extrema, 10 classic patterns, US equities 1962–96) — found
+  patterns carry *modest incremental statistical information* (conditional ≠ unconditional
+  return distribution) but **explicitly did not show cost-surviving profitability.**
+  "Informative ≠ tradeable."
+- **Sullivan-Timmermann-White (1999)** and **Bajgrowicz-Scaillet (2012)**: technical-rule
+  profits largely vanish under data-snooping / FDR correction + realistic costs, OOS.
+- **McLean-Pontiff decay:** a pattern taught publicly for decades is a published,
+  arb-eligible signal by definition.
+- **Program-internal, mechanistic prediction:** continuation patterns (flags, triangles,
+  breakouts) ARE breakouts → inherit the breakout family's three kills (E8/E11/C3; C3
+  showed the channel exit is a whipsaw tax). Reversal patterns (double bottoms, inverse
+  H&S) are cousins of the reversal near-miss that cleared then decayed (E16/C1). And
+  next-open execution bleeds the same overnight gap the program keeps losing.
+- **Out of scope for this task (different ask):** CNN chart-*image* classifiers (Jiang-
+  Kelly-Xiu 2023) find image predictivity but are ML-driven, cross-sectional over thousands
+  of names, not rule-based K=1–3 — Evan specified rule-based, not LLM/ML.
+
+**Expected verdict: FAIL, extending the terminal claim to "even the chart *shapes* don't
+trade at retail EOD," with a small chance of a forward-paper "PROMISING."** Either outcome
+is a legitimate program result — a FAIL adds the chart-pattern family (a genuine 9th equity
+family) to the exhausted set; a PROMISING queues for M3 forward paper. Running it is
+**lower-expected-value than M7/M8 were, and that is the point of doing it: it closes the
+last obvious gap in "trying everything."**
+
+Discipline unchanged (prereg-before-code hash, D1 dual-bar, asymmetric survivor framing,
+tripwire GREEN after, no swing.db writes, tiered costs per `docs/prereg_TEMPLATE.md`).
+
+54. **M11.1 — (optional) sourced brief.** Per the program's arc-opening pattern, a short
+    `/research-brief` on algorithmic chart-pattern detection (LMW detector definitions;
+    STW / Bajgrowicz-Scaillet snoop-decay; Bulkowski's *Encyclopedia* as a design source,
+    graded skeptically; the CNN-image adjacent-but-out-of-scope line). May be SKIPPED — the
+    capstone §8 already surveys the core sources — at the executor's/Evan's discretion.
+55. **M11.2 — prereg (doc-only, committed BEFORE the runner).** The discipline-critical
+    task: chart patterns are parameter-rich (lookback, extremum prominence, neckline
+    tolerance, breakout confirmation %), so the prereg must PIN every parameter a priori by
+    **adopting LMW's published detector definitions** (externally anchored, not fit), and
+    commit to **ONE consolidated pattern spec, or a small pre-declared set with an explicit
+    multiple-testing / snoop adjustment** (the C3 kill-shot model — collapse the variants to
+    avoid data-mining). Fix: detection rules; entry (pattern completion, next open) + exit
+    (time-stop baseline per TEMPLATE, any price-stop must beat it); K sizing; full-window
+    gate 2000–2013 + secondary 2014→; survivor-universe asymmetric framing (only a FAIL is
+    clean); tiered costs + the 15 bps stress leg; the D1 dual-bar verdict labels; and the
+    a-priori FAIL-lean disclosure above. Recommended lead: the **LMW head-and-shoulders +
+    double-top/bottom reversal detector** as a single honest kill-shot (the reversal-side
+    analogue of C3's breakout kill-shot).
+56. **M11.3 — build + run.** Detector (kernel-smooth / rolling local-extrema geometry) +
+    a runner reusing the survivor universe, coverage gate, and D1 stats. Run per prereg;
+    state the verdict PLAINLY, **no tuning a FAIL.**
+57. **M11.4 — record.** Results doc + record entry + tripwire GREEN; capstone §3 ledger +
+    §8 frontier + HANDOFF + memory updated with the outcome. If FAIL → the terminal claim
+    upgrades to include the chart-pattern family; if PROMISING → joins the M3 forward-paper
+    candidate list (still Evan-gated).
+
+**M11 status: UNSTARTED.** Evan *suggested* this direction (2026-07-14); per one-task-per-
+sitting it is queued as the next experiment on his go. It is the program's designated
+default idle experiment — the one remaining free, autonomously-runnable mechanism.
 
 ## 7. HANDOFF NOTES
 

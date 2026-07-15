@@ -12,11 +12,31 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 1 IN-SAMPLE-COMPOSED PASS-HR + 1 weak PASS-RA / 0 clean edges / 33 attempts; nothing live
+## Current state — research OPEN (not done): 33 attempts / 0 clean PASS-HR / 1 in-sample PASS-HR (M10-1) + 1 weak PASS-RA (E18); M11 chart-patterns = next; nothing live
 
 **Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-14 — FINALIZED THROUGH M10; research OPEN, not done; new direction = M11
+> algorithmic chart patterns (record Appendix CL).** Evan: "finalize with M10 but DON'T
+> call research done; full report on what didn't work and what might; the project is about
+> trying everything (incl. biased-off-different-data)." Reframed the **capstone** from
+> "COMPLETE / method space exhausted" → **"ONGOING"** (counts 31→33, M10 folded into the §3
+> ledger, and a new **§8 "open frontier"** = the *what-might-work* half of the report:
+> chart patterns + M3 forward paper + lower-priority untested levers). **New M11
+> (chart-pattern detection — rule-based, NOT LLM)** added to the PRD as the **CURRENT OPEN
+> DIRECTION, UNSTARTED**: the one classical mechanism family never tested here (it trades
+> *shape*, not a number; price-only → full-window D1-reachable, unlike every post-2000
+> experiment). **Honest prior = FAIL** (Lo-Mamaysky-Wang: patterns carry modest info but not
+> cost-surviving profit; Sullivan-Timmermann-White / Bajgrowicz-Scaillet snoop-decay;
+> McLean-Pontiff; and program-internally the breakout family already died 3× — E8/E11/C3)
+> — but genuinely untested, so running it closes the last gap in "trying everything."
+> **Docs-only turn:** capstone/PRD/record/HANDOFF/memory updated; tally UNCHANGED (33);
+> nothing run; tripwire GREEN. **Next honest experiment = M11** (prereg the LMW
+> head-and-shoulders / double-top kill-shot, then run — the reversal-side analogue of C3's
+> breakout kill-shot) on Evan's go. M3 forward paper stays the one lever that could validate
+> M10-1 (Evan-gated: Alpaca paper account).
 
 > **2026-07-14 — M10 synthesis arc: Nagel Switch = the program's FIRST PASS-HR,
 > but IN-SAMPLE-COMPOSED / forward-paper-only (record Appendices CG–CI).** Evan:
