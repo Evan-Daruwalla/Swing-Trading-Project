@@ -144,7 +144,7 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 | M2c | E3: concentrated mega-cap stocks (stub — designed after E2 readout) | liquidity-defined stock universe + survivorship caveat; own pre-reg |
 | M2d | Rotation family (E4/E5/E6, done 2026-07-09) | 3× MA rotation PASS-then-regime-FAIL; 1× (E6) robust drawdown overlay |
 | M2e | E7: international validation (added 2026-07-10, record Appendix AF) | genuinely-unseen non-US regimes (Nikkei 1990s bear etc.): Arm 1 confirm E6 1×, Arm 2 a-priori-vol-gated 3× high-return shot |
-| M3 | Live paper (GATED on a passing pre-registered strategy + Evan approval) | deploy best E-series survivor; daily loop, Alpaca mirror, divergence logging (#28), control + LLM-veto sleeves |
+| M3 | Live paper (GATED on a passing pre-registered strategy + Evan approval) — **infra BUILT + 3 paper accounts VERIFIED CONNECTED 2026-07-15; ready to run** | deploy the 3 forward-paper candidates (adapted from stale e1_control/e1_llm_veto — E1 failed; record Appendices CP/CQ): e6_1x / e18_vixts / m10_1_nagel, each with its OWN $1,000 Alpaca paper account. Daily loop + sleeve DB + per-account Alpaca mirror BUILT; keys pasted + smoke-test 200 OK all 3. Remaining: authorize/schedule the first `--execute` run (no orders placed yet); scheduling |
 | M6 | Portfolio packaging | README → findings doc, record HTML twin, git tag; make the repo readable cold |
 | M4 | Overlay readout (GATED on pre-registered N/horizon) | evaluate veto vs control; continue, add cascade arm, or kill per pre-reg |
 | M5 | Expansion (GATED on M3 stable) | deferred ideas only: exit/stop ablations (#17/#18), sizing (#20), RSI comparison (#2), mega-cap pullback (#5), VIX gate (#11) |
@@ -305,6 +305,16 @@ idea without live paper.
 
 ### M3 — Live paper (gated)
 
+**ADAPTATION (dated decision, 2026-07-15, record Appendix CP):** tasks 14/18 below
+originally named `e1_control` / `e1_llm_veto` (written 2026-07-08, M0 era) — but **E1
+FAILED and was shelved in M2b (2026-07-09)**; those sleeves no longer correspond to
+anything worth forward-testing. Adapted to the three real forward-paper candidates per
+every HANDOFF entry since: **`e6_1x`** (E6, prereg `0526ea2`), **`e18_vixts`** (E18 arm (a),
+prereg `f32b008`), **`m10_1_nagel`** (M10-1, prereg `prereg_m10_1_nagel_switch.md` — the
+program's first PASS-HR, IN-SAMPLE-COMPOSED, the one M3 exists to actually validate). The
+LLM-overlay design (task 18, M9 task 51) is untouched — still a separate, later, forward-only
+treatment arm. Setup notes: `docs/research/2026-07-15_M3_forward_paper_setup.md`.
+
 14. **Sleeve DB + daily loop.** Port `paper_trader.py` schema into
     `swing.db` (portfolio/positions/nav/transactions + `fill_divergence` +
     `overlay_log`), TWO sleeves from day one: `e1_control` (pure mechanical)
@@ -315,9 +325,38 @@ idea without live paper.
     constraint).
     Done: dry-run against a historical date produces hand-checkable orders
     for both sleeves; control orders byte-identical with overlay disabled.
+    *(Outcome 2026-07-15, adapted per above: DONE for the 3 real sleeves.
+    `swing_bot/paper_sleeves.py` (schema: paper_sleeves/paper_positions/
+    paper_transactions/paper_nav/fill_divergence — new tables, doesn't touch
+    the pinned `bars` rows or anything test_frozen.py reads) +
+    `scripts/daily_swing_paper.py` (one evening run: realizes the prior
+    run's pending at today's now-known open, then stores today's close
+    signal as tomorrow's pending — needs no separate morning touch). Each
+    decide_* function reuses the IDENTICAL condition as its backtest runner
+    (same SMA window / VIX threshold / `residual_series` FF3 machinery) for
+    implementation-fidelity. Done-check MET: dry-run against the latest
+    session produced hand-checkable per-sleeve output; a same-day re-run bug
+    (pending filled against its own signal day's open, non-idempotent) was
+    FOUND and FIXED by the dry-run — `realize_pending` now requires a
+    strictly later session before filling; re-verified idempotent. No
+    overlay/LLM sleeve — task 18 stays separate/later. Frozen tripwire
+    GREEN.)*
 15. **Alpaca PAPER account — BLOCKED-ON-EVAN.** Which of the ~3 paper
     accounts (some hold Trading sleeves); keys into gitignored
     `alpaca_keys.env`. Reported, never worked around.
+    *(Outcome 2026-07-15: the FILE exists — `alpaca_keys.env` at project
+    root, confirmed gitignored via `git check-ignore -v` against the
+    existing `*_keys.env` pattern — with placeholder fields
+    (APCA_API_KEY_ID / APCA_API_SECRET_KEY / APCA_API_BASE_URL pinned to
+    paper / SWING_ALPACA_SLEEVE selector) and instructions. **Still
+    BLOCKED-ON-EVAN:** creating/choosing the actual account and generating
+    keys is Evan's step (recommended: a NEW dedicated paper account, not one
+    of Trading's ~3, so order flow never mixes across the two separate
+    projects) — Claude does not do this and never sees the resulting keys.)*
+    *(UPDATE 2026-07-15, record Appendix CQ: DONE — Evan created **3 dedicated paper
+    accounts, $1,000 each** (one per sleeve), pasted per-sleeve keys (E_SIX / E_EIGHTEEN_
+    VIX_TS / M_TEN_ONE KEY+SECRET) into `alpaca_keys.env`. Smoke test = all 3 CONNECTED
+    (200 OK / ACTIVE / $1,000). Account+keys no longer blocking.)*
 16. **Alpaca mirror port.** `alpaca_client.py` + `alpaca_sync.py` pattern:
     paper base URL, live hard-guard kept, CASH_BUFFER=0.01, fractionability
     whole-share fallback, dry-run default / `--execute`. Mirrors
@@ -326,10 +365,36 @@ idea without live paper.
     field reference.
     Done: dry-run sync prints sane target orders; grep confirms no
     `daytrade` / `pattern_day_trader` reads.
+    *(Outcome 2026-07-15: `swing_bot/alpaca_client.py` BUILT — ported (not
+    imported) from Trading's `alpaca_client.py` (read-only reference), paper
+    base URL default, refuses a live base_url without explicit
+    allow_live=True (nothing in this project's scripts passes it), no PDT
+    field reads (grep-confirmed absent — Alpaca removed those fields
+    2026-07-06 anyway per the standing constraint). Mirrors ONE
+    Evan-selected sleeve (`SWING_ALPACA_SLEEVE` in alpaca_keys.env; the
+    other two always stay swing.db-only, per this task's own established
+    "one account, others DB-only" design) sized to NAV-matched notional
+    orders. **UNTESTED against a real account (no keys yet — task 15
+    blocks this)**; connectivity smoke test is
+    `.venv\Scripts\python.exe -m swing_bot.alpaca_client`, to be run by
+    Evan once keys are pasted in. The after-hours DAY-limit order-queuing
+    assumption is explicitly disclosed as unverified until a real cycle
+    runs — see the setup doc.)*
+    *(UPDATE 2026-07-15, record Appendix CQ: rewired to the 3-account model
+    (`client_for_sleeve()`, all 3 mirror; base-URL `/v2` normalized; buys are
+    market-notional DAY — fixed a would-have-failed notional+limit). CONNECTIVITY
+    VERIFIED (read-only GET /account, all 3 200 OK). The order-mirroring path
+    (flatten-then-enter) is written but UNEXERCISED until the first `--execute`
+    cycle on a live session.)*
 17. **Divergence logging (#28).** Every fill: DB-sim price vs Alpaca-paper
     fill into `fill_divergence`, with the simulated-fill caveat in the
     module docstring and in `HANDOFF.md`.
     Done: first live day populates the table.
+    *(Outcome 2026-07-15: table BUILT (`fill_divergence` in
+    paper_sleeves.py's schema) and wired — every DB-simulated fill logs a
+    row (sim_price always; alpaca_price/alpaca_order_id populated only when
+    `--execute` mirrors that sleeve). **Not yet populated by a real Alpaca
+    fill** — genuinely gated on task 15/16's keys, not just undone.)*
 18. **Overlay live cash-veto arm (Evan's decision 2026-07-08, amended from
     shadow-mode the same day).** Every entry candidate gets an LLM verdict
     (BUY/VETO + invalidation + rationale) logged to `overlay_log` —

@@ -12,11 +12,55 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 34 attempts / 0 clean PASS-HR / 1 in-sample PASS-HR (M10-1) + 1 weak PASS-RA (E18); M11 chart-patterns = FAIL; M3 forward paper = the open lever; nothing live
+## Current state — 34 attempts, research phase parked; M3 forward-paper infra BUILT + 3 Alpaca paper accounts VERIFIED CONNECTED 2026-07-15; ready to run, nothing traded yet
 
 **Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
 the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+
+> **2026-07-15 — M3 rewired to 3-account model; all 3 Alpaca paper accounts VERIFIED
+> CONNECTED (record Appendix CQ).** Evan made **3 separate Alpaca paper accounts, $1,000
+> each (one per sleeve)** and pasted per-sleeve keys (E_SIX / E_EIGHTEEN_VIX_TS / M_TEN_ONE
+> KEY+SECRET, shared paper base URL) into `alpaca_keys.env`. Rewired the code from the
+> single-mirror model to mirror ALL 3 sleeves each to its own account
+> (`client_for_sleeve()`; `--execute` now does a per-account flatten-then-enter). **Caught +
+> fixed two real issues in the new format:** the base URL ends in `/v2` → would double to
+> `/v2/v2/...` (fixed: normalize-strip `/v2`); Alpaca rejects notional+limit orders (fixed:
+> buys are market-notional DAY, still next-open). **VERIFIED (read-only, no orders):**
+> `python -m swing_bot.alpaca_client` → all 3 accounts **200 OK / ACTIVE / $1,000 each**,
+> distinct account numbers. Keys work; isolation real. Dry-run intact; paper_* reset clean;
+> `var/` added to .gitignore. **Did NOT place orders** — "set up + keys" ≠ "start trading
+> tonight", markets closed, data mid-transition (07-14 bar incomplete). **Remaining gates
+> (small):** authorize the first `--execute` run / scheduling (task 19, not created — real
+> order flow needs Evan's explicit setup); after-hours DAY-order queuing unverified until the
+> first live cycle. Account+keys gates from CP are DONE. Keys are PAPER, gitignored, never
+> committed. Setup notes: `docs/research/2026-07-15_M3_forward_paper_setup.md`.
+
+> **2026-07-15 — M3 forward-paper infrastructure BUILT; BLOCKED-ON-EVAN for Alpaca keys
+> (record Appendix CP).** Evan: "set up M3 forward paper and make a spot (file) to paste
+> the keys into." **Adapted M3's stale task 14/18 spec** (`e1_control`/`e1_llm_veto` —
+> E1 failed months ago, M2b) **to the 3 real forward-paper candidates:** `e6_1x` (E6),
+> `e18_vixts` (E18 arm a), `m10_1_nagel` (M10-1 — the program's first PASS-HR, the one M3
+> exists to actually validate). Built: `swing_bot/paper_sleeves.py` (sleeve DB schema +
+> decide_* signal functions, each reusing the IDENTICAL condition as its backtest runner
+> — implementation-fidelity); `swing_bot/alpaca_client.py` (ported, not imported, from
+> Trading's client; paper-only, hard live-guard); **`alpaca_keys.env`** (project root,
+> gitignored — confirmed via `git check-ignore -v` — **the spot to paste keys into**, with
+> instructions + a SWING_ALPACA_SLEEVE selector); `scripts/daily_swing_paper.py` (one
+> evening-run daily loop; dry-run default, `--execute` mirrors one sleeve to Alpaca).
+> **Dry-run caught and fixed a real bug:** re-running same-day filled a pending order
+> against its own signal day's open (non-idempotent) — fixed (`realize_pending` now
+> requires a strictly later session), re-verified. Two operational findings disclosed
+> (not bugs): Yahoo's same-session bar can be incomplete for hours after close (schedule
+> the real job late evening); ^VIX3M lags ^VIX by ≥1 session (e18_vixts safely skips + logs
+> when this happens, never guesses). Frozen tripwire GREEN. **BLOCKED-ON-EVAN:** create/
+> choose an Alpaca PAPER account (recommend a NEW one, dedicated — not one of Trading's
+> ~3), generate keys, paste into `alpaca_keys.env`, run
+> `.venv\Scripts\python.exe -m swing_bot.alpaca_client` to smoke-test, choose
+> SWING_ALPACA_SLEEVE (recommend starting with `e6_1x`, simplest, before upgrading to
+> `m10_1_nagel`). Scheduling (Task Scheduler) and the 20-day stabilization window are
+> explicitly NOT done — deliberately left for Evan once keys are verified. Setup notes:
+> `docs/research/2026-07-15_M3_forward_paper_setup.md`.
 
 > **2026-07-14 — M11 chart-pattern detection = FAIL (signal-dead); 9th family closed;
 > survivor bias DESTROYS the pattern edge (record Appendices CL–CO).** Evan "1, then 3" →

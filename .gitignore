@@ -34,3 +34,6 @@ graphify-out/.graphify_root
 .finra_cache/
 .regsho_cache/
 .crypto_cache/
+
+# M3 paper runtime logs (Alpaca X-Request-IDs; regeneratable, not secrets)
+var/

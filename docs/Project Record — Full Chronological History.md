@@ -3462,3 +3462,164 @@ Tripwire GREEN. swing.db untouched.
 
 **Next action:** commit M11; on Evan's word, push. The only lever that could validate M10-1
 = M3 forward paper (Evan-gated: Alpaca paper account).
+
+# Appendix CP - M3 forward-paper infrastructure BUILT; BLOCKED-ON-EVAN for keys (2026-07-15, ~01:29 CST)
+
+**WHAT:** Evan: "set up M3 forward paper and make a spot (file) to paste the keys into."
+Recon first: read Trading's alpaca_client.py/paper_trader.py (read-only reference, per the
+established port-not-import rule) and the exact signal code in run_e6_deleveraged.py /
+run_e18_regime_gates.py / run_m10_1_nagel_switch.py.
+
+**ADAPTATION (dated decision):** PRD M3 tasks 14/18 (written 2026-07-08, M0 era) named two
+sleeves `e1_control`/`e1_llm_veto` -- but E1 FAILED and was shelved in M2b (2026-07-09);
+those names no longer correspond to anything worth forward-testing. Adapted to the three
+REAL forward-paper candidates per every HANDOFF entry since: **e6_1x** (E6, prereg
+0526ea2), **e18_vixts** (E18 arm a, prereg f32b008), **m10_1_nagel** (M10-1 -- the program's
+FIRST PASS-HR, IN-SAMPLE-COMPOSED -- the one M3 exists to actually validate). LLM-overlay
+(M9 task 51) untouched, stays separate/later.
+
+**BUILT:**
+- `swing_bot/paper_sleeves.py` -- sleeve DB schema (paper_sleeves/paper_positions/
+  paper_transactions/paper_nav/fill_divergence, NEW tables, doesn't touch pinned `bars`
+  rows or anything test_frozen.py reads) + decide_e6_1x/decide_e18_vixts/decide_m10_1, each
+  reusing the IDENTICAL signal condition as its backtest runner (same SMA200 window, same
+  VIX threshold, same residual_series FF3 machinery) -- load-bearing for M3's
+  "implementation fidelity vs shadow backtest" success criterion (PRD task 51 amendment).
+- `swing_bot/alpaca_client.py` -- ported (NOT imported) from Trading's alpaca_client.py.
+  ~180-line httpx wrapper, PAPER base URL default, refuses a live base_url without explicit
+  allow_live=True (nothing in this project's scripts passes it -- belt+suspenders on top of
+  the base_url guard), reads credentials from alpaca_keys.env with OS-env fallback.
+- **`alpaca_keys.env`** (project root) -- THE SPOT TO PASTE KEYS INTO. Confirmed gitignored:
+  `git check-ignore -v alpaca_keys.env` -> matched `.gitignore:18:*.env` -> CONFIRMED
+  IGNORED (checked BEFORE writing anything else, non-negotiable for a secrets file).
+  Placeholder fields (APCA_API_KEY_ID/SECRET/BASE_URL pinned to paper) + instructions +
+  SWING_ALPACA_SLEEVE selector (which ONE sleeve mirrors live; others stay swing.db-only,
+  per the PRD's own established "one account, others DB-only" design from task 16).
+- `scripts/daily_swing_paper.py` -- the daily loop. Design: ONE evening run suffices (no
+  separate morning touch) -- realizes the PRIOR run's pending using TODAY's now-known open
+  (today's full bar is complete by evening), then stores TODAY's close signal as pending for
+  TOMORROW. Exactly mirrors every backtest runner's own signal-at-close/execute-next-open
+  timing. Dry-run default; --execute mirrors ONE sleeve to Alpaca as a notional order
+  matching the DB ledger 1:1 (NAV-sized).
+
+**DRY-RUN CAUGHT + FIXED A REAL BUG (the value of testing before claiming done):**
+running the script twice on the SAME still-latest session filled the pending order against
+its OWN signal day's open -- one day too early, non-idempotent. Fixed: `realize_pending`
+now requires `today > pending_signal_date` (strictly later session). Verified: two
+consecutive same-day runs correctly both show filled-today=False, target unchanged. Test
+artifacts (the buggy fills) were deleted from swing.db's new paper_* tables afterward (my
+own dry-run data this session, safe to clean per standing rule) -- reset to a clean slate so
+the first REAL invocation unambiguously starts the forward-paper evidentiary clock.
+
+**TWO OPERATIONAL FINDINGS (disclosed, not bugs -- the dry run exercising real yfinance
+data surfaced both):**
+- Yahoo's same-session bar can be INCOMPLETE for hours after close (verified directly:
+  yfinance showed 2026-07-14's Close as NaN while Open/Volume were populated, hours into
+  2026-07-15). swing_bot.prices.fetch already (correctly, pre-existing behavior) drops any
+  NaN O/H/L/C row -> the script safely fell back to 07-13 as the latest COMPLETE session.
+  Operational implication for scheduling (task 19, not yet done): run late evening
+  (~8-9pm ET), not right at 4pm ET close.
+- **^VIX3M lags ^VIX by >=1 session** (verified directly: VIX3M had literally no row for
+  the session VIX did have). decide_e18_vixts correctly returns None with a stated reason
+  when this happens -- sleeve holds its current position, never guesses. Confirmed this
+  fires safely in the actual dry run (e18_vixts showed "SKIPPED (VIX or VIX3M unavailable
+  today)" both runs, no crash, no bad trade).
+
+**Frozen tripwire GREEN** (12 refs d=0) both before and after -- new tables only, orthogonal
+to the pinned `bars` rows.
+
+**BLOCKED-ON-EVAN (explicit, reported not worked around):**
+1. Create/choose an Alpaca PAPER account (recommend a NEW dedicated one, not one of
+   Trading's ~3, so the two separate projects' order flow never mixes) + generate keys ->
+   paste into alpaca_keys.env. Claude does not do this and never sees the resulting keys.
+2. Choose SWING_ALPACA_SLEEVE. Recommendation (not decided on Evan's behalf): start with
+   `e6_1x` (simplest, single-instrument, lowest risk of a plumbing bug corrupting the
+   evidence trail), verify clean cycles, then upgrade to `m10_1_nagel` (the sleeve M3
+   actually exists to test) once proven.
+3. Smoke-test: `.venv\Scripts\python.exe -m swing_bot.alpaca_client` once keys are in.
+4. The after-hours DAY-limit order-queuing assumption is explicitly UNVERIFIED until a real
+   cycle runs (disclosed, not assumed true).
+
+**EXPLICITLY NOT DONE (deliberate scope boundary, stated plainly):** Task 19 scheduling (no
+Windows Task Scheduler entry -- an unattended process submitting real order flow to a live
+brokerage API needs Evan's explicit setup/confirmation, not auto-scheduled); task 20's
+20-day stabilization (can't be "set up," starts once real runs begin); the LLM overlay
+(M9 task 51, separate/later).
+
+Setup notes: `docs/research/2026-07-15_M3_forward_paper_setup.md`. PRD M3 tasks 14/16/17
+updated with outcomes + adaptation note; milestone table row updated; HANDOFF snapshot
+added.
+
+**TALLY unchanged** (34 attempts -- this is infrastructure, not an experiment; no D1
+verdict). Cadence: this entry + earlier CN/CO/CP work covers cadence through ~#101.
+
+**STATE:** all new files UNCOMMITTED (Evan has not yet said "commit"/"push" for this work).
+swing.db has 5 new empty tables (paper_sleeves etc.), reset clean after bug-fix testing.
+alpaca_keys.env exists locally, confirmed gitignored, contains NO real keys (placeholders
+only).
+
+**Next action:** on Evan's word, commit (alpaca_keys.env will NOT be included, per
+.gitignore) + push. Then genuinely blocked until Evan pastes in Alpaca keys and picks
+SWING_ALPACA_SLEEVE.
+
+# Appendix CQ - M3 rewired to 3-account model; all 3 Alpaca paper accounts VERIFIED CONNECTED (2026-07-15, ~02:15 CST)
+
+**WHAT:** Evan made **3 separate Alpaca paper accounts, $1,000 each (one per sleeve)** -- a
+better design than the single-mirror model from Appendix CP -- and pasted per-sleeve keys
+into alpaca_keys.env with a new format: E_SIX_KEY/SECRET (e6_1x), E_EIGHTEEN_VIX_TS_KEY/
+SECRET (e18_vixts), M_TEN_ONE_KEY/SECRET (m10_1_nagel), shared
+APCA_API_BASE_URL=https://paper-api.alpaca.markets/v2. Rewired the code to match; verified
+all 3 connect.
+
+**TWO REAL ISSUES CAUGHT IN THE NEW FORMAT + FIXED IN CODE (not by editing Evan's keys):**
+1. The base URL now ends in `/v2`, but request paths already prepend `/v2/...` -> would
+   double to `/v2/v2/account`. Fixed: `_normalize_base()` strips a trailing `/v2` (and
+   slashes), so both forms work. Verified: the smoke test's actual GET hit
+   `/v2/account` correctly (200 OK).
+2. Alpaca REJECTS notional+limit orders (notional must be market). My earlier --execute used
+   a notional LIMIT -> would have failed on the first real order. Fixed: buys are now MARKET
+   NOTIONAL DAY orders (canonical fractional order; DAY-TIF still queues for next open when
+   sent after hours). submit_order() now raises if notional+non-market is attempted.
+
+**CODE CHANGES:**
+- `swing_bot/alpaca_client.py`: SLEEVE_ENV_PREFIX map (sleeve -> env prefix) +
+  `client_for_sleeve(name)` factory (builds a client from that sleeve's own key pair);
+  base-URL normalization; `close_position` + `cancel_all_orders` (for the flatten step);
+  submit_order notional+limit guard; smoke test now loops ALL 3 accounts.
+- `scripts/daily_swing_paper.py` --execute: rewired from single-sleeve (SWING_ALPACA_SLEEVE,
+  now obsolete) to mirror ALL 3 sleeves, each to its own account, with a proper
+  flatten-then-enter reconcile (cancel open orders -> close held symbols not in target ->
+  buy target legs as market-notional-DAY sized to the sleeve's DB NAV).
+- `alpaca_keys.env`: comment block updated (SWING_ALPACA_SLEEVE section replaced with the
+  3-account note). Evan's key lines untouched. Still gitignored (re-confirmed).
+- `.gitignore`: added `var/` (the Alpaca X-Request-ID runtime log dir; no secrets, but a
+  runtime artifact).
+
+**VERIFICATION (the valuable part -- read-only, no orders placed):**
+`.venv\Scripts\python.exe -m swing_bot.alpaca_client` -> **all 3 accounts 200 OK, ACTIVE,
+$1,000 cash each**, distinct account numbers (PA38ZZKY6WN0 / PA3W9UGPNIU4 / PA37SB3WCFTP).
+Keys work; the 3-account isolation is real. Base-URL normalization confirmed live. Dry-run
+of the daily loop still intact after the refactor; paper_* tables reset to clean slate so
+the official forward-paper clock starts fresh on the first real run. Frozen tripwire
+unaffected (no computation touched).
+
+**DID NOT place any orders.** Markets are closed and, more to the point, submitting orders
+(even paper) is a side-effectful action Evan hasn't explicitly asked for yet ("set up" +
+provide keys != "start trading tonight"), and tonight's data is mid-transition (07-14 bar
+still incomplete on yfinance, so "latest complete session" is 07-13). The first `--execute`
+cycle -- and whether Alpaca queues an after-hours DAY order for the next open -- remains
+the one genuinely unverified assumption; it should be run deliberately (ideally scheduled
+late-evening on a complete session) with Evan's go.
+
+**REMAINING GATES (much smaller than CP):** (1) decision/authorization to actually start
+placing paper orders (run `--execute`, or schedule it); (2) Task Scheduler entry (task 19,
+still not created -- unattended real order flow needs Evan's explicit setup); (3) the
+after-hours order-queuing behavior, unverified until the first live cycle. Account creation +
+keys (CP gates 1-3) are now DONE.
+
+**TALLY unchanged** (34 attempts -- infra). Keys are PAPER (PK-prefix), never printed here,
+never committed (gitignored). **STATE:** code + doc changes UNCOMMITTED pending Evan's word;
+alpaca_keys.env holds real keys locally, gitignored, will not be in any commit.
+
+**Next action:** on Evan's word, commit + push (keys excluded). Then either authorize the
+first `--execute` run / scheduling, or leave it staged for Evan to kick off.
