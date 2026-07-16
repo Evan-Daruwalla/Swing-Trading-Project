@@ -5,6 +5,11 @@ breakout bar (RVOL = vol_t / mean(vol[t-20..t-1])). Tests whether volume
 confirmation gives breakouts the directional edge E8 lacked. Gate 2000-2013
 CAGR>=15% & maxDD<=60%, n>=30. No tuning after results. Reuses E8 engine and
 the .e8e9_cache; does NOT touch swing.db.
+
+NAV (finding-things map): imports run_e8_squeeze (GATE_END, SEC_START,
+SIM_START, cache_fetch, indicators, simulate, window_stats);
+swing_bot.universe (UNIVERSE). Imported by: no other module (standalone
+runner).
 """
 import sys
 from pathlib import Path

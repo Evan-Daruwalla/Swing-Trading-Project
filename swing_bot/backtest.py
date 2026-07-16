@@ -13,6 +13,13 @@ Implements EXACTLY the frozen pre-registration `docs/prereg_E1_ibs.md`
 
 Purpose-built (~200 lines); deliberately NOT adapted from Trading's monthly
 factor_backtest.py. Prices split-adjusted, dividend-UNADJUSTED.
+
+NAV (finding-things map): THE E1 IBS engine — entry points `run_backtest()` and
+`metrics()`. Imports swing_bot.{prices, universe, signals}. Callers:
+test_frozen (pins E1 refs), run_e1/e1b/e2 backtests, run_e4_rotation.
+IMPORTANT: the scripts/ experiments (E3, E5-E20, C*, X*, M10-1, M11 ...) each
+carry their OWN inline backtest loop and do NOT use this engine — it is
+E1/E2-specific. rotation.py is the separate E4 engine.
 """
 import math
 

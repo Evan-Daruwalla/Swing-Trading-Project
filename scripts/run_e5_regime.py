@@ -5,6 +5,9 @@ TQQQ over 2014-2026 (validation gate), then run the 200-MA rotation over the
 UNSEEN 2000-2013 window. No tuning; drag METHOD fixed, its VALUE data-derived.
 
 Does NOT touch swing.db — fetches fresh into memory.
+
+NAV (finding-things map): imports swing_bot (prices). Imported by: no other
+module (standalone runner).
 """
 import math
 import sys

@@ -11,6 +11,12 @@ Not survivor-biased (market-wide ETF signal). No swing.db writes.
 DATA CONVENTION: split-adjusted, dividend-UNADJUSTED (auto_adjust=False). HYG/IEF are
 dividend-heavy -> the ratio is a PRICE-ONLY credit-regime signal (not total return),
 which is correct: it is never traded, only gates QQQ.
+
+NAV (finding-things map): imports `cache_fetch, CAP0` <- run_e8_squeeze and
+`sma, stats` <- run_e18_regime_gates (the shared-helper hub). RESULT = FAIL,
+2026-07-15 (gate beat the 200-DMA in-window — the program's first to do so —
+but the post-window sec bar failed; crisis specialist that whipsaws in bulls) —
+NOT forwarded to M3 paper. See docs/research/2026-07-15_X7_credit_gate_results.md.
 """
 import sys
 from pathlib import Path

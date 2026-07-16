@@ -9,6 +9,13 @@ D1 dual-bar. IN-SAMPLE-COMPOSED (M10 snooping disclosure) - a pass = forward
 paper REQUIRED, never clean. No swing.db writes.
 
 DATA CONVENTION: prices split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): stitches four modules — `cache_fetch, COST, CAP0` <-
+run_e8_squeeze (shared data); `macro_close, sma` <- run_e18_regime_gates;
+`ff3_daily, residual_series, isoweek, stats, K, BETA_N, FORM_N` <-
+run_c1_residual_reversal (the verbatim STRESS machinery); `UNIV` (39-name
+survivor list) <- run_e10_earnings_drift. LIVE forward-paper twin:
+swing_bot.paper_sleeves.decide_m10_1.
 """
 import bisect
 import sys

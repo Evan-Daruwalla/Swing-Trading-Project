@@ -7,6 +7,9 @@ close -> next open; 1 bp/side. Calendar: data/fomc_announcement_dates.json
 (federalreserve.gov primary sources). D1 verdict. No swing.db writes.
 
 DATA CONVENTION: SPY split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): imports run_e8_squeeze (CAP0, cache_fetch).
+Imported by: no other module (standalone runner).
 """
 import bisect
 import json

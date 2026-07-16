@@ -4,6 +4,9 @@ PRIMARY cell: QQQ->TQQQ, N=200, lag 0, 5bps. Gates on the full window
 (holdout contaminated by the B4 screen — see prereg §0). Robustness battery =
 MA{150,175,200,225,250} x lag{0,1} x cost{5,10} (20 cells). Benchmarks:
 buy-hold TQQQ, buy-hold QQQ. Live paper is the true OOS (Evan-gated).
+
+NAV (finding-things map): imports swing_bot (backtest, prices, rotation).
+Imported by: no other module (standalone runner).
 """
 import statistics
 import sys

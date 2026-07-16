@@ -7,6 +7,9 @@ question: mean net per-trade return. Reuses .e8e9_cache; no swing.db writes.
 
 DATA: ETF OHLCV + dividends via yfinance (div-UNADJ closes; dividend credited
 explicitly). auto_adjust=False.
+
+NAV (finding-things map): imports run_e8_squeeze (CACHE, CAP0, COST,
+cache_fetch); swing_bot.universe (UNIVERSE). Imported by: run_ex_decomp.py.
 """
 import json
 import math

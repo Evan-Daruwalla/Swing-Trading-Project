@@ -8,6 +8,9 @@ only a hypothesis for a clean forward/new-market test. Labeled as such.
 
 Synthetic 3x Nasdaq from QQQ (drag 4%/yr, validated in E5). Gate: hold 3x when
 QQQ close > 200d MA AND 20d annualized realized vol < V; else cash.
+
+NAV (finding-things map): imports swing_bot (prices). Imported by: no other
+module (standalone runner).
 """
 import math
 import sys

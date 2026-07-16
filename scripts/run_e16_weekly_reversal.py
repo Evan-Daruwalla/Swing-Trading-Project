@@ -6,6 +6,9 @@ buy the bottom 4 (biggest losers) at next open, full weekly rebalance,
 + D1 tiers. Reuses .e8e9_cache; no swing.db writes.
 
 DATA CONVENTION: yfinance auto_adjust=False -> split-adjusted, div-UNADJUSTED.
+
+NAV (finding-things map): imports run_e10_earnings_drift (UNIV);
+run_e8_squeeze (CAP0, COST, cache_fetch). Imported by: run_ex_decomp.py.
 """
 import datetime as dt
 import math

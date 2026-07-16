@@ -8,6 +8,11 @@ CAGR>=15% & maxDD<=65%, n>=20. No tuning. Does NOT touch swing.db.
 DATA: earnings dates via yfinance get_earnings_dates(limit=100) (~2001 on;
 announcement dates are historical fact; estimate/surprise cols NOT used).
 OHLCV auto_adjust=False (split-adj, div-UNADJ). Caches to .e8e9_cache.
+
+NAV (finding-things map): imports run_e8_squeeze (CACHE, cache_fetch).
+Imported by: daily_swing_paper.py, run_c1_residual_reversal.py,
+run_e15_earnings_premium.py, run_e16_weekly_reversal.py, run_e19_insider.py,
+run_m10_1_nagel_switch.py, run_m11_chart_patterns.py, run_x3_regsho_svr.py.
 """
 import json
 import math

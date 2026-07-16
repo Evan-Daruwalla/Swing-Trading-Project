@@ -10,6 +10,11 @@ stress-only entry concentrates the edge. Full window, D1. IN-SAMPLE-COMPOSED
 
 DATA CONVENTION: split-adjusted, dividend-UNADJUSTED. 2x = E6 synth/calib (drag
 QLD-calibrated). No look-ahead (signal close t -> execute open t+1).
+
+NAV (finding-things map): imports run_e18_regime_gates (macro_close, sma);
+run_e6_deleveraged (calib, synth); run_e8_squeeze (CAP0); swing_bot
+(prices); swing_bot.signals (ibs). Imported by: no other module (standalone
+runner).
 """
 import bisect
 import math

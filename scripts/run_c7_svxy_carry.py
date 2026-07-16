@@ -8,6 +8,10 @@ gated no-KS, SVXY-BH, SPY-BH. No swing.db writes.
 
 DATA CONVENTION: split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
 SVXY was -1x until 2018-02-27, -0.5x after (actual prices, disclosed).
+
+NAV (finding-things map): imports run_e18_regime_gates (macro_close);
+run_e8_squeeze (CAP0, COST, cache_fetch). Imported by: no other module
+(standalone runner).
 """
 import math
 import sys

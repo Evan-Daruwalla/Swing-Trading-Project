@@ -8,6 +8,9 @@ Paper-first; live-money crypto is Evan-gated (custody). No swing.db writes.
 
 DATA: yfinance BTC-USD/ETH-USD daily, auto_adjust=False (crypto: close=actual),
 24/7 bars. New domain - does NOT touch swing.db or frozen refs.
+
+NAV (finding-things map): imports run_e8_squeeze (CAP0). Imported by: no
+other module (standalone runner).
 """
 import json
 import math

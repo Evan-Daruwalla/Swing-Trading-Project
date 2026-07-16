@@ -9,6 +9,10 @@ No swing.db writes.
 
 DATA CONVENTION: prices split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
 SVR = executed short flow (MM-hedging contaminated), NOT short interest.
+
+NAV (finding-things map): imports run_e10_earnings_drift (UNIV);
+run_e8_squeeze (CAP0, COST, cache_fetch). Imported by: no other module
+(standalone runner).
 """
 import datetime as dt
 import json

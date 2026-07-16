@@ -14,6 +14,15 @@ country/international ETF, and has zero `next_open` rows for ETFs. Hence this
 project fetches its own full OHLCV.
 
 DB: swing.db at project root (gitignored). Table `bars`, PK (ticker, date).
+
+NAV (finding-things map): foundation OHLCV store, no swing_bot deps of its own.
+Imported by swing_bot.{backtest, rotation, coverage_gate, test_frozen} and ~15
+scripts/ runners (run_e1..e8, run_e4_rotation, run_e6_deleveraged,
+daily_swing_paper, ...). CAVEAT: most scripts/ EXPERIMENTS do not read prices
+directly — they fetch via `run_e8_squeeze.cache_fetch` (a permanent on-disk
+yfinance cache; that function is the repo's real shared data layer, ~26
+importers). This module is the store used by the swing_bot engines + the live
+M3 loop; cache_fetch is the store used by the experiment jungle.
 """
 import sqlite3
 from pathlib import Path

@@ -23,6 +23,12 @@ data up to and including the "as of" date.
 
 Schema is separate from the `bars` table (prices.py) and untouched by
 test_frozen.py's pinned refs — safe to extend without risking the tripwire.
+
+NAV (finding-things map): the M3 sleeve ledger + signal deciders. Imported only
+by scripts/daily_swing_paper (the live loop). The three decide_* fns mirror the
+backtest gate of their runner: decide_e6_1x <-> run_e6_deleveraged,
+decide_e18_vixts <-> run_e18_regime_gates (arm a), decide_m10_1 <->
+run_m10_1_nagel_switch. Broker mirroring is in swing_bot.alpaca_client.
 """
 from __future__ import annotations
 

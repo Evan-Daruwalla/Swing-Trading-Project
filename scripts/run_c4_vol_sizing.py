@@ -7,6 +7,10 @@ open; 1 bp/side. Arms: each base unmanaged vs managed + QQQ-BH. PASS-RA-only,
 DESCRIPTIVE. No swing.db writes.
 
 DATA CONVENTION: split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): imports run_e18_regime_gates (macro_close, sma);
+run_e8_squeeze (CAP0, cache_fetch). Imported by: no other module (standalone
+runner).
 """
 import math
 import sys

@@ -6,6 +6,11 @@ days); enter on first close>prior-day-high (confirmed reversal); exit on
 close<prior-day-low (prior-bar-low trail) or 40-bar max hold. K=3. Distinct
 from E1 IBS (waits for confirmation vs buying the dip). Gate 2000-2013
 CAGR>=15% & maxDD<=60%, n>=30. No tuning. Reuses .e8e9_cache; no swing.db.
+
+NAV (finding-things map): imports run_e8_squeeze (CAP0, COST, GATE_END, K,
+MAX_HOLD, SEC_START, SIM_START, cache_fetch, window_stats);
+swing_bot.universe (UNIVERSE). Imported by: no other module (standalone
+runner).
 """
 import sys
 from pathlib import Path

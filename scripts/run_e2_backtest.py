@@ -5,6 +5,9 @@ clear: n>=100, expectancy>0, net CAGR>=15%, maxDD<=60%. Sharpe reported as
 context (not a gate). Train window + K=1/K=3 + cost/fill sensitivities are
 reported context only. PRE-COMMITTED STOP: if E2 fails, the IBS family is
 shelved. No tuning.
+
+NAV (finding-things map): imports swing_bot (backtest, prices, universe).
+Imported by: no other module (standalone runner).
 """
 import sqlite3
 import sys

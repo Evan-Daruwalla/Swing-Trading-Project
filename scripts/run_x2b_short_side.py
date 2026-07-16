@@ -11,6 +11,10 @@ daily, and accrues a BORROW FEE swept 0/2/5/10/20%/yr on short market value
 MODIFIED-WINDOW CAP: best verdict = PROMISING. No swing.db writes.
 
 DATA CONVENTION: prices split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): imports ingest_finra_short_interest (OUT, UNIV);
+run_e8_squeeze (CAP0, COST, cache_fetch). Imported by: no other module
+(standalone runner).
 """
 import bisect
 import json

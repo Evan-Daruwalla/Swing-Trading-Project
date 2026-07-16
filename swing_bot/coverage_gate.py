@@ -16,6 +16,12 @@ independent checks:
    almost certainly bad data, not a real move).
 
 Prices are split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): the M0.4 data-quality gate. Imports swing_bot.
+{prices, universe}. CAVEAT (2026-07-15): NO module currently imports it — it
+was built for M0.4 but is NOT yet wired into the live loop (daily_swing_paper
+does its own fetch without this gate). If you add a pre-signal data check to
+the daily loop, call it from here.
 """
 import sqlite3
 

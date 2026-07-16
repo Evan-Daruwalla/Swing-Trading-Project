@@ -4,6 +4,9 @@ Gate = HOLDOUT (2022-01-01..2026-07-08) on the PRIMARY universe (broad_us),
 next-open, 5bps/side, must clear: n>=100, expectancy>0, Sharpe>=0.50,
 maxDD<=25%. Train window + secondary universe + sensitivities are reported
 context only. No tuning.
+
+NAV (finding-things map): imports swing_bot (backtest, prices, universe).
+Imported by: no other module (standalone runner).
 """
 import sqlite3
 import sys

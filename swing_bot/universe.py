@@ -19,6 +19,12 @@ member, EWG, had ~$47M/day median dollar volume at the 2026-07-08 probe —
 orders of magnitude above any order size here); the real friction is the
 bid-ask spread. MIN_MEDIAN_DOLLAR_VOL is a forward guard against future
 degradation, enforced by the coverage/quality gate (M0.4), not here.
+
+NAV (finding-things map): exports `UNIVERSE` (the frozen ETF list) + `ETF`
+namedtuple + `MIN_MEDIAN_DOLLAR_VOL`. Imported by swing_bot.{backtest,
+coverage_gate, test_frozen} and runners run_e18_regime_gates, run_e1/e1b/e2,
+run_c3, run_e20, run_ex_decomp, ... (the 39-name survivor list used by M10-1
+lives in run_e10_earnings_drift.UNIV, NOT here — this is the ETF universe).
 """
 from collections import namedtuple
 

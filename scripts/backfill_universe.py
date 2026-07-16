@@ -5,6 +5,9 @@ Idempotent (INSERT OR REPLACE). Run from the project root with the venv:
 
 Prices are split-adjusted, dividend-UNADJUSTED (auto_adjust=False), matching
 the project convention. Default history start 2014-01-01 (plenty for E1).
+
+NAV (finding-things map): imports swing_bot (prices, universe). Imported by:
+no other module (standalone runner).
 """
 import sys
 from pathlib import Path

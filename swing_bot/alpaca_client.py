@@ -25,6 +25,12 @@ passes allow_live=True (nothing in this project does), on top of the paper
 default. Notional (dollar-sized) orders are MARKET orders — Alpaca does not
 accept notional+limit — submitted DAY-TIF, so they queue for the next open when
 sent after hours (the project's signal-at-close/execute-next-open rule).
+
+NAV (finding-things map): the broker mirror. Imported only by
+scripts/daily_swing_paper (the --execute path). Entry point:
+`client_for_sleeve(name)` -> AlpacaClient bound to that sleeve's key pair;
+then `.submit_order(...)` / `.close_position(...)` / `.cancel_all_orders()`.
+Signal logic is NOT here — it lives in swing_bot.paper_sleeves.decide_*.
 """
 from __future__ import annotations
 

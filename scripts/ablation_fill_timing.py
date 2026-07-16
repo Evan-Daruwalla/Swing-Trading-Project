@@ -14,6 +14,9 @@ per-signal average, NOT the K=5 strategy return (that is M2).
 
 Returns permitted here: run strictly AFTER the M1.7 pre-registration commit
 (8963e49). Prices split-adjusted, dividend-UNADJUSTED.
+
+NAV (finding-things map): imports swing_bot (prices, signals, universe).
+Imported by: no other module (standalone runner).
 """
 import sys
 from pathlib import Path

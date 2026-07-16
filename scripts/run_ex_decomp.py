@@ -23,6 +23,12 @@ honest null:
                  FAIL is then about the 15% high-return bar / DD, not the signal)
 
 Reuses .e8e9_cache; no swing.db writes; frozen tripwire unaffected.
+
+NAV (finding-things map): imports run_e13_turn_of_month;
+run_e14_sector_momentum; run_e15_earnings_premium; run_e16_weekly_reversal;
+run_e20_dividend_capture; run_e8_squeeze (COST, cache_fetch);
+swing_bot.universe (UNIVERSE). Imported by: no other module (standalone
+runner).
 """
 import io
 import sys

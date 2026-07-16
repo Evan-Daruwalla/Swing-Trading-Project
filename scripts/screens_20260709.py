@@ -14,6 +14,9 @@ All sized NAV-proportionally (v2 semantics), 5 bps/side. Any survivor gets
 its own pre-registration before a confirmatory run — these numbers are
 in-sample screens and say NOTHING final.
 Prices split-adjusted, dividend-UNADJUSTED (swing.db).
+
+NAV (finding-things map): imports swing_bot (prices, signals, universe).
+Imported by: no other module (standalone runner).
 """
 import math
 import sys

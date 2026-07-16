@@ -9,6 +9,10 @@ Single 2018-2026 window -> MODIFIED-WINDOW CAP: best verdict = PROMISING.
 5 bps/side. Reuses .e8e9_cache; no swing.db writes.
 
 DATA CONVENTION: prices split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): imports ingest_finra_short_interest (OUT, UNIV);
+run_e8_squeeze (CAP0, COST, cache_fetch). Imported by: no other module
+(standalone runner).
 """
 import bisect
 import json

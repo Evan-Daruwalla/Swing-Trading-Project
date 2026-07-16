@@ -6,6 +6,9 @@ D1 dual-bar verdict. Reuses .e8e9_cache; no swing.db writes.
 
 DATA CONVENTION: yfinance auto_adjust=False -> split-adjusted,
 dividend-UNADJUSTED.
+
+NAV (finding-things map): imports run_e8_squeeze (CAP0, COST, cache_fetch).
+Imported by: run_ex_decomp.py.
 """
 import math
 import sys

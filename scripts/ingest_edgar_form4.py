@@ -7,6 +7,9 @@ map recovers XOM/DIS pre-reorg history. Parses RAW Form-4 XML (not the XSL
 render). ~104k documents total -> hours; run in background.
 
 No swing.db writes. Data feeds run_e19_insider.py.
+
+NAV (finding-things map): imports no project modules (self-contained).
+Imported by: no other module (standalone runner).
 """
 import json
 import sys

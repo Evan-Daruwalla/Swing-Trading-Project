@@ -3,6 +3,11 @@
 PRIMARY: 1x = QQQ real data (no synthesis). SECONDARY: 2x synthetic (drag
 calibrated to real QLD). Gates on the 1x cell across three windows. No tuning.
 Does NOT touch swing.db.
+
+NAV (finding-things map): E6 sleeve backtest. Imports swing_bot.prices (fetches
+its own series, no cache_fetch). LIVE forward-paper twin:
+swing_bot.paper_sleeves.decide_e6_1x (the e6_1x sleeve mirrors this 200-DMA
+gate). Self-contained otherwise.
 """
 import math
 import sys

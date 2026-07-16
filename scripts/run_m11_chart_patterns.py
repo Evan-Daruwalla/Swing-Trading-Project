@@ -12,6 +12,12 @@ returns) documenting the Savin (2007) short effect = non-deployable (X2 lesson).
 
 DATA CONVENTION: split-adjusted, dividend-UNADJUSTED (auto_adjust=False). Pivots
 on close (b[5]); fills on open (b[2]); MTM on close. No swing.db writes.
+
+NAV (finding-things map): imports `cache_fetch, COST, CAP0` <- run_e8_squeeze
+and `UNIV` (39-name survivor list) <- run_e10_earnings_drift. Self-contained
+detectors: causal pivots + detect() (long) / detect_short() (diagnostic).
+RESULT = FAIL, 2026-07-14 (signal-dead; survivorship destroyed the edge) — NOT
+forwarded to M3 paper. See docs/research/2026-07-14_M11_chart_patterns_results.md.
 """
 import math
 import sys

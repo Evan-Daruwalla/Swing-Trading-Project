@@ -8,6 +8,10 @@ main (channel+time exit) and time-stop-only. Rungs A/B/C. D1 dual-bar.
 No swing.db writes.
 
 DATA CONVENTION: split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): imports run_e8_squeeze (CAP0, COST, cache_fetch);
+swing_bot.universe (UNIVERSE). Imported by: no other module (standalone
+runner).
 """
 import math
 import statistics

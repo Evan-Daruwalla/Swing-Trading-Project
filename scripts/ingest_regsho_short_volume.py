@@ -11,6 +11,9 @@ contaminated, per BU; NOT short interest).
 
 Resumable per-day (skips cached dates). Cache gitignored
 (.regsho_cache/short_volume.json). No swing.db writes.
+
+NAV (finding-things map): imports no project modules (self-contained).
+Imported by: no other module (standalone runner).
 """
 import datetime as dt
 import json

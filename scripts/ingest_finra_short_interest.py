@@ -11,6 +11,9 @@ DATA NOTE: this is SETTLEMENT-date short interest (point-in-time as-of settle);
 public dissemination lags ~8-9 business days -> the RUNNER enters on a lagged
 date, NOT the settlement date (lookahead guard lives in the runner, not here).
 Cache is gitignored (.finra_cache/short_interest.json). No swing.db writes.
+
+NAV (finding-things map): imports no project modules (self-contained).
+Imported by: run_x2_days_to_cover.py, run_x2b_short_side.py.
 """
 import csv
 import io

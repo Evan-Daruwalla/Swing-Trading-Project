@@ -6,6 +6,10 @@ lookahead => asymmetric framing (only a FAIL is clean) on top of the D1
 dual-bar verdict. Reuses E10 earnings-date + OHLCV cache; no swing.db writes.
 
 DATA CONVENTION: yfinance auto_adjust=False -> split-adjusted, div-UNADJUSTED.
+
+NAV (finding-things map): imports run_e10_earnings_drift (UNIV,
+earnings_dates); run_e8_squeeze (CAP0, COST, cache_fetch). Imported by:
+run_ex_decomp.py.
 """
 import bisect
 import math

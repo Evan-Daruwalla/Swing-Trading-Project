@@ -8,6 +8,10 @@ flat iff (VIX/VIX3M>1 AND SPY<200DMA). Gate 2006-2013 (VIX3M floor), secondary
 No swing.db writes.
 
 DATA CONVENTION: SPY split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): imports run_e18_regime_gates (macro_close, sma);
+run_e8_squeeze (CAP0, COST, cache_fetch). Imported by: no other module
+(standalone runner).
 """
 import math
 import sys

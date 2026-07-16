@@ -8,6 +8,10 @@ French library (fetched once, cached, gitignored). D1 + asymmetric framing.
 No swing.db writes.
 
 DATA CONVENTION: prices split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): imports run_e10_earnings_drift (UNIV);
+run_e8_squeeze (CACHE, CAP0, COST, cache_fetch). Imported by:
+daily_swing_paper.py, run_m10_1_nagel_switch.py.
 """
 import datetime as dt
 import io

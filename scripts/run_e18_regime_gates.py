@@ -8,6 +8,13 @@ windows) + D1 tiers. Signal at close, next-open, 5bps. No swing.db writes.
 
 DATA: QQQ/ETFs from .e8e9_cache; ^VIX/^VIX3M via yfinance (cached);
 HY-OAS BAMLH0A0HYM2 via FRED keyless CSV (cached). auto_adjust=False.
+
+NAV (finding-things map): SHARED-HELPER HUB. Its `macro_close`, `sma`, `stats`
+are imported by run_m10_1_nagel_switch, run_x7_credit_gate, run_c4_vol_sizing,
+run_c7_svxy_carry, run_x1_vol_targeting, run_m10_2 — edit them with care.
+Shared price data via `cache_fetch` <- run_e8_squeeze; universe via
+swing_bot.universe.UNIVERSE. LIVE forward-paper twin:
+swing_bot.paper_sleeves.decide_e18_vixts mirrors arm (a) VIX/VIX3M<1.
 """
 import json
 import math

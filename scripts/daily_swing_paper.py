@@ -36,6 +36,15 @@ test_frozen.py reads -- new tables only (paper_sleeves/paper_positions/
 paper_transactions/paper_nav/fill_divergence), tripwire-safe by construction.
 
 DATA CONVENTION: split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
+
+NAV (finding-things map): THE live daily orchestrator. Fired by the Windows
+task `SwingTradingDailyPaper` via daily_swing_paper.bat (--execute), logging to
+var/daily_swing_paper.log. Imports swing_bot.{prices, paper_sleeves as ps};
+alpaca_client is used lazily in the --execute path. Per-sleeve SIGNAL logic
+lives in ps.decide_* (swing_bot/paper_sleeves.py), NOT here; this file only
+orchestrates fetch -> realize-pending -> decide -> record-NAV -> mirror. The
+M10-1 weekly path also pulls `UNIV` <- run_e10_earnings_drift and
+`residual_series, BETA_N` <- run_c1_residual_reversal.
 """
 import argparse
 import bisect

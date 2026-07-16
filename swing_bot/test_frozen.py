@@ -18,6 +18,13 @@ no data change, a regression was introduced. NOTE: it depends on the frozen
 re-backfill with unchanged code means upstream yfinance DATA drift, not a
 code bug; investigate the data. Do not delete this harness; extend
 REFERENCES.
+
+NAV (finding-things map): the tripwire. Covers backtest.py (E1) + rotation.py
+(E4) via swing_bot.{prices, signals, universe}. RUN AFTER ANY swing_bot CHANGE:
+    .venv\\Scripts\\python.exe -m swing_bot.test_frozen
+d must be +/-0.0000pp at each case's declared precision. It does NOT cover the
+scripts/ experiment runners (they have no frozen refs) or the M3 paper tables
+(paper_sleeves' schema is orthogonal to `bars`).
 """
 import sqlite3
 from collections import namedtuple

@@ -8,6 +8,11 @@ different strategy class (regime timing, single instrument).
 
 Prices split-adjusted, dividend-UNADJUSTED. Returns a dict compatible with
 `backtest.metrics` ('nav' + 'trades' where trades = switch records).
+
+NAV (finding-things map): the E4 regime-rotation engine — entry point
+`run_rotation()`. A DIFFERENT strategy class from backtest.py's IBS engine
+(single-instrument MA timing vs multi-name mean reversion). Imports
+swing_bot.prices. Callers: test_frozen (pins E4 refs), run_e4_rotation.
 """
 from swing_bot import prices
 

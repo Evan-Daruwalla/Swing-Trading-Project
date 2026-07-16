@@ -4,6 +4,9 @@ Arm 1: 1x MA-rotation drawdown overlay (confirm E6) per market.
 Arm 2: a-priori-vol-gated 3x rotation (vol<30%, drag 5%/yr, fixed a priori).
 Local-index returns (currency-neutral); price indices understate return by
 dividends. No tuning. Does NOT touch swing.db.
+
+NAV (finding-things map): imports swing_bot (prices). Imported by: no other
+module (standalone runner).
 """
 import math
 import sys

@@ -7,6 +7,15 @@ CAGR>=15% AND maxDD<=60%, n_trades>=30. No tuning after results.
 DATA CONVENTION: yfinance auto_adjust=False -> split-adjusted,
 dividend-UNADJUSTED. Fetched live from inception; does NOT touch swing.db
 (protects frozen-regression refs). Cache in scratchpad only.
+
+NAV (finding-things map): this file is E8's own experiment, BUT its
+`cache_fetch(ticker)` (below) + `CACHE, COST, CAP0` are the repo's de-facto
+SHARED DATA LAYER — imported by ~26 scripts/ runners (e18, m10-1, m11, x7,
+c1, c4, c7, x1, ...). If you are hunting for "where do the experiments get
+their prices," it is here, not swing_bot/prices.py (that store feeds the
+swing_bot engines + the live M3 loop instead). Returns rows as
+(ticker, date, open, high, low, close, ...); most callers use b[1]=date,
+b[2]=open, b[5]=close.
 """
 import json
 import math

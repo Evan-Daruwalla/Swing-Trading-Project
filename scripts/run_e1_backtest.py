@@ -6,6 +6,9 @@ context: c2c model, 0/20 bps sensitivity, per-group, split-sample.
 
 Kill criteria (E1 PASSES only if ALL): n>=200; mean net return/trade>0;
 annualized Sharpe>=0.50; max drawdown<=25%. No tuning on a FAIL.
+
+NAV (finding-things map): imports swing_bot (backtest, prices, universe).
+Imported by: no other module (standalone runner).
 """
 import sqlite3
 import sys

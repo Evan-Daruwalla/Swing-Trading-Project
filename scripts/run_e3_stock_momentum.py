@@ -6,6 +6,9 @@ Universe = ~35 survivor large-caps (explicitly biased, see prereg S0). Hold
 top K=3 by trailing 63-day return, rebalance every 10 trading days, next-open
 fills, 5 bps/side, full rebalance each period (slightly pessimistic on cost =
 conservative for a falsification test). Does NOT touch swing.db.
+
+NAV (finding-things map): imports swing_bot (prices). Imported by: no other
+module (standalone runner).
 """
 import math
 import sys

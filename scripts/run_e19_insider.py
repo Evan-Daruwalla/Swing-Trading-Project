@@ -6,6 +6,10 @@ of the prior 3 years, per reporting owner); trades OPPORTUNISTIC buys only.
 Enter next open after filing date, hold 40 sessions, K=5. Gate 2003-2013.
 D1 dual-bar verdict + asymmetric framing (survivor => only a FAIL is clean).
 Reuses .e8e9_cache prices; no swing.db writes.
+
+NAV (finding-things map): imports run_e10_earnings_drift (UNIV);
+run_e8_squeeze (CAP0, COST, cache_fetch). Imported by: no other module
+(standalone runner).
 """
 import bisect
 import json
