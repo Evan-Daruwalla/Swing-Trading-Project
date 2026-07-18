@@ -281,32 +281,55 @@ def main():
 
     if args.execute:
         # THREE-ACCOUNT model (2026-07-15): every sleeve mirrors to its OWN
-        # Alpaca paper account. For each sleeve with a NEW pending target,
-        # reconcile the account: close held symbols not in the target (market
-        # liquidation, queues for next open after hours), then buy each target
-        # symbol not already held as a MARKET NOTIONAL DAY order (notional+limit
-        # is rejected by Alpaca; market-notional-DAY queues for next open and
-        # satisfies the DAY-TIF rule). UNVERIFIED against real fills until a
-        # live cycle runs -- fill_divergence logs the order ids for audit.
+        # Alpaca paper account.
+        #
+        # RECONCILE-TO-DB (2026-07-17 footgun fix, record DA): each run drives
+        # the Alpaca account toward the DB's AUTHORITATIVE desired holding --
+        # the pending target if one is set (the new allocation that fills next
+        # open), ELSE the sleeve's current DB positions (steady state). The old
+        # code mirrored only a "new pending" and skipped otherwise; but a stray
+        # dry-run (which still advances the DB ledger, by design) can REALIZE a
+        # pending and clear it before any --execute ever mirrored it -> the DB
+        # then holds a position Alpaca never got, and pending-only mirroring
+        # can't see it. Reading DB STATE (positions|pending), not "a decision
+        # happened this run", lets the account self-heal on the next --execute.
+        # Close held symbols not wanted (market liquidation, queues next open
+        # after hours); buy each wanted symbol not already held as a MARKET
+        # NOTIONAL DAY order (notional+limit is rejected by Alpaca;
+        # market-notional-DAY queues for next open, satisfies DAY-TIF).
+        # UNVERIFIED against real fills until a live cycle runs -- fill_divergence
+        # logs the order ids for audit.
         from swing_bot.alpaca_client import client_for_sleeve, AlpacaError
         import json
         for s in ps.SLEEVES:
             st = ps.get_sleeve(conn, s)
             pending = json.loads(st["pending_json"]) if st["pending_json"] else None
-            if not pending and pending != {}:
-                print(f"\n--execute [{s}]: no new pending decision today -- nothing to mirror.")
-                continue
+            positions = ps.get_positions(conn, s)
+            nav = mark_nav(conn, s, today, close_px)
+            # {symbol: notional$} the Alpaca account should hold. Pending has
+            # explicit weights (nav*w); steady-state positions mirror their
+            # current DB dollar exposure (qty*close).
+            if pending is not None:
+                desired = {t: round(nav * w, 2) for t, w in pending.items()}
+            else:
+                desired = {t: round(p["qty"] * close_px.get(t, 0.0), 2)
+                           for t, p in positions.items()}
+            desired = {t: n for t, n in desired.items() if n > 0}
             try:
                 client = client_for_sleeve(s)
             except AlpacaError as e:
                 print(f"\n--execute [{s}]: SKIPPED (creds): {e}")
                 continue
             try:
-                nav = mark_nav(conn, s, today, close_px)
                 held = {p["symbol"]: p for p in client.list_positions()}
-                target_syms = set(pending)
+                target_syms = set(desired)
+                if not target_syms and not held:
+                    print(f"\n--execute [{s}]: Alpaca PAPER {client.base_url}  "
+                          f"NAV=${nav:,.2f}  DB flat + Alpaca flat -- nothing to mirror.")
+                    continue
+                src = "pending" if pending is not None else "positions"
                 print(f"\n--execute [{s}]: Alpaca PAPER {client.base_url}  NAV=${nav:,.2f}  "
-                      f"held={sorted(held)}  target={sorted(target_syms)}")
+                      f"held={sorted(held)}  target={sorted(target_syms)} (from DB {src})")
                 client.cancel_all_orders()
                 for sym in held:                       # flatten what's not wanted
                     if sym not in target_syms:
@@ -315,11 +338,10 @@ def main():
                             print(f"    CLOSE {sym}")
                         except AlpacaError as e:
                             print(f"    close {sym} FAILED: {e}")
-                for t, w in pending.items():            # enter new target legs
+                for t, notional in desired.items():     # enter / repair wanted legs
                     if t in held:
                         print(f"    hold {t} (already held; not re-buying)")
                         continue
-                    notional = round(nav * w, 2)
                     try:
                         o = client.submit_order(symbol=t, notional=notional, side="buy",
                                                 type="market", time_in_force="day")

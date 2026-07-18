@@ -3953,3 +3953,147 @@ era, near-orthogonal signals = a natural experiment across concentration / horiz
 (includes the earlier unpushed record-notes commit 9930ccf) per Evan.
 
 **Next action:** commit + push; M3 task armed for 19:00 tonight.
+
+# Appendix CZ - Graphify graph rebuilt (was 0-edge) + NAV finding-things maps across the codebase (2026-07-15, ~21:15 CST)
+
+**WHAT:** Evan: "update the /graphify-windows, then use it and other things to add more
+verbose comments to the codebase to make finding things easier." Two clauses. Not an
+experiment; tally unchanged (35). Committed + pushed as **e5a4e94**.
+
+**CLAUSE 1 - graphify "update" resolved to a REBUILD, not a skill edit.** The `/graphify`
+skill's internal name is `graphify-windows` (frontmatter). Two readings: edit `SKILL.md`, or
+refresh the graph. Checked the skill -- no defect -> discarded the edit reading. The graph was
+BOTH stale (graph.json Jul 10; 27 of 53 .py newer) AND broken: **281 nodes / 0 EDGES** =
+useless for navigation. Rebuilt via AST extraction (code-only path, deterministic, free, no
+LLM/subagents/API key -- installed graphify 0.8.50): **381 nodes / 589 edges / 25
+communities**. The 0-edge graph was a stale doc-heavy artifact; the AST pass produces edges
+fine, so the skill itself is not broken. Regenerated graph.html (317 KB) too.
+
+**HUBS the graph surfaced (the navigation payload):** (a) god node = `run_e8_squeeze
+.cache_fetch` (degree 28, ~26 importers) -- the experiment jungle's REAL shared data layer, a
+permanent on-disk yfinance cache parked inside an experiment script, NOT `swing_bot/prices.py`
+(that store feeds the swing_bot engines + the live M3 loop instead). (b) `run_e18_regime_gates`
+exports `macro_close/sma/stats` reused by m10-1, x7, c4, c7, x1, m10-2. (c) `swing_bot/` = the
+E1/E4 engines + M3 paper infra, cleanly separate from the scripts/ jungle.
+
+**CLAUSE 2 - NAV stanzas on 52 files.** Added a `NAV (finding-things map):` block inside every
+`swing_bot/` module docstring + every `scripts/` runner docstring. Content = grep/AST-VERIFIED
+project imports + importers + shared-hub pointers -- the reverse-dependency layer you cannot
+see from inside a file. Scope grew across the session: first core+active-sleeves (Evan's pick),
+then all retired runners ("3 then 1"). Deliberate anti-fabrication choice: NAV = DEPENDENCY
+FACTS ONLY, zero result verdicts (inventing FAIL/PASS history from memory violates the
+no-fabrication order; the dependency map is the actual "find things" value anyway). The 16
+core+active files got hand-written stanzas (with the few verdicts that are copied from each
+file's OWN existing header); the 36 retired runners got stanzas from an AST-driven inserter
+(scratchpad navadd.py: parses each module docstring node, inserts before the closing quotes
+via end_lineno/end_col_offset). All stanzas live INSIDE docstrings -> inert.
+
+**HONEST FINDINGS logged in the comments:** (1) `coverage_gate.py` has ZERO importers -- built
+for M0.4, never wired into the live loop (daily_swing_paper fetches without it). (2) The
+prices.py-vs-cache_fetch data-layer split is now documented in both files. (3) `run_e8_squeeze`
+was one deliberate step outside the "core+active" scope because it holds the single most-
+imported symbol in the repo -- flagged to Evan, kept.
+
+**VERIFIED:** frozen tripwire GREEN twice (14 cases d=+/-0.0000pp -- comments confirmed inert);
+all 53 .py compile (py_compile); `alpaca_keys.env` confirmed gitignored (`.gitignore:18:*.env`)
++ never staged (guarded before commit). Temp `.graphify_*.json` intermediates cleaned per skill
+Step 9; kept graph.json + GRAPH_REPORT.md + graph.html.
+
+**Cadence #117 satisfied** (hook prompt #117). STATE: committed + pushed e5a4e94; graph.html
+regenerated (uncommitted -- see next).
+
+**Next action:** none required. M3 scheduled task `SwingTradingDailyPaper` fired 19:00 CDT
+tonight -- Evan reviews `var\daily_swing_paper.log` as desired. graph.html regen is uncommitted
+(a build artifact; commit only if Evan wants the viz tracked).
+
+# Appendix DA - m10-1 "hasn't bought" diagnosed (weekly cadence, not a bug) + dry-run/Alpaca desync footgun fixed (2026-07-17, CST)
+
+**TRIGGER:** Evan: "m10-1 still hasnt bought anything." Investigated the live M3 sleeve DB +
+the daily loop; did NOT guess.
+
+**DIAGNOSIS - not a bug.** m10_1_nagel is the WEEKLY switch: it decides only on
+`weekday()==4` (Friday), `today = qdates[-1]` = latest QQQ session (daily_swing_paper.py:174,
+224). Sleeves launched Thu 2026-07-16; the last completed scheduled run was Thu 07-16 19:00
+(LastTaskResult=0), so `today`=07-16 (Thu) -> m10 correctly SKIPPED every run since launch
+(`last_decided_week`=None, cash still $1,000, NAV flat). e6/e18 decide DAILY -> they bought QQQ
+Thursday (cash ~0, NAV 991.49 on 07-16). A dry-run with today=Fri 07-17 (VIX 18.76 < 20 =
+CALM regime, QQQ>200DMA) confirmed m10's decision = `target=QQQ:1.00 (NEW pending -> next
+open)`. So m10 makes its INAUGURAL buy at tonight's (Fri 07-17 19:00) scheduled --execute run,
+filling Mon 07-20 open.
+
+**FOOTGUN FOUND + FIXED.** The diagnostic dry-run MUTATED the ledger: the loop commits DB
+state (realize_pending/set_pending/last_decided_week/NAV) even WITHOUT --execute -- by design
+(the DB-sim ledger is the primary evidence, Alpaca is a secondary mirror; docstring pts 3-4).
+That is fine in isolation, but it exposes a desync: a stray dry-run can REALIZE a pending
+(advance positions) and CLEAR it before any --execute ever mirrored that entry -> the DB then
+holds a position Alpaca never received, and the old mirror (which fired only on a live
+`pending_json`) could not see it. Reverted my dry-run's mutation surgically (reset m10
+week/pending to NULL; deleted the 3 off-schedule 07-17 NAV rows; positions/transactions from
+Thursday untouched) so tonight's scheduled run is the canonical decision+mirror.
+
+**THE FIX (daily_swing_paper.py --execute block, RECONCILE-TO-DB):** each --execute run now
+drives the Alpaca account toward the DB's AUTHORITATIVE desired holding -- the pending target
+if set (nav*w sizing, the next-open allocation), ELSE the sleeve's current DB positions
+(qty*close dollar exposure, steady state). Reads DB STATE, not "a decision happened this run",
+so an off-schedule dry-run that advanced the ledger SELF-HEALS on the next --execute instead of
+leaving Alpaca silently behind. Close-not-wanted / buy-missing as before (market-notional DAY).
+Note: this corrected my own imprecise "option 2" framing -- the old mirror ALREADY read current
+pending; pending-only mirroring cannot self-heal a pending that a dry-run already realized-and-
+cleared, which is why the fix reconciles to positions|pending, not pending alone.
+
+**VERIFIED:** py_compile OK; frozen tripwire GREEN (d=+/-0.0000pp -- --execute change does not
+touch the ledger or the E1/E4 engines); DB confirmed clean post-revert (m10 pending/week NULL,
+no 07-17 NAV rows). The --execute reconcile itself stays UNVERIFIED against real fills until a
+live cycle runs (the file's standing disclosure) -> tonight's 19:00 scheduled run is its first
+end-to-end test; review var\daily_swing_paper.log after.
+
+**STATE:** uncommitted -- daily_swing_paper.py fix + record CZ/DA + regenerated graph.html +
+rebuilt graphify graph. swing.db is gitignored (revert not tracked). Tally unchanged (35).
+
+**Next action:** none forced. Evan fires/awaits the 19:00 scheduled --execute; DO NOT run the
+bare script before then (re-contaminates the ledger off-schedule). Commit the code+docs when
+Evan says.
+
+# Appendix DB - m10-1 inaugural buy CONFIRMED live + reconcile fix verified end-to-end (double-run, harmless) (2026-07-18, ~00:25 CST)
+
+**CONTEXT:** Following DA (m10 diagnosis + reconcile-to-DB footgun fix). Evan: "run
+Start-ScheduledTask -TaskName SwingTradingDailyPaper." Fired it, then verified against Alpaca
+ground truth (read-only list_orders/list_positions/get_account on all 3 paper accounts).
+
+**WHAT ACTUALLY HAPPENED - a double-run, made harmless by the fix.** The 7pm Fri 07-17
+SCHEDULED run had ALREADY fired (log line 86; order 7d348c06 submitted 2026-07-18T00:00:06Z =
+19:00 CST Fri) and correctly did m10's INAUGURAL weekly decision -> QQQ (VIX 18.77<20 = calm,
+QQQ>200DMA), set week=2026-W29, pending={QQQ}, mirrored BUY. Evan's manual Start-ScheduledTask
+landed at 00:21 CST Sat (order d0b7fc18 submitted 2026-07-18T05:21:50Z) -- the machine clock had
+already rolled past the 7pm trigger, so this was a REDUNDANT 2nd run. m10's decision correctly
+SKIPPED (week W29 guard), but pending {QQQ} persisted (unrealized, today 07-17 <= signal_date)
+so the reconcile mirror re-synced: cancel_all_orders() CANCELED the stale 7pm order 7d348c06,
+then re-placed a fresh BUY (d0b7fc18). NET = exactly ONE live order. The accidental double-run
+was an unplanned but real end-to-end test of the RECONCILE-TO-DB fix -- it passed.
+
+**ALPACA GROUND TRUTH (read-only, 2026-07-18 ~00:25 CST):**
+- m10_1_nagel: flat, cash $1,000; 1 OPEN order BUY QQQ notional=1000 market DAY (d0b7fc18,
+  accepted); 7d348c06 = CANCELED. -> fills Mon 07-20 open, long QQQ. NO double exposure.
+- e18_vixts: holds QQQ 1.4045 (equity $976.58); 1 OPEN order SELL QQQ qty 1.4045 market DAY
+  (aa234592) -> goes to CASH Mon. Signal: VIX/VIX3M = 18.77/18.57 = 1.011 > 1 (backwardation).
+- e6_1x: holds QQQ 1.4045 (equity $976.58); 0 open orders -> stays long QQQ. No churn.
+- DB (paper_sleeves) matches Alpaca EXACTLY: e6 QQQ/no-pending; e18 QQQ/pending={} (cash);
+  m10 flat/pending={QQQ}. Prior orders canceled, zero duplicates.
+
+**MILESTONE:** the --execute mirror was "UNVERIFIED against real fills until a live cycle runs"
+(daily_swing_paper.py standing disclosure) -- that caveat is now RETIRED. Full cycle observed:
+decision -> pending -> market-notional DAY order queued after-hours -> Alpaca accepts + queues
+for next open; cancel_all_orders reconciliation confirmed working.
+
+**TWO FLAGS (not bugs):** (1) the scheduled task SELF-RUNS at 7pm weekdays -- a manual
+Start-ScheduledTask after 7pm is redundant + churns orders (cancel+replace); harmless here.
+(2) VIX3M feed lagged ~7 sessions (asof 07-10 on the 07-17 run) -> e18's flip to cash rode a
+week-stale VIX3M at a MARGINAL 1.011 ratio. Carry-forward is by-design past-only (record CQ),
+but the freshness gap + marginal ratio is worth monitoring; a fresher VIX3M could flip the call.
+
+**STATE:** committing the reconcile fix (daily_swing_paper.py) + records CZ/DA/DB + regenerated
+graph.html + rebuilt graphify graph. swing.db gitignored (paper state not tracked). Tally 35.
+
+**Next action:** review Monday 07-20's run -- confirm m10 QQQ + e18 cash actually FILL at the
+open (first realized fills; fill_divergence will log sim-vs-Alpaca price). Do NOT manually fire
+the task after 7pm.
