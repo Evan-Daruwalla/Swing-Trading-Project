@@ -55,6 +55,8 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
+import httpx
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from swing_bot import prices, paper_sleeves as ps
@@ -98,6 +100,41 @@ def series(ticker, start="1999-01-01"):
     close = {b[1]: b[5] for b in bars}
     openp = {b[1]: b[2] for b in bars}
     return dates, close, openp
+
+
+VIX3M_CBOE_URL = "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX3M_History.csv"
+
+
+def vix3m_close(start="2015-01-01"):
+    """VIX3M close series {YYYY-MM-DD: close}. PRIMARY = CBOE's authoritative
+    daily CSV (fresh through the latest session). Yahoo's ^VIX3M symbol lags
+    ~a week (Yahoo stops updating the term-structure indices while ^VIX stays
+    current) -- on 2026-07-17 that stale value INVERTED e18's live signal
+    (record DC): stale 18.77/18.57=1.011 said CASH, fresh 18.77/20.54=0.914
+    says HOLD. FALLBACK = yfinance ^VIX3M if CBOE is unreachable. The signal
+    CONDITION (VIX/VIX3M<1) is unchanged -- this only swaps the live VENDOR
+    for the freshest reading, same class of live-vs-backtest data
+    accommodation as the VIX3M carry-forward. CBOE's VIX matches Yahoo's ^VIX
+    exactly, so mixing CBOE-VIX3M with Yahoo-VIX is consistent."""
+    try:
+        r = httpx.get(VIX3M_CBOE_URL, timeout=20, follow_redirects=True)
+        r.raise_for_status()
+        out = {}
+        for line in r.text.strip().splitlines()[1:]:      # skip DATE,OPEN,HIGH,LOW,CLOSE
+            parts = line.split(",")
+            if len(parts) < 5:
+                continue
+            m, d, y = parts[0].split("/")                  # CBOE date = MM/DD/YYYY
+            iso = f"{y}-{int(m):02d}-{int(d):02d}"
+            if iso >= start:
+                out[iso] = float(parts[4])                 # CLOSE
+        if out:
+            return out
+        print("  VIX3M CBOE returned no rows; falling back to yfinance ^VIX3M", flush=True)
+    except Exception as e:
+        print(f"  VIX3M CBOE fetch failed ({e}); falling back to yfinance ^VIX3M", flush=True)
+    _, v3, _ = series("^VIX3M", start=start)
+    return v3
 
 
 def realize_pending(conn, sleeve, today, fill_open):
@@ -174,7 +211,7 @@ def main():
     today = qdates[-1]
     print(f"  latest session: {today}")
     _, vclose, _ = series("^VIX", start="2015-01-01")
-    _, v3close, _ = series("^VIX3M", start="2015-01-01")
+    v3close = vix3m_close(start="2015-01-01")   # CBOE-primary (Yahoo ^VIX3M lags, record DC)
 
     # Carry-forward the most-recent-available reading <= today (PAST-ONLY, no
     # look-ahead). Necessary live: yfinance's ^VIX3M feed lags ^VIX by 1-3
@@ -247,12 +284,18 @@ def main():
                                           f"decided, or today is not Friday)")
 
     # ---- store new pending where the target differs from what's now held ----
+    # If the target MATCHES current holdings, clear any stale pending: a prior
+    # run may have queued a move (e.g. e18's cash SELL on a stale-VIX3M signal,
+    # record DC) that this run's corrected signal reverses. Without the clear,
+    # the reconcile mirror would still act on the dead pending. (2026-07-18)
     for s, (target, err) in decisions.items():
         if target is None:
             continue
         positions = set(ps.get_positions(conn, s))
         if set(target) != positions:
             ps.set_pending(conn, s, target, today)
+        else:
+            ps.clear_pending(conn, s)
 
     # ---- mark NAV + summarize ----
     close_px = dict(qclose)

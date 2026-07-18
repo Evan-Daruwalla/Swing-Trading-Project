@@ -4097,3 +4097,75 @@ graph.html + rebuilt graphify graph. swing.db gitignored (paper state not tracke
 **Next action:** review Monday 07-20's run -- confirm m10 QQQ + e18 cash actually FILL at the
 open (first realized fills; fill_divergence will log sim-vs-Alpaca price). Do NOT manually fire
 the task after 7pm.
+
+# Appendix DC - VIX3M staleness diagnosed: Yahoo source lag INVERTED e18's live signal (2026-07-18, ~16:45 CST)
+
+**TRIGGER:** Evan chose to investigate the VIX3M staleness flagged in DB ("fetch path or
+yfinance?"). Answer: **yfinance/Yahoo source**, not our code.
+
+**DIAGNOSIS.** daily_swing_paper.series() calls prices.fetch (live yf.download, auto_adjust=
+False, NO local cache), so it returns the freshest data Yahoo HAS. Queried live 2026-07-18:
+- `^VIX`   fresh through 2026-07-17 (close 18.77).
+- `^VIX3M` STOPS at 2026-07-10 (close 18.57) -- Yahoo stopped updating the ^VIX3M symbol ~07-10
+  while ^VIX (flagship) stays current. Known Yahoo weakness on the term-structure indices.
+Our fetch path is correct; the source is stale. The carry-forward (record CQ) faithfully rode
+the last available (07-10) value -- masking the broken feed rather than failing loud.
+
+**MATERIAL IMPACT - the stale feed INVERTED e18's signal.** CBOE's authoritative CSV
+(cdn.cboe.com/api/global/us_indices/daily_prices/VIX3M_History.csv) has VIX3M fresh through
+07-17 = 20.54; CBOE's VIX_History.csv 07-17 = 18.77 = Yahoo's VIX EXACTLY (clean cross-check).
+- Live run used stale VIX3M: 18.77/18.57 = 1.011 > 1 -> risk-OFF -> e18 -> CASH (queued SELL
+  QQQ order aa234592 for Mon 07-20 open).
+- CORRECT with fresh VIX3M: 18.77/20.54 = 0.914 < 1 -> risk-ON -> e18 HOLDS QQQ.
+The true 07-17 term structure was CONTANGO (0.91, clearly risk-on); the week-old VIX3M made it
+look like backwardation. e18 is queued to WRONGLY sell QQQ Monday on stale data.
+
+**FIX CANDIDATE (not yet applied - Evan's call, live-sleeve source change):** switch the LIVE
+loop's VIX3M (and optionally VIX) fetch to the CBOE daily CSV -- authoritative, fresh, matches
+Yahoo on the overlapping VIX series. Signal CONDITION (VIX/VIX3M<1) unchanged; this only swaps
+the live data VENDOR at the current edge, same class of live-vs-backtest accommodation as the
+carry-forward. Backtest/prereg f32b008 unaffected (it used cached history where every date had
+a value; the lag only bites the most-recent live sessions). If applied, re-run so e18 cancels
+the wrong SELL and holds QQQ before Monday open.
+
+**STATE:** finding only, doc-only. e18's stale-data SELL order is still live on Alpaca pending
+Evan's decision. Tally 35. **Cadence #123.**
+
+**Next action:** Evan decides: (1) swap live VIX3M to CBOE + re-run (recommended), (2) also move
+VIX to CBOE for single-vendor consistency, (3) accept e18's cash call this week + document only.
+
+# Appendix DD - Fix applied: live VIX3M -> CBOE source + clear-stale-pending (option 1) (2026-07-18, ~16:50 CST)
+
+**DECISION:** Evan chose option 1 (from DC): swap live VIX3M to CBOE + re-run. Implemented in
+daily_swing_paper.py (2 changes) + verified.
+
+**CHANGE 1 - CBOE-primary VIX3M (`vix3m_close()`):** new helper fetches CBOE's authoritative
+daily CSV (VIX3M_History.csv), parses MM/DD/YYYY -> ISO + CLOSE, falls back to yfinance ^VIX3M
+if CBOE is unreachable. Replaces `series("^VIX3M")` in the loop. Signal CONDITION unchanged
+(VIX/VIX3M<1); only the live VENDOR at the current edge changes. CBOE VIX == Yahoo ^VIX exactly,
+so CBOE-VIX3M + Yahoo-VIX is consistent. Backtest/prereg f32b008 untouched (cached history).
+
+**CHANGE 2 - clear stale pending on revert (necessary companion):** the "store pending" block
+only SET pending on a change; it never CLEARED a pending when the new target matched current
+holdings. So re-running with the corrected signal alone would NOT fix e18 -- its stale cash
+pending={} would survive and the reconcile mirror would still SELL. Added `else:
+ps.clear_pending(conn, s)` so a target that matches holdings drops any dead pending. This is
+what actually lets the re-run reverse e18's wrong SELL. Safe for the legit cash case (target={}
+!= positions={QQQ} -> still sets the sell).
+
+**VERIFIED (isolated, no DB writes):** CBOE VIX3M now fresh through 2026-07-17 = 20.54 (vs
+Yahoo's stale 07-10 = 18.57). asof 07-17: ratio 18.77/20.54 = 0.9138 < 1 -> e18 decision =
+{'QQQ':1.0} = HOLD (was CASH on stale data). py_compile OK; frozen tripwire GREEN (scripts-only
+change); DB confirmed unmutated by the check (e18 still holds the stale pending={} pending the
+--execute re-run). The clear_pending path + Alpaca SELL-cancel are exercised end-to-end only
+when the --execute re-run fires -- that is the pending live verification.
+
+**STATE:** committed + pushed (this entry). e18's WRONG cash SELL order (aa234592) is STILL LIVE
+on Alpaca -- the code fix does not cancel it; an --execute re-run must. Tally 35.
+
+**Next action (TIME-SENSITIVE):** Evan re-fires the --execute run (Start-ScheduledTask or the
+script) THIS WEEKEND, before Mon 07-20 open. That run: e18 -> fresh CBOE VIX3M -> HOLD -> clears
+stale pending -> reconcile CANCELS the queued SELL + keeps QQQ; m10 keeps its QQQ buy; e6
+unchanged. If NOT re-fired before Monday open, e18's stale SELL FILLS at the open (wrongly goes
+to cash). Verify the log afterward: e18 target=['QQQ'] (from DB positions), CLOSE of nothing,
+SELL canceled.
