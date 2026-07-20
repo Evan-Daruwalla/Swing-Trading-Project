@@ -22,10 +22,14 @@ task is the default work.
 - PRD next-task (§4): on request; default idle action once a PRD exists.
 - Codebase-memory bins (§5): same session as any fact-changing change.
 - Misses are logged in the record, not hidden.
-- TIMEZONE: record/doc timestamps in **CST (UTC-5)**. The /project-memory
-  cadence hook reports UTC (Z) — subtract 5h before stamping an entry
-  (date rolls back if UTC time < 05:00). Set 2026-07-11 (record Appendix AZ)
-  after earlier entries were mislabeled UTC-as-local.
+- TIMEZONE: record/doc timestamps in **Central time, DST-aware**. Run `date`
+  before stamping and label the zone by its UTC offset — **UTC-6 → CST,
+  UTC-5 → CDT** — never estimate or hardcode one. The /project-memory cadence
+  hook reports UTC (Z); prefer running `date` over hand-converting, but if you
+  do convert, subtract the current offset (6h winter/CST, 5h summer/CDT; date
+  rolls back if UTC time is before the offset). Set 2026-07-11 (record Appendix
+  AZ) after earlier entries were mislabeled UTC-as-local; made DST-aware
+  2026-07-19.
 
 ## Definition of done (additive to global standards)
 - No test suite exists yet (2026-07-08). Once a backtest engine lands, port
