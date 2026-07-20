@@ -151,6 +151,11 @@ class AlpacaClient:
     def get_account(self) -> dict:
         return self._request("GET", "/v2/account")
 
+    def get_clock(self) -> dict:
+        """Alpaca market clock: {is_open, next_open, next_close, timestamp}.
+        Authoritative session state (holidays/half-days/DST handled server-side)."""
+        return self._request("GET", "/v2/clock")
+
     def list_positions(self) -> list[dict]:
         return self._request("GET", "/v2/positions") or []
 

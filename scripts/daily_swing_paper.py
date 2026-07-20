@@ -137,6 +137,28 @@ def vix3m_close(start="2015-01-01"):
     return v3
 
 
+def market_is_open():
+    """Alpaca's authoritative market clock -> True/False, or None if it can't
+    be determined (no usable creds / clock call failed). Used to gate --execute
+    order submission to AFTER-HOURS only (record DF): a market-notional order
+    placed while the market is OPEN fills intraday instead of queuing for the
+    next open, breaking the EOD/execute-next-open rule and desyncing the ledger
+    (record DE)."""
+    from swing_bot.alpaca_client import client_for_sleeve, AlpacaError
+    for s in ps.SLEEVES:
+        try:
+            c = client_for_sleeve(s)
+        except AlpacaError:
+            continue
+        try:
+            return bool(c.get_clock().get("is_open"))
+        except AlpacaError:
+            return None
+        finally:
+            c.close()
+    return None
+
+
 def realize_pending(conn, sleeve, today, fill_open):
     """fill_open: {ticker: open_price_today}. Liquidates every current
     position (sell at today's open), then buys into the sleeve's pending
@@ -344,7 +366,25 @@ def main():
         # logs the order ids for audit.
         from swing_bot.alpaca_client import client_for_sleeve, AlpacaError
         import json
+        # INTRADAY GUARD (record DF): only submit orders after-hours, so
+        # market-notional DAY orders queue for the NEXT open (EOD rule). While
+        # the market is OPEN a market order fills intraday -> discipline break +
+        # DB/Alpaca desync (record DE). The DB ledger already advanced above and
+        # is next-open disciplined on its own; the next after-hours run
+        # reconciles Alpaca to it, so skipping order submission here is safe.
+        mkt = market_is_open()
+        if mkt:
+            print("\n--execute: US MARKET IS OPEN -- SKIPPING all Alpaca order "
+                  "submission to avoid intraday fills (EOD/execute-next-open rule). "
+                  "Re-run after the close; the DB ledger stands and the next "
+                  "after-hours run will reconcile the broker to it.")
+        elif mkt is None:
+            print("\n--execute: WARNING could not verify market state (Alpaca "
+                  "clock unavailable) -- proceeding; ensure this is an "
+                  "after-hours run.")
         for s in ps.SLEEVES:
+            if mkt:
+                break                      # market open -> place no orders (guard above)
             st = ps.get_sleeve(conn, s)
             pending = json.loads(st["pending_json"]) if st["pending_json"] else None
             positions = ps.get_positions(conn, s)

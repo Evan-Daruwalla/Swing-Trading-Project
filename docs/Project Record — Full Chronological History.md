@@ -4169,3 +4169,80 @@ stale pending -> reconcile CANCELS the queued SELL + keeps QQQ; m10 keeps its QQ
 unchanged. If NOT re-fired before Monday open, e18's stale SELL FILLS at the open (wrongly goes
 to cash). Verify the log afterward: e18 target=['QQQ'] (from DB positions), CLOSE of nothing,
 SELL canceled.
+
+# Appendix DE - Monday re-fire: window MISSED (stale SELL filled) + intraday-execution footgun found (2026-07-20, ~12:55 CDT)
+
+**HONEST OUTCOME - the fix landed too late to prevent the wrong sell.** Evan re-fired
+Start-ScheduledTask on MONDAY 07-20 at 12:55 CDT -- AFTER Monday's open. The DAY orders queued
+Saturday (before the CBOE fix) had already filled at Monday's open in BOTH ledgers:
+- e18's STALE cash SELL executed: Alpaca sold 1.4045 QQQ @ 703.63 (Mon open); the DB ledger
+  likewise realized its cash pending at Monday's open. e18's wrong Friday-stale-VIX3M signal
+  DID cost a real (paper) sell. The CBOE fix did NOT prevent it -- it only corrected what came
+  next.
+- m10's inaugural BUY filled correctly: holds QQQ 1.4238 (calm regime, long QQQ). CORRECT.
+
+**THE FIX WORKED FOR THE RE-DECISION.** This Monday run re-decided e18 with fresh CBOE VIX3M
+(18.13/20.54 = 0.883 < 1 -> HOLD) and bought QQQ back. Net e18 round-trip: sold @703.63,
+rebought @700.622 -> ~neutral-to-slightly-positive (rebought ~3 pts cheaper; e18 equity
+$988.09, holds 1.4078 QQQ, marginally MORE shares). Damage from the missed window = one
+round-trip's cost, ~neutral here by luck of an intraday dip.
+
+**NEW FOOTGUN FOUND - intraday execution.** Because the re-fire happened DURING Monday market
+hours (not the after-hours 7pm the task is built for), e18's corrective market-notional BUY
+filled IMMEDIATELY intraday (@700.622, 12:52 CDT) instead of queuing for next open. This
+VIOLATES the project's EOD / signal-at-close-execute-next-open hard rule and created a 1-day
+DB-vs-Alpaca DIVERGENCE on e18: DB set pending={QQQ} to realize at TUESDAY open, while Alpaca
+already holds QQQ (filled Monday intraday). They re-converge Tue when the DB realizes, at
+different entry prices (fill_divergence logs the gap). m10/e6 unaffected (m10 filled at open,
+e6 held).
+
+**ALPACA GROUND TRUTH (2026-07-20 ~12:55 CDT):** all three now long QQQ -- e6 1.4045 ($983.87),
+e18 1.4078 ($988.09), m10 1.4238 ($997.39); zero open orders. DB matches EXCEPT e18 (DB
+cash+pending{QQQ} for Tue open vs Alpaca already-QQQ) -- the intraday-fill divergence above.
+
+**TWO LESSONS:** (1) a code fix does NOT retroactively cancel already-queued broker orders --
+only a timely --execute run does, and it must beat the next open. (2) --execute MUST run
+after-hours; firing it intraday breaks the next-open discipline and desyncs the ledgers for a
+day. Candidate guard (not yet applied): --execute should REFUSE (or loudly warn) to submit
+orders while the US market is open. Evan's call.
+
+**STATE:** doc-only (this entry). No code change this step. Tally 35.
+
+**Next action:** Evan decides on the intraday guard (recommended). Otherwise: run the task only
+after-hours; the e18 DB/Alpaca divergence self-heals at Tue 07-21 open (no action needed).
+
+# Appendix DF - Intraday-execution guard added + verified (option 1 from DE) (2026-07-20, ~13:00 CDT)
+
+**DECISION:** Evan chose option 1 (from DE): guard --execute so it only submits orders
+after-hours, closing the intraday-fill footgun that round-tripped e18 (DE).
+
+**CHANGE (2 files):**
+- swing_bot/alpaca_client.py: new `get_clock()` (GET /v2/clock) -> Alpaca's AUTHORITATIVE
+  market clock (handles holidays / half-days / DST server-side; better than a local ET guess).
+- scripts/daily_swing_paper.py: new module helper `market_is_open()` (True/False, or None if no
+  usable creds / clock call fails) + a guard at the top of the --execute mirror loop:
+  `for s in ps.SLEEVES: if mkt: break`. If the market is OPEN -> loud SKIP message, ZERO order
+  submission. If clock is UNKNOWN (None) -> warn + proceed (don't hard-block on a transient
+  clock failure). If CLOSED -> proceed as normal. The DB ledger advances regardless (it is
+  next-open disciplined on its own); only broker ORDER SUBMISSION is gated, and the next
+  after-hours run reconciles Alpaca to the DB (record DA reconcile-to-DB). Implemented via
+  `if mkt: break` at loop top rather than nesting the whole 48-line body under an else -- keeps
+  the diff surgical (no mass re-indent).
+
+**VERIFIED END-TO-END (market was OPEN, Mon 07-20 ~13:00 CDT -- ideal test):** get_clock() live
+returned is_open=True (next_open 2026-07-21T09:30 ET); market_is_open()=True. Ran the real
+`--execute`: it printed "US MARKET IS OPEN -- SKIPPING all Alpaca order submission" and placed
+ZERO orders -- Alpaca open-order count 0 before AND 0 after across all 3 accounts. The DB ledger
+still advanced (NAV re-marked; e18 re-decided QQQ) with no broker side effect. py_compile OK
+(both files); frozen tripwire GREEN. The after-hours path (mkt=False -> proceeds) is the
+existing reconcile path already verified in DB.
+
+**EFFECT:** "run --execute only after the close" is now ENFORCED, not assumed. A future
+mistimed midday fire (like DE's) can no longer produce intraday fills or a DB/Alpaca desync.
+
+**STATE:** doc-only pending Evan's commit call (DE + DF + the code + get_clock all uncommitted).
+e18's DB/Alpaca divergence from DE still self-heals at Tue 07-21 open (unrelated to this guard).
+Tally 35.
+
+**Next action:** commit + push (DE, DF, guard code, get_clock) on Evan's go. After-hours runs
+now behave; the scheduled 7pm task is unaffected (7pm = market closed -> guard passes through).
