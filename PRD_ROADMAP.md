@@ -4,6 +4,21 @@
 document — the executing model works through TASK BREAKDOWN top to bottom,
 one task at a time, and checks off SUCCESS CRITERIA.**
 
+**GOAL:** When this plan is done, exactly one of two results stands on the
+record — for Evan (a personal, small-capital trader) and for the
+college-application reader auditing the engineering process: either a
+forward-paper-validated, out-of-sample swing strategy (concentrated K=1–3, EOD
+signals, days-to-weeks holds, $100–1,000 capital, chasing a HIGH percent return
+with losses explicitly accepted and drawdown loosened-but-capped), OR a
+documented proof that the retail-EOD / K=1–3 / liquidity-floored corner holds
+no robust edge. Both outcomes are reached only through PRE-REGISTERED
+falsification (prereg-before-code, kill-switches, honest negatives): the rigor
+loop is as much the deliverable as any strategy. Fresh-session north star —
+work the next open TASK BREAKDOWN item under that rigor; never tune a FAIL,
+never fake a live sleeve, never invent a number. (Top-of-file GOAL added
+2026-07-22 to match the PRD skeleton; distills §1 OBJECTIVE, which keeps the
+full dated history.)
+
 **SCOPE GUARD (decided by Evan 2026-07-08): NEVER modify anything in
 `D:\ClaudeCode\Trading` (repo or DB) from this project. Trading's
 `price_cache` is READ-ONLY from here; never run backtests concurrently with

@@ -4246,3 +4246,29 @@ Tally 35.
 
 **Next action:** commit + push (DE, DF, guard code, get_clock) on Evan's go. After-hours runs
 now behave; the scheduled 7pm task is unaffected (7pm = market closed -> guard passes through).
+
+# Appendix DG - Top-of-file GOAL block added to PRD_ROADMAP.md (matches 2026-07-22 skeleton) (2026-07-22, ~18:14 CDT)
+
+**WHAT:** Evan updated the /project-memory PRD skeleton (templates.md §3) 2026-07-22 to require
+a one-paragraph **GOAL:** block at the very top of every PRD -- after the standing-document
+line, before SCOPE GUARD ("what will exist when done, for whom, the sentence a fresh session
+reads to stay on track. Not vision, not process: the goal."). This project's PRD_ROADMAP.md
+predated that skeleton -- its goal lived buried in `## 1. OBJECTIVE`, below SCOPE GUARD. Brought
+the file in line: added the top GOAL block. No task/tally change (35).
+
+**THE GOAL PARAGRAPH (distilled, not new):** when done, one of two results stands on the record
+-- either a forward-paper-validated OOS concentrated (K=1-3, EOD, days-weeks, $100-1,000, HIGH
+%return, losses accepted, DD loosened-but-capped) swing strategy, OR a documented proof the
+retail-EOD/K=1-3/liquidity-floored corner holds no robust edge. Both via PRE-REGISTERED
+falsification (prereg-before-code, kill-switches, honest negatives) -- the rigor loop is as much
+the deliverable as any strategy. North star: work the next open TASK BREAKDOWN item under that
+rigor; never tune a FAIL, fake a live sleeve, or invent a number.
+
+**DISCIPLINE:** honored the roadmap never-delete rule -- `## 1. OBJECTIVE` (with its dated
+2026-07-09 supersession history) is UNTOUCHED; the top block DISTILLS it and says so in a
+trailing parenthetical so the two never read as competing goals. Placement verified (after
+standing-document line, before SCOPE GUARD).
+
+**Cadence #129.** STATE: committing + pushing PRD_ROADMAP.md + this entry.
+
+**Next action:** none -- doc alignment only.
