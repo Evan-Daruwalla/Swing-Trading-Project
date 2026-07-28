@@ -4512,7 +4512,7 @@ this entry). **Cadence #135.**
 bookkeeping orders -- deliberately not defaulted). The 7pm scheduled run tonight is the first
 to exercise backfill_divergence + report_mirror_drift + the retry paths end-to-end.
 
-# Appendix DL - #4b qty-aware reconcile implemented (closes the e18 share fork on the next run) (2026-07-28, ~15:41 CDT)
+# Appendix DL - #4b qty-aware reconcile implemented (closes the e18 share fork on the next run) (2026-07-28, ~16:19 CDT)
 
 **TRIGGER:** Evan: "do #4b" -- the open decision left by DJ/DK. This is the piece I
 deliberately did NOT default to in #4, because it places autonomous BOOKKEEPING orders on his
