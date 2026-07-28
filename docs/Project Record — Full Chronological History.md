@@ -4335,3 +4335,65 @@ entry). Findings 2, 4, 6-10 remain OPEN by Evan's selection. **Cadence #132.**
 
 **Next action:** Evan's call on commit + whether to take #2 (backfill real Alpaca fill prices --
 the inert fidelity instrument) and #4 (e18 permanent share fork: resync or document).
+
+# Appendix DI - Audit finding #2 FIXED: fill_divergence made live; first real sim-vs-broker numbers (2026-07-28, ~15:03 CDT)
+
+**TRIGGER:** Evan: "2" -- commit fixes 1/3/5 (pushed 1078693), then take audit finding #2
+(fill_divergence inert). Tally unchanged (35).
+
+**THE DEFECT WAS DEEPER THAN "A NULL COLUMN."** Investigation found the table conflated TWO row
+types that could never be joined: (a) SUBMIT rows (from the --execute mirror) carry
+alpaca_order_id but their sim_price is the DECISION-DAY CLOSE, not a fill -- the DB-sim fill is
+TOMORROW's open and is unknowable at submit time; (b) REALIZE rows (from realize_pending) carry
+the true sim fill but NO order id. So both halves of the measurement existed in different rows
+and no comparison was possible even in principle. Worse, `close_px.get(t, 0.0)` silently wrote
+sim_price=0.0 for a first-ever entry (rows 3/4): close_px is DATE-keyed and only gains ticker
+keys for tickers ALREADY HELD, so the very first buy of a sleeve had no close to find.
+
+**THE FIX (3 files):**
+- `alpaca_client.get_order(order_id)` -- new read endpoint (GET /v2/orders/{id}); carries
+  status / filled_avg_price / filled_qty, which is how a queued next-open order's REAL fill is
+  learned after the fact.
+- `paper_sleeves`: +2 ADDITIVE columns `alpaca_status`, `alpaca_qty` via a `_MIGRATIONS` tuple
+  applied in connect() behind a PRAGMA table_info check (never drops/rewrites; existing DB
+  upgrades in place, idempotent). New `open_divergence_rows()` (work list: has order id, no
+  terminal status) and `resolve_divergence()` which records the real outcome AND REPAIRS
+  sim_price by joining to the FIRST paper_transactions row for that sleeve+ticker strictly
+  after the decision date -- the same fill cycle. Only after that repair is sim vs alpaca
+  apples-to-apples. `alpaca_status` also stops canceled orders being re-polled forever.
+- `daily_swing_paper.backfill_divergence(conn)` -- runs at the TOP of the --execute block,
+  BEFORE the intraday guard, because polling is READ-ONLY against Alpaca: a market-open run
+  that submits nothing still learns what filled. Non-terminal statuses are left open and
+  retried next run; a failed poll leaves the row unresolved (never invents a fill). Also fixed
+  the 0.0 silent fallback at the submit site (fetches the ticker's close instead of defaulting).
+
+**FIRST REAL FIDELITY NUMBERS (the instrument was 0-for-10; now 4 real fills):**
+| sleeve | decided | sim $ | alpaca $ | divergence | status |
+|---|---|---|---|---|---|
+| e6_1x | 2026-07-15 | 712.000 | 712.000 | **+0.0 bps** | filled |
+| e18_vixts | 2026-07-15 | 712.000 | 712.000 | **+0.0 bps** | filled |
+| m10_1_nagel | 2026-07-17 | 702.260 | -- | -- | canceled (the DB double-run cancel) |
+| m10_1_nagel | 2026-07-17 | 702.260 | 702.350 | **+1.3 bps** | filled |
+| e18_vixts | 2026-07-20 | 706.680 | 700.622 | **-85.7 bps** | filled |
+
+**WHAT THE NUMBERS SAY (and it is a real result):** when the EOD discipline is FOLLOWED, the
+next-open DB simulation is near-perfect against a real broker -- 0.0, 0.0, +1.3 bps. The single
+large divergence (-85.7 bps) is EXACTLY the run where the discipline was BROKEN: the 2026-07-20
+midday manual fire (record DE), where Alpaca filled intraday Monday @700.622 while the DB
+simulated Tuesday's open @706.680. So the instrument's first act was to independently quantify
+the DE incident AND finding #4's share fork (sim qty 1.3957 vs alpaca 1.4078). M3's core
+premise -- that the DB ledger is a faithful stand-in for broker reality -- now has EVIDENCE
+rather than an assumption, and the one exception has a documented cause.
+
+**VERIFIED (real output):** migration additive + idempotent (10 rows preserved, 2 cols added,
+second connect() a no-op); read-only probe run BEFORE any write to confirm the join; backfill
+resolved 5/5 orders; RE-RUN is a clean no-op (0 unresolved, nothing re-polled); ledger UNTOUCHED
+by the observation writes (positions/cash/nav/transactions all unchanged -- e18 still 1.3957099,
+the known fork); py_compile OK on all 3 files; frozen tripwire GREEN (d=+/-0.0000pp). Self-caught
+during the pass: my own print path divided by zero when sim_price==0 with no tx to join -- guarded
+before running.
+
+**STATE:** uncommitted (3 code files + this entry). Findings 4, 6-10 remain OPEN.
+
+**Next action:** Evan's call on commit. Finding #4 (e18 permanent share fork) is now MEASURED
+rather than merely suspected -- the natural next task if he wants it closed.

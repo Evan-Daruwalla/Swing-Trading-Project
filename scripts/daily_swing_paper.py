@@ -181,6 +181,70 @@ def market_is_open():
     return dt.time(9, 30) <= now.time() < dt.time(16, 0)
 
 
+def backfill_divergence(conn):
+    """Learn the REAL Alpaca outcome of every mirrored order still unresolved,
+    and repair its sim-side so the row is an actual measurement.
+
+    Why this exists (audit finding #2, 2026-07-28): fill_divergence is M3's ONLY
+    implementation-fidelity instrument, and it was INERT -- 10/10 rows had
+    alpaca_price NULL because all three call sites pass sim_price only. An order
+    is submitted the evening BEFORE it fills, so its fill price cannot be known
+    at submit time; nothing ever went back for it. The daily_swing_paper
+    docstring meanwhile claimed any gap is "visible, never assumed" -- false
+    verification, the exact class of claim this project treats as a trust-killer.
+    Read-only against Alpaca, so it runs regardless of the intraday guard."""
+    from swing_bot.alpaca_client import client_for_sleeve, AlpacaError
+    rows = ps.open_divergence_rows(conn)
+    if not rows:
+        return
+    print(f"\nfill_divergence backfill: {len(rows)} unresolved order(s)")
+    clients = {}
+    try:
+        for r in rows:
+            s = r["sleeve"]
+            if s not in clients:
+                try:
+                    clients[s] = client_for_sleeve(s)
+                except AlpacaError as e:
+                    print(f"    [{s}] SKIPPED (creds): {e}")
+                    clients[s] = None
+            client = clients[s]
+            if client is None:
+                continue
+            try:
+                o = client.get_order(r["alpaca_order_id"])
+            except AlpacaError as e:
+                # leave unresolved -> retried next run (never invent a fill)
+                print(f"    [{s}] {r['ticker']} {r['date']}: poll failed ({e})")
+                continue
+            status = o.get("status")
+            if status not in ("filled", "canceled", "expired", "rejected", "done_for_day"):
+                print(f"    [{s}] {r['ticker']} {r['date']}: still {status} -- leaving open")
+                continue
+            fp = o.get("filled_avg_price")
+            fq = o.get("filled_qty")
+            fp = float(fp) if fp not in (None, "") else None
+            fq = float(fq) if fq not in (None, "") else None
+            joined = ps.resolve_divergence(conn, r["id"], status=status,
+                                           alpaca_price=fp, alpaca_qty=fq)
+            row = conn.execute("SELECT sim_price FROM fill_divergence WHERE id=?",
+                               (r["id"],)).fetchone()
+            sim = row["sim_price"]
+            if status == "filled" and fp:
+                d = fp - sim
+                bps = f"{d / sim * 10000:+.1f} bps" if sim else "n/a bps (no sim fill)"
+                note = "" if joined else "  (no DB fill to join -- sim side unrepaired)"
+                print(f"    [{s}] {r['ticker']} {r['date']}: sim ${sim:.4f} vs "
+                      f"alpaca ${fp:.4f}  d={d:+.4f} ({bps}) "
+                      f"qty={fq}{note}")
+            else:
+                print(f"    [{s}] {r['ticker']} {r['date']}: {status} (no fill)")
+    finally:
+        for c in clients.values():
+            if c is not None:
+                c.close()
+
+
 def realize_pending(conn, sleeve, today, fill_open):
     """fill_open: {ticker: open_price_today}. Liquidates every current
     position (sell at today's open), then buys into the sleeve's pending
@@ -401,6 +465,10 @@ def main():
         # logs the order ids for audit.
         from swing_bot.alpaca_client import client_for_sleeve, AlpacaError
         import json
+        # Resolve YESTERDAY's mirrored orders before placing today's (audit #2).
+        # Read-only against Alpaca, so it runs even when the guard below skips
+        # submission -- a market-open run still learns what actually filled.
+        backfill_divergence(conn)
         # INTRADAY GUARD (record DF): only submit orders after-hours, so
         # market-notional DAY orders queue for the NEXT open (EOD rule). While
         # the market is OPEN a market order fills intraday -> discipline break +
@@ -460,7 +528,20 @@ def main():
                         o = client.submit_order(symbol=t, notional=notional, side="buy",
                                                 type="market", time_in_force="day")
                         print(f"    BUY {t} ~${notional:.2f} -> order {o.get('id')}")
-                        ps.log_divergence(conn, s, today, t, close_px.get(t, 0.0),
+                        # Provisional sim side = today's close for t. It is only
+                        # a placeholder: the real DB-sim fill is TOMORROW's open,
+                        # and backfill_divergence repairs this field from
+                        # paper_transactions once that fill happens. Fetch the
+                        # close rather than defaulting to 0.0 -- close_px is
+                        # date-keyed and only gains ticker keys for tickers
+                        # already HELD, so a first-ever entry silently logged
+                        # sim_price=0.0 (rows 3/4; audit #2).
+                        prov = close_px.get(t)
+                        if prov is None:
+                            _, _cl, _ = series(t, start="2024-01-01")
+                            prov = _cl.get(today)
+                            close_px[t] = prov
+                        ps.log_divergence(conn, s, today, t, prov if prov else 0.0,
                                           alpaca_order_id=o.get("id"))
                     except AlpacaError as e:
                         print(f"    buy {t} FAILED: {e}")

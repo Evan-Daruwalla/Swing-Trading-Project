@@ -170,6 +170,12 @@ class AlpacaClient:
     def get_asset(self, symbol: str) -> dict:
         return self._request("GET", f"/v2/assets/{symbol}")
 
+    def get_order(self, order_id: str) -> dict:
+        """One order by id -- carries status / filled_avg_price / filled_qty,
+        which is how a queued next-open order's REAL fill is learned after the
+        fact (fill_divergence backfill)."""
+        return self._request("GET", f"/v2/orders/{order_id}")
+
     def list_orders(self, *, status: str = "open", limit: int = 100) -> list[dict]:
         return self._request("GET", "/v2/orders",
                              params={"status": status, "limit": limit}) or []

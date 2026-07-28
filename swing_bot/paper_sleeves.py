@@ -88,15 +88,29 @@ CREATE TABLE IF NOT EXISTS fill_divergence (
     sim_price       REAL NOT NULL,    -- our DB-simulated fill (yfinance next open)
     alpaca_price    REAL,             -- actual Alpaca paper fill $, if mirrored
     alpaca_order_id TEXT,
-    logged_at       TEXT NOT NULL
+    logged_at       TEXT NOT NULL,
+    alpaca_status   TEXT,             -- terminal order status once polled (filled/canceled/...)
+    alpaca_qty      REAL              -- actual filled qty (notional orders => qty is discovered)
 );
 """
+
+# Columns added after the table shipped. Additive only (never drops/rewrites) --
+# applied on every connect() so an existing swing.db upgrades in place.
+_MIGRATIONS = (
+    ("fill_divergence", "alpaca_status", "TEXT"),
+    ("fill_divergence", "alpaca_qty", "REAL"),
+)
 
 
 def connect(db_path=DB_PATH):
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
+    for table, col, coltype in _MIGRATIONS:
+        have = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})")}
+        if col not in have:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {coltype}")
+    conn.commit()
     return conn
 
 
@@ -174,6 +188,45 @@ def log_divergence(conn, sleeve, date, ticker, sim_price, alpaca_price=None, alp
         (sleeve, date, ticker, sim_price, alpaca_price, alpaca_order_id,
          datetime.now(timezone.utc).isoformat()))
     conn.commit()
+
+
+def open_divergence_rows(conn):
+    """Mirrored orders whose real Alpaca outcome is still unknown -- the work
+    list for the backfill pass. A row qualifies while it has an order id and no
+    terminal status yet; once status is set (filled/canceled/...) it is done and
+    never re-polled."""
+    return conn.execute(
+        "SELECT id, sleeve, date, ticker, alpaca_order_id FROM fill_divergence "
+        "WHERE alpaca_order_id IS NOT NULL AND alpaca_status IS NULL "
+        "ORDER BY date, id").fetchall()
+
+
+def resolve_divergence(conn, row_id, *, status, alpaca_price=None, alpaca_qty=None):
+    """Record an order's real outcome AND repair sim_price to the DB-simulated
+    fill for the same cycle.
+
+    Why the repair: the submit-time row stores the DECISION-DAY CLOSE, not a
+    fill -- the DB-sim fill is tomorrow's open and is unknown when the order is
+    sent. Comparing that close against Alpaca's fill measures nothing (and when
+    the ticker's close was missing it silently stored 0.0). The true sim fill is
+    already in paper_transactions, written when realize_pending fills at the
+    next open, so we join to the FIRST transaction for this sleeve+ticker
+    strictly after the decision date -- the same cycle this order belongs to.
+    Only then is sim_price vs alpaca_price an apples-to-apples divergence."""
+    row = conn.execute("SELECT sleeve, date, ticker FROM fill_divergence WHERE id=?",
+                       (row_id,)).fetchone()
+    tx = conn.execute(
+        "SELECT price FROM paper_transactions WHERE sleeve=? AND ticker=? AND date>? "
+        "ORDER BY date, id LIMIT 1",
+        (row["sleeve"], row["ticker"], row["date"])).fetchone()
+    if tx is not None:
+        conn.execute("UPDATE fill_divergence SET sim_price=? WHERE id=?",
+                     (tx["price"], row_id))
+    conn.execute(
+        "UPDATE fill_divergence SET alpaca_status=?, alpaca_price=?, alpaca_qty=? "
+        "WHERE id=?", (status, alpaca_price, alpaca_qty, row_id))
+    conn.commit()
+    return tx is not None
 
 
 # ---------------------------------------------------------------------------
