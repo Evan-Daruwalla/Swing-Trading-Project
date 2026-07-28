@@ -25,6 +25,7 @@ importers). This module is the store used by the swing_bot engines + the live
 M3 loop; cache_fetch is the store used by the experiment jungle.
 """
 import sqlite3
+import time
 from pathlib import Path
 
 import yfinance as yf
@@ -62,15 +63,42 @@ def _flatten(df):
     return df
 
 
+# shortcut: retry-on-empty assumes an empty result is a yfinance blip, which
+# holds for THIS project (every ticker requested here has history in the range).
+# If a caller ever legitimately requests an empty range, it pays 22s of backoff.
+FETCH_RETRY_BACKOFF_S = (2.0, 5.0, 15.0)
+
+
 def fetch(ticker, start, end=None):
     """Fetch daily OHLCV for one ticker; return list of bar tuples.
 
     Rows with any NaN in O/H/L/C are dropped (yfinance occasionally emits a
     trailing partial/blank row). Prices are split-adjusted, dividend-UNADJ.
-    """
-    df = yf.download(ticker, start=start, end=end, auto_adjust=False,
-                     progress=False, actions=False)
-    if df.empty:
+
+    RETRIES on exception OR empty result (audit finding #8, 2026-07-28).
+    yfinance is flaky, and a bare blip here was not a harmless no-op: the daily
+    loop turns a missing price into a SKIPPED FILL LEG, and realize_pending
+    clears the pending target afterwards regardless -- so a single failed fetch
+    silently dropped that leg and left the sleeve sitting in cash with no
+    record. For m10_1_nagel's K=4 basket one bad fetch = 25% silently
+    uninvested. Retrying here removes the common cause; the daily loop also now
+    reports any leg it still could not fill."""
+    last_err = None
+    for i in range(len(FETCH_RETRY_BACKOFF_S) + 1):
+        try:
+            df = yf.download(ticker, start=start, end=end, auto_adjust=False,
+                             progress=False, actions=False)
+            if not df.empty:
+                break
+            last_err = "empty result"
+        except Exception as e:                      # noqa: BLE001 - yfinance raises broadly
+            last_err = repr(e)
+            df = None
+        if i < len(FETCH_RETRY_BACKOFF_S):
+            time.sleep(FETCH_RETRY_BACKOFF_S[i])
+    if df is None or df.empty:
+        print(f"  prices.fetch({ticker}): no data after "
+              f"{len(FETCH_RETRY_BACKOFF_S) + 1} attempts ({last_err})", flush=True)
         return []
     df = _flatten(df)
     bars = []

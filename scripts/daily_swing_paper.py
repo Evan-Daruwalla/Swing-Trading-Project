@@ -317,9 +317,15 @@ def realize_pending(conn, sleeve, today, fill_open):
     target = json.loads(st["pending_json"])
     positions = ps.get_positions(conn, sleeve)
     cash = st["cash"]
+    # A leg with no price today cannot fill. That is survivable, but it must
+    # never be SILENT (audit #8): the pending target is cleared at the end of
+    # this function regardless, so an unfilled BUY leg is dropped for good and
+    # the sleeve just sits on that cash. Collect both kinds and report below.
+    skipped_sell, skipped_buy = [], []
     for t, pos in positions.items():
         px = fill_open.get(t)
         if px is None or px <= 0:
+            skipped_sell.append(t)
             continue  # no bar today for this ticker -- leave held, retry next run
         cash += pos["qty"] * px
         ps.record_fill(conn, sleeve, today, t, "sell", pos["qty"], px, "pending-liquidate")
@@ -330,12 +336,20 @@ def realize_pending(conn, sleeve, today, fill_open):
         for t, w in target.items():
             px = fill_open.get(t)
             if px is None or px <= 0:
+                skipped_buy.append(t)
                 continue
             qty = per_ticker_cash / px
             cash -= qty * px
             ps.record_fill(conn, sleeve, today, t, "buy", qty, px, "pending-enter")
             ps.upsert_position(conn, sleeve, t, qty, px, today)
             ps.log_divergence(conn, sleeve, today, t, px)
+    if skipped_sell or skipped_buy:
+        pct = 100.0 * len(skipped_buy) / len(target) if target else 0.0
+        print(f"  !! [{sleeve}] PARTIAL REALIZE on {today} -- no open price for: "
+              f"sell={skipped_sell or '-'} buy={skipped_buy or '-'}. "
+              f"Unfilled BUY legs are DROPPED (pending is cleared below), so this "
+              f"sleeve is ~{pct:.0f}% under-invested vs its target until the next "
+              f"decision. Check the yfinance feed for those tickers.", flush=True)
     conn.execute("UPDATE paper_sleeves SET cash=? WHERE sleeve=?", (cash, sleeve))
     conn.commit()
     ps.clear_pending(conn, sleeve)

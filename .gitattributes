@@ -1,0 +1,16 @@
+# Line-ending policy (audit finding #9, 2026-07-28).
+#
+# .bat/.cmd MUST be CRLF in the working tree. cmd.exe's parser is line-ending
+# sensitive: an LF-only batch file works for simple sequential commands (which
+# is why scripts/daily_swing_paper.bat has run fine for 12 scheduled runs) but
+# can mis-resolve labels/goto and multi-line blocks. This repo runs a .bat from
+# Task Scheduler, so pin it rather than leave it to core.autocrlf.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Shell scripts must stay LF even on Windows -- CRLF breaks the shebang.
+*.sh  text eol=lf
+*.bash text eol=lf
+
+# SQLite DBs and caches are binary; never let git touch their bytes.
+*.db binary

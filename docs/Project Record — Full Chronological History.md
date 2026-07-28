@@ -4453,3 +4453,61 @@ Findings 8, 9, 10 remain OPEN.
 **Next action:** Evan's call on commit. Remaining: #8 prices.fetch retry, #9 .bat LF-only
 (latent), #10 dependency CVE scan (needs pip-audit installed -- BLOCKED-ON-EVAN, the audit
 rule forbids installing tooling unasked). Also open: whether to add qty-aware reconcile (#4b).
+
+# Appendix DK - Audit findings #8, #10, #9 closed -- all 10 findings now resolved or explicitly open (2026-07-28, ~15:34 CDT)
+
+**TRIGGER:** Evan: "do 1 then 2 then do #9" -- #8 (prices.fetch retry), #10 (install pip-audit
++ CVE scan, now explicitly authorized), #9 (.bat LF-only). Tally unchanged (35).
+
+**#8 -- WAS MIS-RANKED "low"; it is a SILENT UNDER-EXECUTION bug.** Tracing the failure path
+before fixing showed the real severity: `prices.fetch` returning [] on a yfinance blip makes
+`fill_open[t]` None, `realize_pending` `continue`s past that leg -- and then
+`ps.clear_pending()` runs UNCONDITIONALLY at the end. So an unfilled BUY leg is dropped FOR
+GOOD, the sleeve keeps the cash, and NOTHING is recorded. For m10_1_nagel's K=4 basket, one bad
+fetch = 25% silently uninvested vs target. Fixed BOTH halves: (a) root cause -- `prices.fetch`
+now retries on exception OR empty result, backoff (2s, 5s, 15s), reporting failure loudly and
+marked with a `# shortcut:` comment naming the ceiling (retry-on-empty assumes empty = blip,
+true for every ticker this project requests); (b) the silence -- `realize_pending` now collects
+skipped sell/buy legs and prints a loud "!! PARTIAL REALIZE" line naming the tickers and
+quantifying how under-invested the sleeve is.
+
+**#10 -- DEPENDENCY CVE SCAN: CLEAN.** pip-audit 2.10.1 installed into .venv with Evan's
+explicit authorization (the audit rule forbids installing tooling unasked, which is why this
+was BLOCKED-ON-EVAN in DH). Result: **"No known vulnerabilities found"** across the 50-package
+venv. Checked the install itself for collateral damage -- runtime pins UNCHANGED (yfinance
+1.5.1, httpx 0.28.1, exactly matching requirements.txt) and the frozen tripwire re-run GREEN
+after install, so dropping a tool into the venv that hosts the frozen-regression environment
+did NOT drift anything. pip-audit deliberately NOT added to requirements.txt (that file is the
+RUNTIME dependency list; this is a dev tool).
+
+**#9 -- .bat LF-only, fixed DURABLY.** File was 20 bare LF / 0 CRLF on disk with NO
+.gitattributes and core.autocrlf=true -- so a naive on-disk conversion would drift back on the
+next checkout. Added `.gitattributes` pinning `*.bat`/`*.cmd` to `text eol=crlf` (plus `*.sh`
+eol=lf so shebangs never break, and `*.db binary`), then converted the file. Now
+`i/lf w/crlf attr/text eol=crlf` -- normalized in the repo, native CRLF in the working tree.
+
+**VERIFIED (real output):** #8 -- bogus ticker `ZZZZ_NOT_A_TICKER` retried 4 attempts over
+23.3s then reported and returned [] (no silent empty); real QQQ fetch still 2.4s / 7 bars (no
+regression); partial-realize check on a TEMP db (live swing.db never opened) passed 8/8 --
+warns loudly, names the unfilled leg, quantifies "~50% under-invested", drops the leg, clears
+pending, AND a complete realize stays silent (no false alarm). #9/#5 -- built a neutered copy
+of the REAL .bat (only the python invocation replaced, every other line byte-identical) and ran
+it through cmd.exe: parsed cleanly and the log shows **"exit code 3"**, proving both the CRLF
+conversion AND the #5 exit-code fix on the real file structure (that line used to vanish
+entirely). All 53 .py compile; frozen tripwire GREEN; live ledger UNTOUCHED (positions, 27 NAV
+rows, 5 transactions, no pending -- identical to before this session's work). Self-caught: I
+introduced a stray non-ASCII `«` (U+00AB) into prices.py which broke it with a SyntaxError, and
+omitted `import time` -- both caught by the compile check and fixed before anything ran; also
+botched an inline shell-quoting attempt and rewrote it as a proper temp .py (the documented
+CLAUDE.md gotcha).
+
+**AUDIT NOW CLOSED: 10/10 findings resolved or explicitly dispositioned.** Fixed: #1, #2, #3,
+#5, #6, #7, #8, #9, #10(scanned clean). Documented-not-traded by design: #4 (e18 share fork --
+made visible every run; a qty-aware reconcile remains an open Evan decision).
+
+**STATE:** uncommitted (prices.py, daily_swing_paper.py, .gitattributes, daily_swing_paper.bat,
+this entry). **Cadence #135.**
+
+**Next action:** none forced. Open decision: #4b qty-aware reconcile (would place small
+bookkeeping orders -- deliberately not defaulted). The 7pm scheduled run tonight is the first
+to exercise backfill_divergence + report_mirror_drift + the retry paths end-to-end.
