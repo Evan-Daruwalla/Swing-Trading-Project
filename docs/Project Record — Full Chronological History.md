@@ -4397,3 +4397,59 @@ before running.
 
 **Next action:** Evan's call on commit. Finding #4 (e18 permanent share fork) is now MEASURED
 rather than merely suspected -- the natural next task if he wants it closed.
+
+# Appendix DJ - Audit findings #4 (measured, not traded), #6 (safe retry), #7 (HANDOFF refresh) (2026-07-28, ~15:19 CDT)
+
+**TRIGGER:** Evan: "2 then 3 checking your work along the way" -- commit #2 (pushed 6c9b161),
+then take #4, then #6/#7. Tally unchanged (35).
+
+**#4 -- e18 PERMANENT SHARE FORK: measured, deliberately NOT traded away.** Quantified against
+the live broker: e6_1x -0.001%, m10_1_nagel -0.014% (fractional-share rounding), **e18_vixts
++0.864% = +0.0120535 sh = +$8.14** -- the real fork from the 07-20 midday fire (Alpaca filled
+intraday @700.622, DB simulated Tuesday's open @706.680; same $ notional, different share
+count). reconcile-to-DB (record DA) drives SYMBOLS not QUANTITIES, so nothing was ever going to
+close it -- record DE's "self-heals at Tue open" was wrong (already corrected in DH).
+**THREE OPTIONS, AND THE REASONING FOR THE CHOICE:** (a) rewrite the DB to match Alpaca --
+REJECTED, the DB ledger IS the primary forward-paper evidence and is next-open disciplined;
+matching it to a discipline-breaking intraday fill would CORRUPT the record. (b) place a
+corrective ~$8.50 order on Alpaca -- NOT DONE UNASKED: that is a new autonomous trading
+behavior on Evan's account, and the risk is asymmetric (documenting now costs nothing and stays
+reversible; placing unrequested trades does not). (c) MAKE IT VISIBLE -- chosen. New
+`report_mirror_drift(conn)` prints DB-vs-Alpaca share counts per sleeve every --execute run,
+flagging anything >= MIRROR_DRIFT_WARN_PCT (0.25%) as "MATERIAL FORK" while staying silent on
+rounding noise. Read-only; runs before the intraday guard. Verified live: e18 flagged, e6/m10
+correctly silent. A qty-aware reconcile remains available as an explicit Evan decision.
+
+**#6 -- TRANSIENT BROKER ERRORS: retry, but ONLY where provably safe.** Evidence first: all 3
+real HTTP 500s (2026-07-23, var/alpaca_request_ids.log) were on IDEMPOTENT endpoints --
+`DELETE /v2/orders` x2 and `GET /v2/positions` x1 -- so retry would have recovered every
+observed failure. `_request` now retries GET/DELETE on {429,500,502,503,504} + httpx
+RequestError, 2 retries at 1s/3s, printing each retry to the run log (the "unalerted" half).
+**`POST /v2/orders` IS NEVER AUTO-RETRIED, BY DESIGN:** a submit that times out or 500s may
+still have been ACCEPTED server-side, so retrying can place a DUPLICATE order. A missed order
+is recoverable (the next run's reconcile-to-DB re-places it); a duplicate is not. That
+asymmetry is the whole policy.
+
+**#7 -- HANDOFF refreshed** (was 13 days stale, "last updated 2026-07-14", still claiming "all
+3 sleeves launch at tonight's 7pm run (accounts flat now)"). Rewrote the state header + added
+two dated blocks: the audit summary (10 findings, which are fixed/open) and the live M3 status
+(13 sessions 07-15..07-27, 27 NAV rows no gaps, all 3 long QQQ, marks e6 $958.03 / e18 $952.04
+/ m10 $971.32 off $1,000 each, plus the do-NOT-fire-intraday warning). Also fixed a FACTUAL
+ERROR in the live snapshot: it read "record/doc stamps are CST (UTC-5)", which is
+self-contradictory under the DST-aware rule (UTC-5 = CDT, UTC-6 = CST) -- now states the rule
+and the current offset. 591 -> 640 lines; history blocks preserved, nothing deleted.
+
+**VERIFIED (real output):** #4 -- drift report run live, e18 flagged MATERIAL FORK at +0.864%,
+e6/m10 silent at -0.001%/-0.014%. #6 -- 8/8 retry cases pass against a FAKE transport (no
+network, no orders): GET/DELETE/429/network-error all retry and recover, 404 does not retry,
+and **both POST cases confirm calls=1 (never retried)**; then live read-only calls through the
+rewritten `_request` succeeded (clock is_open=False, positions, equity $949.09). py_compile OK
+on all touched files; frozen tripwire GREEN (d=+/-0.0000pp). Self-caught: my check harness
+first failed on a sys.path issue (script dir, not cwd) -- fixed the harness, not the code.
+
+**STATE:** uncommitted (daily_swing_paper.py, alpaca_client.py, HANDOFF.md, this entry).
+Findings 8, 9, 10 remain OPEN.
+
+**Next action:** Evan's call on commit. Remaining: #8 prices.fetch retry, #9 .bat LF-only
+(latent), #10 dependency CVE scan (needs pip-audit installed -- BLOCKED-ON-EVAN, the audit
+rule forbids installing tooling unasked). Also open: whether to add qty-aware reconcile (#4b).

@@ -12,11 +12,60 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 35 attempts (X7 credit gate = FAIL); M3 forward paper LIVE-SCHEDULED 2026-07-15 (3 paper accounts, daily 7pm task); e18 bug fixed; all 3 sleeves launch at tonight's 7pm run (accounts flat now)
+## Current state — 35 attempts (research parked); M3 forward paper RUNNING 13 sessions, all 3 sleeves long QQQ; full audit done 2026-07-28 (10 findings, 5 fixed)
 
-**Last updated: 2026-07-14 (CST)** — this file is the only live snapshot;
-history lives in the record. **Timezone: record/doc stamps are CST (UTC-5);
-the cadence hook reports UTC — subtract 5h (record Appendix AZ).**
+**Last updated: 2026-07-28 ~15:18 CDT** — this file is the only live snapshot;
+history lives in the record. **Timezone: record/doc stamps are Central,
+DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
+(winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
+reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
+2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
+self-contradictory and was corrected 2026-07-28 by audit #7).**
+
+> **2026-07-28 — FULL AUDIT (`/audit`) + 5 fixes landed (records DH, DI; commits
+> `1078693`, `6c9b161`, + this session).** System structurally sound; risk was concentrated
+> in the LIVE harness, not the research. Clean: 12/12 scheduled runs succeeded, secret scan
+> CLEAN across full git history, DB integrity/FK checks pass, 0 duplicate bars, NAV series
+> complete, tripwire GREEN. **10 findings (1 crit / 2 high / 4 med / 3 low); 1,2,3,5,6
+> FIXED, 4 documented-not-traded, 7 = this update, 8-10 open.**
+> - **#1 (crit) `market_is_open()` FAILED OPEN** — returned None on any AlpacaError and the
+>   caller then submitted orders ANYWAY, defeating the intraday guard exactly when the broker
+>   is flaky (real Alpaca 500 on 2026-07-23). Now always returns a bool: Alpaca clock primary,
+>   local ET regular-hours fallback that errs safe.
+> - **#2 (high) `fill_divergence` was INERT** (0-for-10 rows had a real fill price) while the
+>   docstring claimed gaps are "visible, never assumed" = false verification. Root cause was
+>   structural: submit rows carry the order id but a decision-day CLOSE as their sim side,
+>   realize rows carry the true sim fill but no order id — the two halves could never be
+>   joined. Fixed with `get_order()`, 2 additive columns, and a `backfill_divergence()` pass
+>   that polls the real fill and repairs sim_price from `paper_transactions`.
+>   **FIRST REAL FIDELITY NUMBERS: +0.0, +0.0, +1.3 bps when the EOD discipline held;
+>   −85.7 bps on the one run where it broke (07-20 midday fire).** M3's premise that the DB
+>   ledger stands in for broker reality now has EVIDENCE, not an assumption.
+> - **#3 (high) no staleness bound on VIX3M** → `VIX3M_MAX_STALE_SESSIONS=2`; e18 now REFUSES
+>   to decide on a stale term structure (the exact 5-session lag that inverted it on 07-17
+>   would now be blocked).
+> - **#6 (med) transient broker errors unretried** — 3× HTTP 500 on 2026-07-23, all on
+>   idempotent endpoints (`DELETE /v2/orders` ×2, `GET /v2/positions`). Retry added for
+>   GET/DELETE only; **`POST /v2/orders` is never auto-retried** (a timed-out submit may have
+>   landed → duplicate order; a missed order self-heals via reconcile, a duplicate does not).
+> - **#4 (med) e18 carries a PERMANENT share fork** — record DE's "self-heals at Tue open" was
+>   WRONG: it re-converged in STATE, never in QUANTITY. Now MEASURED: DB 1.3957099 vs Alpaca
+>   1.4077634 = **+0.864% (+$8.14)**; e6/m10 drift is −0.001%/−0.014% (rounding). NOT traded
+>   away: the DB ledger is the primary evidence and is next-open disciplined, so it is never
+>   rewritten to match a broker fill, and placing bookkeeping orders is a trading-behavior
+>   change = Evan's explicit call. Instead `report_mirror_drift()` now prints the gap every
+>   run (flags ≥0.25%), so comparisons are made knowing the offset.
+> - **Open: #8** prices.fetch has no retry (partial-realize risk), **#9** `.bat` is LF-only
+>   (latent), **#10** dependency CVE status UNKNOWN (pip-audit not installed; audit rule =
+>   never install tooling unasked).
+
+> **M3 forward paper — RUNNING, 13 sessions (2026-07-15 → 07-27), 27 NAV rows, no gaps.**
+> All three sleeves currently long QQQ. Latest marks (07-27): **e6_1x $958.03 · e18_vixts
+> $952.04 · m10_1_nagel $971.32** (each started at $1,000). Scheduled task
+> `SwingTradingDailyPaper` fires 7pm weekdays via `scripts/daily_swing_paper.bat --execute`;
+> logs to `var/daily_swing_paper.log`. **Do NOT fire it manually intraday** — that is what
+> caused the 07-20 round-trip and the e18 fork; the guard now blocks order submission while
+> the market is open, but the DB ledger still advances on any run.
 
 > **2026-07-15 — X7 HYG:IEF credit gate = FAIL, but the FIRST gate to beat the 200-DMA
 > in-window (record Appendix CV; results `docs/research/2026-07-15_X7_credit_gate_results.md`).**

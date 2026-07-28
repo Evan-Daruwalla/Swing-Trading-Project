@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -43,6 +44,12 @@ from typing import Any
 import httpx
 
 log = logging.getLogger(__name__)
+
+# Transient-failure retry policy (audit #6). Only GET/DELETE are retried --
+# see _request for why POST /v2/orders must never be (duplicate-order risk).
+_TRANSIENT_STATUS = frozenset({429, 500, 502, 503, 504})
+_IDEMPOTENT_METHODS = frozenset({"GET", "DELETE"})
+_RETRY_BACKOFF_S = (1.0, 3.0)      # 2 retries; short -- this runs in a nightly job
 
 PAPER_BASE_URL = "https://paper-api.alpaca.markets"
 LIVE_BASE_URL = "https://api.alpaca.markets"
@@ -128,12 +135,42 @@ class AlpacaClient:
 
     # ---- core request + X-Request-ID persistence ----
     def _request(self, method: str, path: str, **kw) -> Any:
-        resp = self._client.request(method, path, **kw)
-        rid = resp.headers.get("X-Request-ID")
-        self._persist_request_id(method, path, resp.status_code, rid)
-        if resp.status_code >= 400:
-            raise AlpacaError(resp.status_code, rid, resp.text)
-        return resp.json() if resp.content else None
+        """Issue one API call, retrying ONLY where a retry is provably safe.
+
+        Audit finding #6 (2026-07-28): transient broker failures were neither
+        retried nor surfaced -- a single blip silently skipped that sleeve's
+        mirror for the day. Real data: 3 x HTTP 500 on 2026-07-23, all on
+        DELETE /v2/orders and GET /v2/positions.
+
+        RETRIES ARE RESTRICTED TO IDEMPOTENT METHODS (GET/DELETE) BY DESIGN.
+        POST /v2/orders is never auto-retried: a submit that times out or 500s
+        may still have been ACCEPTED server-side, so retrying it can place a
+        DUPLICATE order. A missed order is recoverable (the next run's
+        reconcile-to-DB re-places it); a duplicate order is not. Every failure
+        still raises AlpacaError and is printed by the caller."""
+        attempts = 1 + (len(_RETRY_BACKOFF_S) if method.upper() in _IDEMPOTENT_METHODS else 0)
+        for i in range(attempts):
+            last = i + 1 == attempts
+            try:
+                resp = self._client.request(method, path, **kw)
+            except httpx.RequestError as e:      # network/timeout: no response
+                if last:
+                    raise AlpacaError(0, None, f"network error: {e}") from e
+                print(f"    alpaca {method} {path}: network error ({e}); "
+                      f"retry {i + 1}/{attempts - 1} in {_RETRY_BACKOFF_S[i]}s", flush=True)
+                time.sleep(_RETRY_BACKOFF_S[i])
+                continue
+            rid = resp.headers.get("X-Request-ID")
+            self._persist_request_id(method, path, resp.status_code, rid)
+            if resp.status_code >= 400:
+                if resp.status_code in _TRANSIENT_STATUS and not last:
+                    print(f"    alpaca {method} {path}: HTTP {resp.status_code} "
+                          f"(X-Request-ID={rid}); retry {i + 1}/{attempts - 1} "
+                          f"in {_RETRY_BACKOFF_S[i]}s", flush=True)
+                    time.sleep(_RETRY_BACKOFF_S[i])
+                    continue
+                raise AlpacaError(resp.status_code, rid, resp.text)
+            return resp.json() if resp.content else None
 
     def _persist_request_id(self, method: str, path: str,
                             status: int, rid: str | None) -> None:

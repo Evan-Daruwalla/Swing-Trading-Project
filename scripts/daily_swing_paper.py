@@ -245,6 +245,56 @@ def backfill_divergence(conn):
                 c.close()
 
 
+MIRROR_DRIFT_WARN_PCT = 0.25   # below this = fractional-share rounding, not a fork
+
+
+def report_mirror_drift(conn):
+    """Print DB-ledger vs Alpaca share counts per sleeve (read-only).
+
+    Audit finding #4 (2026-07-28): the e18 sleeve carries a PERMANENT share fork
+    -- record DE claimed it would "self-heal at Tue open", which was WRONG. It
+    re-converged in STATE (both hold QQQ) but never in QUANTITY: the 07-20
+    midday fire had Alpaca fill intraday @700.622 while the DB simulated
+    Tuesday's open @706.680, so the same $ notional bought different share
+    counts. reconcile-to-DB (record DA) drives SYMBOLS, not quantities, so
+    nothing was ever going to close it.
+
+    This does NOT trade to correct the fork -- the DB ledger is the primary
+    forward-paper evidence and is next-open disciplined, so it is never rewritten
+    to match a broker fill, and placing bookkeeping orders is a trading-behavior
+    change that is Evan's call, not a silent default. What it does is make the
+    gap VISIBLE every run, so any DB-vs-Alpaca comparison is made knowing the
+    offset instead of assuming there is none."""
+    from swing_bot.alpaca_client import client_for_sleeve, AlpacaError
+    print("\nmirror drift (DB ledger vs Alpaca shares):")
+    for s in ps.SLEEVES:
+        pos = ps.get_positions(conn, s)
+        try:
+            c = client_for_sleeve(s)
+        except AlpacaError as e:
+            print(f"    [{s}] SKIPPED (creds): {e}")
+            continue
+        try:
+            ap = {p["symbol"]: p for p in c.list_positions()}
+        except AlpacaError as e:
+            print(f"    [{s}] unavailable: {e}")
+            continue
+        finally:
+            c.close()
+        syms = set(pos) | set(ap)
+        if not syms:
+            print(f"    [{s}] both flat -- aligned")
+            continue
+        for t in sorted(syms):
+            dbq = pos[t]["qty"] if t in pos else 0.0
+            aq = float(ap[t]["qty"]) if t in ap else 0.0
+            dq = aq - dbq
+            pct = (dq / dbq * 100) if dbq else float("inf")
+            flag = "  <-- MATERIAL FORK" if abs(pct) >= MIRROR_DRIFT_WARN_PCT else ""
+            print(f"    [{s}] {t}: DB {dbq:.7f} vs Alpaca {aq:.7f}  "
+                  f"d={dq:+.7f} ({pct:+.3f}%){flag}")
+
+
 def realize_pending(conn, sleeve, today, fill_open):
     """fill_open: {ticker: open_price_today}. Liquidates every current
     position (sell at today's open), then buys into the sleeve's pending
@@ -469,6 +519,7 @@ def main():
         # Read-only against Alpaca, so it runs even when the guard below skips
         # submission -- a market-open run still learns what actually filled.
         backfill_divergence(conn)
+        report_mirror_drift(conn)
         # INTRADAY GUARD (record DF): only submit orders after-hours, so
         # market-notional DAY orders queue for the NEXT open (EOD rule). While
         # the market is OPEN a market order fills intraday -> discipline break +
