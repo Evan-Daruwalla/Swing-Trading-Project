@@ -54,6 +54,7 @@ import sys
 import urllib.request
 import zipfile
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -64,6 +65,10 @@ from run_e10_earnings_drift import UNIV
 from run_c1_residual_reversal import residual_series, BETA_N
 
 VIX_THR = 20.0
+# Max sessions the VIX3M reading may lag `today` before e18 refuses to decide
+# (audit #3). 2 = tolerate the normal 1-session publish lag + a holiday edge;
+# the 5-session Yahoo lag that inverted the signal (record DC) trips it.
+VIX3M_MAX_STALE_SESSIONS = 2
 FF3_URL = ("https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
            "F-F_Research_Data_Factors_daily_CSV.zip")
 
@@ -138,12 +143,24 @@ def vix3m_close(start="2015-01-01"):
 
 
 def market_is_open():
-    """Alpaca's authoritative market clock -> True/False, or None if it can't
-    be determined (no usable creds / clock call failed). Used to gate --execute
-    order submission to AFTER-HOURS only (record DF): a market-notional order
-    placed while the market is OPEN fills intraday instead of queuing for the
-    next open, breaking the EOD/execute-next-open rule and desyncing the ledger
-    (record DE)."""
+    """Is the US equity market open RIGHT NOW -> True/False (never None).
+
+    Gates --execute order submission to AFTER-HOURS only (record DF): a
+    market-notional order placed while the market is OPEN fills intraday
+    instead of queuing for the next open, breaking the EOD/execute-next-open
+    rule and desyncing the ledger (record DE).
+
+    PRIMARY: Alpaca's market clock (authoritative -- holidays/half-days/DST
+    handled server-side). FALLBACK (audit finding #1, 2026-07-28): a local
+    America/New_York regular-hours check. The previous version FAILED OPEN --
+    it returned None on any AlpacaError and the caller then warned and
+    submitted orders ANYWAY, defeating the guard exactly when the broker is
+    flaky (a real Alpaca 500 hit this account 2026-07-23). The local fallback
+    errs SAFE in the direction that matters: outside 09:30-16:00 ET on a
+    weekday the market is never open, so a "closed" verdict is trustworthy;
+    inside that window it may be a holiday (really closed) and we
+    conservatively say OPEN, which costs only a skipped mirror that the next
+    after-hours run reconciles."""
     from swing_bot.alpaca_client import client_for_sleeve, AlpacaError
     for s in ps.SLEEVES:
         try:
@@ -152,11 +169,16 @@ def market_is_open():
             continue
         try:
             return bool(c.get_clock().get("is_open"))
-        except AlpacaError:
-            return None
+        except AlpacaError as e:
+            print(f"  market clock unavailable ({e}) -- using local ET fallback",
+                  flush=True)
+            break
         finally:
             c.close()
-    return None
+    now = dt.datetime.now(ZoneInfo("America/New_York"))
+    if now.weekday() >= 5:                       # Sat/Sun
+        return False
+    return dt.time(9, 30) <= now.time() < dt.time(16, 0)
 
 
 def realize_pending(conn, sleeve, today, fill_open):
@@ -275,7 +297,20 @@ def main():
     decisions = {}
     target_e6, err = ps.decide_e6_1x(list(qclose[d] for d in qdates))
     decisions["e6_1x"] = (target_e6, err)
-    target_e18, err = ps.decide_e18_vixts(vix_today, vix3m_today)
+    # STALENESS GATE (audit finding #3, 2026-07-28): _asof carry-forward will
+    # happily reach ARBITRARILY far back, and the CBOE fetch falls back to the
+    # yfinance ^VIX3M feed that is exactly the stale source which INVERTED this
+    # signal on 2026-07-17 (record DC: stale 1.011 said CASH, fresh 0.914 said
+    # HOLD). Carry-forward across 1-2 sessions is the intended live
+    # accommodation; beyond that the term structure is no longer current and a
+    # decision would be fiction dressed as data. Refuse loudly instead.
+    v3_stale = len([d for d in qdates if v3_dt is not None and v3_dt < d <= today])
+    if vix3m_today is None or v3_stale > VIX3M_MAX_STALE_SESSIONS:
+        target_e18, err = None, (f"VIX3M STALE ({v3_stale} sessions behind; asof "
+                                 f"{v3_dt} vs {today}) -- refusing to decide on "
+                                 f"a stale term structure")
+    else:
+        target_e18, err = ps.decide_e18_vixts(vix_today, vix3m_today)
     decisions["e18_vixts"] = (target_e18, err)
 
     wk = isoweek_str(today)
@@ -378,10 +413,6 @@ def main():
                   "submission to avoid intraday fills (EOD/execute-next-open rule). "
                   "Re-run after the close; the DB ledger stands and the next "
                   "after-hours run will reconcile the broker to it.")
-        elif mkt is None:
-            print("\n--execute: WARNING could not verify market state (Alpaca "
-                  "clock unavailable) -- proceeding; ensure this is an "
-                  "after-hours run.")
         for s in ps.SLEEVES:
             if mkt:
                 break                      # market open -> place no orders (guard above)

@@ -4272,3 +4272,66 @@ standing-document line, before SCOPE GUARD).
 **Cadence #129.** STATE: committing + pushing PRD_ROADMAP.md + this entry.
 
 **Next action:** none -- doc alignment only.
+
+# Appendix DH - Full project audit (/audit) + fixes 1/3/5 applied and verified (2026-07-28, ~14:31 CDT)
+
+**TRIGGER:** Evan ran `/audit` (full sweeping audit), then "do 1,3,5". Findings pass changed
+nothing; fixes applied only after approval. Tally unchanged (35) -- no experiment ran.
+
+**AUDIT RESULT - system structurally sound, risks concentrated in the LIVE harness.** Clean:
+12/12 scheduled runs succeeded (0 missed, weekday trigger correct), secret scan CLEAN across
+full git history, DB integrity_check/foreign_key_check ok, 0 duplicate (ticker,date) rows, 0
+OHLC violations, 0 non-positive prices, NAV series complete (9 rows = the 9 trading days
+07-15..07-27, no gaps), frozen tripwire GREEN, `.bat` pure ASCII. `bars` frozen at 2026-07-08
+is BY DESIGN (tripwire depends on it; the live loop uses prices.fetch, not bars); the 5 extra
+tickers are E2's leveraged ETFs. Explicitly NOT a finding: e6/m10 DB-vs-Alpaca NAV deltas
+(-$7.22/-$7.41) are a timing artifact (DB marks 07-27 close, Alpaca is live 07-28 intraday;
+qty deltas ~1e-5 rounding).
+
+**10 FINDINGS RANKED** (1 crit, 2 high, 4 med, 3 low). Full table in the audit output. Two of
+the top three were MY OWN prior work, flagged as such:
+1. **(crit) `market_is_open()` FAILED OPEN** -- returned None on any AlpacaError and the caller
+   then warned + submitted orders ANYWAY, defeating the DF guard exactly when the broker is
+   flaky. Not hypothetical: a real Alpaca 500 hit this account 2026-07-23 (log:291).
+2. **(high) `fill_divergence.alpaca_price` NEVER written** -- 10/10 rows NULL; all 3 call sites
+   pass only sim_price. M3's only implementation-fidelity instrument is INERT while the
+   docstring claims gaps are "visible, never assumed" = false verification. NOT YET FIXED.
+3. **(high) No staleness bound on VIX3M** -- `_asof` carry-forward reaches arbitrarily far back
+   and the CBOE fetch falls back to the very Yahoo feed that inverted e18 (record DC).
+4. (med) e18 DB<->Alpaca divergence is PERMANENT (DB 1.3957 sh vs Alpaca 1.4078, +$2.93) --
+   record DE's "self-heals at Tue open" is WRONG: it re-converged in STATE, never in QUANTITY.
+   Correction noted here; DE stands as written (append-only). NOT YET FIXED.
+5. (med) `.bat` exit-code capture broken -- `%ERRORLEVEL%>>` (no space) makes cmd read the
+   trailing digit as a redirection HANDLE; 0 "exit code" lines across 12 runs.
+6. (med) transient broker errors unretried/unalerted. 7. (med) HANDOFF 13 days stale.
+8. (low) prices.fetch has no retry -> partial-realize risk. 9. (low) `.bat` is LF-only (works;
+latent if a label/goto is added). 10. (low) dependency CVE status UNKNOWN -- pip-audit not
+installed and NOT installed by the audit (rule: never install tooling unasked).
+
+**FIXES APPLIED (1, 3, 5):**
+- **#1**: `market_is_open()` now returns a bool ALWAYS. Primary = Alpaca clock; FALLBACK = local
+  America/New_York regular-hours check. Errs SAFE: outside 09:30-16:00 ET on a weekday the
+  market is never open so "closed" is trustworthy; inside it may be a holiday and we
+  conservatively say OPEN (costs only a skipped mirror the next run reconciles). Dead
+  `mkt is None` caller branch removed.
+- **#3**: new `VIX3M_MAX_STALE_SESSIONS = 2` + a gate before `decide_e18_vixts`: if the VIX3M
+  reading is >2 sessions behind `today`, e18 REFUSES to decide (loud message) instead of
+  deciding on a stale term structure.
+- **#5**: added the required space -- `echo exit code %ERRORLEVEL% >> "..."` -- with a REM
+  explaining why the gap must stay.
+
+**VERIFIED (real output, not "should work"):** wrote a runnable assert-check exercising both
+non-trivial paths. FIX #1: with Alpaca FORCED DOWN (simulated 500), 7/7 ET cases correct
+(09:29 F, 09:30 T, 15:59 T, 16:00 F, 19:00 F, Sat F) and NEVER None. FIX #3: 5/5 lag cases
+correct, and the REAL record-DC case (VIX3M 07-10 vs today 07-17, n=5) now REFUSES -- the exact
+run that inverted e18 would be blocked today. Integration on LIVE data: VIX3M asof 07-27 vs
+session 07-28 = 1 session behind -> "decide normally" (gate does NOT false-positive in normal
+operation, the failure mode that would silently halt e18). py_compile OK, `.bat` still pure
+ASCII, frozen tripwire GREEN (d=+/-0.0000pp). Honest note: the check harness FAILED first on my
+own wrong expected value (n=4; the code's 5 was right) -- corrected the test, not the code.
+
+**STATE:** uncommitted (scripts/daily_swing_paper.py, scripts/daily_swing_paper.bat, this
+entry). Findings 2, 4, 6-10 remain OPEN by Evan's selection. **Cadence #132.**
+
+**Next action:** Evan's call on commit + whether to take #2 (backfill real Alpaca fill prices --
+the inert fidelity instrument) and #4 (e18 permanent share fork: resync or document).
