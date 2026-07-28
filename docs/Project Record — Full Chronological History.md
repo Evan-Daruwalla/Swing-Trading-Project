@@ -4511,3 +4511,48 @@ this entry). **Cadence #135.**
 **Next action:** none forced. Open decision: #4b qty-aware reconcile (would place small
 bookkeeping orders -- deliberately not defaulted). The 7pm scheduled run tonight is the first
 to exercise backfill_divergence + report_mirror_drift + the retry paths end-to-end.
+
+# Appendix DL - #4b qty-aware reconcile implemented (closes the e18 share fork on the next run) (2026-07-28, ~15:41 CDT)
+
+**TRIGGER:** Evan: "do #4b" -- the open decision left by DJ/DK. This is the piece I
+deliberately did NOT default to in #4, because it places autonomous BOOKKEEPING orders on his
+account; now explicitly authorized. Tally unchanged (35).
+
+**WHAT IT FIXES.** The symbol-level reconcile (record DA) only ever answered WHICH tickers the
+mirror should hold, never HOW MANY shares -- so the e18 fork created by the 07-20 intraday fill
+(+0.0120535 sh, +0.864%, +$8.14) was PERMANENT by construction: both sides held QQQ, so nothing
+in the loop ever looked at quantity. #4b closes share-count drift too.
+
+**DESIGN (the constraints that matter):**
+- **Pure decision function** `qty_reconcile_orders(positions, held, close_px, pending)` returns
+  a list of corrections and places nothing -- extracted specifically so money-adjacent logic
+  could be put under a real runnable check instead of being buried in main()'s loop.
+- **STEADY STATE ONLY** (`pending is None`): when a pending target exists the position is about
+  to be rebuilt wholesale by the caller, so correcting share counts first would fight that and
+  risk double-trading. Returns [] in that case.
+- **Threshold = the SAME band the drift report flags** (MIRROR_DRIFT_WARN_PCT 0.25%), so what
+  the operator sees warned is exactly what gets acted on. Ordinary fractional rounding
+  (e6 -0.001%, m10 -0.014%) is 20-800x below it -> no churn.
+- **MIN_RECONCILE_NOTIONAL $1**: a correction worth less than a dollar is REPORTED, not traded
+  (Alpaca rejects sub-$1 notional, and it is not worth an order).
+- **qty-based market DAY orders**, so they queue for the next open under the existing
+  after-hours guard -- the EOD discipline is preserved even for bookkeeping.
+- **NOT written to fill_divergence**: these are bookkeeping, not signal fills, and logging them
+  would pollute the instrument that measures signal-fill fidelity (audit #2).
+
+**VERIFIED (8/8, pure -- no network, no orders, no DB):** e18's REAL measured drift ->
+SELL 0.0120535 sh (~$8.14), which closes the +0.864% fork EXACTLY; e6 (-0.001%) and m10
+(-0.014%) -> NO order; an Alpaca-short case -> BUY (both directions work); pending set -> NO
+order (steady-state guard); a large-% but $0.03 case -> reported as skip_small, not traded; and
+**convergence: once the correction fills, the next run places NOTHING** (proving it cannot
+churn). py_compile OK; frozen tripwire GREEN; Alpaca open-order count 0 on all 3 accounts --
+I placed NOTHING. Self-caught: my first insertion landed BETWEEN the entry loop's `try:` and its
+`except`, orphaning the handler (SyntaxError) -- caught by the compile check and restored to the
+correct order before anything ran.
+
+**STATE:** uncommitted -> committing now. NO order placed by me. **Tonight's 7pm scheduled run
+is what will place the correction** (market is closed then, so it queues for the 07-29 open).
+
+**Next action:** review `var\daily_swing_paper.log` after 7pm -- expect a "QTY-RECONCILE SELL
+QQQ 0.0120535 sh" line for e18 and nothing for e6/m10; the following run should show e18 drift
+back under the band and place nothing further.

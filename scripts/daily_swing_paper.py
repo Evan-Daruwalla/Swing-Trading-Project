@@ -246,6 +246,7 @@ def backfill_divergence(conn):
 
 
 MIRROR_DRIFT_WARN_PCT = 0.25   # below this = fractional-share rounding, not a fork
+MIN_RECONCILE_NOTIONAL = 1.0   # Alpaca rejects sub-$1 notional; not worth an order anyway
 
 
 def report_mirror_drift(conn):
@@ -293,6 +294,45 @@ def report_mirror_drift(conn):
             flag = "  <-- MATERIAL FORK" if abs(pct) >= MIRROR_DRIFT_WARN_PCT else ""
             print(f"    [{s}] {t}: DB {dbq:.7f} vs Alpaca {aq:.7f}  "
                   f"d={dq:+.7f} ({pct:+.3f}%){flag}")
+
+
+def qty_reconcile_orders(positions, held, close_px, pending):
+    """Decide the share-count corrections that bring Alpaca back to the DB
+    ledger. PURE -- returns a list of dicts, places nothing (audit #4b).
+
+    The symbol-level reconcile (record DA) only ever answered WHICH tickers to
+    hold, never HOW MANY shares, so the e18 fork (+0.864%, +$8.14) created by
+    the 07-20 intraday fill was permanent by construction. This closes that.
+
+    STEADY STATE ONLY: when `pending` is set the position is about to be
+    rebuilt wholesale by the caller, so correcting its share count first would
+    fight that and risk double-trading -- return nothing.
+
+    The action threshold is the SAME band the drift report flags, so what the
+    operator sees warned is exactly what gets acted on; ordinary fractional
+    rounding (e6 -0.001%, m10 -0.014%) sits far below it. Corrections below
+    MIN_RECONCILE_NOTIONAL are reported, not placed (Alpaca rejects sub-$1
+    notional, and it is not worth an order).
+
+    These are BOOKKEEPING orders, not signals -- the caller deliberately does
+    NOT write them to fill_divergence, which measures signal-fill fidelity."""
+    if pending is not None:
+        return []
+    out = []
+    for t in sorted(set(positions) & set(held)):
+        dbq = positions[t]["qty"]
+        aq = float(held[t]["qty"])
+        dq = aq - dbq                       # + => Alpaca holds too many
+        pct = abs(dq / dbq * 100) if dbq else 0.0
+        if pct < MIRROR_DRIFT_WARN_PCT:
+            continue
+        notional = abs(dq) * (close_px.get(t) or 0.0)
+        out.append({
+            "ticker": t, "drift": dq, "pct": pct, "notional": notional,
+            "qty": round(abs(dq), 9), "side": "sell" if dq > 0 else "buy",
+            "action": "skip_small" if notional < MIN_RECONCILE_NOTIONAL else "order",
+        })
+    return out
 
 
 def realize_pending(conn, sleeve, today, fill_open):
@@ -610,6 +650,38 @@ def main():
                                           alpaca_order_id=o.get("id"))
                     except AlpacaError as e:
                         print(f"    buy {t} FAILED: {e}")
+                # QTY RECONCILE (audit #4b, authorized by Evan 2026-07-28).
+                # Symbol-level reconcile (record DA) only ever answered WHICH
+                # tickers to hold, never HOW MANY shares -- so the e18 fork
+                # (+0.864%, +$8.14) from the 07-20 intraday fill was permanent
+                # by construction. This closes share-count drift too.
+                #
+                # STEADY STATE ONLY (`pending is None`): when a pending target
+                # exists the position is about to be rebuilt wholesale above, so
+                # correcting its share count first would fight that and could
+                # double-trade. Threshold is the same band the drift report
+                # flags, so what you see warned is exactly what gets acted on;
+                # rounding noise (e6 -0.001%, m10 -0.014%) is far below it.
+                # These are BOOKKEEPING orders, not signals -- deliberately NOT
+                # written to fill_divergence, which measures signal-fill fidelity
+                # and would be polluted by them.
+                for corr in qty_reconcile_orders(positions, held, close_px, pending):
+                    if corr["action"] == "skip_small":
+                        print(f"    qty-drift {corr['ticker']} {corr['pct']:.3f}% but "
+                              f"~${corr['notional']:.2f} < ${MIN_RECONCILE_NOTIONAL:.2f} "
+                              f"-- too small to correct, leaving it")
+                        continue
+                    try:
+                        o = client.submit_order(symbol=corr["ticker"],
+                                                qty=corr["qty"], side=corr["side"],
+                                                type="market", time_in_force="day")
+                        print(f"    QTY-RECONCILE {corr['side'].upper()} {corr['ticker']} "
+                              f"{corr['qty']:.7f} sh (~${corr['notional']:.2f}, drift "
+                              f"{corr['drift']:+.7f} = {corr['pct']:.3f}%) "
+                              f"-> order {o.get('id')}")
+                    except AlpacaError as e:
+                        print(f"    qty-reconcile {corr['side']} {corr['ticker']} "
+                              f"FAILED: {e}")
             except AlpacaError as e:
                 print(f"\n--execute [{s}]: connection failed: {e}")
             finally:
