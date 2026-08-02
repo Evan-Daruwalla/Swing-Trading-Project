@@ -4556,3 +4556,45 @@ is what will place the correction** (market is closed then, so it queues for the
 **Next action:** review `var\daily_swing_paper.log` after 7pm -- expect a "QTY-RECONCILE SELL
 QQQ 0.0120535 sh" line for e18 and nothing for e6/m10; the following run should show e18 drift
 back under the band and place nothing further.
+
+# Appendix DM - #4b VERIFIED IN PRODUCTION: e18 share fork closed at the 07-29 open (2026-08-02, ~17:13 CDT)
+
+**TRIGGER:** Evan fired `Start-ScheduledTask -TaskName SwingTradingDailyPaper` (2026-08-02
+17:11 CDT, market closed). Tally unchanged (35). Doc-only entry; no code change.
+
+**THE FORK IS CLOSED -- #4b worked exactly as designed and tested.** The correction was placed
+by the 2026-07-28 7pm scheduled run (not by me; I placed nothing) and the log line is verbatim
+what the pre-commit test predicted:
+`QTY-RECONCILE SELL QQQ 0.0120535 sh (~$8.14, drift +0.0120535 = 0.864%) -> order 2fd4597a...`
+Order outcome (polled 08-02): **side=sell qty=0.01205352 status=FILLED, filled_avg $675.03,
+filled 2026-07-29T13:30:01Z = 09:30:01 ET = EXACTLY THE MARKET OPEN** -- the next-open discipline
+held for a bookkeeping order too (submitted after hours, queued, filled at the open).
+
+**STATE NOW (08-02, all three sleeves):**
+| sleeve | DB qty | Alpaca qty | drift | DB NAV | open orders |
+|---|---|---|---|---|---|
+| e6_1x | 1.4044944 | 1.4044803 | -0.001% | $966.28 | 0 |
+| e18_vixts | 1.3957099 | 1.3957099 | **+0.000%** | $960.23 | 0 |
+| m10_1_nagel | 1.4239740 | 1.4237773 | -0.014% | $979.68 | 0 |
+e18 DB and Alpaca now agree to 7 decimal places. The permanent fork created by the 07-20
+intraday fire (record DE) is GONE.
+
+**CONVERGENCE CONFIRMED IN PRODUCTION -- it fired ONCE and never again.** Exactly one
+QTY-RECONCILE line exists in the entire log across all runs since; the 07-30, 07-31 and 08-02
+runs all printed drift under the band and placed nothing. This is the anti-churn property the
+pre-commit check asserted ("after it fills, next run places NOTHING") now demonstrated on real
+runs rather than in a harness. e6/m10 rounding drift (-0.001%/-0.014%) has never triggered it.
+
+**OTHER AUDIT FIXES OBSERVED LIVE:** `exit code 0` now appears in the log (4 occurrences since
+the #5 fix -- that line used to vanish entirely into a redirection handle). `mirror drift`
+(#4) prints every run. `fill_divergence` (#2): 10 rows, 4 carrying a real Alpaca fill price, 0
+unresolved -- and correctly NO backfill activity since, because the only order placed was the
+qty-reconcile, which is deliberately excluded from that table as bookkeeping-not-signal. #6
+retry: no transient failures logged since (nothing to exercise it).
+
+**M3 STATUS:** 12 sessions (2026-07-15..07-31), 36 NAV rows, no gaps. All three sleeves long
+QQQ. Marks: e6 $966.28 / e18 $960.23 / m10 $979.68 off $1,000 each -- all three down, tracking
+QQQ's drawdown over the window (they are all currently the same trend-following bet).
+
+**Next action:** none. The harness is now self-correcting on share drift, self-reporting on
+fidelity, and guarded against intraday fires. Research remains parked at 35 attempts.
