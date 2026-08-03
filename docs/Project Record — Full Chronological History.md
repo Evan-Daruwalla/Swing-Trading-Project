@@ -4913,3 +4913,90 @@ DEPLOYED), plus an M12 row in the MILESTONES table.
 **Next action:** Evan picks the universe option (a/b/c). Then: freeze the universe decision if
 (b) -> commit the M12 prereg DOC-ONLY -> write `scripts/run_m12_factorial.py` -> run 4 cells +
 benchmarks + stress leg -> results doc + record + tripwire GREEN.
+
+# Appendix DS - M12 universe option (b) chosen; ~100-name expansion PROBED, 143 verified (2026-08-03, ~08:22 CDT)
+
+**TRIGGER:** Evan picked option **1 = expand to ~100 large-caps** for the M12 K=20 arm (from the
+three universe options logged in DR). Probe run; universe not yet frozen. Tally 37; nothing run.
+
+**QUALIFYING RULE, DECLARED BEFORE THE PROBE:** a candidate must have a real bar on or before
+**1999-01-04**, so the 2000-2013 GATE window has a full 252-session 12-1 momentum formation
+available from its first day. Every `data_start` is **FETCHED EMPIRICALLY, never invented** --
+the same convention `swing_bot/universe.py` uses. Candidates were assembled sector-spread
+(tech / financials / energy / staples / discretionary / health / industrials / utilities /
+materials / REITs) so a top-20 sort cannot be a single-sector artifact by construction.
+
+**RESULT: 104 of 112 candidates qualify -> 39 existing + 104 = 143 verified names.** That is
+larger than the "~100" the plan targeted, and better for the experiment: **top-20 of 143 is a
+14% sort**, a genuinely selective ranking rather than the "top-20 of 39 = half the universe"
+weak sort that made option (a) unattractive. Per-sector qualifying counts: tech 12, financials
+10, energy 7, staples 10, discretionary 9, health 15, industrial 16, utilities 10, materials 9,
+REITs 6.
+
+**REJECTS (8), and the distinction matters:**
+- **TOO-YOUNG (2, a clean rule application):** **NVDA** first bar 1999-01-22 -- missed the
+  pre-declared cutoff by 18 days -- and **STX** 2002-12-11. NVDA's exclusion is worth naming
+  explicitly: it is the single most famous momentum survivor of the era, so dropping it
+  **REDUCES survivorship flattery** and makes the test more conservative, not less. The rule was
+  applied as written rather than bent for a name that would have helped the strategy.
+- **FETCH-FAIL (6): BK, MMC, MRO, HES, K, GPS** -- these are `RuntimeError` from
+  `cache_fetch`'s retry exhaustion (transient yfinance failure), **NOT evidence that the data
+  does not exist.** Excluding a large-cap because MY fetch failed would be a subtle selection
+  artifact, so they are being retried before the freeze rather than silently dropped. Whatever
+  the retry returns is recorded either way.
+
+**STATE:** probe complete; **universe NOT yet frozen** (deliberately -- a frozen universe is an
+immutable dated decision, so it gets written ONCE, after the 6 retries resolve). M12 prereg not
+yet written. **Cadence #144.**
+
+**Next action:** resolve the 6 retries -> freeze the ~143-name universe as a dated decision
+(module + rationale + empirical data_starts + survivorship disclosure) -> commit the M12 prereg
+DOC-ONLY -> write `scripts/run_m12_factorial.py` -> run the 4 cells + benchmarks + 15 bps stress.
+
+# Appendix DT - M12 universe FROZEN at 142 names; GS excluded by the pre-declared cutoff (2026-08-03, ~08:24 CDT)
+
+**TRIGGER:** continues DS. Universe frozen as a dated decision (PRD M0.3 rule). Nothing run;
+tally 37.
+
+**FROZEN: `swing_bot/universe_m12.py`, 142 US large-caps.** SEPARATE module from
+`swing_bot/universe.py`, whose frozen 29-ETF set is UNTOUCHED and still backs the
+frozen-regression tripwire. Every `data_start` is the ticker's FIRST ACTUAL BAR, read from the
+fetched data (`auto_adjust=False`) -- never invented. Latest data_start across the whole
+universe is **1998-09-24**, so every member has a full 252-session 12-1 formation available
+before the 2000-01-01 GATE start.
+
+**Sector spread (max 15% in any one sector, so a top-20 sort cannot be a single-sector
+artifact):** tech 21, industrial 21, health 20, financials 15, staples 14, discretionary 13,
+energy 11, utilities 10, materials 9, REITs 6, telecom 2. **Top-20 of 142 = a 14.1% sort** --
+the whole reason option (b) was chosen over the 39-name set, where top-20 would have been half
+the universe.
+
+**FINDING FROM VERIFYING RATHER THAN ASSUMING: GS (Goldman Sachs) was REJECTED -- first bar
+1999-05-04.** GS is one of the ORIGINAL 39 names, so the existing 39-name survivor universe is
+**not uniformly pre-1999** -- Goldman IPO'd in May 1999. I had planned to carry the 39 in
+wholesale; re-verifying them against the same cutoff caught it. Final arithmetic: 39 existing
+- 1 (GS) + 104 new = **142**. Any prior experiment that ran the 39 over a pre-1999-05 window
+was silently running GS with no data for that stretch -- worth knowing, though it does not
+change those FAIL verdicts (a missing member can only reduce, not manufacture, an edge).
+
+**EXCLUSIONS RECORDED HONESTLY (two different reasons, not conflated):**
+- **Rule application (3):** **GS** (1999-05-04), **NVDA** (1999-01-22, missed by 18 days),
+  **STX** (2002-12-11). **NVDA's exclusion is conservative, not costly:** it is the era's most
+  famous momentum survivor, so dropping it REDUCES survivorship flattery. The cutoff was
+  applied as written rather than bent for a name that would have helped the strategy.
+- **Data-source limitation (6):** **BK, MMC, MRO, HES, K, GPS** -- excluded because yfinance
+  returns "possibly delisted / no timezone found" for them on EVERY retry, consistently across
+  two independent attempts. This is NOT rate-limiting (the errors are symbol-resolution
+  failures, not throttling) and NOT my judgement about the companies. Documented so the
+  exclusion is auditable rather than invisible.
+
+**SURVIVORSHIP DISCLOSURE written INTO the module docstring, not just the record:** these are
+companies that still trade today, so the universe is biased IN THE STRATEGY'S FAVOUR -- under
+the project's asymmetric-falsification rule **only a FAIL is clean**; a PASS is uninterpretable
+and routes to forward paper, never a live claim.
+
+**STATE:** universe frozen + committed. M12 prereg NOT yet written.
+
+**Next action:** commit the M12 prereg DOC-ONLY (cells, held-constant signal, diagnostic-not-
+deployment guard) -> write `scripts/run_m12_factorial.py` -> run 4 cells + benchmarks + 15 bps
+stress leg.
