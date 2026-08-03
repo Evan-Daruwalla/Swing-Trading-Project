@@ -5000,3 +5000,64 @@ and routes to forward paper, never a live claim.
 **Next action:** commit the M12 prereg DOC-ONLY (cells, held-constant signal, diagnostic-not-
 deployment guard) -> write `scripts/run_m12_factorial.py` -> run 4 cells + benchmarks + 15 bps
 stress leg.
+
+# Appendix DU - M12 factorial RUN: HORIZON binds, breadth does NOT -- and it overturns the program's own explanation (2026-08-03, ~08:27 CDT)
+
+**TRIGGER:** Evan's "3 then 1" plan, executed. **Attempt #38. Tally 37 -> 38.** DIAGNOSTIC --
+no PASS/FAIL issued, nothing deployed (prereg 6). Prereg `43e4d42` doc-only, runner verified
+absent at that moment. Universe frozen `b2a421a` (142 names). All 142 pre-cached -> the run was
+fully offline and reproducible.
+
+**RESULT (5 bps/side):** (1) BASELINE 10/K=3: GATE +6.26%/DD 71.3%/Sh 0.35, SEC +21.19%/DD
+59.3%/Sh 0.71, turnover **50.5x/yr**. **(2) H 63/K=3: GATE +14.24%/DD 63.8%/Sh 0.56, SEC
++27.04%/DD 37.8%/Sh 0.85, turnover 8.3x/yr** -- best cell in BOTH windows at BOTH cost levels.
+(3) C 10/K=20: GATE +7.53%/Sh 0.42, SEC +13.91%/Sh 0.70. (4) H+C 63/K=20: GATE +7.50%/Sh 0.41,
+SEC +12.80%/Sh 0.65. Benchmark EW-hold of the same 142: GATE +10.42%/Sh 0.59, SEC +9.41%/Sh 0.59.
+
+**EFFECTS -- horizon alone GATE +7.98pp / SEC +5.84pp; breadth alone +1.28pp / -7.28pp;
+interaction -8.01pp / -6.95pp.** At the 15 bps stress leg the horizon effect GROWS to +12.29pp
+/ +10.77pp while the breadth effect is unchanged (+1.21 / -6.92). **That growth-with-cost is the
+mechanistic signature of a TURNOVER problem** -- turnover falls 50.5x -> 8.3x/yr between the
+short and long hold. Direct experimental confirmation of X9's inference ("the signal is smaller
+than the toll").
+
+**THIS OVERTURNS THE PROGRAM'S OWN STATED EXPLANATION -- a self-correction, logged as such.**
+Record CY (cross-project comparison) asserted: *"the problem is not that factors fail -- it is
+that Swing's retail constraints (K=1-4, $1K, liquidity floor) forbid the BREADTH the premium
+requires."* **M12 says breadth was NOT the binding constraint.** K=3 -> K=20 helped negligibly
+in GATE and HURT materially in SEC, because top-20 of 142 is 14% of the universe, so the
+portfolio converges toward the equal-weight benchmark -- visible directly in the numbers (cell
+3 SEC +13.91% drifting toward EW's +9.41%, while cell 2 holds +27.04%). The negative
+interaction (~-8pp both windows) says breadth actively DESTROYS the horizon gain. The Hou-Xue-
+Zhang breadth story was being asserted, not tested; now it has been tested and it lost.
+
+**WHAT IT DOES NOT ESTABLISH -- stated plainly so the good-looking cell is not over-read:**
+- **Cell (2) would STILL FAIL this project's D1 bar.** PASS-HR needs CAGR >=15% AND maxDD <=60%
+  in BOTH windows; cell (2) posts GATE **CAGR 14.24% (<15%)** and **DD 63.8% (>60%)** -- it
+  fails BOTH GATE criteria, narrowly on return and clearly on drawdown. At 15 bps GATE CAGR is
+  13.33%, still short. **The best cell in the factorial is not a passing strategy.**
+- **Survivorship:** all 142 names still trade today, so the universe is biased IN THE
+  STRATEGY'S FAVOUR -> only a FAIL is clean; cell (2)'s +27% SEC is UNINTERPRETABLE as evidence
+  of edge. This is exactly why the prereg forbade deploying any cell off this run.
+- **Not decorrelated:** corr(cell 4, e6 rule) = **+0.587** over 6,668 sessions -- these momentum
+  cells would NOT solve the standing decorrelation problem either.
+- **Drawdowns are brutal everywhere:** every cell >30% DD in SEC; three of four >59% in GATE;
+  baseline 71.3%.
+- **142 names is a 14% sort, not momentum_v2's 1%** -- tests the DIRECTION of the concentration
+  effect, not its magnitude.
+
+**HONEST SUMMARY:** the 2x2 did its job -- it ATTRIBUTED the failure. The old constraint box was
+losing to transaction costs from over-trading, not to a lack of breadth. That answers by
+experiment a question the program had been answering by assertion. It does NOT produce a
+deployable strategy: we now know which wall we were hitting, and the wall behind it is drawdown.
+
+**VERIFIED:** frozen tripwire GREEN (d=+/-0.0000pp); no swing.db writes; the 3 live M3 sleeves
+NOT modified; run fully offline from cache.
+
+**STATE:** results doc `docs/research/2026-08-03_M12_constraint_factorial_results.md`;
+committing runner + results + this entry. Nothing deployed.
+
+**Next action:** Evan's call. Options: (a) prereg a D1-gated test of the 63-session/K=3
+configuration on a NON-survivor basis (the only way its +27% could ever mean anything);
+(b) attack the drawdown wall directly (the horizon finding says the return side is reachable;
+DD 63.8% is what now blocks D1); (c) leave research parked and let M3 accrue forward evidence.
