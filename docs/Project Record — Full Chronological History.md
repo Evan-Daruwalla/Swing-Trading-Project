@@ -4710,3 +4710,68 @@ runner + results + this entry. Nothing deployed; M3 still runs exactly 3 sleeves
 is -- options are (a) accept 3 correlated sleeves as an honest program limit, (b) test a
 DIFFERENT rule family (the 200-DMA family now has six one-window deaths against it), or (c)
 build the total-return data path first so bonds/dividend assets can be tested fairly.
+
+# Appendix DP - X9 pairs/relative-value = FAIL; decorrelation is not the scarce resource, EDGE is (2026-08-03, ~01:04 CDT)
+
+**TRIGGER:** Evan chose option 1 after X8 -- "test a different rule family." **Attempt #37.
+Tally 36 -> 37.** FAIL; nothing deployed.
+
+**FAMILY SELECTION (grounded, not invented).** Re-read the project's own July-12 survey
+(`docs/research/2026-07-12_swing_method_full_survey.md`) and removed everything since tested
+(C1 residual reversal, C3 breakout, C6 FOMC, X1 vol-targeting, X3 RegSHO). What remains is
+mostly **1-12 month horizons** -- outside the days-to-weeks swing scope -- or data-gated.
+**Pairs was the one structurally different family left, and the only MARKET-NEUTRAL one**,
+which is why it directly served the decorrelation goal from DN. Prereg
+`prereg_x9_pairs_relative_value.md` committed DOC-ONLY as **00c8c44**, runner verified absent
+at that moment.
+
+**H0 WAS PRE-DECLARED AS THE FAVORED PRIOR** (Do & Faff 2010: the Gatev 2006 edge decayed to
+~nil net post-2002), explicitly so a FAIL could not later be dressed up as a surprise. H0 won.
+
+**SETUP:** Gatev's distance method at his PUBLISHED defaults adopted wholesale (252 formation /
+63 trading / K=3 lowest-SSD / 2-sigma entry / 20-session stop / exit on spread sign change),
+29-ETF universe with leveraged members excluded, 6,927 sessions 1998-12..2026-07, **5 bps per
+side PER LEG so a round trip pays 4 legs (~20 bps)** -- deliberately not the 1 bp broad-ETF
+tier, since understating the leg count is how this family is usually flattered.
+
+**RESULT (net):** GATE -2.50%/DD 41.3%/Sh -0.47; SEC -6.71%/DD 60.2%/Sh -1.40. 2,196 trades
+opened, **1,920 converged (87.4%)**, 274 time-stopped. Final NAV **$294.16** from $1,000.
+corr to e6 = **-0.0571**. Criteria: (1) FAIL (2) FAIL (3) FAIL (60.2% DD in SEC) **(4) PASS**.
+
+**DIAGNOSTIC (post-hoc, clearly NOT part of the gated test -- same pattern as M11's
+reported-not-gated short-side check): ZERO-COST run splits the failure in two.** Gross: GATE
++2.07%/DD 9.2%/**Sh 0.43**; SEC -0.35%/DD 15.8%/**Sh -0.05**; final gross NAV $1,273.57.
+- **(a) The edge had ALREADY decayed before costs** -- gross Sharpe 0.43 in GATE (below the
+  0.50 bar even for FREE) and **-0.05 in 2014+, i.e. literally nothing.** That is Do & Faff's
+  decay reproduced INDEPENDENTLY on this project's own data.
+- **(b) Then the cost structure kills it** -- ~81 round trips/yr x ~20 bps = ~16%/yr drag,
+  converting a nil gross edge into -70% of capital.
+- **The mechanism is NOT broken: 87.4% of trades converged.** Spreads genuinely mean-revert;
+  the reversion is simply smaller than four legs of cost. "The signal is smaller than the toll"
+  is a different and more useful finding than "the signal does not exist."
+
+**PROGRAM-LEVEL FINDING -- DECORRELATION IS NOT THE SCARCE RESOURCE, EDGE IS.** Three
+consecutive decorrelation attempts all cleared the correlation bar comfortably and all failed
+profitability: **X8a GLD +0.089 · X8b TLT -0.191 · X9 pairs -0.057** (bar: |corr| <= 0.30).
+Finding an uncorrelated return stream is easy; finding one with a surviving retail-net edge is
+not. The 3 live sleeves therefore remain ~ONE strategy (DN: m10 duplicates e6 on 69.7% of 4,226
+sessions) -- now a DOCUMENTED CONSEQUENCE of the evidence, not an oversight. X9 also closes the
+last structurally-different in-scope family the survey identified.
+
+**SELF-CAUGHT DURING CODE-CHECK, FIXED BEFORE THE RUN (would have produced a wrong FAIL):**
+(1) the first draft DOUBLE-CHARGED costs -- `qa = leg/(oa*(1+COST))` already embeds the cost,
+so the extra `cash -= leg*COST*2` charged it twice; (2) the spread logic was not Gatev's --
+it compared a 1-DAY normalized difference against `sigma/sqrt(252)` and used ENTRY rather than
+the FORMATION base for the exit test. Both corrected before any number was generated. Compile
++ run clean afterwards. An artificially harsh cost model would have made the FAIL uninformative
+(edge vs. my own bug), which is exactly why this mattered.
+
+**STATE:** results doc `docs/research/2026-08-03_X9_pairs_results.md`; committing prereg +
+runner + results + this entry + HANDOFF tally 36->37. Nothing deployed; M3 still runs exactly
+3 sleeves, unmodified.
+
+**Next action:** Evan's call. Honest read: the in-scope, free-data, days-to-weeks, retail-cost
+space is close to EXHAUSTED at 37 attempts. Remaining moves are (a) relax a CONSTRAINT
+(horizon, data, or capital) rather than hunt another rule, (b) build the total-return data path
+(gap logged in DO) to fairly test dividend/coupon assets, or (c) declare the search complete and
+let the 3 live sleeves run as the forward test they already are.

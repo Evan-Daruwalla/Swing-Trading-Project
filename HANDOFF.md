@@ -12,7 +12,30 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 36 attempts (X8 non-equity trend = FAIL both arms); M3 forward paper RUNNING, all 3 sleeves long QQQ and ~1 strategy; full audit closed 2026-07-28
+## Current state — 37 attempts (X9 pairs = FAIL; decorrelation is not the scarce resource, EDGE is); M3 forward paper RUNNING, all 3 sleeves long QQQ and ~1 strategy
+
+> **2026-08-03 — X9 pairs / relative-value = FAIL; attempt #37 (record DP; results
+> `docs/research/2026-08-03_X9_pairs_results.md`).** Evan chose "test a different rule family"
+> after X8. Family picked from the project's OWN July-12 survey after removing everything since
+> tested (C1/C3/C6/X1/X3): what remains is mostly 1–12 month horizons (outside the days-to-weeks
+> scope) or data-gated — **pairs was the one structurally different family left, and the only
+> MARKET-NEUTRAL one.** Prereg `00c8c44` (doc-only, predates the runner). **H0 was pre-declared
+> as the FAVORED prior** (Do & Faff 2010: Gatev's edge decayed to ~nil post-2002) so a FAIL
+> could not be dressed up as a surprise. H0 won.
+> Gatev's distance method at his PUBLISHED defaults adopted wholesale (252/63/K=3/2σ/20-stop),
+> 29 ETFs (leveraged excluded), 6,927 sessions, **5 bps per side PER LEG = ~20 bps a round trip.**
+> **Net: GATE −2.50%/DD 41.3%/Sh −0.47 · SEC −6.71%/DD 60.2%/Sh −1.40**, final NAV **$294.16**
+> from $1,000. corr to e6 **−0.0571**. FAILS ①②③, passes only ④.
+> **Zero-cost DIAGNOSTIC (post-hoc, not gated) splits the failure in two:** gross GATE
+> +2.07%/Sh **0.43**, gross SEC −0.35%/Sh **−0.05** — **the edge had already decayed to nothing
+> before costs** (Do & Faff reproduced independently on this project's data), **and then ~81
+> round trips/yr × ~20 bps ≈ 16%/yr of drag destroys what remains.** But **87.4% of trades
+> CONVERGED** — the mechanism works; the reversion is simply smaller than four legs of cost.
+> **PROGRAM-LEVEL FINDING: decorrelation is NOT the scarce resource, EDGE is.** Three straight
+> decorrelation attempts cleared the correlation bar and failed profitability: **X8a GLD +0.089
+> · X8b TLT −0.191 · X9 pairs −0.057** (bar ≤0.30). The 3 live sleeves remain ~one strategy as a
+> DOCUMENTED CONSEQUENCE of the evidence, not an oversight. X9 closes the last
+> structurally-different in-scope family.
 
 > **2026-08-02 — X8 non-equity trend sleeve = FAIL both arms; decorrelation attempt deployed
 > NOTHING (record DO; results `docs/research/2026-08-02_X8_noneq_trend_results.md`).** Evan:
@@ -39,7 +62,7 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
 > instruments cannot be tested fairly.
 
-**Last updated: 2026-07-28 ~15:18 CDT** — this file is the only live snapshot;
+**Last updated: 2026-08-03 ~01:04 CDT** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
