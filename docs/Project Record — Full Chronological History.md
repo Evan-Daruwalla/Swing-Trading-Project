@@ -4845,3 +4845,71 @@ call, not a silent default. **Cadence #141.**
 
 **Next action:** Evan picks the constraint; then write the goal amendment as a DATED
 supersession (never a retype) and pre-register the first experiment in the widened space.
+
+# Appendix DR - M12 constraint-relaxation factorial PLANNED + revert point tagged; PRD amended (2026-08-03, ~01:25 CDT)
+
+**TRIGGER:** Evan: "make a revert point then do horizon 1 -> 6 then keep that data and do
+concentration -> K=20-50 then combine them and compare all 3 against what we have now. Plan out
+the experiment then update the PRD with the new plan." This entry covers the PLAN, the revert
+point, and the PRD amendment. **Nothing has been run; no prereg committed yet.** Tally 37.
+
+**REVERT POINT:** annotated git tag **`search-phase-closed-v1`** at **6e8f431**, pushed. Captures
+the program exactly as the search phase closed (37 attempts, original constraints intact, M3
+live, tripwire GREEN). Everything after belongs to the constraint-relaxation phase.
+
+**DESIGN -- Evan asked for 3 variants vs the current state, which is exactly a CONTROLLED 2x2
+FACTORIAL** (and this resolves my earlier objection to "both at once," which was that a combined
+test cannot say WHICH relaxation mattered -- a factorial can):
+- Factor **H (horizon)**: 10-session hold (inside the old swing scope) vs **63-session** (~3
+  months, mid-range of the 1-6 month relaxation).
+- Factor **K (concentration)**: **K=3** vs **K=20**.
+- Cells: (1) BASELINE 10/K=3 = today's constraint box · (2) H = 63/K=3 · (3) C = 10/K=20 ·
+  (4) H+C = 63/K=20. Report both MAIN EFFECTS and the INTERACTION.
+
+**HELD CONSTANT so only the constraint varies: 12-1 cross-sectional momentum.** Chosen because
+the project already owns BOTH ENDPOINTS of the answer -- **E3** (single-stock momentum,
+concentrated + short horizon) **FAILED** at 6.27% gate CAGR, while **Trading's momentum_v2**
+(12-1, top-50, monthly, read-only) **VALIDATED** at IS +21.0%/yr and OOS +26.5%/yr, Sharpe 0.87.
+Same factor family, opposite verdicts; something between those two points does the work and
+nobody has isolated it. Also constant: next-open fills, 5 bps/side (+15 bps stress leg, since
+the cost hypothesis is half of what is being tested and must not be flattered), GATE/SEC
+windows, CAP0 $1,000, and benchmarks (EW buy-hold of the same universe, QQQ BH, e6 rule).
+
+**VERIFIED DURING PLANNING (probes, not assumptions) -- and one of my own prior claims was
+WRONG.** I had repeated the `prices.py` docstring's line that Trading's `price_cache` has no
+open prices. READ-ONLY probe shows it **DOES** carry `next_open` (1,115,871 rows) across
+**12,486 tickers**. But it is still not a clean breadth source: `next_open` coverage is thin
+against `close` (1.1M vs 15.7M rows -> many ticker-days cannot be filled next-open), the
+`delistings` table holds only **3 rows** (all 'data_gap_offline') so the universe remains
+survivor-biased, and median history is 636 rows/ticker. Recorded so the correction is on the
+record, not silently reused.
+
+**OPEN DECISION LOGGED (Evan's call, not a silent default): the universe for the K=20 arm.**
+(a) existing **39-name** survivor set -- self-contained, full OHLC, but top-20 of 39 is HALF the
+universe = a weak sort, testing direction not magnitude; (b) **expand to ~100 large-caps**
+[RECOMMENDED] -- a genuine sort, still self-contained/free/full-OHLC, but needs a new dated
+frozen-universe decision per M0.3; (c) **Trading's 12,486 read-only** -- true breadth but the
+fill-coverage gap + survivorship above, and it COUPLES two projects CLAUDE.md deliberately keeps
+separate (plus the concurrent-DB rule).
+
+**RIGOR GUARD PRE-COMMITTED IN THE PLAN (section 5): M12 IS A DIAGNOSTIC, NOT A DEPLOYMENT
+GATE.** Picking the best of four cells and deploying it would be in-sample composition -- the
+exact M10-1 mistake the program already documented and capped. Pre-committed path: M12 reports
+the 4 cells with NO PASS/FAIL claimed -> any promising configuration gets a SEPARATE prereg on
+the standard D1 dual-bar -> only then forward paper. Also pre-committed: **M12 cannot rewrite
+the search-phase terminal claim**, which is explicitly scoped to the OLD constraints; a result
+here EXTENDS the map rather than retroactively un-falsifying anything. And the "all four cells
+look the same" outcome -- meaning NEITHER constraint was the binding problem -- is written down
+in the plan NOW so it cannot be quietly discarded later.
+
+**DOCS:** new `docs/M12_constraint_relaxation_plan.md` (full plan). **PRD_ROADMAP amended by
+APPENDING, never retyping:** a dated AMENDMENT block at the head of section 4 CONSTRAINTS
+declaring horizon and concentration to be experimental variables (originals preserved as
+baseline cell 1; every other constraint unchanged; widens what may be TESTED, not what may be
+DEPLOYED), plus an M12 row in the MILESTONES table.
+
+**STATE:** committing plan + PRD amendment + this entry. Nothing run.
+
+**Next action:** Evan picks the universe option (a/b/c). Then: freeze the universe decision if
+(b) -> commit the M12 prereg DOC-ONLY -> write `scripts/run_m12_factorial.py` -> run 4 cells +
+benchmarks + stress leg -> results doc + record + tripwire GREEN.

@@ -115,6 +115,26 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 
 ## 4. CONSTRAINTS
 
+> **AMENDMENT 2026-08-03 (Evan) — HORIZON AND CONCENTRATION ARE NOW EXPERIMENTAL
+> VARIABLES, NOT FIXED CONSTRAINTS.** The search phase closed at 37 attempts
+> (record DQ) having falsified the space *conditioned on* these constraints; the
+> program never tested **which constraint binds**. Under milestone **M12** the
+> two are relaxed as a controlled 2×2:
+> - **Horizon:** days-to-weeks → also test **1–6 months** (M12 uses 10-session
+>   vs 63-session holds).
+> - **Concentration:** K=1–3 → also test **K=20**.
+>
+> The original values are NOT deleted and remain the baseline cell ① of the
+> factorial, so the old constraint box is still measured head-to-head. Every
+> other constraint below (EOD-only, paper-only, liquidity floor, free data,
+> $100–1,000, rigor discipline) is **UNCHANGED**. Plan:
+> `docs/M12_constraint_relaxation_plan.md`. Revert point: git tag
+> **`search-phase-closed-v1`** (`6e8f431`).
+>
+> **This amendment widens what may be TESTED. It does not widen what may be
+> DEPLOYED:** M12 is a diagnostic, and no cell of it becomes a sleeve without a
+> separate prereg gated on the standard D1 dual-bar (plan §5).
+
 - Capital assumption $100–1,000 (Evan's brief 2026-07-08; the $100–10,000
   figure in the pasted inventory remains unconfirmed — sizing code takes
   capital as a parameter so this never hard-codes).
@@ -169,6 +189,7 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 | M9 | Research-batch-2 arc X1–X6 + discipline adoptions (added 2026-07-13, record Appendices BN–BP) | candidates + process upgrades from the LLM brief and the four-topic batch (execution/risk/data/crypto): prereg-template discipline (tiered costs, decomposition ladder, time-stop baseline, capped fractional-Kelly), conditional vol-targeting (E6×E18), E17-free days-to-cover (FINRA 2021+), Reg SHO short-volume drift, MOC close-entry probe, analyst recommendation-change drift ($22-gated), crypto BTC/ETH trend pilot (scope-gated), LLM forward-only arc (M3-attached) |
 | M10 | Evidence-synthesis arc: state-conditioned strategies (added 2026-07-14, record Appendices CG–CK) — **DONE** | compose the 31 results into strategies vs BOTH D1 tiers; a design panel proved fixed-weight PASS-HR is arithmetically empty → the only escape is state-conditioning on a causal variable. M10-1 Nagel Switch = program's FIRST PASS-HR (IN-SAMPLE-COMPOSED, forward-paper-only); M10-2 gap-amortized stress IBS = FAIL (closes the E2 c2c mirage). Both panel survivors run |
 | M11 | Algorithmic chart-pattern detection (added 2026-07-14, Evan's direction; record Appendices CL–CO) — **DONE 2026-07-14: FAIL** | the one untested mechanism family: rule-based (NOT LLM) detection of the chart *shapes* (double-bottom, inverse-H&S), buy on neckline break. **Attempt 34, the 9th equity family. FAIL — signal-dead** (gate −0.14% CAGR / Sh 0.09; frictionless ≈ 0; loses SPY + survivorship-clean EW-39). Payload: the survivor universe *destroyed* the documented bearish-pattern edge (fwd-20 after top/H&S +1.70% > unconditional +1.15%, opposite of Savin 2007). Prior held exactly |
+| M12 | **Constraint-relaxation factorial (added 2026-08-03, Evan's direction; record DQ) — PLANNED, NOT RUN** | The search phase closed at 37 attempts having falsified the space *conditioned on* K=1–3 and days-to-weeks holds — but never tested **which constraint binds**. Controlled **2×2**: horizon (10-session vs 63-session hold) × concentration (K=3 vs K=20), with **12-1 cross-sectional momentum held constant** as the signal because the project already owns both endpoints (E3 concentrated/short = FAIL; Trading's momentum_v2 top-50/monthly = validated IS +21.0% / OOS +26.5%). Reports both main effects + the interaction. **DIAGNOSTIC ONLY — no cell becomes a sleeve without a separate D1-gated prereg** (plan §5). Plan: `docs/M12_constraint_relaxation_plan.md`. Revert point: tag `search-phase-closed-v1` (6e8f431). **OPEN DECISION: the universe** (39-name existing / ~100 expanded [recommended] / Trading's 12,486 read-only) |
 
 Order is deliberate: infrastructure before science (council 5/5); thresholds
 provably precede results (M1 before M2); nothing goes live on an unvalidated
