@@ -4645,3 +4645,68 @@ from mutating the running three.**
 
 **Next action:** Evan picks the decorrelation path (options put to him this turn). Whatever is
 chosen, the existing 3 sleeves keep running untouched.
+
+# Appendix DO - X8 non-equity trend sleeve = FAIL both arms; decorrelation attempt deploys NOTHING (2026-08-02, ~23:00 CDT)
+
+**TRIGGER:** Evan: "do recommended" -- execute the recommendation from DN, i.e. leave the three
+running sleeves UNTOUCHED and add a newly pre-registered, structurally uncorrelated sleeve.
+**Attempt #36. Tally 35 -> 36.** Result: FAIL, nothing deployed.
+
+**PROCESS (the rigor claim, honored):** prereg `docs/prereg_x8_noneq_trend.md` committed
+DOC-ONLY as **8b408f9**, verified (`ls scripts/run_x8*`) that no runner existed at that moment;
+runner written only afterwards. Gap targeted: `swing_bot/universe.py` is 100% EQUITY (US
+indices, 11 sectors, country ETFs, leveraged equity); IEF appears in the project only as the
+DENOMINATOR of X7's HYG:IEF ratio, never traded. **The program's one surviving rule had never
+been tested on a non-equity asset.**
+
+**RULE:** E6 verbatim (long iff close > SMA200, signal at close, execute next open), 1 bp/side,
+K=1, CAP0 $1,000 -- deliberately identical so this tests the ASSET, not a new rule. Two
+pre-declared arms: (a) GLD, (b) TLT. Multiple-comparison risk declared before running.
+
+**VERDICT BAR -- pre-declared and explicitly NOT D1.** Stated in the prereg before results
+precisely so it could not look retrofitted: D1's CAGR>=15% would reject this sleeve on a
+criterion it was never meant to satisfy (gold/bonds have no plausible 15%/yr trend CAGR). The
+DIVERSIFIER bar: (1) |corr to e6| <= 0.30, (2) CAGR > 0 both windows, (3) maxDD <= 60% both,
+(4) Sharpe > the asset's OWN buy-and-hold both windows.
+
+**RESULTS -- both FAIL:**
+- **GLD (5,458 bars, 2004-11..2026-07):** trend GATE +11.81%/DD 24.5%/Sh 0.73; SEC +6.26%/DD
+  28.4%/Sh 0.52. Buy-hold 0.65/0.65. **corr to e6 = +0.0886** over 5,243 sessions.
+  (1) PASS (2) PASS (3) PASS **(4) FAIL** -> beat buy-hold in GATE (0.73>0.65), LOST in SEC
+  (0.52<0.65). A genuine 3-of-4 NEAR-MISS. The gate cut GFC-era DD by a third (37.8%->24.5%).
+- **TLT (6,040 bars, 2002-07..2026-07):** trend GATE -0.45%/DD 23.7%/Sh 0.02; SEC -0.74%/DD
+  38.6%/Sh -0.03. **corr to e6 = -0.1905**. (1) PASS **(2) FAIL** (negative CAGR both) (3) PASS
+  **(4) FAIL**. **DECLARED BIAS RESTATED AS PROMISED:** dividend-UNADJUSTED prices materially
+  understate TLT (coupon-bearing); this is NOT a clean read on bonds. Arm (b) still fails (4)
+  independently, since both sides of that comparison are dividend-unadjusted.
+
+**THE ACTUAL FINDING -- decorrelation was never the hard part.** Both arms cleared the
+correlation bar EASILY (+0.089, -0.191 vs a 0.30 ceiling). Uncorrelated assets are easy to
+find; an uncorrelated asset where THIS program's one surviving rule adds value is not. And this
+is the **SIXTH** appearance of the program's signature death -- works in the stressed window,
+gives the Sharpe back in the calm one (E6-downgrade, C7, X6, X7, M10-2, now X8a) -- now
+confirmed across US equity, non-US equity, crypto, credit, and gold. Trend gating is drawdown
+control, not return enhancement, in every asset class tested.
+
+**HONEST UNCOMFORTABLE OBSERVATION (reported, not acted on):** plain buy-and-hold GLD would
+decorrelate BETTER than the trend-gated version -- same low correlation, higher Sharpe in both
+windows (0.65/0.65 vs 0.73/0.52). But buy-and-hold is an ALLOCATION, not a swing strategy, and
+sits outside this program's scope (EOD swing, holds of days-to-weeks). Stating it is accuracy,
+not a recommendation to buy gold.
+
+**NOT DONE, DELIBERATELY:** the bar was NOT lowered to deploy GLD on its 3-of-4 near-miss. The
+prereg forbids tuning after results, and a near-miss is a near-miss. The three live sleeves were
+NOT modified -- their preregs (0526ea2, f32b008, prereg_m10_1_nagel_switch.md) and their 12
+sessions of forward evidence remain intact.
+
+**NEW GAP LOGGED:** the project has no total-return (dividend-adjusted) data path, which makes
+any coupon/dividend-heavy instrument untestable on a fair basis. That is a data-layer gap, not
+just an X8 limitation.
+
+**STATE:** results doc `docs/research/2026-08-02_X8_noneq_trend_results.md`; committing prereg
+runner + results + this entry. Nothing deployed; M3 still runs exactly 3 sleeves.
+
+**Next action:** Evan's call. The decorrelation goal is NOT satisfied and I will not pretend it
+is -- options are (a) accept 3 correlated sleeves as an honest program limit, (b) test a
+DIFFERENT rule family (the 200-DMA family now has six one-window deaths against it), or (c)
+build the total-return data path first so bonds/dividend assets can be tested fairly.

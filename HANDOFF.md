@@ -12,7 +12,32 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 35 attempts (research parked); M3 forward paper RUNNING 13 sessions, all 3 sleeves long QQQ; full audit done 2026-07-28 (10 findings, 5 fixed)
+## Current state — 36 attempts (X8 non-equity trend = FAIL both arms); M3 forward paper RUNNING, all 3 sleeves long QQQ and ~1 strategy; full audit closed 2026-07-28
+
+> **2026-08-02 — X8 non-equity trend sleeve = FAIL both arms; decorrelation attempt deployed
+> NOTHING (record DO; results `docs/research/2026-08-02_X8_noneq_trend_results.md`).** Evan:
+> "make the sleeves less correlated." **Measured first (record DN): the 3 live sleeves are
+> ~ONE strategy** — m10 runs the IDENTICAL e6 rule on **69.7%** of 4,226 sessions, e6/e18 agree
+> **84.0%**, all three effectively long **65.3%**, live correlation **+0.86…+0.95** with 7–9 of
+> 11 days byte-identical. Root cause is not sloppiness: 35 attempts yielded ONE survivor
+> (200-DMA trend gating), market-dependent across equity regions (E7) and failed on crypto (X6)
+> — **there was no validated uncorrelated candidate to deploy.**
+> Attempt #36 tested the gap: the universe is 100% equity, so the surviving rule had never met a
+> NON-EQUITY asset. Prereg `8b408f9` (doc-only, predates the runner), E6's rule verbatim, arms
+> GLD + TLT, on an explicitly-labelled **DIVERSIFIER bar** (corr ≤0.30, CAGR>0 both, DD ≤60%
+> both, Sharpe > the asset's own buy-hold both) — declared before results precisely so it could
+> not look retrofitted.
+> **GLD: corr +0.0886, CAGR +11.81%/+6.26%, DD 24.5%/28.4% — 3 of 4, FAILS ④** (Sharpe 0.73 beat
+> buy-hold 0.65 in GATE, 0.52 LOST to 0.65 in SEC). **TLT: corr −0.1905 but negative CAGR both
+> windows** — and dividend-UNADJUSTED prices materially understate TLT (declared bias, restated).
+> **The finding: decorrelation was never the hard part** (+0.09 and −0.19 vs a 0.30 ceiling).
+> Finding an uncorrelated asset is easy; finding one where this rule adds value is not. **Sixth
+> repetition of the one-window death** (E6-downgrade, C7, X6, X7, M10-2, X8a) — now across US
+> equity, non-US equity, crypto, credit and gold. **The bar was NOT lowered for GLD's near-miss,
+> and the three running sleeves were NOT modified** (their preregs and 12 sessions of forward
+> evidence stay intact). **Decorrelation goal NOT satisfied — stated plainly, not papered over.**
+> New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
+> instruments cannot be tested fairly.
 
 **Last updated: 2026-07-28 ~15:18 CDT** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
