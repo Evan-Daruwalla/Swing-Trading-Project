@@ -8,16 +8,26 @@ https://github.com/Evan-Daruwalla/Swing-Trading-Project**
 > `docs/Project Record — Full Chronological History.md` remains ground truth for
 > dated detail; this synthesizes it. **Standing counts (2026-07-14): 0 CLEAN PASS-HR /
 > 1 IN-SAMPLE-COMPOSED PASS-HR (M10-1 Nagel Switch, forward-paper-only) / 1 weak PASS-RA
-> (E18) / 35 pre-registered attempts — 34 equity across 9 strategy families + a
-> state-conditioned synthesis arc, plus 1 crypto pilot.** The fixed-single-strategy space
-> (E/C/X families) is exhausted and the M10 synthesis arc (composing the evidence into
-> state-conditioned strategies) is complete — but **the program is NOT concluded.** M10 found
-> the one design that clears PASS-HR *in-sample* (the Nagel Switch), a forward-paper
-> hypothesis rather than a refutation of the terminal claim; and the last untouched mechanism
-> family — **algorithmic chart-pattern detection** — has now been run and **FAILED** (M11,
-> the 9th family; §3, §8), signal-dead on the deployable long side. The one untested
-> *evidence* lever that remains is **M3 forward paper**. This reads as a progress report,
-> not an obituary.
+> (E18) / 37 pre-registered attempts — 36 equity across 9 strategy families + a
+> state-conditioned synthesis arc, plus 1 crypto pilot and 2 decorrelation probes.**
+>
+> **SEARCH PHASE CLOSED 2026-08-03 (Evan's dated decision); FORWARD-EVIDENCE PHASE OPEN.**
+> The backtest search space under this project's constraints — free EOD data, holds of
+> days-to-weeks, K=1–3, retail costs, $100–1,000 — is **exhausted**. The fixed-single-strategy
+> space (E/C/X) went first; the M10 synthesis arc completed; **M11** killed the last free
+> *shape* mechanism; and **X7/X8/X9** closed the last structurally different families
+> (credit regime, non-equity trend, market-neutral relative value). What remains untested is
+> 1–12 month horizons (outside the swing scope) or data-gated.
+>
+> **The search phase's terminal finding: decorrelation is not the scarce resource — EDGE is.**
+> The final three attempts each cleared a ≤0.30 correlation bar comfortably (GLD +0.089,
+> TLT −0.191, pairs −0.057) and each failed profitability. X9 named the mechanism precisely:
+> **87.4% of pairs trades converged** — the signal is real, and simply **smaller than four
+> legs of transaction cost.**
+>
+> **One lever is now open, and it needs elapsed time rather than another attempt: M3 forward
+> paper**, live since 2026-07-15 across 3 isolated Alpaca paper accounts. This reads as a
+> progress report, not an obituary — and closing the search is a *result*, not a surrender.
 
 ---
 
@@ -46,11 +56,14 @@ informed-positioning, and crypto data. Two things sit outside it. (1) The M10 sy
 arc showed that *state-conditioning* a losing fixed strategy on a causal regime variable
 (VIX, per Nagel 2012) can clear PASS-HR **in-sample** — the Nagel Switch (§3, M10-1) — but
 that pass is composed after seeing 31 results and buys known survivors in crashes, so it
-is a forward-paper hypothesis, not a live edge. (2) One classical mechanism family has
-**never been tested here:** algorithmic detection of the chart *shapes* retail traders are
-taught (head-and-shoulders, double tops/bottoms, triangles, flag breakouts). Its prior is
-weak (§8), but it is genuinely untested — so the honest statement is "no edge found in what
-was tested," not "no edge exists." The program continues.
+is a forward-paper hypothesis, not a live edge. (2) The chart-*shape* family — algorithmic
+detection of head-and-shoulders, double tops/bottoms, triangles, flag breakouts — was the
+last untested classical mechanism and has **since been tested and FAILED** (M11, 2026-07-14,
+signal-dead; §3, §8), as have the credit-regime, non-equity-trend and market-neutral families
+(X7/X8/X9). The honest statement therefore remains **"no edge found in what was tested," not
+"no edge exists"** — but what was tested now spans every free, EOD-testable mechanism family
+the program could identify. **The search phase is closed (2026-08-03); the forward-evidence
+phase (M3) continues.**
 
 **The deliverable is the discipline, not a winning strategy.** The value of this work —
 and the reason it is written this way — is that it demonstrates rigorous, honest,
@@ -85,7 +98,7 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 4. **Frozen-regression tripwire.** `swing_bot/test_frozen.py` pins 12 deterministic
    reference numbers to **exact** values (d = ±0.0000pp). It runs GREEN after every
    experiment; a silent drift from an "unrelated" change fails loud. It has stayed
-   GREEN across all 35 attempts.
+   GREEN across all 37 attempts.
 
 5. **Execution/signal decomposition ladder.** Every result is decomposed **Rung A**
    (frictionless close-to-close) → **Rung B** (next-open, 0 bps) → **Rung C**
@@ -104,7 +117,7 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 
 ---
 
-## 3. Results ledger — 9 equity families + a synthesis arc + 1 crypto pilot, 35 attempts, 0 clean high-return passes
+## 3. Results ledger — 9 equity families + a synthesis arc + 1 crypto pilot + 2 decorrelation probes, 37 attempts, 0 clean high-return passes
 
 | Family | Experiments | Verdict |
 |---|---|---|
@@ -121,9 +134,12 @@ Every experiment obeyed the same machinery. This is the part worth reading.
 | *(closed on probe)* | C2 dividend-initiation | Only 3 first-ever initiations in 26 years among the survivors → insufficient event flow, no runner |
 | Evidence synthesis *(state-conditioned)* | M10-1, M10-2 | **M10-1 Nagel Switch = the program's FIRST PASS-HR, but IN-SAMPLE-COMPOSED / forward-paper-only** (VIX>20 → C1 residual reversal, VIX≤20 → E6 trend; Nagel-2012 mechanism; gate 17.87% CAGR / DD 59.95% / Sh 0.66, sec 15.94% / 39.68% / 0.78) — composed after 31 results, survivor-flattered (buys known survivors in crashes), DD clears by 0.05 pp, breaks at VIX>18 (14.83%) and at 15 bps, fails PASS-RA (Sh 0.66) → **not clean, per the M10 data-snooping cap.** **M10-2** (2× QQQ stress mean-reversion, 5-day hold) = FAIL (gate 2.99% CAGR / **83.3% DD**) and **closes the E2 "c2c mirage"**: the 5-day hold neutralized the overnight gap (c2c 3.18% ≈ next-open 2.99%), proving the gap was hiding a *falling 2× knife into 2000–02/2008*, not alpha |
 | Chart-pattern geometry *(shape, not a number)* | M11 | **FAIL — signal-dead** (attempt 34, the 9th family). Rule-based (NOT LLM) causal detection of long-side reversal shapes (double-bottom + inverse-H&S), fresh neckline break → next open, on the 39 survivors: gate **−0.14% CAGR / 50.4% DD / Sh 0.09**, loses SPY *and* survivorship-clean EW-39; frictionless Rung B ≈ 0 → the shape carries no directional edge. **Payload:** the survivor universe *destroys* the one documented (bearish) pattern edge — fwd-20 after a bearish top/H&S is +1.70% (> unconditional +1.15%), the opposite of Savin (2007), because survivorship removed exactly the names a bearish pattern predicts. Closes the last untested mechanism gap |
+| Credit-regime gate | X7 | **FAIL — the first gate to BEAT the plain 200-DMA in-window.** Long QQQ iff HYG:IEF > its 200-DMA. Gate (2007–13, GFC) 9.60% CAGR / DD 12.9% / **Sh 0.98 vs the 200-DMA's 0.61**, cutting QQQ-BH's 53.6% DD to 12.9% — credit led 2008, so it de-risked earlier. But **secondary (2014+) collapses: 3.81% / DD 47.6% / Sh 0.34**, 221 whipsaw switches on credit noise that never became equity drawdowns. A crisis specialist that self-destructs in bulls. Corroborated by 3 independent institutional HY reports |
+| Non-equity trend *(decorrelation probe)* | X8a GLD, X8b TLT | **FAIL both arms** (attempt 36). E6's rule verbatim on non-equity assets, judged on an explicitly-labelled **DIVERSIFIER bar** declared before results (corr ≤0.30 · CAGR>0 both · DD ≤60% both · Sharpe > the asset's own buy-hold both). **GLD: corr +0.089, CAGR +11.81%/+6.26%, a 3-of-4 NEAR-MISS** — Sharpe 0.73 beat buy-hold 0.65 in GATE but 0.52 LOST to 0.65 in SEC (the 6th one-window death). Trend still cut GFC-era DD by a third (37.8%→24.5%) = E6's lesson in a 3rd asset class. **TLT: corr −0.191 but negative CAGR both windows**; dividend-UNADJUSTED prices materially understate it (declared bias) |
+| Market-neutral relative value *(decorrelation probe)* | X9 | **FAIL** (attempt 37) — the last structurally different family. Gatev (2006) distance pairs at published defaults, 29 ETFs, 5 bps **per side PER LEG** (~20 bps a round trip). Net: GATE −2.50%/DD 41.3%/Sh −0.47, SEC −6.71%/DD 60.2%/Sh −1.40, NAV $294 from $1,000; **corr to e6 −0.057 (passes)**. **Zero-cost diagnostic splits the failure:** gross GATE Sh **0.43**, gross SEC Sh **−0.05** — the edge had already decayed to nothing BEFORE costs (Do & Faff 2010 reproduced independently), then ~81 round trips/yr × ~20 bps ≈ 16%/yr of drag finished it. **87.4% of trades converged** — the mechanism works; the reversion is simply smaller than the toll |
 
 **Tally: 0 CLEAN PASS-HR, 1 IN-SAMPLE-COMPOSED PASS-HR (M10-1 Nagel Switch —
-forward-paper-only), 1 weak PASS-RA (E18 VIX-TS), 35 pre-registered attempts (34 equity
+forward-paper-only), 1 weak PASS-RA (E18 VIX-TS), 37 pre-registered attempts (36 equity
 across 9 families + a state-conditioned synthesis arc + 1 crypto pilot).** Full
 per-experiment detail: the append-only record and `docs/research/`.
 
@@ -191,7 +207,7 @@ preserves both.)*
 A working model of honest quantitative research at small scale: falsifiable
 pre-registration, bias-aware experiment design, a regression tripwire, direct
 cost/execution decomposition, and a documentation trail that records — and
-corrects — its own errors. **Thirty-five pre-registered attempts across nine equity
+corrects — its own errors. **Thirty-seven pre-registered attempts across nine equity
 families, a state-conditioned synthesis arc, and a crypto pilot — zero CLEAN high-return
 passes**, and a terminal claim that is *stronger* for being negative: the retail-EOD,
 K=1–3, liquidity-floored swing-trading space does not contain a robust fixed-strategy
@@ -284,16 +300,43 @@ that the search is not finished, and that the next honest experiment is M11.
 - This capstone supersedes the earlier partial write-up
   (`docs/findings_2026-07-09_experiment_arc.md`, E1–E7) as the complete synthesis.
 
-*Status (2026-07-14): ONGOING — finalized THROUGH the M10 synthesis arc, not closed. The
-fixed-single-strategy space (E/C/X families) is exhausted, M10 is complete (M10-1 Nagel
-Switch = in-sample PASS-HR / forward-paper-only; M10-2 closed the E2 "c2c mirage"), and
-**M11 — the last free backtestable mechanism (chart-pattern geometry) — ran 2026-07-14 →
-FAIL** (signal-dead; the survivor universe destroyed the one documented pattern edge). **What
-remains open:** no free autonomously-runnable backtest remains — the one untested *evidence*
-lever is M3 Alpaca paper deploy of the three forward-paper candidates (E6-1× / E18-VIX-TS /
-M10-1), the sole source of uncontaminated evidence (Evan-gated: account + go); the
-lower-priority untested levers need new capital/data (pairs/stat-arb — shorting; LLM-forward —
-M3; short-interest-done-right — paid borrow data; intraday/MOC — an intraday feed); X5
-analyst-revision drift (**BLOCKED — $22 FMP feed**); live-money crypto (custody gate).
-Standing at **35 attempts / 0 clean PASS-HR / 1 in-sample PASS-HR / 1 weak PASS-RA.** **The
-research phase is NOT declared done — M3 forward paper is the open lever.***
+*Status (2026-08-03): **SEARCH PHASE CLOSED. FORWARD-EVIDENCE PHASE OPEN.*** Declared by Evan
+2026-08-03 after attempt #37. This is a deliberate, dated decision — not an abandonment and
+not a claim of success.
+
+**Why closed.** The backtest search space defined by this project's constraints (free EOD
+data · holds of days-to-weeks · K=1–3 · retail costs · $100–1,000) is **exhausted**. The
+fixed-single-strategy space (E/C/X) went first; M10 closed the synthesis arc; **M11** killed
+the last free *shape* mechanism (2026-07-14); and the final three attempts closed the last
+structurally different families:
+- **#35 X7** HYG:IEF credit gate — FAIL (first gate to beat the 200-DMA in-window; died in the bull).
+- **#36 X8** non-equity trend (GLD/TLT) — FAIL both arms; GLD a 3-of-4 near-miss.
+- **#37 X9** pairs / relative value — FAIL; the last **market-neutral** family.
+Re-reading the project's own method survey after removing everything since tested, the
+remaining untested candidates are **1–12 month horizons (outside the swing scope) or
+data-gated**. Continuing to hunt rules inside the same constraint box has low expected value.
+
+**The terminal finding of the search phase — stated as the program's actual contribution:**
+**decorrelation is not the scarce resource; EDGE is.** The final three attempts each cleared
+the ≤0.30 correlation bar easily (**GLD +0.089 · TLT −0.191 · pairs −0.057**) and each failed
+profitability. Finding an uncorrelated return stream at retail scale is trivial; finding one
+whose edge survives retail costs is not. X9 made the mechanism explicit: **87.4% of pairs
+trades converged** — the signal is real and simply **smaller than four legs of transaction
+cost**, and it had *already* decayed to a gross Sharpe of −0.05 post-2014 before any cost was
+charged (reproducing Do & Faff 2010 independently).
+
+**What is open now:** exactly one lever — **M3 forward paper**, LIVE since 2026-07-15 across 3
+isolated Alpaca paper accounts (e6_1×, e18-VIX-TS, m10-1). It is the only source of
+uncontaminated, non-survivorship, non-in-sample evidence this program has, and it needs
+*elapsed time*, not another attempt. Its harness is now instrumented (measured sim-vs-broker
+fidelity of **+0.0/+0.0/+1.3 bps** when the EOD discipline holds) and self-correcting on share
+drift. **Disclosed limitation, not hidden:** the three sleeves are ~ONE strategy — m10 runs the
+identical e6 rule on 69.7% of 4,226 sessions — which is itself a documented consequence of the
+evidence above, since nothing uncorrelated *and* profitable was found to deploy.
+
+**Still blocked / out of scope:** short-interest-done-right (paid borrow data), intraday/MOC
+(intraday feed), X5 analyst-revision drift (**$22 FMP feed**), live-money crypto (custody),
+and any dividend/coupon-heavy instrument (**no total-return data path — a real data-layer gap
+logged in record DO**).
+
+Standing at **37 attempts / 0 clean PASS-HR / 1 in-sample PASS-HR / 1 weak PASS-RA.***

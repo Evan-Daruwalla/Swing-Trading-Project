@@ -4775,3 +4775,73 @@ space is close to EXHAUSTED at 37 attempts. Remaining moves are (a) relax a CONS
 (horizon, data, or capital) rather than hunt another rule, (b) build the total-return data path
 (gap logged in DO) to fairly test dividend/coupon assets, or (c) declare the search complete and
 let the 3 live sleeves run as the forward test they already are.
+
+# Appendix DQ - SEARCH PHASE CLOSED at 37 attempts; forward-evidence phase is the only open lever (2026-08-03, ~01:14 CDT)
+
+**TRIGGER:** Evan: "3 then 1" -- (3) declare the search complete and let the 3 live sleeves run
+as the forward test they already are, then (1) relax a constraint. This entry covers (3);
+the constraint analysis for (1) follows below and awaits his pick. Tally unchanged (37).
+
+**THE DECLARATION (dated decision, Evan 2026-08-03).** The backtest search space defined by
+this project's constraints -- **free EOD data · holds of days-to-weeks · K=1-3 · retail costs ·
+$100-1,000** -- is **EXHAUSTED at 37 pre-registered attempts.** This is NOT an abandonment and
+NOT a claim of success. Sequence of closure: the fixed-single-strategy space (E/C/X) went
+first; M10 closed the state-conditioned synthesis arc; **M11** killed the last free *shape*
+mechanism (2026-07-14); and **X7 -> X8 -> X9** closed the last structurally different families
+(credit regime, non-equity trend, market-neutral relative value). Re-reading the project's own
+July-12 method survey with everything since-tested removed, what remains is **1-12 month
+horizons (outside the swing scope) or data-gated** (paid borrow data, intraday feed, $22 FMP,
+total-return prices). Hunting a 38th rule inside the same constraint box has low expected value.
+
+**TERMINAL FINDING OF THE SEARCH PHASE: decorrelation is not the scarce resource -- EDGE is.**
+The last three attempts each cleared a <=0.30 correlation bar comfortably (GLD +0.089, TLT
+-0.191, pairs -0.057) and each failed profitability. X9 named the mechanism exactly: **87.4% of
+pairs trades CONVERGED** -- the signal is real and simply **smaller than four legs of
+transaction cost** -- and it had already decayed to a gross Sharpe of **-0.05** post-2014
+before any cost was charged.
+
+**WHAT IS OPEN: exactly one lever -- M3 forward paper.** Live since 2026-07-15 on 3 isolated
+Alpaca paper accounts. It is the ONLY uncontaminated evidence source the program has (no
+survivorship, no in-sample composition) and it needs **elapsed time, not another attempt**. Its
+harness is now instrumented and self-correcting after the 2026-07-28 audit: measured
+sim-vs-broker fidelity **+0.0/+0.0/+1.3 bps** when the EOD discipline holds, qty-aware
+reconcile closing share drift, intraday-fire guard, staleness bound on VIX3M.
+**Disclosed, not buried:** the 3 sleeves are ~ONE strategy (m10 runs the identical e6 rule on
+69.7% of 4,226 sessions) -- a documented CONSEQUENCE of the evidence above, since nothing
+uncorrelated AND profitable was ever found to deploy.
+
+**DOCS UPDATED:** `CAPSTONE_program_synthesis.md` -- status block rewritten to
+"SEARCH PHASE CLOSED / FORWARD-EVIDENCE PHASE OPEN", header framing updated, attempt counts
+35->37 throughout, X7/X8/X9 ledger rows added, and a **stale claim corrected in section 1**
+(it still asserted chart-shape detection was "never tested here" and "the program continues" --
+M11 tested and killed it on 2026-07-14). `HANDOFF.md` -- state header + closure block.
+
+**CONSTRAINT ANALYSIS FOR STEP (1) -- which constraint to relax.** Four exist; two are
+immediately available:
+- **HORIZON** (days-weeks -> 1-6 months). Unlocks the survey's ACTUAL remaining documented
+  candidates (52-week-high anchor / George-Hwang 2004; residual momentum / Blitz-Huij-Martens
+  2011; dividend-initiation drift / Michaely-Thaler-Womack 1995; frog-in-the-pan /
+  Da-Gurun-Warachka 2014). **Also directly attacks the problem that killed X9:** fewer round
+  trips = less cost drag, and cost drag is the program's most repeated killer. Free data,
+  existing infra. **Cost: changes the project's stated identity ("swing" = days to a few
+  weeks).** Mitigation: keeping K=1-3 preserves separation from the Trading project (top-50,
+  monthly, $100k).
+- **CONCENTRATION** (K=1-3 -> K=20-50). Would directly test the program's OWN terminal
+  explanation (Hou-Xue-Zhang: concentration destroys factor premia), and fractional shares make
+  K=20-50 feasible at $1,000. **But it largely DUPLICATES the Trading project's validated
+  design** (momentum_v2 top-50 monthly: IS +21.0%, OOS +26.5%, Sharpe 0.87) -> low NEW
+  information for THIS project and it blurs the two projects' separation.
+- **DATA** (free -> paid): BLOCKED-ON-EVAN, $0 spend ceiling until ref income starts (Aug 2026).
+- **CAPITAL** ($1,000 -> larger): not available; and it unlocks few strategies, mainly easing
+  whole-share/short binds.
+
+**RECOMMENDATION: relax HORIZON, keep K=1-3.** It is the only relaxation that both unlocks real
+documented candidates AND attacks the cost-drag mechanism the program has now identified six
+different ways.
+
+**STATE:** committing the closure docs + this entry. Awaiting Evan's pick on the constraint,
+because relaxing one edits the project's stated GOAL (PRD/HANDOFF/CLAUDE.md) and that is his
+call, not a silent default. **Cadence #141.**
+
+**Next action:** Evan picks the constraint; then write the goal amendment as a DATED
+supersession (never a retype) and pre-register the first experiment in the widened space.

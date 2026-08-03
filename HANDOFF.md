@@ -12,7 +12,24 @@ pre-registration/OOS rigor machinery stays as the ACCURACY instrument.
 SEPARATE project from `D:\ClaudeCode\Trading` (read-only from here). Paper
 first; nothing goes live without a pre-registered PASS + Evan's go.
 
-## Current state — 37 attempts (X9 pairs = FAIL; decorrelation is not the scarce resource, EDGE is); M3 forward paper RUNNING, all 3 sleeves long QQQ and ~1 strategy
+## Current state — SEARCH PHASE CLOSED 2026-08-03 at 37 attempts; FORWARD-EVIDENCE PHASE (M3) is the only open lever
+
+> **2026-08-03 — SEARCH PHASE DECLARED CLOSED (Evan's dated decision; record DQ).** Not an
+> abandonment and not a claim of success: the backtest search space under this project's
+> constraints — **free EOD data · holds of days-to-weeks · K=1–3 · retail costs · $100–1,000**
+> — is **exhausted** at 37 pre-registered attempts. E/C/X fixed-strategy space went first, M10
+> closed the synthesis arc, M11 killed the last free *shape* mechanism, and **X7/X8/X9 closed
+> the last structurally different families** (credit regime · non-equity trend · market-neutral
+> relative value). Everything still untested is **1–12 month horizon** (outside the swing scope)
+> or **data-gated** (paid borrow data, intraday feed, $22 FMP, total-return prices).
+> **Terminal finding of the search phase: decorrelation is not the scarce resource — EDGE is.**
+> **What is open:** exactly one lever — **M3 forward paper**, live since 2026-07-15 on 3
+> isolated Alpaca paper accounts. It needs *elapsed time*, not another attempt. Its harness is
+> instrumented (sim-vs-broker fidelity +0.0/+0.0/+1.3 bps when the EOD discipline holds) and
+> self-correcting on share drift. **Disclosed:** the 3 sleeves are ~ONE strategy — a documented
+> consequence of the evidence, since nothing uncorrelated *and* profitable was found to deploy.
+> **Next research direction (Evan, 2026-08-03): RELAX A CONSTRAINT** rather than hunt a 38th
+> rule inside the same box — see the options block below.
 
 > **2026-08-03 — X9 pairs / relative-value = FAIL; attempt #37 (record DP; results
 > `docs/research/2026-08-03_X9_pairs_results.md`).** Evan chose "test a different rule family"
