@@ -4598,3 +4598,50 @@ QQQ's drawdown over the window (they are all currently the same trend-following 
 
 **Next action:** none. The harness is now self-correcting on share drift, self-reporting on
 fidelity, and guarded against intraday fires. Research remains parked at 35 attempts.
+
+# Appendix DN - Sleeve-correlation MEASURED: the 3 live sleeves are ~1 strategy (2026-08-02, ~22:16 CDT)
+
+**TRIGGER:** Evan: "now make the sleeves less correlated." Measured before acting. Findings
+only -- NO code or sleeve change made this step (see the rigor block below). Tally 35.
+
+**LIVE SAMPLE (small, n=11 daily returns, 12 sessions 07-15..07-31):** pairwise correlation
+e6/e18 **+0.9495**, e6/m10 **+0.9386**, e18/m10 **+0.8554**; and **7-9 of 11 days have
+BYTE-IDENTICAL returns** between pairs. Caveat stated up front: n=11 is far too small to
+decide on, so the structural test below is the real evidence.
+
+**STRUCTURAL (4,226 sessions, 2009-09-18..2026-07-09 -- not sample-limited):**
+- **m10_1_nagel runs the IDENTICAL e6 rule (QQQ>200-DMA) on 69.7% of days.** Its stress arm
+  (VIX>20 -> FF3-residual reversal basket) only engages 30.3% of the time. So ~70% of the
+  time e6 and m10 are literally the same strategy, not merely correlated.
+- e6 vs e18 hold the same position **84.0%** of days (different gate, same instrument, same
+  long-or-cash structure).
+- **All three are effectively long simultaneously 65.3% of days.**
+- INSTRUMENT: e6=QQQ, e18=QQQ, m10=QQQ in calm / 4-stock basket in stress. One instrument.
+
+**ROOT CAUSE -- and this is the important part: the correlation is NOT sloppiness, it is the
+honest CONSEQUENCE of the program's own results.** 35 attempts produced exactly ONE thing that
+survives in any form: 200-DMA-style trend gating of QQQ (and E6 is explicitly "drawdown
+control, not a return enhancer"). Everything structurally different FAILED. The program already
+tested the same rule on OTHER assets: **E7** (5 non-US regimes -> works in only 3/5,
+market-dependent) and **X6** (BTC/ETH dual-MA -> beats HODL in the 2018-22 bears, LOSES its
+Sharpe in the 2023+ bull; FAIL, same one-window death). **So there is no validated,
+uncorrelated candidate sitting on the shelf to deploy.** You cannot diversify into strategies
+you do not have. Three sleeves are currently delivering roughly ONE sleeve's worth of
+independent forward evidence -- which matters more for M3 (whose product is EVIDENCE) than for
+returns.
+
+**RIGOR CONSTRAINT (why the obvious fix is forbidden).** The 3 sleeves are a PRE-REGISTERED
+forward test: e6 prereg `0526ea2`, e18 prereg `f32b008` arm (a), m10-1
+`prereg_m10_1_nagel_switch.md`. Editing what a RUNNING sleeve trades would (1) break the
+pre-registration -- the forward test would no longer test what was registered, (2) destroy 12
+sessions of accumulated forward evidence, and (3) be precisely "changing the strategy after
+seeing results," which project CLAUDE.md forbids: *"Risk appetite changes gate NUMBERS, never
+rigor DISCIPLINE (prereg before results; no tuning a FAIL)."* The forward-paper record is the
+project's single uncontaminated evidence lever; spending it to reduce correlation would be a
+bad trade. **Therefore: decorrelation must come from ADDING newly pre-registered sleeves, not
+from mutating the running three.**
+
+**STATE:** doc-only; awaiting Evan's choice of path. **Cadence #138.**
+
+**Next action:** Evan picks the decorrelation path (options put to him this turn). Whatever is
+chosen, the existing 3 sleeves keep running untouched.
