@@ -5175,3 +5175,37 @@ ASCII; live ledger untouched (positions and 42 NAV rows unchanged, opened `mode=
 
 **Next action:** none forced. The three M3 sleeves are untouched and still running; the nightly
 task now cannot silently skip a session without saying so.
+
+# Appendix DX - M12 re-run: corrected numbers reproduce BIT-FOR-BIT (2026-08-05, ~00:01 CDT)
+
+**TRIGGER:** Evan: "re-run M12 and check the corrected numbers hold." They hold exactly.
+Verification only -- no code or doc change. Tally unchanged (38).
+
+**METHOD:** re-ran `scripts/run_m12_factorial.py` clean, then asserted PROGRAMMATICALLY (not by
+eye) that every corrected figure published in
+`docs/research/2026-08-03_M12_constraint_factorial_results.md` appears in the fresh run's
+output, that NO superseded figure survives anywhere in the doc body, and that every corrected
+figure is actually present in the doc. **22/22 run assertions passed · 0 stale values in the
+doc body · 0 corrected values missing.**
+
+**REPRODUCED EXACTLY (5 bps):** (1) GATE +6.26%/DD 71.3%/Sh 0.35, SEC +26.66%/DD 36.9%/Sh 0.84 ·
+(2) GATE +14.24%/DD 63.8%/Sh 0.56, SEC +28.53%/DD 34.3%/Sh 0.89 · (3) GATE +7.53%, SEC
++16.43%/Sh 0.82 · (4) GATE +7.50%, SEC +14.96%/Sh 0.75 · EW bench GATE +10.42%, SEC +12.11%/Sh
+0.77. Effects GATE +7.98 / +1.28 / -8.01 pp; **SEC +1.87 / -10.23 / -3.34 pp**. 15 bps leg also
+exact (SEC horizon +7.05pp, breadth -9.72pp). The fix is deterministic: the runner reports
+"MIXED-VINTAGE CACHE ... truncating the date axis to 2026-07-10 (38 ticker(s) end there)" on
+every run, so the contamination is now LOUD instead of silent.
+
+**OPEN ITEM SURFACED BY THIS RUN (flagged, deliberately NOT acted on).** The truncation makes
+the run CORRECT but not COMPLETE: the cache still holds 38 tickers ending 2026-07-10 and 104
+ending 2026-07-31, so every run discards ~15 sessions of data that already exists for 104
+names. Refreshing the 38 stale tickers (now safe -- `cache_fetch` has the `through=` freshness
+contract) would give all 142 a common recent end date and a fuller SEC window. **That is NOT a
+correction and must not be presented as one: it would move the published numbers AGAIN, on more
+data.** It is a separate, dated decision for Evan, and if taken it needs its own record entry
+distinguishing "corrected the contamination" (done, DV) from "extended the window" (not done).
+
+**STATE:** verification only; nothing committed this step (no files changed). **Cadence #147.**
+
+**Next action:** Evan's call on whether to refresh the 38 stale tickers and re-publish on a
+common recent cutoff.
