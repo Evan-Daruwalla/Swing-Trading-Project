@@ -23,6 +23,42 @@ Universe: `swing_bot/universe_m12.py` — 142 large-caps, frozen `b2a421a`.
 > final bar, mixed vintage reported loudly). Every table below is the corrected
 > re-run. Original values are preserved in record DU and its correction DV.
 
+> ### ▶ EXTENDED 2026-08-05 — re-run on a uniform, longer window (this is NOT a second correction)
+>
+> The correction above fixed *wrong* numbers. This is a different thing and is
+> labelled separately on purpose: after the whole 142-name universe was refreshed
+> to a common `through=2026-08-04` cutoff (via the freshness contract the audit
+> added), M12 was re-run on **more data** — the secondary window now runs three
+> weeks further forward and no longer discards sessions.
+>
+> **The conclusion is stable and the magnitudes barely moved.** GATE is
+> **byte-identical** (it ends 2013, so it cannot change). SEC shifts by
+> 0.2–0.6 pp:
+>
+> | SEC effect (5 bps) | truncated (to 07-10) | extended (to 08-04) |
+> |---|---|---|
+> | horizon alone | +1.87 pp | **+2.06 pp** |
+> | breadth alone | −10.23 pp | **−9.60 pp** |
+> | interaction | −3.34 pp | **−3.56 pp** |
+>
+> | SEC cell (5 bps) | truncated | extended |
+> |---|---|---|
+> | ① BASELINE | +26.66% / Sh 0.84 | **+25.69% / DD 39.4% / Sh 0.81** |
+> | ② H horizon | +28.53% / Sh 0.89 | **+27.75% / DD 36.3% / Sh 0.86** |
+> | ③ C breadth | +16.43% / Sh 0.82 | **+16.09% / DD 31.2% / Sh 0.80** |
+> | ④ H+C both | +14.96% / Sh 0.75 | **+14.59% / DD 35.2% / Sh 0.73** |
+> | EW bench | +12.11% / Sh 0.77 | **+12.09% / DD 37.0% / Sh 0.77** |
+>
+> 15 bps SEC effects: horizon **+7.20 pp**, breadth **−9.13 pp**, interaction
+> **−3.56 pp** — same signs, same story.
+>
+> **Why this matters more than the numbers:** a conclusion that flipped on three
+> extra weeks was never solid. This one did not flip, which is the actual result
+> of the re-run. Cell ② still fails D1 in GATE (CAGR 14.24% < 15%, DD 63.8% >
+> 60%) — unchanged, since GATE is unchanged. **The tables in §1–§2 below remain the
+> truncated-window figures as originally corrected; the extended figures live
+> here so the two runs stay auditable side by side.**
+
 ## TL;DR
 
 **Horizon was the binding constraint; concentration was not — and the program's

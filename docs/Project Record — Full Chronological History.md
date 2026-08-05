@@ -5209,3 +5209,56 @@ distinguishing "corrected the contamination" (done, DV) from "extended the windo
 
 **Next action:** Evan's call on whether to refresh the 38 stale tickers and re-publish on a
 common recent cutoff.
+
+# Appendix DY - M12 EXTENDED to a uniform 2026-08-04 cutoff; conclusion stable (2026-08-05, ~00:07 CDT)
+
+**TRIGGER:** Evan chose option 1 from DX -- refresh the stale tickers and re-publish on a common
+recent cutoff. **This is an EXTENSION, not a correction, and the record keeps the two separate
+deliberately:** DV corrected numbers that were WRONG on the data then available; DY re-runs on
+MORE data. Conflating "we fixed a mistake" with "we added three weeks" is how a research trail
+stops being trustworthy. Tally unchanged (38).
+
+**REFRESH:** all **142/142** tickers refetched to `through=2026-08-04` using the freshness
+contract added by audit #1 -- **0 failures, 0 still short**, end-date histogram now
+`{2026-08-04: 142}` (was `{07-10: 38, 07-31: 104}`). The contract worked exactly as designed:
+it detected each stale file and refetched rather than silently returning it. The M12 runner no
+longer prints the MIXED-VINTAGE warning because there is no longer a mixed vintage.
+
+**RESULT -- the conclusion is STABLE and the magnitudes barely moved.** GATE is **BYTE-IDENTICAL**
+(+6.26 / +14.24 / +7.53 / +7.50; effects +7.98 / +1.28 / -8.01), exactly as it must be since
+GATE ends 2013-12-31 -- a useful internal check that the refresh changed only what it should.
+SEC shifts by 0.2-0.6 pp:
+| SEC effect (5 bps) | truncated (07-10) | extended (08-04) |
+|---|---|---|
+| horizon alone | +1.87 pp | **+2.06 pp** |
+| breadth alone | -10.23 pp | **-9.60 pp** |
+| interaction | -3.34 pp | **-3.56 pp** |
+Cells SEC 5 bps: (1) 26.66 -> **25.69%**, (2) 28.53 -> **27.75%**, (3) 16.43 -> **16.09%**,
+(4) 14.96 -> **14.59%**, EW 12.11 -> **12.09%**. 15 bps SEC effects: horizon **+7.20pp**,
+breadth **-9.13pp**, interaction **-3.92pp** -- same signs, same story.
+
+**THE ACTUAL RESULT OF THIS RE-RUN IS THE STABILITY, NOT THE NUMBERS.** A conclusion that
+flipped on three extra weeks was never solid. **HORIZON BINDS, BREADTH DOES NOT** survives both
+the contamination fix (DV) and the window extension (DY), at both cost levels, in both windows.
+Cell (2) still FAILS D1 in GATE (CAGR 14.24% < 15%, DD 63.8% > 60%) -- necessarily unchanged,
+since GATE did not move.
+
+**SIDE EFFECT DISCLOSED, NOT BURIED:** `.e8e9_cache` is shared by 29 importers, so refreshing it
+means a future re-run of ANY experiment (M11, C1, X8, X9, ...) will see data through 2026-08-04
+rather than whatever its recorded run used. **GATE windows are untouched, so every recorded GATE
+verdict is stable**; only SEC windows extend. Recorded verdicts stand AS-OF their run date and
+are not retroactively restated.
+
+**DOCS:** results doc now carries TWO clearly-separated banners -- the 2026-08-03 **CORRECTED**
+block (the contamination) and a 2026-08-05 **EXTENDED** block (this re-run), with a
+side-by-side truncated-vs-extended table. Sections 1-2 deliberately retain the truncated
+figures so both runs stay auditable rather than one overwriting the other.
+
+**VERIFIED:** frozen tripwire GREEN (d=+/-0.0000pp -- expected, since the pinned refs read
+`swing.db`, not the price cache, so the refresh could not touch them); 142/142 refreshed;
+GATE byte-identical across runs.
+
+**STATE:** committing the extension block + this entry.
+
+**Next action:** none forced. M12's numbers are now on a uniform, current window and the
+horizon-binds conclusion has survived two independent re-runs.
