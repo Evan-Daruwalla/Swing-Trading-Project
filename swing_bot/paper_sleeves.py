@@ -41,6 +41,13 @@ DB_PATH = Path(__file__).resolve().parent.parent / "swing.db"
 CAP0 = 1000.0     # starting notional per sleeve; matches E6/M10-1 backtest CAP0
 SLEEVES = ("e6_1x", "e18_vixts", "m10_1_nagel")
 STRESS_K = 4       # M10-1 stress-mode basket size (matches C1's K)
+# M10-1 regime threshold. SINGLE SOURCE OF TRUTH (audit #6): the daily loop
+# gates its residual-rank fetch on this same number. When it was duplicated as
+# a literal in both files, raising one copy (e.g. to 22) meant that at VIX=21 on
+# a Friday the loop would skip the fetch while decide_m10_1 still took the
+# stress branch -- with residual_ranks=None -- and the weekly decision would be
+# skipped SILENTLY for as long as VIX sat between the two values.
+VIX_STRESS_THR = 20.0
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS paper_sleeves (
@@ -271,7 +278,7 @@ def decide_m10_1(vix_today, qqq_close_series, residual_ranks=None):
     thr=20.0 — IN-SAMPLE-COMPOSED, forward-paper-required per the M10 cap.)"""
     if vix_today is None:
         return None, "VIX unavailable today"
-    if vix_today > 20.0:
+    if vix_today > VIX_STRESS_THR:
         if residual_ranks is None or len(residual_ranks) < STRESS_K:
             return None, "insufficient residual-ranked names for stress basket"
         names = [t for _, t in residual_ranks[:STRESS_K]]

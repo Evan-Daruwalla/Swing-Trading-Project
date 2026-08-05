@@ -181,8 +181,11 @@ class AlpacaClient:
             REQUEST_ID_LOG.parent.mkdir(parents=True, exist_ok=True)
             with REQUEST_ID_LOG.open("a", encoding="utf-8") as fh:
                 fh.write(line + "\n")
-        except OSError:
-            pass  # logging the id is best-effort; never break a call over it
+        except OSError as e:
+            # Best-effort by design -- never break a trading call over a log
+            # write. But do not vanish: the X-Request-ID is what an Alpaca
+            # support ticket needs, so note that it was lost (audit #12).
+            log.warning("could not persist X-Request-ID (%s): %s", rid, e)
 
     # ---- read endpoints ----
     def get_account(self) -> dict:
@@ -254,8 +257,12 @@ class AlpacaClient:
     def cancel_all_orders(self) -> None:
         try:
             self._request("DELETE", "/v2/orders")
-        except AlpacaError:
-            pass  # nothing open / already flat — non-fatal
+        except AlpacaError as e:
+            # Usually "nothing open / already flat" and non-fatal -- but this is
+            # the call the reconcile relies on to clear stale orders before
+            # re-placing, so a silent failure here can leave a duplicate live.
+            # Say it out loud rather than swallowing (audit #12).
+            print(f"    cancel_all_orders failed (continuing): {e}", flush=True)
 
     def cancel_order(self, order_id: str) -> None:
         self._request("DELETE", f"/v2/orders/{order_id}")

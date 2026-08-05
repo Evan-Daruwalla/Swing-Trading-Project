@@ -44,8 +44,22 @@ def load():
             continue
         if b:
             raw[t] = {x[1]: (x[2], x[5]) for x in b}
-    dates = sorted(set().union(*[set(v) for v in raw.values()]))
+    # COMMON CUTOFF (audit E1/#1). The date axis used to be a UNION over
+    # whatever each cached file happened to hold, so a mixed-vintage cache
+    # produced an axis running past the point where some names still have data.
+    # Those names then read None and were marked at ZERO, which is not a price
+    # -- it silently rewrote every metric in the affected window. Truncate to
+    # the EARLIEST final bar so every member is live for the whole axis.
+    last = {t: max(m) for t, m in raw.items() if m}
+    cutoff = min(last.values())
+    n_at = sum(1 for v in last.values() if v == cutoff)
+    if len(set(last.values())) > 1:
+        print("  MIXED-VINTAGE CACHE: end dates span %s .. %s -- truncating the "
+              "date axis to %s (%d ticker(s) end there)"
+              % (cutoff, max(last.values()), cutoff, n_at), flush=True)
+    dates = sorted({d for m in raw.values() for d in m if d <= cutoff})
     idx = {d: i for i, d in enumerate(dates)}
+    raw = {t: {d: v for d, v in m.items() if d <= cutoff} for t, m in raw.items()}
     op, cl = {}, {}
     for t, m in raw.items():
         o = [None] * len(dates); c = [None] * len(dates)
@@ -85,6 +99,21 @@ def run_cell(dates, op, cl, hold_n, k, cost, start_i):
             for t in list(pos):
                 o = op[t][i]
                 if o is None or o <= 0:
+                    # No open today -> `continue` used to leave the position in
+                    # `pos` forever while NAV valued it at 0 (audit E4): its
+                    # entire value vanished silently, ~33% of NAV at K=3. Exit
+                    # at the last known close instead, and say so.
+                    lk = next((cl[t][j] for j in range(i - 1, -1, -1)
+                               if cl[t][j] is not None), None)
+                    if lk is None:
+                        raise RuntimeError(
+                            "cell hold=%d K=%d: %s has no open on %s and no prior "
+                            "close to exit at" % (hold_n, k, t, dates[i]))
+                    print("    WARN %s: no open on %s -- forced exit at last "
+                          "close %.2f" % (t, dates[i], lk), flush=True)
+                    cash += pos[t] * lk * (1 - cost)
+                    traded_notional += pos[t] * lk
+                    del pos[t]
                     continue
                 cash += pos[t] * o * (1 - cost)
                 traded_notional += pos[t] * o

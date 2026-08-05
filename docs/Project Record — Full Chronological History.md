@@ -5061,3 +5061,117 @@ committing runner + results + this entry. Nothing deployed.
 configuration on a NON-survivor basis (the only way its +27% could ever mean anything);
 (b) attack the drawdown wall directly (the horizon finding says the return side is reachable;
 DD 63.8% is what now blocks D1); (c) leave research parked and let M3 accrue forward evidence.
+
+# Appendix DV - CORRECTION to DU: the published M12 SEC numbers were WRONG (stale-cache contamination) (2026-08-04, ~23:56 CDT)
+
+**THIS ENTRY CORRECTS APPENDIX DU. DU is left exactly as written (append-only rule); its SEC
+numbers are wrong and this is the correction of record.** Found by a COLD audit (`/audit`,
+fresh auditor with no session history) and then independently re-verified by me before
+accepting it.
+
+**ROOT CAUSE.** `run_e8_squeeze.cache_fetch` -- the repo's shared data layer, 29 importers --
+had **NO freshness check**: it returned any existing cache file unconditionally. Cache entries
+are written on whatever day a ticker is first touched, so the M12 universe was **mixed
+vintage**: **38 of 142 tickers ended 2026-07-10** (they are exactly the ORIGINAL 39-name set,
+cached weeks earlier for M11/C1) while **104 ended 2026-07-31** (fetched the day the universe
+was frozen). `run_m12_factorial.load()` built its date axis as a **UNION**, so for the final 15
+sessions the 38 short names read `None` and were **marked at ZERO -- not a price**. Verified
+directly: `.e8e9_cache` end-date histogram = {2026-07-10: 38, 2026-07-31: 104}.
+
+**IMPACT -- every SEC number in DU and in the results doc was wrong; GATE is unaffected**
+(it reproduces byte-exactly, since the contamination is confined to the last 15 sessions):
+| cell | SEC published (DU) | SEC CORRECTED |
+|---|---|---|
+| (1) BASELINE | +21.19% / DD 59.3% / Sh 0.71 | **+26.66% / DD 36.9% / Sh 0.84** |
+| (2) H horizon | +27.04% / DD 37.8% / Sh 0.85 | **+28.53% / DD 34.3% / Sh 0.89** |
+| (3) C breadth | +13.91% / DD 31.6% / Sh 0.70 | **+16.43% / DD 31.2% / Sh 0.82** |
+| (4) H+C both | +12.80% / DD 35.2% / Sh 0.65 | **+14.96% / DD 35.2% / Sh 0.75** |
+| EW bench | +9.41% / Sh 0.59 | **+12.11% / Sh 0.77** |
+
+**THE HEADLINE WAS OVERSTATED 3x: SEC horizon effect published +5.84pp -> ACTUAL +1.87pp.**
+Breadth alone -7.28pp -> **-10.23pp** (worse). Interaction -6.95pp -> **-3.34pp**. At 15 bps:
+horizon +10.77 -> **+7.05pp**, breadth -6.92 -> **-9.72pp**, interaction -7.19 -> **-3.73pp**.
+
+**WHAT SURVIVES AND WHAT DOES NOT.** The QUALITATIVE conclusion of DU stands -- **horizon binds,
+breadth does not** (horizon still positive in both windows and both cost levels; breadth still
+negative in SEC, in fact MORE negative). The GATE finding is untouched (+7.98pp horizon,
++1.28pp breadth). **What does NOT survive is the magnitude**: the "+5.84pp SEC horizon effect"
+claim was 3x too large, and DU's line that the effect "GROWS with cost" is weaker than stated
+in SEC (+1.87 -> +7.05 across cost levels is still growth, but from a much lower base). The
+D1-failure conclusion is unchanged and in fact firmer: cell (2) still posts GATE CAGR 14.24%
+(<15%) and DD 63.8% (>60%).
+
+**MY ERROR, NAMED PLAINLY:** I froze a 142-name universe on 2026-08-03 and asserted the run was
+"fully offline and reproducible" from cache -- which was true and irrelevant. I never checked
+that the cached files shared an END DATE. The cold audit caught it within a day of publication.
+This is exactly the failure mode the project's own rules exist to catch, and it reached a
+committed, pushed results doc.
+
+**FIXED:** `cache_fetch` now takes an optional `through=` freshness contract and REFETCHES a
+short series instead of silently returning it; `run_m12_factorial.load()` truncates the date
+axis to the EARLIEST final bar and prints "MIXED-VINTAGE CACHE" loudly when vintages differ;
+the results doc carries a prominent CORRECTED banner with the old values preserved.
+
+# Appendix DW - Cold audit: 12 findings + 8 edge cases, ALL FIXED and verified (2026-08-04, ~23:56 CDT)
+
+**TRIGGER:** Evan ran `/audit`, then "do all". Per the skill's Step 0 I did NOT audit my own
+work -- this session built most of the code under test, so a **COLD auditor** (fresh agent, no
+conversation history, no "this part is known-good") ran methods M1-M9 and generators G1-G4 and
+returned 12 findings + 8 edge cases. I independently re-verified the crit and both highs before
+accepting them. Tally unchanged (38 attempts); no experiment verdict moved except M12's
+corrected magnitudes (record DV).
+
+**CRIT/HIGH (all re-verified by me, not taken on trust):**
+- **#1 stale shared cache corrupted a COMMITTED result** -> full correction in **record DV**.
+- **#2 nightly task silently skipped 2026-07-30.** Verified: `paper_nav` holds 07-29 and 07-31
+  but NOT 07-30 (the auditor said both were missing; only 07-30 is -- corrected). Cause: task
+  had `DisallowStartIfOnBatteries=True` + `StopIfGoingOnBatteries=True`, and Windows reports
+  `NumberOfMissedRuns: 0`, so nothing could notice. `last_run_at` was WRITTEN but read by zero
+  code paths -- an UNENFORCEABLE contract. **FIXED both halves:** battery settings flipped to
+  False (`StartWhenAvailable` already True), and the loop now compares `max(paper_nav.date)`
+  against the sessions that actually traded and prints a loud MISSED SESSION(S) warning.
+- **#3 NAV marking crashes on a missing bar; the fallback could not arithmetically fire.**
+  `close_px[t] = cl.get(today)` STORES `None`, so `close_px.get(t, entry_price)` returns None --
+  the key exists. Reproduced the exact `TypeError`. Under `--execute` it aborts AFTER the ledger
+  advanced, leaving Alpaca unmirrored. **FIXED** at both sites using the `or` form the sibling
+  call site already used.
+
+**MED/LOW -- all fixed:** **#4** liquidity floor was UNENFORCEABLE (`MIN_MEDIAN_DOLLAR_VOL`
+defined once, read nowhere, while CLAUDE.md calls it mandatory) -> now enforced at the only
+place the live loop picks individual stocks, the m10 stress-basket ranking, with a 20-session
+median-dollar-volume screen that reports exclusions; **#5** two different 200-DMA windows
+(`run_e6_deleveraged` EXCLUDED today's close, everything else includes it) -> unified;
+**#6** `VIX_THR` duplicated as a literal in two files -> single source
+`paper_sleeves.VIX_STRESS_THR`; **#7** two cache consumers silently disagreed on missing-bar
+semantics -> documented in `cache_fetch` with the rule "zero is never correct for a HELD
+position"; **#8** live decision functions had ZERO coverage -> 9 new tripwire invariants;
+**#9** sqlite connections leaked -> closed; **#10** the tripwire opened the LIVE ledger
+read-WRITE while the 19:00 job may run -> now `mode=ro`; **#11** venv drifted 18 packages from
+`requirements.lock` -> scope note added so a future `pip freeze` cannot bake audit tooling into
+the runtime lock; **#12** two swallowed exceptions -> both now report.
+**Edge cases:** E1/E4 (stale cache; a position in a truncated ticker was never sold and its
+value vanished silently -- ~33% of NAV at K=3) fixed by the truncation + a forced-exit guard;
+E6 (pending cleared even when a BUY leg could not fill, dropping the leg permanently) -> pending
+is now KEPT for retry; E8 (cash float residue -1.14e-13) -> rounded.
+
+**A FINDING I HAD TO CORRECT MID-FIX -- honest note.** The auditor reported #5 as cosmetic:
+"0 signal disagreements over 2,946 QQQ sessions." I wrote that into the code comment, then ran
+E6 before/after and **the numbers DID move**: 2000-2013 maxDD 52.2% -> 54.3%, Sharpe 0.24 ->
+0.22; 2000-2026 Sharpe 0.54 -> 0.53. The auditor's sample was smaller than E6's ~6,600-session
+range. All three prereg-0526ea2 kill criteria still PASS so the E6 VERDICT is unchanged, but I
+rewrote the comment to state the real measured deltas rather than the claim I had copied.
+
+**VERIFIED:** all 53 .py compile; **frozen tripwire GREEN (12 pinned refs d=+/-0.0000pp)** and
+now also GREEN under `-W error` with **zero ResourceWarnings** (was 3); 9 new sleeve invariants
+PASS; liquidity floor exercised on real data (AAPL $17,087M/day, DRI $287M/day, both clear the
+$20M floor; a short series returns None rather than falsely excluding); `.bat` still pure
+ASCII; live ledger untouched (positions and 42 NAV rows unchanged, opened `mode=ro`).
+
+**CLEAN, confirmed by the cold auditor:** 38/38 preregs verifiably predate their runners;
+`pm-secretscan --history` clean across full history; `alpaca_keys.env` never committed;
+`pip-audit` no known vulnerabilities; DB integrity + FK checks pass.
+
+**STATE:** committing all fixes + DV + DW.
+
+**Next action:** none forced. The three M3 sleeves are untouched and still running; the nightly
+task now cannot silently skip a session without saying so.

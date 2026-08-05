@@ -60,11 +60,11 @@ import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from swing_bot import prices, paper_sleeves as ps
+from swing_bot import prices, paper_sleeves as ps, universe
 from run_e10_earnings_drift import UNIV
 from run_c1_residual_reversal import residual_series, BETA_N
 
-VIX_THR = 20.0
+VIX_THR = ps.VIX_STRESS_THR   # single source of truth (audit #6) -- see paper_sleeves
 # Max sessions the VIX3M reading may lag `today` before e18 refuses to decide
 # (audit #3). 2 = tolerate the normal 1-session publish lag + a holiday edge;
 # the 5-session Yahoo lag that inverted the signal (record DC) trips it.
@@ -105,6 +105,31 @@ def series(ticker, start="1999-01-01"):
     close = {b[1]: b[5] for b in bars}
     openp = {b[1]: b[2] for b in bars}
     return dates, close, openp
+
+
+def series_with_volume(ticker, start="1999-01-01"):
+    """Like series() but also returns {date: volume} -- needed by the liquidity
+    floor (audit #4). prices.fetch bar layout: (ticker, date, o, h, l, c, adj, vol)."""
+    bars = prices.fetch(ticker, start=start)
+    dates = [b[1] for b in bars]
+    close = {b[1]: b[5] for b in bars}
+    vol = {b[1]: b[7] for b in bars}
+    return dates, close, vol
+
+
+def median_dollar_volume(dates, close, vol, n=20, asof=None):
+    """Median close*volume over the last `n` sessions up to and including `asof`.
+    Past-only -- never looks beyond `asof`. Returns None if there is not enough
+    data or the feed carries no volume (in which case the caller must NOT treat
+    the name as illiquid on missing data alone)."""
+    ds = [d for d in dates if asof is None or d <= asof][-n:]
+    vals = [close[d] * vol[d] for d in ds
+            if close.get(d) is not None and vol.get(d)]
+    if len(vals) < max(5, n // 2):
+        return None
+    vals.sort()
+    m = len(vals) // 2
+    return vals[m] if len(vals) % 2 else (vals[m - 1] + vals[m]) / 2.0
 
 
 VIX3M_CBOE_URL = "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX3M_History.csv"
@@ -390,9 +415,23 @@ def realize_pending(conn, sleeve, today, fill_open):
               f"Unfilled BUY legs are DROPPED (pending is cleared below), so this "
               f"sleeve is ~{pct:.0f}% under-invested vs its target until the next "
               f"decision. Check the yfinance feed for those tickers.", flush=True)
-    conn.execute("UPDATE paper_sleeves SET cash=? WHERE sleeve=?", (cash, sleeve))
+    # Round away float residue (audit E8): full liquidation left cash at
+    # -1.14e-13 instead of 0.0. Harmless to arithmetic, but it makes any future
+    # `if cash < 0` guard fire on a sleeve that is exactly flat.
+    conn.execute("UPDATE paper_sleeves SET cash=? WHERE sleeve=?",
+                 (round(cash, 9), sleeve))
     conn.commit()
-    ps.clear_pending(conn, sleeve)
+    # Only clear the pending target if every BUY leg actually filled (audit E6).
+    # Clearing unconditionally dropped an unfillable leg for good -- the sleeve
+    # then sat ~1/K in cash against its target until the next weekly decision,
+    # with no way to recover it. Keeping the pending lets the next run retry the
+    # leg; the realize guard (today > pending_signal_date) still prevents a
+    # same-session double fill.
+    if skipped_buy:
+        print("  [%s] pending KEPT for retry next run (unfilled buy legs: %s)"
+              % (sleeve, skipped_buy), flush=True)
+    else:
+        ps.clear_pending(conn, sleeve)
     return True
 
 
@@ -400,7 +439,10 @@ def mark_nav(conn, sleeve, today, close_px):
     """close_px: {ticker: close_price_today}."""
     st = ps.get_sleeve(conn, sleeve)
     positions = ps.get_positions(conn, sleeve)
-    nav = st["cash"] + sum(p["qty"] * close_px.get(t, p["entry_price"])
+    # `or` not a dict default (audit #3): close_px[t] is SET to None when a
+    # ticker has no bar today (line ~531 `cl.get(today)`), so the key EXISTS
+    # holding None and a `.get(t, default)` fallback can never fire.
+    nav = st["cash"] + sum(p["qty"] * (close_px.get(t) or p["entry_price"])
                             for t, p in positions.items())
     ps.record_nav(conn, sleeve, today, nav)
     return nav
@@ -444,6 +486,22 @@ def main():
     print(f"  VIX={vix_today} (asof {vix_dt})  VIX3M={vix3m_today} (asof {v3_dt})")
 
     conn = ps.connect()
+
+    # ---- MISSED-SESSION DETECTOR (audit #2) ----
+    # The nightly task silently skipped 2026-07-30: no error, non-zero exit, or
+    # Windows "missed run" -- the session just vanished from paper_nav, which is
+    # the forward-evidence series this whole project rests on. `last_run_at` was
+    # already being written but READ BY NOTHING, so nothing could ever notice.
+    # Compare the newest NAV date against the sessions that actually traded.
+    prev = conn.execute("SELECT max(date) FROM paper_nav").fetchone()[0]
+    if prev and prev < today:
+        missed = [d for d in qdates if prev < d < today]
+        if missed:
+            print("\n!! MISSED SESSION(S): paper_nav's newest date is %s but %d "
+                  "trading session(s) have closed since -- %s. Those NAV rows are "
+                  "PERMANENTLY absent from the forward-evidence series (this run "
+                  "records %s only). Check the scheduled task."
+                  % (prev, len(missed), ", ".join(missed), today), flush=True)
 
     # ---- realize any pending from the previous run (needs today's opens for
     # whatever tickers are currently held / newly targeted) ----
@@ -492,13 +550,29 @@ def main():
                   "for the residual ranking ...", flush=True)
             ff = fresh_ff3()
             ranks = []
+            illiquid = []
             for t in UNIV:
-                ds, cl, _ = series(t, start="2010-01-01")
+                ds, cl, vol = series_with_volume(t, start="2010-01-01")
                 cls = [cl[d] for d in ds]
+                # LIQUIDITY FLOOR (audit #4). CLAUDE.md calls this floor
+                # mandatory in any universe filter, but MIN_MEDIAN_DOLLAR_VOL
+                # was defined in universe.py and READ BY NOTHING -- an
+                # UNENFORCEABLE contract. This is the only place the live loop
+                # picks individual stocks, so it is the correct chokepoint:
+                # screen on 20-session median dollar volume before ranking.
+                adv = median_dollar_volume(ds, cl, vol, n=20, asof=today)
+                if adv is not None and adv < universe.MIN_MEDIAN_DOLLAR_VOL:
+                    illiquid.append((t, adv))
+                    continue
                 form = residual_series(ds, cls, ff)
                 v = dict(zip(ds, form)).get(today)
                 if v is not None:
                     ranks.append((v, t))
+            if illiquid:
+                print("  liquidity floor ($%.0fM/day) excluded %d name(s): %s"
+                      % (universe.MIN_MEDIAN_DOLLAR_VOL / 1e6, len(illiquid),
+                         ", ".join("%s $%.1fM" % (t, a / 1e6) for t, a in illiquid)),
+                      flush=True)
             residual_ranks = sorted(ranks)
         target_m10, err = ps.decide_m10_1(vix_today, list(qclose[d] for d in qdates), residual_ranks)
         decisions["m10_1_nagel"] = (target_m10, err)
@@ -599,7 +673,7 @@ def main():
             if pending is not None:
                 desired = {t: round(nav * w, 2) for t, w in pending.items()}
             else:
-                desired = {t: round(p["qty"] * close_px.get(t, 0.0), 2)
+                desired = {t: round(p["qty"] * (close_px.get(t) or 0.0), 2)
                            for t, p in positions.items()}
             desired = {t: n for t, n in desired.items() if n > 0}
             try:

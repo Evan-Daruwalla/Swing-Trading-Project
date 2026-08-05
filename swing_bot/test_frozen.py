@@ -29,15 +29,28 @@ scripts/ experiment runners (they have no frozen refs) or the M3 paper tables
 import sqlite3
 from collections import namedtuple
 
-from swing_bot import prices, signals, backtest, rotation
+from swing_bot import prices, signals, backtest, rotation, paper_sleeves as ps
 
 Case = namedtuple("Case", ["name", "value", "ref", "unit", "dp"])
+
+
+def _ro_connect():
+    """Open swing.db READ-ONLY. The tripwire must never take a write handle on
+    the live paper ledger (audit #10)."""
+    return sqlite3.connect("file:%s?mode=ro" % str(prices.DB_PATH).replace("\\", "/"),
+                           uri=True)
 
 
 def _window(start, end, entries=None, k=5, size_on_nav=False):
     """Run the engine (next-open, 5bps) on a fixed swing.db window; return
     (total_return_pct, closed_count). Default entries/k = E1 config."""
-    src = prices.connect()
+    # READ-ONLY (audit #10) + explicitly closed (audit #9). prices.connect()
+    # opens swing.db read-WRITE and runs CREATE TABLE IF NOT EXISTS -- the
+    # tripwire was taking a write handle on the LIVE paper ledger, which the
+    # 19:00 scheduled job also writes. SQLite's default busy_timeout is 0, so an
+    # overlap is `database is locked` mid-transaction. The tripwire only ever
+    # reads, so it has no business holding a write handle.
+    src = _ro_connect()
     mem = sqlite3.connect(":memory:")
     mem.execute(prices.SCHEMA)
     rows = src.execute(
@@ -49,6 +62,7 @@ def _window(start, end, entries=None, k=5, size_on_nav=False):
                                                fill="next_open",
                                                cost_bps=5.0, k=k,
                                                size_on_nav=size_on_nav))
+    src.close(); mem.close()          # audit #9: were leaked (ResourceWarning)
     return m["total_ret"] * 100, m["n_trades"]
 
 _w1_tpnl, _w1_n = _window("2019-01-01", "2019-06-30")
@@ -66,9 +80,11 @@ _e2w2_tpnl, _e2w2_n = _window("2020-01-01", "2020-06-30",
 _v2w1_tpnl, _v2w1_n = _window("2019-01-01", "2019-06-30", size_on_nav=True)
 
 # E4 rotation engine (2026-07-09): QQQ->TQQQ N=200 lag0 5bps, fixed window
+_e4_conn = _ro_connect()
 _e4 = backtest.metrics(rotation.run_rotation(
-    prices.connect(), "TQQQ", "QQQ", ma_len=200, exec_lag=0, cost_bps=5.0,
+    _e4_conn, "TQQQ", "QQQ", ma_len=200, exec_lag=0, cost_bps=5.0,
     start="2015-01-01", end="2016-12-31"))
+_e4_conn.close()                      # audit #9
 _e4_tpnl, _e4_n = _e4["total_ret"] * 100, _e4["n_trades"]
 
 # --- REAL E1 references (M2.11), pinned 2026-07-09 -----------------------
@@ -94,6 +110,35 @@ REFERENCES = [
 INVARIANTS = [
     ("ibs_zero_range_is_none", signals.ibs(10.0, 10.0, 10.0) is None),
     ("ibs_inverted_is_none",   signals.ibs(8.0, 10.0, 9.0) is None),
+
+    # --- LIVE SLEEVE DECISIONS (audit #8, added 2026-08-03) -----------------
+    # These three functions decide what the M3 paper sleeves actually trade and
+    # had ZERO automated coverage while daily_swing_paper.py was the repo's
+    # highest-churn file. They are pure, so they need no fixtures.
+    # e6_1x: long QQQ iff last close > its 200-DMA.
+    ("e6_above_200dma_is_long",
+     ps.decide_e6_1x([100.0] * 199 + [150.0])[0] == {"QQQ": 1.0}),
+    ("e6_below_200dma_is_cash",
+     ps.decide_e6_1x([100.0] * 199 + [50.0])[0] == {}),
+    ("e6_short_series_refuses",
+     ps.decide_e6_1x([100.0] * 50)[0] is None),
+    # e18_vixts: long QQQ iff VIX/VIX3M < 1 (contango = risk-on).
+    ("e18_contango_is_long",
+     ps.decide_e18_vixts(15.0, 20.0)[0] == {"QQQ": 1.0}),
+    ("e18_backwardation_is_cash",
+     ps.decide_e18_vixts(25.0, 20.0)[0] == {}),
+    ("e18_missing_vix3m_refuses",
+     ps.decide_e18_vixts(15.0, None)[0] is None),
+    # m10_1: VIX>THR -> residual-reversal basket, else the e6 trend rule.
+    ("m10_calm_uses_trend_rule",
+     ps.decide_m10_1(15.0, [100.0] * 199 + [150.0], None)[0] == {"QQQ": 1.0}),
+    ("m10_stress_without_ranks_refuses",
+     ps.decide_m10_1(25.0, [100.0] * 200, None)[0] is None),
+    ("m10_stress_basket_is_equal_weight_K",
+     ps.decide_m10_1(25.0, [100.0] * 200,
+                     [(-0.5, "AAA"), (-0.4, "BBB"), (-0.3, "CCC"),
+                      (-0.2, "DDD"), (0.9, "EEE")])[0]
+     == {t: 1.0 / ps.STRESS_K for t in ("AAA", "BBB", "CCC", "DDD")}),
 ]
 
 

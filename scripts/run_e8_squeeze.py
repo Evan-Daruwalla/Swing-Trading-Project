@@ -40,11 +40,55 @@ GATE_END = "2013-12-31"
 SEC_START = "2014-01-01"
 
 
-def cache_fetch(ticker):
+def cache_last_date(ticker):
+    """Last bar date held in cache for `ticker`, or None if not cached.
+    Lets a caller detect a MIXED-VINTAGE universe before trusting it."""
+    f = CACHE / f"{ticker}.json"
+    if not f.exists():
+        return None
+    try:
+        bars = json.loads(f.read_text())
+    except (ValueError, OSError):
+        return None
+    return bars[-1][1] if bars else None
+
+
+def cache_fetch(ticker, through=None):
+    """Cached bars for `ticker` (permanent on-disk cache; the repo's shared
+    data layer, ~29 importers).
+
+    FRESHNESS (audit finding #1, 2026-08-03): this cache had NO end-date check
+    and returned any existing file unconditionally. Because entries are written
+    on whatever day a ticker is first touched, a universe assembled across
+    sessions silently mixes VINTAGES -- and that corrupted a committed result.
+    M12 ran 142 names of which 38 stopped at 2026-07-10 while 104 ran to
+    2026-07-31; every number in the secondary window was wrong (the headline
+    effect was overstated 3x) because the 38 short names went None mid-window
+    and were marked at zero rather than dropped.
+
+    `through`: optional ISO date the cached series must reach. When the cache
+    falls short, it is REFETCHED rather than silently returned stale. Callers
+    that do not care (single-ticker experiments already run and recorded) keep
+    the old behaviour by omitting it, so no prior result shifts underneath.
+
+    MISSING-BAR SEMANTICS -- consumers must choose deliberately (audit #7).
+    A ticker can be absent on a date another ticker trades. Two live consumers
+    already disagree, and neither choice was written down:
+      * run_c3_vol_breakout carries the last known close FORWARD (stale-mark).
+      * run_m12_factorial dropped the position's value to ZERO -- which is not a
+        price, and is exactly what let a mixed-vintage cache silently rewrite a
+        published result. It now truncates the date axis instead.
+    Zero is never correct for a HELD position. Carry forward, or truncate the
+    axis. If you add a consumer, state which you chose.
+    """
     CACHE.mkdir(exist_ok=True)
     f = CACHE / f"{ticker}.json"
     if f.exists():
-        return json.loads(f.read_text())
+        bars = json.loads(f.read_text())
+        if not through or (bars and bars[-1][1] >= through):
+            return bars
+        print(f"  cache STALE {ticker}: ends {bars[-1][1] if bars else 'empty'} "
+              f"< {through} -- refetching", flush=True)
     for attempt in range(4):
         try:
             bars = prices.fetch(ticker, start="1990-01-01")

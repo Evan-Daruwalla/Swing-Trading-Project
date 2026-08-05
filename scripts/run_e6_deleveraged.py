@@ -58,7 +58,21 @@ def rotation_nav(dates, sig_close, pos_oc, ma=200, cost_bps=5.0,
         if (start is None or d >= start) and (end is None or d <= end):
             nav.append(v)
         if i >= ma:
-            m = sum(closes[i - ma:i]) / ma
+            # INCLUSIVE window (audit #5, fixed 2026-08-03): this was
+            # closes[i-ma:i], which EXCLUDES today's close, while every other
+            # 200-DMA in the project (run_e18.sma, paper_sleeves.sma, and the
+            # LIVE e6_1x sleeve) includes it. paper_sleeves' docstring claimed
+            # an "identical condition" to this function; it was not.
+            # MEASURED EFFECT of the fix -- the numbers DID move, contrary to a
+            # 2,946-session sample that showed no signal disagreement (E6 runs
+            # ~6,600 sessions, where the two forms do diverge):
+            #   2000-2013 maxDD 52.2% -> 54.3%, Sharpe 0.24 -> 0.22
+            #   2000-2026 maxDD 52.2% -> 54.3%, Sharpe 0.54 -> 0.53
+            #   2014-2026 Sharpe 0.92 -> 0.92 (unchanged)
+            # All three prereg 0526ea2 kill criteria still PASS, so the E6
+            # verdict is unchanged -- but the backtest now computes the same
+            # number the live sleeve trades, instead of agreeing by luck.
+            m = sum(closes[i - ma + 1:i + 1]) / ma
             want = 1 if closes[i] > m else 0
             if want != state and pend is None:
                 pend = (want, i)
