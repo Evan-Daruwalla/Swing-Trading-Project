@@ -169,15 +169,26 @@ def evaluate(name, series_by_cfg, n_trials, gated=True):
                  "OVERFIT (>=%.1f)" % PBO_FAIL_AT if p["pbo"] >= PBO_FAIL_AT
                  else "below threshold"))
 
-    rejected = (not dsr_sig) and (p.get("pbo") is None or p["pbo"] >= PBO_FAIL_AT)
+    # AMENDED per prereg V2 (33b3b5c): reject if EITHER axis fires. V1 required
+    # BOTH, which demanded one strategy fail two tests that measure different
+    # things -- DSR is strategy-level (does the Sharpe survive the trial count),
+    # PBO is selection-level (is config selection overfit). Thresholds are
+    # UNCHANGED; only the combinator changed.
+    fired_a = not dsr_sig                                    # strategy-level
+    fired_b = p.get("pbo") is not None and p["pbo"] >= PBO_FAIL_AT   # selection
+    rejected = fired_a or fired_b
+    axes = [n for n, f in (("DSR", fired_a), ("PBO", fired_b)) if f] or ["none"]
+    # Which axis fired is REQUIRED output (prereg V2 section 5.4): a bare
+    # "rejected" would hide the distinction the V1 run proved is informative.
     if gated:
-        print("  VERDICT: %s" % ("REJECTED (as required)" if rejected
-                                 else "*** NOT REJECTED -- see done-check ***"))
+        print("  VERDICT: %s   [axis fired: %s]"
+              % ("REJECTED (as required)" if rejected
+                 else "*** NOT REJECTED -- see done-check ***", ", ".join(axes)))
     else:
-        print("  VERDICT (diagnostic, not gated): %s"
-              % ("rejected" if rejected else "not rejected"))
+        print("  VERDICT (diagnostic, not gated): %s   [axis fired: %s]"
+              % ("rejected" if rejected else "not rejected", ", ".join(axes)))
     return {"rejected": rejected, "dsr": dsr_val, "pbo": p.get("pbo"),
-            "sr_var": sr_var, "paths": path_sr}
+            "axes_fired": axes, "sr_var": sr_var, "paths": path_sr}
 
 
 def statistics_pvariance(xs):

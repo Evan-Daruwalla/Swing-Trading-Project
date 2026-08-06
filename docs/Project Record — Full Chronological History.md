@@ -5556,3 +5556,137 @@ each one is a trial.
 in a NEW dated prereg -- the existing one must not be edited after results. My recommendation is
 to split it: DSR governs strategy-level rejection, PBO governs selection-level rejection, and a
 subject is rejected if EITHER fires.
+
+# Appendix EC - V2 amendment applied: harness ACCEPTED, and the pre-registered false positive materialised exactly as predicted (2026-08-06, ~13:04 CDT)
+
+**TRIGGER:** Evan chose option 2 from EB -- commit the V1 FAIL, then amend the criterion in a
+NEW dated prereg. Done in that order. Prereg **V2 = `33b3b5c`** (doc-only; verified the
+acceptance logic was UNCHANGED at that commit). V1's failure stands unedited at `3b346cb`.
+**Not an attempt; tally stays 38.**
+
+**RESULT: HARNESS ACCEPTED -- all 5 criteria PASS.**
+| subject | DSR | PBO | verdict | axis fired |
+|---|---|---|---|---|
+| 6.2 pure noise | 0.0001 | 0.900 | **REJECTED** | DSR, PBO |
+| 6.1 chart-pattern rule | 0.0168 | 0.429 | **REJECTED** | **DSR** |
+| 5 planted edge (diagnostic) | **1.0000** | **0.514** | **rejected** | **PBO** |
+
+**THE PRE-REGISTERED PREDICTION WAS CORRECT ON ALL THREE, INCLUDING THE FAILURE.** V2 section 4
+was written BEFORE the re-run and said: noise rejected on both axes; pattern rule rejected via
+DSR; and **"the planted edge is EXPECTED TO BE REJECTED via (b), because its PBO was 0.514 --
+this is a predicted FALSE POSITIVE of the amended rule."** That is exactly what happened. It is
+recorded as a prediction that came true, not as a surprise explained afterwards.
+
+**SO THE ACCEPTANCE COMES WITH A REAL CAVEAT, REPORTED NOT BURIED.** Under the OR-rule the
+harness now rejects a KNOWN edge (planted-edge DSR = 1.0000, unambiguously significant, yet
+rejected on PBO 0.514). Per V2 section 6's pre-committed handling: this is reported as a
+**limitation of the selection-level axis**, `PBO_FAIL_AT` was **NOT** loosened, and the
+falsifier was **NOT** dropped.
+
+**THE EMPIRICAL LESSON, now demonstrated rather than argued: PBO is only meaningful when the
+CONFIGURATION SET REPRESENTS A GENUINE SELECTION CHOICE.** None of the three subjects is such a
+set -- the pattern rule's 5 configs are near-identical (same M11 detector, only hold period and
+entry threshold vary) so there is nothing to overfit (PBO 0.429), while noise and the planted
+edge use INDEPENDENT random draws so their in-sample winner is uninformative out-of-sample by
+construction (0.900, 0.514). PBO measured exactly what it is designed to measure in all three
+cases; the mistake was ever asking it about edge.
+
+**NET STATE OF THE TWO AXES:**
+- **DSR: perfect three-way discrimination** -- 0.0001 (noise) / 0.0168 (patterns) / 1.0000
+  (planted edge). This is the axis that answers "does the Sharpe survive the trial count," and
+  it works.
+- **PBO: correct but narrow** -- trustworthy only over a real selection set. On these subjects
+  it contributes one true positive (noise) and one false positive (planted edge).
+
+**RECOMMENDED NEXT STEP (not taken, requires its own prereg): a V3 that computes PBO ONLY over
+configuration sets where selection is genuine**, and otherwise reports it as N/A rather than
+letting it vote. Pre-registered separately; never patched in after seeing output.
+
+**OTHER CRITERIA, unchanged and re-verified with real output:** cost model RAISED (4 fills, 20
+required; override tagged `ASSUMED / NOT MEASURED`); DSR RAISED on a missing trial log -- **and
+the staleness guard fired for real a second time** when V2 was added, correctly forcing a
+regeneration before any DSR was computed (the exclusion list is built at log-build time, so a
+new prereg legitimately invalidates it); purge+embargo removed **70 obs/split** (2971 -> 2901).
+Trial count **50**, source printed alongside every DSR.
+
+**VERIFIED:** frozen tripwire **GREEN, d=+/-0.0000pp** (12 pinned refs + 11 invariants); all
+modules compile; swing.db opened READ-ONLY; no swing.db writes; M11's detector reused verbatim
+through `signals_for()` (causal j+W confirmation, no look-ahead introduced).
+
+**STATE:** V2 prereg committed `33b3b5c`; amended logic + this entry uncommitted.
+
+**Next action:** Evan's call on committing. Open item: V3 to scope PBO to genuine selection
+sets. The cost model remains SPECIFIED BUT UNCALIBRATED (4 fills, 20 required) -- it unblocks
+only as the live paper loop accumulates fills.
+
+---
+
+# Appendix ED - Amended harness COMMITTED; V3 deferred to "after fills accrue" -- and that gate is measured to be UNREACHABLE on the current trajectory (2026-08-06, ~13:31 CDT)
+
+**Evan's instruction:** *"wait for the paper loop to accumulate fills then 2"* -- i.e. commit the
+amended harness now, and defer the V3 prereg (scope PBO to genuine selection sets) until the
+live paper loop has produced enough measured fills. Commit authorised; V3 deferred.
+
+**Before accepting the deferral I checked whether the gate can actually clear.** It cannot, and
+the reasons are two separate defects. Both are REPORTED, neither is fixed here (out of scope for
+the instruction given).
+
+**MEASURED STATE OF THE FILL PIPELINE (`swing.db`, read-only, 2026-08-06):**
+
+```
+fills usable by costs.estimate_friction : 4     (required: 20)
+fill_divergence rows, total             : 10
+  resolved (alpaca_price NOT NULL)      : 4
+  order id present but never resolved   : 1     (id 7, status 'canceled', qty 0.0 -- a genuine no-fill)
+  NO alpaca_order_id at all             : 5     (ids 5, 6, 9, 10, 12)
+last fill_divergence row                : 2026-07-21
+last paper_transactions row             : 2026-07-21
+paper_nav rows through                  : 2026-08-05  (3 sleeves, still running daily)
+open positions                          : e6_1x QQQ, e18_vixts QQQ, m10_1_nagel QQQ  (1 each)
+```
+
+**DEFECT 1 -- the accrual rate since the initial entry burst is ZERO.** All 10 divergence rows
+and all 5 transactions fall in 2026-07-15..2026-07-21. In the **16 days since**, the loop has run
+(paper_nav is current through 2026-08-05) and produced **zero transactions and zero new
+divergence rows**. This is not a malfunction: all three sleeves are K=1, fully invested in QQQ,
+and holding. A new fill requires an EXIT or a REBALANCE, and none has triggered. The early burst
+was the one-off entry-from-cash phase, not a steady state. **Waiting for 16 more fills at an
+observed rate of zero is an unbounded wait**, so "defer V3 until fills accrue" is, on this
+evidence, "defer V3 indefinitely."
+
+**DEFECT 2 -- half the divergence rows never acquire an order id.** 5 of 10 rows carry
+`alpaca_order_id = NULL` / `alpaca_status = NULL`, so they can never resolve. The pattern looks
+like duplicate logging across adjacent dates rather than genuine no-fills: ids 3,4 (2026-07-15,
+sim 712.0) resolved with order ids, and ids 5,6 (2026-07-16, same ticker, same sim 712.0) are
+orphans -- while `paper_transactions` records the e6_1x and e18_vixts buys at 712.0 under
+2026-07-16. Same shape for ids 9,10 (orphans) beside id 11 (resolved). **DIAGNOSIS ONLY -- not
+investigated to root cause and not fixed in this entry.** Consequence for the cost model: even
+if trading resumed at the burst rate, roughly half the rows would not count toward the 20.
+
+**THE COUPLING IS ALSO WRONG, and this is my error to own from the previous turn.** V3 scopes
+PBO to configuration sets where selection is genuine. That is pure backtest machinery operating
+on returns matrices; it consumes **no live fills whatsoever**. The V1/V2 harness already ran to
+completion on 4 fills, using the `assumed_bps` override tagged `ASSUMED / NOT MEASURED`. **Fills
+gate the COST MODEL's calibration; they do not gate V3.** My previous-turn option list put the
+fills caveat on option 3 and Evan reasonably carried it across to option 2 -- but the two are
+independent, and pairing them delays V3 for a reason that does not apply to it.
+
+**WHAT WAS DONE THIS ENTRY:** committed the V2-amended acceptance logic
+(`scripts/run_v1_harness_check.py`), the regenerated `docs/trial_log.json`, and Appendix EC.
+Nothing in the harness or the sleeves was modified. No V3 prereg was written.
+
+**VERIFIED:** frozen tripwire re-run **GREEN, d=+/-0.0000pp**; `swing.db` opened READ-ONLY for
+every query above (`file:swing.db?mode=ro`); no writes to `swing.db`; no Alpaca orders placed;
+Trading's repo untouched.
+
+**STATE:** amended harness + EC + this entry committed. Cost model **SPECIFIED BUT
+UNCALIBRATED** (4/20 fills) and, per Defect 1, not on track to calibrate. V3 **NOT WRITTEN**,
+deferred by instruction.
+
+**Next action:** Evan's call, now that the gate is measured. The three live options are (a) write
+V3 now, since it never needed fills; (b) fix Defect 2 first so the fill pipeline can resolve what
+it logs; (c) accept that the cost model stays ASSUMED and say so explicitly wherever a cost
+number is published. Defect 1 has no fix that does not change a pre-registered sleeve, which is
+not something to do casually.
+
+**Doc cadence:** prompt #156, cadence hit, entry written same prompt. No miss.

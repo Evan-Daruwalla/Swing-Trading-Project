@@ -21,6 +21,10 @@
     {
       "file": "docs\\prereg_v1_cost_model_and_validation_harness.md",
       "reason": "self-declared non-attempt (infrastructure)"
+    },
+    {
+      "file": "docs\\prereg_v2_harness_acceptance_amendment.md",
+      "reason": "self-declared non-attempt (infrastructure)"
     }
   ],
   "trials": [
