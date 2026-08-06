@@ -1,0 +1,543 @@
+{
+  "generated_by": "scripts/build_trial_log.py",
+  "sources": [
+    "docs/prereg_*.md",
+    "git log",
+    "docs/research/*results*",
+    "docs/Project Record \u2014 Full Chronological History.md"
+  ],
+  "prereg_docs_found": 37,
+  "max_attempt_number_in_record": 38,
+  "attempt_count_discrepancy": {
+    "record_says": 38,
+    "prereg_docs": 37,
+    "note": "UNRESOLVED -- do not silently pick one. See docs/trial_log_notes.md"
+  },
+  "declared_variant_total": 50,
+  "variant_count_is_lower_bound": true,
+  "lower_bound_reason": "Counts only variants DECLARED in a prereg. Excludes: parameter values explored before pre-registration, the ~90-method survey and the dropped-16 list (record Appendix B), and any abandoned variant never written down. The true search effort is strictly LARGER, so any DSR computed from this number is OPTIMISTIC (too generous to the strategy).",
+  "entries_with_unknown_fields": 1,
+  "trials": [
+    {
+      "id": "E1_ibs",
+      "prereg_file": "docs\\prereg_E1_ibs.md",
+      "prereg_commit": "8963e49",
+      "prereg_date": "2026-07-09",
+      "results_files": [
+        "docs\\research\\2026-07-09_E1_backtest_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "E1b_broad_us",
+      "prereg_file": "docs\\prereg_E1b_broad_us.md",
+      "prereg_commit": "0126ce3",
+      "prereg_date": "2026-07-09",
+      "results_files": [
+        "docs\\research\\2026-07-09_E1b_broad_us_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "E2_leveraged_ibs",
+      "prereg_file": "docs\\prereg_E2_leveraged_ibs.md",
+      "prereg_commit": "865c09e",
+      "prereg_date": "2026-07-09",
+      "results_files": [
+        "docs\\research\\2026-07-09_E2_leveraged_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "E3_stock_momentum",
+      "prereg_file": "docs\\prereg_E3_stock_momentum.md",
+      "prereg_commit": "87bc8d9",
+      "prereg_date": "2026-07-09",
+      "results_files": [
+        "docs\\research\\2026-07-10_E3_stock_momentum_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "E4_rotation",
+      "prereg_file": "docs\\prereg_E4_rotation.md",
+      "prereg_commit": "313d88a",
+      "prereg_date": "2026-07-09",
+      "results_files": [
+        "docs\\research\\2026-07-09_E4_rotation_results.md"
+      ],
+      "headline_verdict_at_publication": "PASS",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "E5_rotation_regime",
+      "prereg_file": "docs\\prereg_E5_rotation_regime.md",
+      "prereg_commit": "09a3a31",
+      "prereg_date": "2026-07-09",
+      "results_files": [
+        "docs\\research\\2026-07-09_E5_regime_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "E6_deleveraged_rotation",
+      "prereg_file": "docs\\prereg_E6_deleveraged_rotation.md",
+      "prereg_commit": "0526ea2",
+      "prereg_date": "2026-07-09",
+      "results_files": [
+        "docs\\research\\2026-07-09_E6_deleveraged_results.md"
+      ],
+      "headline_verdict_at_publication": "PASS",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "E7_international",
+      "prereg_file": "docs\\prereg_E7_international.md",
+      "prereg_commit": "70ed2a1",
+      "prereg_date": "2026-07-09",
+      "results_files": [
+        "docs\\research\\2026-07-10_E7_international_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "c1_residual_reversal",
+      "prereg_file": "docs\\prereg_c1_residual_reversal.md",
+      "prereg_commit": "187604e",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_C1_residual_reversal_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "c3_vol_breakout",
+      "prereg_file": "docs\\prereg_c3_vol_breakout.md",
+      "prereg_commit": "85d102e",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_C3_vol_breakout_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "c4_vol_sizing",
+      "prereg_file": "docs\\prereg_c4_vol_sizing.md",
+      "prereg_commit": "3807078",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_C4_vol_sizing_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "c6_fomc_cycle",
+      "prereg_file": "docs\\prereg_c6_fomc_cycle.md",
+      "prereg_commit": "14ff680",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_C6_fomc_cycle_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "c7_svxy_carry",
+      "prereg_file": "docs\\prereg_c7_svxy_carry.md",
+      "prereg_commit": "1a103a2",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_C7_svxy_carry_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e10_earnings_drift",
+      "prereg_file": "docs\\prereg_e10_earnings_drift.md",
+      "prereg_commit": "129dc22",
+      "prereg_date": "2026-07-10",
+      "results_files": [
+        "docs\\research\\2026-07-10_E10_E11_E12_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e11_volume_gated_breakout",
+      "prereg_file": "docs\\prereg_e11_volume_gated_breakout.md",
+      "prereg_commit": "129dc22",
+      "prereg_date": "2026-07-10",
+      "results_files": [
+        "docs\\research\\2026-07-10_E10_E11_E12_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e12_confirmed_capitulation",
+      "prereg_file": "docs\\prereg_e12_confirmed_capitulation.md",
+      "prereg_commit": "129dc22",
+      "prereg_date": "2026-07-10",
+      "results_files": [
+        "docs\\research\\2026-07-10_E10_E11_E12_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e13_turn_of_month",
+      "prereg_file": "docs\\prereg_e13_turn_of_month.md",
+      "prereg_commit": "0324196",
+      "prereg_date": "2026-07-11",
+      "results_files": [
+        "docs\\research\\2026-07-12_E13_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e14_sector_momentum",
+      "prereg_file": "docs\\prereg_e14_sector_momentum.md",
+      "prereg_commit": "f922f1f",
+      "prereg_date": "2026-07-11",
+      "results_files": [
+        "docs\\research\\2026-07-12_E14_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e15_earnings_premium",
+      "prereg_file": "docs\\prereg_e15_earnings_premium.md",
+      "prereg_commit": "9b0aeb3",
+      "prereg_date": "2026-07-11",
+      "results_files": [
+        "docs\\research\\2026-07-11_E15_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e16_weekly_reversal",
+      "prereg_file": "docs\\prereg_e16_weekly_reversal.md",
+      "prereg_commit": "a090294",
+      "prereg_date": "2026-07-11",
+      "results_files": [
+        "docs\\research\\2026-07-11_E16_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e18_regime_gate_bakeoff",
+      "prereg_file": "docs\\prereg_e18_regime_gate_bakeoff.md",
+      "prereg_commit": "f32b008",
+      "prereg_date": "2026-07-11",
+      "results_files": [
+        "docs\\research\\2026-07-11_E18_results.md"
+      ],
+      "headline_verdict_at_publication": null,
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 4,
+      "variant_basis": "4 pre-declared gates (a)-(d), prereg 'Four a-priori risk-on/off gates'",
+      "_unknown": [
+        "headline_verdict_at_publication"
+      ]
+    },
+    {
+      "id": "e19_insider_opportunistic",
+      "prereg_file": "docs\\prereg_e19_insider_opportunistic.md",
+      "prereg_commit": "ebf54a4",
+      "prereg_date": "2026-07-12",
+      "results_files": [
+        "docs\\research\\2026-07-13_E19_insider_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e20_dividend_capture",
+      "prereg_file": "docs\\prereg_e20_dividend_capture.md",
+      "prereg_commit": "d0642ad",
+      "prereg_date": "2026-07-11",
+      "results_files": [
+        "docs\\research\\2026-07-11_E20_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e8_squeeze_breakout",
+      "prereg_file": "docs\\prereg_e8_squeeze_breakout.md",
+      "prereg_commit": "9b49190",
+      "prereg_date": "2026-07-10",
+      "results_files": [
+        "docs\\research\\2026-07-10_E8_E9_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "e9_deep_dip_audit",
+      "prereg_file": "docs\\prereg_e9_deep_dip_audit.md",
+      "prereg_commit": "9b49190",
+      "prereg_date": "2026-07-10",
+      "results_files": [
+        "docs\\research\\2026-07-10_E8_E9_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "m10_1_nagel_switch",
+      "prereg_file": "docs\\prereg_m10_1_nagel_switch.md",
+      "prereg_commit": "63fa9db",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_M10-1_nagel_switch_results.md"
+      ],
+      "headline_verdict_at_publication": "PASS-HR",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "m10_2_gap_amortized_ibs",
+      "prereg_file": "docs\\prereg_m10_2_gap_amortized_ibs.md",
+      "prereg_commit": "1bc74a9",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_M10-2_gap_amortized_ibs_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "m11_chart_patterns",
+      "prereg_file": "docs\\prereg_m11_chart_patterns.md",
+      "prereg_commit": "9cb5ac5",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_M11_chart_patterns_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 2,
+      "variant_basis": "long-side gated rule + a REPORTED-not-gated short-side diagnostic"
+    },
+    {
+      "id": "m12_constraint_factorial",
+      "prereg_file": "docs\\prereg_m12_constraint_factorial.md",
+      "prereg_commit": "43e4d42",
+      "prereg_date": "2026-08-03",
+      "results_files": [
+        "docs\\research\\2026-08-03_M12_constraint_factorial_results.md"
+      ],
+      "headline_verdict_at_publication": "DIAGNOSTIC",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 8,
+      "variant_basis": "2x2 cells x 2 cost levels (5bps + 15bps stress), prereg sections 3-4"
+    },
+    {
+      "id": "x1_vol_targeting",
+      "prereg_file": "docs\\prereg_x1_vol_targeting.md",
+      "prereg_commit": "07c22cb",
+      "prereg_date": "2026-07-13",
+      "results_files": [
+        "docs\\research\\2026-07-13_X1_vol_targeting_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "x2_days_to_cover",
+      "prereg_file": "docs\\prereg_x2_days_to_cover.md",
+      "prereg_commit": "4094889",
+      "prereg_date": "2026-07-13",
+      "results_files": [
+        "docs\\research\\2026-07-13_X2_days_to_cover_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "x2b_short_side",
+      "prereg_file": "docs\\prereg_x2b_short_side.md",
+      "prereg_commit": "e718f6f",
+      "prereg_date": "2026-07-13",
+      "results_files": [
+        "docs\\research\\2026-07-13_X2b_short_side_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "x3_regsho_svr",
+      "prereg_file": "docs\\prereg_x3_regsho_svr.md",
+      "prereg_commit": "037ad11",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_X3_regsho_svr_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "x6_crypto_trend",
+      "prereg_file": "docs\\prereg_x6_crypto_trend.md",
+      "prereg_commit": "8513d11",
+      "prereg_date": "2026-07-14",
+      "results_files": [
+        "docs\\research\\2026-07-14_X6_crypto_trend_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "x7_credit_gate",
+      "prereg_file": "docs\\prereg_x7_credit_gate.md",
+      "prereg_commit": "f4a4d34",
+      "prereg_date": "2026-07-15",
+      "results_files": [
+        "docs\\research\\2026-07-15_X7_credit_gate_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "x8_noneq_trend",
+      "prereg_file": "docs\\prereg_x8_noneq_trend.md",
+      "prereg_commit": "8b408f9",
+      "prereg_date": "2026-08-02",
+      "results_files": [
+        "docs\\research\\2026-08-02_X8_noneq_trend_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 2,
+      "variant_basis": "2 pre-declared arms GLD/TLT, prereg section 3, with an explicit multiple-comparison disclosure"
+    },
+    {
+      "id": "x9_pairs_relative_value",
+      "prereg_file": "docs\\prereg_x9_pairs_relative_value.md",
+      "prereg_commit": "00c8c44",
+      "prereg_date": "2026-08-03",
+      "results_files": [
+        "docs\\research\\2026-08-03_X9_pairs_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 2,
+      "variant_basis": "gated run + a post-hoc zero-cost diagnostic (explicitly not gated)"
+    }
+  ]
+}
