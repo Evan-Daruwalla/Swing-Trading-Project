@@ -117,7 +117,14 @@ def verdict_from(paths):
 
 
 def main():
-    stems = []
+    # Some preregs are INFRASTRUCTURE, not attempts (e.g. the V1 cost-model /
+    # validation-harness prereg, which builds no strategy and claims no edge).
+    # They must not inflate the trial count -- DSR's N is trials in the SEARCH.
+    # Detected from the doc's own self-declaration, not from a hand-kept list.
+    NON_ATTEMPT_RE = re.compile(
+        r"not an attempt|does not increment the (?:attempt )?tally", re.I)
+
+    stems, excluded = [], []
     for f in sorted(os.listdir(PREREG_DIR)):
         m = re.match(r"^prereg_(.+)\.md$", f)
         if not m:
@@ -125,7 +132,16 @@ def main():
         stem = m.group(1)
         if stem == "TEMPLATE":
             continue
-        stems.append((stem, os.path.join("docs", f)))
+        path = os.path.join("docs", f)
+        try:
+            txt = open(os.path.join(REPO, path), encoding="utf-8").read(4000)
+        except OSError:
+            txt = ""
+        if NON_ATTEMPT_RE.search(txt):
+            excluded.append({"file": path,
+                             "reason": "self-declared non-attempt (infrastructure)"})
+            continue
+        stems.append((stem, path))
 
     trials, unknowns = [], 0
     for stem, path in stems:
@@ -184,6 +200,10 @@ def main():
             "written down. The true search effort is strictly LARGER, so any DSR "
             "computed from this number is OPTIMISTIC (too generous to the strategy)."),
         "entries_with_unknown_fields": unknowns,
+        # Files intentionally NOT counted as trials. validation.load_trial_count
+        # also skips these in its staleness scan, so adding infrastructure docs
+        # cannot spuriously mark the log stale.
+        "excluded_non_attempt": excluded,
         "trials": trials,
     }
     with open(OUT, "w", encoding="utf-8") as fh:

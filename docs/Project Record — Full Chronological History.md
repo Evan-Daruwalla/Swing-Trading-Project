@@ -5471,3 +5471,88 @@ KNOWN edge too is equally worthless, and criteria 1-2 would then be satisfied tr
 **Next action:** Step 3 -- implement `swing_bot/costs.py` + `swing_bot/validation.py` and run
 the chart-pattern rule and the noise control through it. **Done-check is INVERTED: success is
 the harness REJECTING both.** If it passes noise, that is the finding and work stops there.
+
+# Appendix EB - V1 harness BUILT and run: DSR axis discriminates perfectly; my pre-registered acceptance criterion was MIS-SPECIFIED (2026-08-06, ~12:58 CDT)
+
+**TRIGGER:** Step 3 of Evan's plan -- implement the cost model + validation harness and prove it
+REJECTS things. Prereg `ec51b91` (doc-only), verified no harness code existed at that commit.
+**Not an attempt; tally stays 38.** Built: `swing_bot/costs.py`, `swing_bot/validation.py`,
+`scripts/run_v1_harness_check.py`.
+
+**HEADLINE: the harness is NOT ACCEPTED under its own pre-registered criteria -- and the reason
+is that I mis-specified criterion 2, not that the harness is broken. Reporting as FAIL per the
+prereg; NOT retuning it after seeing results.**
+
+**RESULTS (real output, 5 configurations per subject, trial count = 50 from the trial log):**
+| subject | DSR | verdict on DSR | PBO | pre-registered verdict |
+|---|---|---|---|---|
+| 6.2 pure-noise control | **0.0001** | NOT significant | **0.900** | **REJECTED** (as required) |
+| 6.1 chart-pattern rule (M11 detector) | **0.0168** | NOT significant | **0.429** | **NOT REJECTED** |
+| 5 planted-edge falsifier (diagnostic) | **1.0000** | SIGNIFICANT | 0.514 | not rejected (**expected**) |
+
+**THE DSR AXIS DISCRIMINATES PERFECTLY -- this is the load-bearing result.** It rejects noise
+(0.0001), rejects the chart-pattern rule (0.0168), and passes a KNOWN planted edge (1.0000).
+That three-way separation is exactly what the section-5 falsifier existed to check: **a harness
+that rejected everything would make criteria 1-2 pass trivially and carry no information.** It
+does not. Its rejections mean something.
+
+**WHY CRITERION 2 FAILED, AND WHY THAT IS MY ERROR NOT THE TOOL'S.** I pre-registered rejection
+as `DSR not significant AND PBO >= 0.5`. Those two tests measure DIFFERENT THINGS:
+- **DSR** asks "does this strategy's Sharpe survive the trial count?" -- a STRATEGY-level test.
+- **PBO** asks "is the CONFIGURATION SELECTION overfit?" -- a SELECTION-level test.
+The chart-pattern rule's 5 configurations are near-identical (same M11 detector; only hold
+period and entry-strength filter vary), so there is almost no selection to overfit and PBO
+lands near random (0.429). The noise control's configurations are INDEPENDENT random draws, so
+its in-sample winner is genuinely uninformative out-of-sample and PBO is high (0.900). **The
+AND-criterion therefore demanded that a single strategy fail two unrelated tests, which a
+no-edge strategy with correlated variants will not do.** The planted edge confirms the reading:
+it too has independent-draw configs and lands at PBO 0.514 despite a real edge -- **PBO does not
+measure edge.**
+
+**NOTE ON THE DONE-CHECK WORDING vs MY PREREG.** Evan's step-3 done-check reads "a FAIL /
+high-PBO / non-significant deflated-Sharpe verdict on BOTH" -- satisfied here, since BOTH
+subjects returned a non-significant DSR (0.0168 and 0.0001). **My prereg tightened that to a
+conjunction and is stricter than what was asked.** Both readings are reported rather than
+picking the flattering one. **The failure mode the done-check exists to catch -- "a harness that
+passes noise is broken" -- DID NOT OCCUR: noise was rejected on both axes.**
+
+**OTHER CRITERIA, all PASS with real output:**
+- **#4 cost model fails loud:** `estimate_friction()` RAISED -- *"friction is NOT MEASURABLE:
+  4 fill(s) available, 20 required"* -- no constant fallback. The explicit override returns
+  `friction[all] median 5.00 bps (n=0, ASSUMED) <-- NOT MEASURED`, so an assumption can never be
+  read as a measurement downstream. **This is the pre-registered behaviour on today's data
+  (section 2.3), not a bug.**
+- **#5 DSR refuses a missing/stale trial log:** RAISED on a nonexistent path. It also RAISED on
+  a genuinely stale log during development -- the V1 prereg was newer than `trial_log.json`.
+  **Fixed properly rather than by weakening the guard:** `build_trial_log.py` now excludes
+  preregs that SELF-DECLARE as non-attempts (infrastructure that builds no strategy), and
+  `validation.load_trial_count` skips those same files in its staleness scan. Otherwise adding
+  an infrastructure doc would force pointless regeneration and train the reader to ignore a real
+  staleness error.
+- **#3 purging demonstrably bites:** mean training size 2971 -> 2901, **70 observations removed**
+  per split by purge+embargo. If purging were not wired in, this would be 0.
+
+**TRIAL COUNT USED: 50**, sourced as `max(attempts=38, declared_variants=50)` per the
+pre-registered "use the larger figure" rule. Printed in the same block as every DSR so a DSR can
+never be quoted without its N. E[max Sharpe] under the null at N=50 is +0.0694 per period for
+subject 6.1 -- i.e. **after 50 trials, a per-period Sharpe of 0.069 is the EXPECTED best outcome
+of pure searching**, which is why the rule's annualised 0.695 does not survive deflation.
+
+**VERIFIED:** frozen tripwire **GREEN, d=+/-0.0000pp** across all 12 pinned numeric refs plus
+the 11 invariants (output pasted in-session); all new modules compile; `swing.db` opened
+READ-ONLY by the cost model; no swing.db writes; M11's detector reused verbatim via
+`signals_for()` (which runs the causal j+W confirmation loop, so no look-ahead was introduced).
+
+**A BUG CAUGHT BY RUNNING IT:** my first harness draft imported
+`detect(c, piv, i, bot_tol, ...)`, but M11's real signature is `detect(conf, cl, i)` with
+tolerances as module globals. Rather than mutate M11's pinned internals to fake a parameter
+sweep, configurations are now built at MY layer (hold period, entry-strength filter) -- which is
+also the honest accounting, since those are the parameters a researcher would actually sweep and
+each one is a trial.
+
+**STATE:** code + this entry written. **Nothing committed** (Evan commits on request).
+
+**Next action:** Evan's call on (a) committing, and (b) whether to amend the acceptance criterion
+in a NEW dated prereg -- the existing one must not be edited after results. My recommendation is
+to split it: DSR governs strategy-level rejection, PBO governs selection-level rejection, and a
+subject is rejected if EITHER fires.

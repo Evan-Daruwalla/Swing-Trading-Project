@@ -17,6 +17,12 @@
   "variant_count_is_lower_bound": true,
   "lower_bound_reason": "Counts only variants DECLARED in a prereg. Excludes: parameter values explored before pre-registration, the ~90-method survey and the dropped-16 list (record Appendix B), and any abandoned variant never written down. The true search effort is strictly LARGER, so any DSR computed from this number is OPTIMISTIC (too generous to the strategy).",
   "entries_with_unknown_fields": 1,
+  "excluded_non_attempt": [
+    {
+      "file": "docs\\prereg_v1_cost_model_and_validation_harness.md",
+      "reason": "self-declared non-attempt (infrastructure)"
+    }
+  ],
   "trials": [
     {
       "id": "E1_ibs",
