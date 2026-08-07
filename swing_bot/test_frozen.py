@@ -24,21 +24,38 @@ NAV (finding-things map): the tripwire. Covers backtest.py (E1) + rotation.py
     .venv\\Scripts\\python.exe -m swing_bot.test_frozen
 d must be +/-0.0000pp at each case's declared precision. It does NOT cover the
 scripts/ experiment runners (they have no frozen refs) or the M3 paper tables
-(paper_sleeves' schema is orthogonal to `bars`).
+(paper_sleeves' schema is orthogonal to `bars`). EXCEPTION since 2026-08-06
+(audit #3): the PURE helpers of scripts/daily_swing_paper.py -- the live
+orchestrator -- are pinned in INVARIANTS, because it is the highest-churn file
+in the repo and the only one that submits orders.
 """
 import sqlite3
+import sys
 from collections import namedtuple
+from pathlib import Path
 
 from swing_bot import prices, signals, backtest, rotation, paper_sleeves as ps
+
+# scripts/ is not a package; the live orchestrator's PURE helpers are pinned
+# below (audit #3), so the suite needs it importable. Import is side-effect-free
+# (~1.3s, no network, no DB write) -- everything in that file runs under main().
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+import daily_swing_paper as dsp        # noqa: E402  (needs the path insert above)
 
 Case = namedtuple("Case", ["name", "value", "ref", "unit", "dp"])
 
 
 def _ro_connect():
     """Open swing.db READ-ONLY. The tripwire must never take a write handle on
-    the live paper ledger (audit #10)."""
-    return sqlite3.connect("file:%s?mode=ro" % str(prices.DB_PATH).replace("\\", "/"),
-                           uri=True)
+    the live paper ledger (audit #10).
+
+    Delegates to prices.connect_ro() as of 2026-08-06 (audit #3): this used to
+    be a local copy of that connection string, which is how six other read-only
+    consumers went on calling prices.connect() unnoticed -- the contract lived
+    in one module's private helper instead of beside connect() where a caller
+    would see it.
+    """
+    return prices.connect_ro()
 
 
 def _window(start, end, entries=None, k=5, size_on_nav=False):
@@ -47,9 +64,14 @@ def _window(start, end, entries=None, k=5, size_on_nav=False):
     # READ-ONLY (audit #10) + explicitly closed (audit #9). prices.connect()
     # opens swing.db read-WRITE and runs CREATE TABLE IF NOT EXISTS -- the
     # tripwire was taking a write handle on the LIVE paper ledger, which the
-    # 19:00 scheduled job also writes. SQLite's default busy_timeout is 0, so an
-    # overlap is `database is locked` mid-transaction. The tripwire only ever
-    # reads, so it has no business holding a write handle.
+    # 19:00 scheduled job also writes. The tripwire only ever reads, so it has
+    # no business holding a write handle.
+    # (Correction, audit #3 2026-08-06: this comment used to justify the fix
+    # with "SQLite's default busy_timeout is 0". That is the C library's
+    # default; Python's sqlite3.connect defaults timeout=5.0, so a contended
+    # write waits 5s before raising, not instantly. The reason to hold a
+    # read-only handle stands on its own -- a reader should not be able to
+    # write -- and did not need the wrong number.)
     src = _ro_connect()
     mem = sqlite3.connect(":memory:")
     mem.execute(prices.SCHEMA)
@@ -139,6 +161,36 @@ INVARIANTS = [
                      [(-0.5, "AAA"), (-0.4, "BBB"), (-0.3, "CCC"),
                       (-0.2, "DDD"), (0.9, "EEE")])[0]
      == {t: 1.0 / ps.STRESS_K for t in ("AAA", "BBB", "CCC", "DDD")}),
+
+    # --- LIVE ORCHESTRATOR PURE HELPERS (audit #3, added 2026-08-06) --------
+    # daily_swing_paper.py is the repo's highest-churn file (13 commits, 2x the
+    # next) and the only code that submits orders, yet the suite reached NONE of
+    # it. qty_reconcile_orders was deliberately refactored to be PURE so it
+    # could be checked, and then never was. These need no fixtures either.
+    # Reconcile is STEADY-STATE ONLY: a pending rebuild must suppress it.
+    ("reconcile_suppressed_while_pending",
+     dsp.qty_reconcile_orders({"QQQ": {"qty": 1.0}}, {"QQQ": {"qty": 1.5}},
+                              {"QQQ": 700.0}, {"QQQ": 1.0}) == []),
+    # 0.30% drift is above MIRROR_DRIFT_WARN_PCT (0.25) and $2.10 is above
+    # MIN_RECONCILE_NOTIONAL ($1), so it is an actionable SELL of the excess.
+    ("reconcile_acts_above_drift_band",
+     [(o["side"], o["action"], o["qty"]) for o in dsp.qty_reconcile_orders(
+         {"QQQ": {"qty": 1.0}}, {"QQQ": {"qty": 1.003}}, {"QQQ": 700.0}, None)]
+     == [("sell", "order", 0.003)]),
+    # 0.20% is inside the band -- ordinary fractional rounding, never traded.
+    ("reconcile_ignores_inside_drift_band",
+     dsp.qty_reconcile_orders({"QQQ": {"qty": 1.0}}, {"QQQ": {"qty": 1.002}},
+                              {"QQQ": 700.0}, None) == []),
+    # The liquidity floor must return None (unknown), NOT 0 (illiquid), on a
+    # thin sample -- the caller treats None as "do not exclude".
+    ("median_dollar_volume_refuses_thin_sample",
+     dsp.median_dollar_volume(["2026-01-0%d" % i for i in range(1, 5)],
+                              {"2026-01-0%d" % i: 10.0 for i in range(1, 5)},
+                              {"2026-01-0%d" % i: 100 for i in range(1, 5)},
+                              n=20) is None),
+    # The m10_1 weekly gate is keyed on this string; a wrong week burns or
+    # repeats a decision.
+    ("isoweek_str_friday_2026_07_31", dsp.isoweek_str("2026-07-31") == "2026-W31"),
 ]
 
 

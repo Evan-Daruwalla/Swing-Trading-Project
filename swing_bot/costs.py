@@ -20,6 +20,7 @@ assumed_bps=, and every result then carries friction_source="ASSUMED".
 """
 from __future__ import annotations
 
+import math
 import sqlite3
 import statistics
 from dataclasses import dataclass, field
@@ -56,19 +57,40 @@ def _ro_conn(db_path=DB_PATH):
                            uri=True)
 
 
+def _check_class(instrument_class):
+    """`instrument_class` was a LABEL, not a filter (audit #6): it was stamped on
+    the returned estimate and quoted in the raise message while the query applied
+    no such predicate, so estimate_friction(instrument_class="crypto") returned
+    equity-ETF friction labelled crypto. In the one module whose whole purpose is
+    to stop an assumed number being reported as a measurement, that is the exact
+    failure mode. Refuse until fill_divergence carries a class column."""
+    if instrument_class != "all":
+        raise NotImplementedError(
+            "instrument_class=%r is not supported: fill_divergence has no "
+            "instrument-class column, so the friction returned would be measured "
+            "over ALL fills and merely LABELLED %r. Only \"all\" is honest today."
+            % (instrument_class, instrument_class))
+
+
 def load_measured_fills(db_path=DB_PATH, instrument_class="all"):
     """Signed friction in bps for every resolved fill in `fill_divergence`.
 
     Sign convention: POSITIVE = the fill was WORSE than the simulation assumed.
-    fill_divergence rows are entries (buys), so alpaca_price > sim_price is an
-    adverse fill. A sell-side table would need the sign flipped; there is no
-    side column today, which is recorded as a limitation rather than assumed away.
+    Restricted to rows with an `alpaca_order_id` (audit #7): log_divergence is
+    called from the SELL leg too, so the table mixes sides while this sign
+    convention assumes buys. Realize-path sell rows carry no order id, so the
+    predicate below states the buy-only assumption IN THE QUERY rather than in
+    prose -- previously it held only by accident, because backfill_divergence
+    never resolved an alpaca_price for those rows. A sell row exists in the live
+    table (id=9). There is still no side column, which stays a stated limitation.
     """
+    _check_class(instrument_class)
     conn = _ro_conn(db_path)
     try:
         rows = conn.execute(
             "SELECT ticker, date, sim_price, alpaca_price FROM fill_divergence "
-            "WHERE alpaca_price IS NOT NULL AND sim_price > 0").fetchall()
+            "WHERE alpaca_price IS NOT NULL AND sim_price > 0 "
+            "AND alpaca_order_id IS NOT NULL").fetchall()
     finally:
         conn.close()
     out = []
@@ -86,6 +108,9 @@ def estimate_friction(db_path=DB_PATH, instrument_class="all",
     estimate is then tagged friction_source="ASSUMED" so no downstream report can
     present it as a measurement.
     """
+    _check_class(instrument_class)     # before the assumed_bps shortcut, which
+                                       # would otherwise return a class-labelled
+                                       # estimate without ever touching the query
     if assumed_bps is not None:
         return FrictionEstimate(float(assumed_bps), float(assumed_bps),
                                 float(assumed_bps), 0, "ASSUMED",
@@ -106,7 +131,10 @@ def estimate_friction(db_path=DB_PATH, instrument_class="all",
     return FrictionEstimate(
         median_bps=statistics.median(vals),
         mean_bps=statistics.fmean(vals),
-        p90_bps=vals[min(len(vals) - 1, int(0.9 * len(vals)))],
+        # ceil-1, not int() (audit E12): int(0.9*20) = 18 -> vals[18], the 19th
+        # of 20 samples, i.e. the 95th percentile reported as p90. ceil(18)-1 = 17
+        # -> vals[17], the 18th of 20, which is the 90th.
+        p90_bps=vals[max(0, math.ceil(0.9 * len(vals)) - 1)],
         n_fills=n, friction_source="MEASURED",
         instrument_class=instrument_class, samples=vals)
 

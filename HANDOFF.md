@@ -14,6 +14,14 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 
 ## Current state — SEARCH PHASE CLOSED 2026-08-03 at 37 attempts; FORWARD-EVIDENCE PHASE (M3) is the only open lever
 
+> **37 vs 38 — both numbers are right, disambiguated 2026-08-06 (audit #3).** The
+> SEARCH phase closed at **37** pre-registered attempts. The record's running
+> tally reads **38** because M12 (record DU) came *after* the close and is a
+> DIAGNOSTIC, not a search attempt. `docs/trial_log.json` flags the gap as
+> UNRESOLVED and refuses to pick one; DSR deflates by the larger figure (50
+> declared variants), so nothing downstream depends on resolving it. Use 37 for
+> "how big was the search", 38 for "how many pre-registered runs exist".
+
 > **2026-08-03 — SEARCH PHASE DECLARED CLOSED (Evan's dated decision; record DQ).** Not an
 > abandonment and not a claim of success: the backtest search space under this project's
 > constraints — **free EOD data · holds of days-to-weeks · K=1–3 · retail costs · $100–1,000**

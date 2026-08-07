@@ -20,11 +20,11 @@
   "excluded_non_attempt": [
     {
       "file": "docs\\prereg_v1_cost_model_and_validation_harness.md",
-      "reason": "self-declared non-attempt (infrastructure)"
+      "reason": "infrastructure, not an attempt (explicit NON_ATTEMPT_PREREGS entry)"
     },
     {
       "file": "docs\\prereg_v2_harness_acceptance_amendment.md",
-      "reason": "self-declared non-attempt (infrastructure)"
+      "reason": "infrastructure, not an attempt (explicit NON_ATTEMPT_PREREGS entry)"
     }
   ],
   "trials": [

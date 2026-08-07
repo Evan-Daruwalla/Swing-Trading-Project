@@ -90,16 +90,16 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 
 ## 3. SUCCESS CRITERIA
 
-- [ ] Git history proves pre-registration: commit of
+- [x] Git history proves pre-registration: commit of
       `docs/prereg_E1_ibs.md` predates the first commit of any backtest
       engine code (`git log --follow --oneline` pasted in the record).
 - [ ] Power calc documented: IBS<0.20 signal counts/year across the ETF
       universe, computed WITHOUT looking at post-signal returns.
 - [ ] Fill-timing ablation (#15+#13) produces per-ETF close-to-close vs
       next-open haircut numbers, saved in docs + record.
-- [ ] E1 (ETF IBS MR) backtest run against pre-registered gates; PASS or
+- [x] E1 (ETF IBS MR) backtest run against pre-registered gates; PASS or
       FAIL stated plainly in a record entry either way.
-- [ ] Frozen-regression tripwire pinned and green:
+- [x] Frozen-regression tripwire pinned and green:
       `python -m swing_bot.test_frozen` prints d=±0.0000pp.
 - [ ] (Gated) Live paper sleeve ≥20 consecutive trading days unattended;
       `fill_divergence` table populated; NAV table in a record entry.
@@ -108,10 +108,27 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
       (assertion in code); every decision logged with UNIQUE(date,ticker).
 - [ ] Overlay readout happens at the pre-registered N / time horizon, not
       before; interim numbers labeled descriptive-only in every doc.
-- [ ] (M2b) Git history proves `docs/prereg_E2_leveraged_ibs.md` predates the
+- [x] (M2b) Git history proves `docs/prereg_E2_leveraged_ibs.md` predates the
       E2 runner; E2 verdict stated PASS/FAIL per criterion in the record.
-- [ ] (M2b) Frozen tests green (d=±0.0000pp) with E2 refs pinned alongside
+- [x] (M2b) Frozen tests green (d=±0.0000pp) with E2 refs pinned alongside
       E1's.
+
+**TICKED 2026-08-06 (audit #3).** Every box above was already satisfied and
+none had ever been marked; the file read as 0/10 done. Evidence, so the ticks
+are checkable rather than asserted:
+  * prereg predates engine: `docs/prereg_E1_ibs.md` added `8963e49`
+    2026-07-09T12:17:29-05:00; `swing_bot/backtest.py` added `415c527`
+    2026-07-09T12:24:54-05:00 (7m25s later).
+  * E1 verdict: FAIL, stated in the record and in README.
+  * tripwire: `python -m swing_bot.test_frozen` -> GREEN, 12 refs at
+    d=+/-0.0000pp + 16 invariants (re-run 2026-08-06).
+  * E2 prereg `865c09e` 13:35:11 predates runner `6ef2b2a` 13:40:03 (same day);
+    E2 verdict FAIL in the record; E2 refs (E2_2019H1/2020H1) are pinned in the
+    tripwire and green.
+The remaining 5 boxes stay OPEN and are NOT ticked: the >=20-unattended-day
+paper run is not met (the series has holes -- see the record), and the three
+LLM-overlay/control criteria belong to the shelved e1_control/e1_llm_veto
+framing, so they are stale rather than done.
 
 ## 4. CONSTRAINTS
 

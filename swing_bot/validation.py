@@ -26,8 +26,14 @@ from statistics import NormalDist
 EULER_GAMMA = 0.5772156649015329
 _N = NormalDist()
 
-TRIAL_LOG = os.path.join("docs", "trial_log.json")
-PREREG_GLOB_DIR = os.path.join("docs")
+# Repo-anchored, not CWD-relative (audit E8): these were "docs/...", so the
+# trial count -- DSR's deflation input -- depended on where the caller happened
+# to be standing. From a scratch directory load_trial_count() raised
+# TrialLogUnavailable (loud, survivable); from another repo with a docs/ tree it
+# would have read the wrong project's log (silent, not survivable).
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TRIAL_LOG = os.path.join(_REPO, "docs", "trial_log.json")
+PREREG_GLOB_DIR = os.path.join(_REPO, "docs")
 
 
 class TrialLogUnavailable(RuntimeError):

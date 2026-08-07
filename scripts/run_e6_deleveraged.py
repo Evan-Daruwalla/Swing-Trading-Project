@@ -59,10 +59,29 @@ def rotation_nav(dates, sig_close, pos_oc, ma=200, cost_bps=5.0,
             nav.append(v)
         if i >= ma:
             # INCLUSIVE window (audit #5, fixed 2026-08-03): this was
-            # closes[i-ma:i], which EXCLUDES today's close, while every other
-            # 200-DMA in the project (run_e18.sma, paper_sleeves.sma, and the
-            # LIVE e6_1x sleeve) includes it. paper_sleeves' docstring claimed
-            # an "identical condition" to this function; it was not.
+            # closes[i-ma:i], which EXCLUDES today's close, while the LIVE
+            # e6_1x sleeve includes it. paper_sleeves' docstring claimed an
+            # "identical condition" to this function; it was not.
+            #
+            # CORRECTION (audit #3, 2026-08-06): the line above used to say
+            # "every other 200-DMA in the project" includes today's close. That
+            # was false -- it named 3 of 13 sites. The project runs BOTH forms
+            # and always has; this fix aligned E6 with the live sleeve, it did
+            # not make the repo uniform. Full census:
+            #   INCLUSIVE  closes[i-ma+1:i+1] / series[-200:]
+            #     swing_bot/paper_sleeves.py:250 (sma), :260 (LIVE e6_1x)
+            #     run_e6_deleveraged.py:75 (here)   run_e18_regime_gates.py:78
+            #     run_m12_factorial.py:202          run_x9_pairs.py:72
+            #     run_x6_crypto_trend.py:59
+            #   EXCLUSIVE  closes[i-ma:i]
+            #     swing_bot/rotation.py:77  <-- E4 engine, PINNED by the frozen
+            #                                   tripwire; changing it goes RED
+            #     run_e5_regime.py:74               run_e7_international.py:73
+            #     pt_volgate.py:70                  screens_20260709.py:117,163
+            # Consequence worth knowing: E5 and E7 -- the out-of-sample regime
+            # and international tests -- use the OPPOSITE convention from the
+            # E6 strategy they are tests of. Not fixed here: each is a recorded
+            # result, and moving one needs its own pre-registration.
             # MEASURED EFFECT of the fix -- the numbers DID move, contrary to a
             # 2,946-session sample that showed no signal disagreement (E6 runs
             # ~6,600 sessions, where the two forms do diverge):

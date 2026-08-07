@@ -409,12 +409,25 @@ def realize_pending(conn, sleeve, today, fill_open):
             ps.upsert_position(conn, sleeve, t, qty, px, today)
             ps.log_divergence(conn, sleeve, today, t, px)
     if skipped_sell or skipped_buy:
-        pct = 100.0 * len(skipped_buy) / len(target) if target else 0.0
+        # Report BOTH sides (audit E6). The old message divided only skipped_buy
+        # by len(target), so a pure sell-side skip printed "buy=- ~0%
+        # under-invested" while the sleeve was in fact simultaneously long a
+        # stale position AND buying under-sized legs -- because a position that
+        # could not be sold never added its proceeds to `cash`, and
+        # per_ticker_cash is that reduced cash divided by the full target size.
+        # The sizing arithmetic is right (you cannot spend cash you do not have);
+        # it is the operator-visible damage that was under-stated.
+        buy_pct = 100.0 * len(skipped_buy) / len(target) if target else 0.0
+        note = ""
+        if skipped_sell:
+            note = (f" ALSO still long {len(skipped_sell)} unsold position(s), so "
+                    f"the remaining legs are under-sized by the value of those "
+                    f"holdings -- this sleeve's weights no longer match the "
+                    f"strategy.")
         print(f"  !! [{sleeve}] PARTIAL REALIZE on {today} -- no open price for: "
               f"sell={skipped_sell or '-'} buy={skipped_buy or '-'}. "
-              f"Unfilled BUY legs are DROPPED (pending is cleared below), so this "
-              f"sleeve is ~{pct:.0f}% under-invested vs its target until the next "
-              f"decision. Check the yfinance feed for those tickers.", flush=True)
+              f"Unfilled BUY legs leave ~{buy_pct:.0f}% of the target unbought."
+              f"{note} Check the yfinance feed for those tickers.", flush=True)
     # Round away float residue (audit E8): full liquidation left cash at
     # -1.14e-13 instead of 0.0. Harmless to arithmetic, but it makes any future
     # `if cash < 0` guard fire on a sleeve that is exactly flat.
@@ -492,20 +505,32 @@ def main():
     # Windows "missed run" -- the session just vanished from paper_nav, which is
     # the forward-evidence series this whole project rests on. `last_run_at` was
     # already being written but READ BY NOTHING, so nothing could ever notice.
-    # Compare the newest NAV date against the sessions that actually traded.
-    prev = conn.execute("SELECT max(date) FROM paper_nav").fetchone()[0]
-    if prev and prev < today:
-        missed = [d for d in qdates if prev < d < today]
+    # Compare the sessions that actually traded against the ones NAV has.
+    # (audit #3) The first version compared max(date) to today, which can only
+    # see a hole at the END of the series: 2026-07-30 went missing, the next run
+    # advanced max(date) to 07-31, and the gap became invisible forever. A set
+    # difference over the whole series sees interior holes too, and keeps seeing
+    # them, so a skipped session stays reported until it is acknowledged.
+    have = {r[0] for r in conn.execute("SELECT DISTINCT date FROM paper_nav")}
+    if have:
+        first = min(have)
+        # `d < today` deliberately: this run has not marked today's NAV yet
+        # (that happens ~100 lines below), so today is never "missed".
+        missed = [d for d in qdates if first < d < today and d not in have]
         if missed:
-            print("\n!! MISSED SESSION(S): paper_nav's newest date is %s but %d "
-                  "trading session(s) have closed since -- %s. Those NAV rows are "
-                  "PERMANENTLY absent from the forward-evidence series (this run "
-                  "records %s only). Check the scheduled task."
-                  % (prev, len(missed), ", ".join(missed), today), flush=True)
+            print("\n!! MISSED SESSION(S): %d trading session(s) have no paper_nav "
+                  "row -- %s. Those NAV rows are PERMANENTLY absent from the "
+                  "forward-evidence series. Check the scheduled task."
+                  % (len(missed), ", ".join(missed)), flush=True)
 
     # ---- realize any pending from the previous run (needs today's opens for
     # whatever tickers are currently held / newly targeted) ----
-    fill_open = dict(qopen)   # QQQ always available
+    # TICKER-keyed, so it starts EMPTY (audit #3). It used to start as
+    # dict(qopen), which is DATE-keyed {'2026-08-05': 703.1, ...}: every consumer
+    # does fill_open.get(<ticker>), so those ~6,700 entries were unreachable
+    # junk, and QQQ was never actually "always available" -- it arrives through
+    # the refetch loop below like every other held name.
+    fill_open = {}
     for s in ps.SLEEVES:
         st = ps.get_sleeve(conn, s)
         positions = ps.get_positions(conn, s)
@@ -576,8 +601,15 @@ def main():
             residual_ranks = sorted(ranks)
         target_m10, err = ps.decide_m10_1(vix_today, list(qclose[d] for d in qdates), residual_ranks)
         decisions["m10_1_nagel"] = (target_m10, err)
-        conn.execute("UPDATE paper_sleeves SET last_decided_week=? WHERE sleeve='m10_1_nagel'", (wk,))
-        conn.commit()
+        # ONLY burn the week when a target actually exists (audit #3).
+        # decide_m10_1 returns (None, reason) on ordinary paths -- VIX feed empty,
+        # stress with no residual ranks. Marking the week decided anyway stored
+        # no pending (the `target is None: continue` below) while blocking retry
+        # until the next Friday: the sleeve would hold stale positions for five
+        # sessions, exit 0, and print no error.
+        if target_m10 is not None:
+            conn.execute("UPDATE paper_sleeves SET last_decided_week=? WHERE sleeve='m10_1_nagel'", (wk,))
+            conn.commit()
     else:
         decisions["m10_1_nagel"] = (None, f"not a decision day (week {wk} already "
                                           f"decided, or today is not Friday)")
@@ -597,7 +629,7 @@ def main():
             ps.clear_pending(conn, s)
 
     # ---- mark NAV + summarize ----
-    close_px = dict(qclose)
+    close_px = {}             # TICKER-keyed -- see the fill_open note above
     for s in ps.SLEEVES:
         needed = set(ps.get_positions(conn, s))
         for t in needed - set(close_px):

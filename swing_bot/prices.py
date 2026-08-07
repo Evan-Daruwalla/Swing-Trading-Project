@@ -48,9 +48,28 @@ CREATE TABLE IF NOT EXISTS bars (
 
 
 def connect(db_path=DB_PATH):
+    """READ-WRITE handle; also runs CREATE TABLE IF NOT EXISTS.
+
+    Use connect_ro() unless you actually write. swing.db is the LIVE paper
+    ledger and the 19:00 scheduled job writes it.
+    """
     conn = sqlite3.connect(str(db_path))
     conn.execute(SCHEMA)
     return conn
+
+
+def connect_ro(db_path=DB_PATH):
+    """READ-ONLY handle on the same file (audit #3).
+
+    "Open read-only / never run these concurrently" was an UNENFORCEABLE
+    contract: it was written in CLAUDE.md and honoured by exactly one module
+    (test_frozen, which rolled its own). Seven read-only consumers still called
+    connect(), taking a write handle -- and a write handle also mutates schema
+    via CREATE TABLE IF NOT EXISTS. A read-only handle makes the contract
+    mechanical: a stray write raises instead of landing on the live ledger.
+    """
+    return sqlite3.connect("file:%s?mode=ro" % str(db_path).replace("\\", "/"),
+                           uri=True)
 
 
 def _flatten(df):

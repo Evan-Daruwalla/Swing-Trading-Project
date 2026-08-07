@@ -12,7 +12,6 @@ NAV (finding-things map): imports no project modules (self-contained).
 Imported by: no other module (standalone runner).
 """
 import json
-import sys
 import time
 import warnings
 from pathlib import Path

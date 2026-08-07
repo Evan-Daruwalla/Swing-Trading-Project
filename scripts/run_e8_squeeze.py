@@ -40,9 +40,27 @@ GATE_END = "2013-12-31"
 SEC_START = "2014-01-01"
 
 
+def _last_bar_date(bars):
+    """Last bar date of a cached series, or None if `bars` is not bar-shaped.
+
+    Deliberately total (audit E13). `.e8e9_cache` is ONE filename namespace over
+    three shapes: bar lists, dicts (`*_div`, `ff3_daily`, `*_idx`), and lists of
+    date strings (`*_earn`). Indexing `bars[-1][1]` blind raises KeyError or
+    TypeError on the other two, which is why the freshness check must not assume.
+    """
+    if not isinstance(bars, list) or not bars:
+        return None
+    row = bars[-1]
+    # Must be a ROW, not a bare string: the `*_earn` shape is a list of date
+    # STRINGS, and "2026-01-01"[1] is the character "0" -- which is a str, passes
+    # a naive isinstance check, and quietly becomes the series' "end date".
+    if not isinstance(row, (list, tuple)) or len(row) < 2:
+        return None
+    return row[1] if isinstance(row[1], str) else None
+
+
 def cache_last_date(ticker):
-    """Last bar date held in cache for `ticker`, or None if not cached.
-    Lets a caller detect a MIXED-VINTAGE universe before trusting it."""
+    """Last bar date held in cache for `ticker`, or None if not cached."""
     f = CACHE / f"{ticker}.json"
     if not f.exists():
         return None
@@ -50,7 +68,38 @@ def cache_last_date(ticker):
         bars = json.loads(f.read_text())
     except (ValueError, OSError):
         return None
-    return bars[-1][1] if bars else None
+    return _last_bar_date(bars)
+
+
+# Every series this PROCESS has read, so a mixed-vintage universe announces
+# itself (audit #1). The `through=` freshness parameter added after the M12
+# incident is opt-in and no caller passes it, so the guard cannot fire and the
+# corruption it was written to stop is still undetectable. This is the passive
+# half of that fix: it changes no result and refetches nothing, it just refuses
+# to let vintages diverge SILENTLY. Threading a real `through` through every
+# call site would move recorded numbers and needs its own pre-registration.
+_VINTAGES = {}
+_VINTAGE_REPORTED = set()
+
+
+def _note_vintage(ticker, bars):
+    last = _last_bar_date(bars)
+    if last is None:
+        return
+    _VINTAGES[ticker] = last
+    distinct = set(_VINTAGES.values())
+    if len(distinct) > 1 and not distinct <= _VINTAGE_REPORTED:
+        _VINTAGE_REPORTED.update(distinct)
+        newest = max(distinct)
+        behind = sorted(t for t, d in _VINTAGES.items() if d != newest)
+        print("  !! MIXED-VINTAGE CACHE: %d distinct end-dates in play (%s .. %s). "
+              "%d of %d series stop before %s: %s%s. Cross-sectional results "
+              "computed over this panel are NOT comparable -- a short series that "
+              "ends mid-window is what overstated M12's headline effect 3x. "
+              "Delete the stale files or pass through= to refetch."
+              % (len(distinct), min(distinct), newest, len(behind),
+                 len(_VINTAGES), newest, ", ".join(behind[:8]),
+                 " ..." if len(behind) > 8 else ""), flush=True)
 
 
 def cache_fetch(ticker, through=None):
@@ -85,15 +134,18 @@ def cache_fetch(ticker, through=None):
     f = CACHE / f"{ticker}.json"
     if f.exists():
         bars = json.loads(f.read_text())
-        if not through or (bars and bars[-1][1] >= through):
+        last = _last_bar_date(bars)
+        if not through or (last and last >= through):
+            _note_vintage(ticker, bars)
             return bars
-        print(f"  cache STALE {ticker}: ends {bars[-1][1] if bars else 'empty'} "
+        print(f"  cache STALE {ticker}: ends {last or 'empty'} "
               f"< {through} -- refetching", flush=True)
     for attempt in range(4):
         try:
             bars = prices.fetch(ticker, start="1990-01-01")
             if bars:
                 f.write_text(json.dumps(bars))
+                _note_vintage(ticker, bars)
                 return bars
         except Exception as e:
             print(f"  {ticker} attempt {attempt+1} error: {e}", flush=True)

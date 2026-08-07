@@ -22,12 +22,23 @@ NAV (finding-things map): the M0.4 data-quality gate. Imports swing_bot.
 was built for M0.4 but is NOT yet wired into the live loop (daily_swing_paper
 does its own fetch without this gate). If you add a pre-signal data check to
 the daily loop, call it from here.
-"""
-import sqlite3
 
+CONSEQUENCES OF BEING UNWIRED, spelled out 2026-08-06 (audit E14) so this reads
+as a live gap rather than a filing note:
+  * MAX_ABS_DAILY_RET can never fire. Nothing in production screens for the
+    mis-applied-split tell it was written to catch.
+  * latest_common_date() reads the `bars` TABLE, whose max date is frozen at
+    2026-07-08. The live loop fetches through yfinance and never writes `bars`,
+    so if this were called today it would report 2026-07-08 as the latest
+    common session — a month stale, and stale in the silent direction.
+Wiring it means calling sanity_scan from backfill_universe.py; that is a real
+change to the ingest path, not a comment fix, so it is left undone here.
+"""
 from swing_bot import prices, universe
 
 MAX_ABS_DAILY_RET = 0.35  # 35% close-to-close; investigate above this
+                          # NOTE: unreachable in production -- see the caveat
+                          # above; no caller exists.
 
 
 def coverage(conn, as_of, entries=None):
@@ -84,7 +95,10 @@ def sanity_scan(conn, entries=None, max_abs_ret=MAX_ABS_DAILY_RET):
 
 
 def main():
-    conn = prices.connect()
+    # READ-ONLY (audit #3): this only reads swing.db, and the 19:00
+    # scheduled job writes it. connect() would take a write handle and
+    # run CREATE TABLE IF NOT EXISTS against the live paper ledger.
+    conn = prices.connect_ro()
     as_of = latest_common_date(conn)
     ok, missing = coverage(conn, as_of)
     print(f"coverage as-of {as_of}: {'OK' if ok else 'FAIL'}"

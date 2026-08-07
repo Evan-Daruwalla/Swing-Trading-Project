@@ -27,7 +27,10 @@ def mopct(m):
 
 
 def main():
-    conn = prices.connect()
+    # READ-ONLY (audit #3): this only reads swing.db, and the 19:00
+    # scheduled job writes it. connect() would take a write handle and
+    # run CREATE TABLE IF NOT EXISTS against the live paper ledger.
+    conn = prices.connect_ro()
 
     # --- benchmarks ---
     bh_tqqq = met(rotation.buy_hold(conn, "TQQQ", *FULL))

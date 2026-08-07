@@ -32,9 +32,12 @@ task is the default work.
   2026-07-19.
 
 ## Definition of done (additive to global standards)
-- No test suite exists yet (2026-07-08). Once a backtest engine lands, port
-  Trading's frozen-regression-test pattern and make it a required done-check
-  here — pinned reference numbers, fail loud on drift.
+- REQUIRED done-check: `.venv\Scripts\python.exe -m swing_bot.test_frozen`
+  must print `FROZEN TESTS: GREEN (all d=0)` — 12 pinned refs at d=±0.0000pp
+  + 16 invariants. Run after ANY change to `swing_bot/` or to
+  `scripts/daily_swing_paper.py`. (This line said "no test suite exists yet"
+  until 2026-08-06; the tripwire has been green since 2026-07-09. Corrected by
+  audit #3. Detail in `.claude/codebase-memory/testing.md`.)
 - Any script that touches price data states its adjustment convention in a
   header comment (split-adjusted / dividend-UNadjusted if sourced from
   Trading's price_cache).

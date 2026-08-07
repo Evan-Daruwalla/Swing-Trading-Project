@@ -18,7 +18,21 @@ Liquidity: at $100-1,000 capital, depth is a non-issue (the least-liquid
 member, EWG, had ~$47M/day median dollar volume at the 2026-07-08 probe —
 orders of magnitude above any order size here); the real friction is the
 bid-ask spread. MIN_MEDIAN_DOLLAR_VOL is a forward guard against future
-degradation, enforced by the coverage/quality gate (M0.4), not here.
+degradation.
+
+WHERE IT IS ACTUALLY ENFORCED — corrected 2026-08-06 (audit #3). This docstring
+used to say "enforced by the coverage/quality gate (M0.4)". That was FALSE:
+coverage_gate.py contains no reference to MIN_MEDIAN_DOLLAR_VOL and never has.
+CLAUDE.md calls the floor mandatory in any universe filter, so the honest status
+is UNENFORCED almost everywhere:
+  * ENFORCED  daily_swing_paper.py:~570, the M10-1 39-name residual ranking --
+              the only place the live loop picks individual stocks. Note this
+              branch is gated on VIX > 20 and has never executed (VIX 15-16 for
+              the whole live period), so the floor has never actually run.
+  * NOT enforced  universe_m12.py (142 names; feeds M12 and the V1 harness),
+              run_e10_earnings_drift.UNIV (39 names), this ETF list.
+Extending it to the backtest universes would move recorded results, so it needs
+its own pre-registration rather than a quiet patch.
 
 NAV (finding-things map): exports `UNIVERSE` (the frozen ETF list) + `ETF`
 namedtuple + `MIN_MEDIAN_DOLLAR_VOL`. Imported by swing_bot.{backtest,

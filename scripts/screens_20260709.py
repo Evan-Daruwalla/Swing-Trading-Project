@@ -36,7 +36,10 @@ LEV = [e.ticker for e in universe.LEVERAGED]
 
 
 def load(tickers):
-    conn = prices.connect()
+    # READ-ONLY (audit #3): this only reads swing.db, and the 19:00
+    # scheduled job writes it. connect() would take a write handle and
+    # run CREATE TABLE IF NOT EXISTS against the live paper ledger.
+    conn = prices.connect_ro()
     bars = {}
     for t in tickers:
         rows = conn.execute(

@@ -44,7 +44,10 @@ def show(label, conn, entries, fill="next_open", cost_bps=5.0):
 
 
 def main():
-    conn = prices.connect()
+    # READ-ONLY (audit #3): this only reads swing.db, and the 19:00
+    # scheduled job writes it. connect() would take a write handle and
+    # run CREATE TABLE IF NOT EXISTS against the live paper ledger.
+    conn = prices.connect_ro()
     train = subset(conn, *TRAIN)
     hold = subset(conn, *HOLD)
 

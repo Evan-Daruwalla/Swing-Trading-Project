@@ -14,7 +14,6 @@ NAV (finding-things map): imports run_e8_squeeze (COST, GATE_END, SEC_START,
 SIM_START, cache_fetch, window_stats); swing_bot.universe (UNIVERSE).
 Imported by: no other module (standalone runner).
 """
-import math
 import sys
 from pathlib import Path
 

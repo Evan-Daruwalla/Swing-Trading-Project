@@ -18,7 +18,6 @@ DATA CONVENTION: prices are SPLIT-ADJUSTED, DIVIDEND-UNADJUSTED (auto_adjust=Fal
 via run_e8_squeeze.cache_fetch. Signal at close, execute NEXT OPEN (EOD rule).
 No swing.db writes; the ledger is opened READ-ONLY by the cost model.
 """
-import math
 import random
 import sys
 from pathlib import Path
@@ -88,20 +87,28 @@ def pattern_signals_cached(panel):
 
 def pattern_signal(panel, sigs, hold, min_strength, cost_bps):
     """One configuration of the chart-pattern rule, equal-weighted across the
-    panel. Entries are M11's detections filtered at `min_strength`."""
-    agg = None
+    panel. Entries are M11's detections filtered at `min_strength`.
+
+    Aggregated BY DATE (audit E5). This used to sum the per-ticker series
+    POSITIONALLY and truncate to min(len), which is only correct while every
+    ticker shares one date axis -- true of the current 142-name universe (all
+    start 2000-01-03, all 6686 bars) and not true in general. Add one name with
+    a later first bar, or let the shared cache go mixed-vintage, and index 0 of
+    one series is a different calendar day from index 0 of another, so the
+    harness that decides whether ANY strategy is believable would be summing
+    misaligned returns and still print HARNESS ACCEPTED. With a single common
+    axis this produces bit-identical output to the positional version.
+    """
+    by_date = {}
     for t, (d, o, c) in panel.items():
         ent = [i for i, s in sigs[t].items() if s >= min_strength]
         r = fwd_returns(d, o, c, ent, hold, cost_bps)
-        if agg is None:
-            agg = r
-        else:
-            n = min(len(agg), len(r))
-            agg = [agg[i] + r[i] for i in range(n)]
-    if agg is None:
+        for dt_, x in zip(d, r):
+            by_date[dt_] = by_date.get(dt_, 0.0) + x
+    if not by_date:
         return []
     n_t = max(1, len(panel))
-    return [x / n_t for x in agg]            # equal-weight across tickers
+    return [by_date[k] / n_t for k in sorted(by_date)]   # equal-weight, date-ordered
 
 
 def noise_signal(n, seed, cost_bps):
@@ -226,8 +233,22 @@ def main():
 
     # --- subjects ------------------------------------------------------------
     print("\nloading price panel (subset of the frozen 142-name universe)...")
-    panel = load_panel(TICKERS[:40])
-    print("  %d tickers loaded" % len(panel))
+    want = TICKERS[:40]
+    panel = load_panel(want)
+    print("  %d of %d tickers loaded" % (len(panel), len(want)))
+    # PANEL-COMPLETENESS GATE (audit E7). load_panel swallows every fetch error
+    # (`except Exception: continue`) and silently drops any series under 800
+    # bars, so with 3 of 40 tickers present this script would run to completion
+    # and print HARNESS ACCEPTED off a 3-name panel -- a verdict computed from a
+    # silently decimated sample, which is the failure mode this whole harness
+    # exists to catch. Only a total wipe-out was loud before.
+    if len(panel) < 0.8 * len(want):
+        print("\n!! PANEL INCOMPLETE: %d of %d tickers loaded (<80%%). Missing: %s\n"
+              "   Refusing to compute an acceptance verdict from a decimated "
+              "panel. Check the shared cache / network, then re-run."
+              % (len(panel), len(want),
+                 ", ".join(t for t in want if t not in panel)), flush=True)
+        return 1
 
     # 6.1 chart-pattern rule. PBO needs a SET of configurations, so sweep the
     # parameters a researcher would actually sweep (hold period, entry-strength

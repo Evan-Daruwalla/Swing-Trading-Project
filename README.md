@@ -1,8 +1,8 @@
 # Swing Trading — a falsification program for a small-account systematic trader
 
 **Author:** Evan Daruwalla · **Status:** first research program complete
-(2026-07-10), nothing live · **Data:** end-of-day, small capital
-($100–1,000), Alpaca paper target.
+(2026-07-10); forward **paper** trading live since 2026-07-15 · **Data:**
+end-of-day, small capital ($100–1,000), Alpaca paper.
 
 ## What this is
 
@@ -20,7 +20,7 @@ high-return EOD strategy was found across seven plausible families — index
 mean reversion, leveraged trend, concentrated stock/sector momentum,
 volatility breakout, deep-dip accumulation, event-driven (post-earnings drift
 & earnings-announcement premium), and calendar/reversal/regime effects
-(**0 passes of the high-return bar in 20 attempts**; one weak risk-adjusted
+(**0 passes of the high-return bar in 38 attempts** as of 2026-08-06; one weak risk-adjusted
 pass — VIX term structure, forward-paper only; one blocked on data, one
 deferred). The single strategy that ever cleared the 15%/yr return bar
 (E16 weekly reversal, 16.8%) did so only on a survivorship-flattered universe
@@ -74,14 +74,23 @@ python -m venv .venv
 .venv\Scripts\python.exe -m scripts.run_e1_backtest      # (and run_e4/e5/e6/e7_*)
 ```
 
-Code: `swing_bot/` (`prices`, `universe`, `coverage_gate`, `signals`,
-`backtest`, `rotation`, `test_frozen`); `scripts/` (per-experiment runners).
+Code: `swing_bot/` (`prices`, `universe`, `universe_m12`, `coverage_gate`,
+`signals`, `backtest`, `rotation`, `paper_sleeves`, `alpaca_client`, `costs`,
+`validation`, `test_frozen`); `scripts/` (per-experiment runners, plus
+`daily_swing_paper.py`, the live paper orchestrator).
 Data convention: split-adjusted, dividend-UNadjusted (yfinance
 `auto_adjust=False`). Pre-registration docs and every commit hash are listed
 in the findings write-up's reproducibility section.
 
 ## What is deliberately not here
 
-No live trading, no real money, no dashboard. This is a research record, not a
-product. The value is the method: a checkable, dated, falsifiable program —
-not an equity curve.
+**No real money and no dashboard.** There IS live trading, and it is
+**PAPER ONLY**: since 2026-07-15 a nightly Windows task
+(`SwingTradingDailyPaper`) runs `scripts/daily_swing_paper.py --execute`
+against three Alpaca **paper** accounts, forward-testing the three surviving
+candidates (E6-1x, E18-VIXTS, M10-1). No code path in this repo can reach a
+funded account. That series exists to accumulate out-of-sample evidence the
+backtests cannot provide, not to make money.
+
+This is a research record, not a product. The value is the method: a
+checkable, dated, falsifiable program — not an equity curve.

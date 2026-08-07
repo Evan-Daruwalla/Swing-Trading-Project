@@ -28,7 +28,12 @@ import re
 import subprocess
 import sys
 
-REPO = os.getcwd()
+# Anchored to THIS FILE, not to os.getcwd() (audit E8). With getcwd(), running
+# the script from another repo that happens to have a docs/ tree would build a
+# trial log out of THAT project's preregs and write it there -- and the trial
+# count is DSR's deflation input, so a wrong-project N silently produces a
+# significance number that looks rigorous and is not.
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PREREG_DIR = os.path.join(REPO, "docs")
 RESEARCH_DIR = os.path.join(REPO, "docs", "research")
 RECORD = os.path.join(REPO, "docs",
@@ -51,6 +56,26 @@ DECLARED_VARIANTS = {
     "x9_pairs_relative_value": (2, "gated run + a post-hoc zero-cost diagnostic "
                                    "(explicitly not gated)"),
 }
+
+# Preregs that are INFRASTRUCTURE, not attempts: they build no strategy and
+# claim no edge, so they are not trials in DSR's search space.
+#
+# EXPLICIT, not prose-detected (audit E9). This used to be a regex for "not an
+# attempt" over the first 4000 chars of every prereg. That put DSR's deflation
+# input at the mercy of an English phrase: any STRATEGY prereg that used those
+# words in any sense would drop out of N, lowering the trial count and INFLATING
+# DSR -- the exact direction validation.py exists to guard against, and silently.
+# An explicit list fails the other way: forget to add one and N is too LARGE,
+# which only makes DSR more conservative. Both errors now point somewhere safe.
+NON_ATTEMPT_PREREGS = frozenset({
+    "v1_cost_model_and_validation_harness",
+    "v2_harness_acceptance_amendment",
+})
+
+# Kept only to FLAG a mismatch between the list above and what a doc says about
+# itself; it never excludes anything on its own.
+SELF_DECLARES_NON_ATTEMPT = re.compile(
+    r"not an attempt|does not increment the (?:attempt )?tally", re.I)
 
 
 def sh(args):
@@ -117,13 +142,6 @@ def verdict_from(paths):
 
 
 def main():
-    # Some preregs are INFRASTRUCTURE, not attempts (e.g. the V1 cost-model /
-    # validation-harness prereg, which builds no strategy and claims no edge).
-    # They must not inflate the trial count -- DSR's N is trials in the SEARCH.
-    # Detected from the doc's own self-declaration, not from a hand-kept list.
-    NON_ATTEMPT_RE = re.compile(
-        r"not an attempt|does not increment the (?:attempt )?tally", re.I)
-
     stems, excluded = [], []
     for f in sorted(os.listdir(PREREG_DIR)):
         m = re.match(r"^prereg_(.+)\.md$", f)
@@ -137,10 +155,18 @@ def main():
             txt = open(os.path.join(REPO, path), encoding="utf-8").read(4000)
         except OSError:
             txt = ""
-        if NON_ATTEMPT_RE.search(txt):
+        if stem in NON_ATTEMPT_PREREGS:
             excluded.append({"file": path,
-                             "reason": "self-declared non-attempt (infrastructure)"})
+                             "reason": "infrastructure, not an attempt (explicit "
+                                       "NON_ATTEMPT_PREREGS entry)"})
             continue
+        if SELF_DECLARES_NON_ATTEMPT.search(txt):
+            # Self-declaration is a PROMPT, never the decision (audit E9). Left
+            # counted, which is the conservative direction; the operator adds it
+            # to NON_ATTEMPT_PREREGS deliberately if it really is infrastructure.
+            print("  ?? %s self-declares 'not an attempt' but is not in "
+                  "NON_ATTEMPT_PREREGS -- COUNTING it as a trial. Add it to the "
+                  "constant if that is wrong." % path)
         stems.append((stem, path))
 
     trials, unknowns = [], 0

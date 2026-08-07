@@ -5690,3 +5690,192 @@ number is published. Defect 1 has no fix that does not change a pre-registered s
 not something to do casually.
 
 **Doc cadence:** prompt #156, cadence hit, entry written same prompt. No miss.
+
+---
+
+# Appendix EE - Third cold audit: 14 findings + 14 edge cases, 25 fixed. The theme is fixes applied at ONE site and claimed at ALL sites (2026-08-06, ~14:13 CDT)
+
+**TRIGGER:** Evan ran `/audit` (whole project, no driver), then "after audit fix all issues then
+do /graphify-windows". A COLD auditor was spawned per the skill's step 0 -- this session had
+built the harness it would be auditing, so it was handed only the project path, the scope, the
+doc pointers as CLAIMS UNDER TEST, and the method steps. No session history, no "this part is
+known-good".
+
+**THE THEME, in the auditor's words: not sloppiness, but "fixes that were applied at one site
+and claimed at all sites."** Three of the four highest findings are PRIOR-AUDIT remediations
+that turned out to be opt-in, unwired, or contradicted by their own comments. That is a more
+uncomfortable result than a list of bugs, because it means this project's own audit trail had
+been over-reporting its completeness.
+
+**COVERAGE:** M1-M9 all swept, G1-G4 all swept; nothing marked not-swept. CVE status "could not
+determine" (pip-audit needs network; none was made). Data at rest verified clean by real
+read-only queries: `integrity_check ok`, `foreign_key_check` empty, 105,396 bars / 34 tickers,
+0 NULL prices, 0 OHLC-order violations, and **exactly** the 19 XLRE zero-range bars the
+gotchas bin claims -- a documented number confirmed rather than assumed. Secrets clean across
+all 149 commits; `requirements.lock` matches the venv exactly.
+
+## The four that mattered
+
+**#1 (crit) -- the cache-freshness guard CANNOT ARITHMETICALLY FIRE.** `cache_fetch(ticker,
+through=None)` was added on 2026-08-03 to stop the mixed-vintage bug that overstated M12's
+published headline effect **3x**. `through` is passed by **zero of 30+ call sites**, so
+`if not through or ...` always short-circuits and any existing cache file is returned forever.
+Its companion detector `cache_last_date` has **zero callers**. Verified by two independent
+implementations (Grep tool and Bash `grep -rn`), both returning 1 hit: the definition.
+The live cache holds **5 distinct vintages** across 181 bar files -- 29 frozen at 2026-07-09
+(SPY/QQQ/DIA/IWM/XL*/EW*), 142 at 2026-08-04. **The ETF universe's prices are frozen at
+2026-07-09 with no code path able to refresh them.**
+
+**#2 (high) -- the 200-DMA convention is split, and the FIX COMMENT ASSERTED IT WAS NOT.** The
+2026-08-03 comment claims "every other 200-DMA in the project ... includes it" and then names
+3 sites. The real census is **13 sites, 6 exclusive vs 7 inclusive**. Worse: E5 and E7 -- the
+out-of-sample regime and international tests the README's conclusion rests on -- use the
+OPPOSITE convention from E6, the strategy they are tests of. This is my own comment from a
+prior audit, and it was wrong in the flattering direction.
+
+**#3 (high) -- the liquidity floor is UNENFORCEABLE.** CLAUDE.md calls it mandatory in any
+universe filter. `MIN_MEDIAN_DOLLAR_VOL` has exactly ONE reader, behind `is_decision_day AND
+vix_today > 20.0` -- a branch that **has never executed** (VIX 15-16 for the entire live
+period). `universe.py` claimed enforcement lived "in the coverage/quality gate (M0.4)";
+`coverage_gate.py` contains zero references to it and never has.
+
+**#4 (high) -- the weekly-decision flag was committed BEFORE the decision was stored.**
+`last_decided_week` was written unconditionally right after `decide_m10_1`, while `set_pending`
+happens 15 lines later and is skipped when the target is None -- which `decide_m10_1` returns on
+two ORDINARY paths (VIX feed empty; stress with no residual ranks). The week would be marked
+decided with nothing stored, retry blocked until the next Friday, stale positions held for five
+sessions, exit code 0, no error printed.
+
+## What was fixed (25 items), and what each was verified with
+
+| item | fix | verification |
+|---|---|---|
+| #4/E2 | `last_decided_week` now written only when a target exists | tripwire GREEN |
+| #6/E3 | `_check_class()` raises NotImplementedError for any class != "all", placed BEFORE the assumed_bps shortcut | both paths raise, real output |
+| #1/E4 | `_note_vintage()` warns on mixed vintages; passive, refetches nothing | **fired on the real cache**: SPY 07-09 vs AAPL 08-04 |
+| #2 | false comment replaced with the 13-site census; `rotation.py:77` marked DELIBERATE AND PINNED | tripwire GREEN (E4 refs unmoved) |
+| #3 | `universe.py` docstring corrected to state the floor is enforced in ONE unreached branch | doc |
+| #8 | missed-session detector rewritten as a set difference over the whole series | sees the 2026-07-30 interior hole the old `max(date)` form could never see |
+| E6 | PARTIAL REALIZE warning now reports sell-side damage, not just buy-side | code read |
+| #5 | 5 new invariants pinning the live orchestrator's pure helpers | tripwire 11 -> 16 invariants, GREEN |
+| E5 | `pattern_signal` aggregates BY DATE, not positionally | **harness re-run BIT-FOR-BIT identical** |
+| #7 | `AND alpaca_order_id IS NOT NULL` states the buy-only assumption in the query | n=4 unchanged |
+| #9 | `prices.connect_ro()` added; 7 read-only consumers switched off write handles | tripwire GREEN |
+| E7 | panel-completeness gate: refuse a verdict below 80% of requested tickers | "40 of 40 tickers loaded" |
+| #10 | README corrected: paper trading IS live; 38 attempts; module list | doc |
+| E8 | `build_trial_log` and `validation` anchored to `__file__`, not `os.getcwd()` | `load_trial_count()` returns 50 from a foreign cwd |
+| E9 | prose regex replaced by explicit `NON_ATTEMPT_PREREGS` | trial log regenerates IDENTICAL (37 docs / 50 variants) |
+| #11 | testing.md, INDEX.md, CLAUDE.md corrected; 5 PRD boxes ticked WITH EVIDENCE | git hashes pasted in the PRD |
+| #13 | 4 unused imports removed | AST pass: 0 remaining |
+| E11 | `fill_open`/`close_px` start EMPTY (were DATE-keyed, ~6,700 junk keys) | all consumers are ticker-keyed |
+| E12 | p90 was `int(0.9*n)` = the 95th percentile at n=20; now `ceil-1` | arithmetic |
+| E13 | `_last_bar_date()` made total across all 3 cache shapes | 292 real files classify correctly |
+| E14 | coverage_gate's unwired consequences spelled out | doc |
+
+**A BUG IN MY OWN FIX, caught by running it rather than reading it.** The first `_last_bar_date`
+did `bars[-1][1]` guarded by `isinstance(last, str)`. On the `*_earn` shape -- a list of date
+STRINGS -- that evaluates `"2026-01-01"[1]` = `"0"`, which IS a str, passes the check, and
+becomes the series' "end date". The test printed a mixed-vintage warning citing a vintage of
+`0`. Fixed by requiring the row to be a list/tuple. **The check found it; reading would not
+have.**
+
+**REFUSED / BLOCKED, not worked around:**
+- **E1 (P1, OBSERVED)** -- the scheduled task is `LogonType: Interactive`, so it runs only while
+  Evan is logged on. **It already lost 2026-07-30 and 07-31** while Windows reported
+  `NumberOfMissedRuns: 0, LastTaskResult: 0`. 07-31 was an M10-1 decision Friday. The fix needs
+  `/RU evan /RP <password>`; **I do not enter credentials.** BLOCKED-ON-EVAN.
+- **E10** -- raising `ExecutionTimeLimit` PT30M -> PT60M is a scheduled-task registration
+  change. BLOCKED-ON-EVAN. Its code-side risk is closed by #4's fix.
+- **#12** -- `UPDATE paper_sleeves SET cash=round(cash,9)` to clear a -1.14e-13 residue was
+  **BLOCKED BY THE PERMISSION CLASSIFIER** as a write to the live paper ledger. Not worked
+  around. Needs Evan's explicit go.
+- **#1's real fix** (threading `through` through 30 call sites), **#3's real fix** (a floor over
+  `universe_m12`/`run_e10`), and harmonising the 200-DMA convention would all MOVE RECORDED
+  RESULTS. Each needs its own pre-registration. Only the passive/detective halves were done.
+
+**VERIFIED:** frozen tripwire **GREEN d=+/-0.0000pp** (12 refs + **16** invariants, up from 11),
+GREEN again under `python -W error`; `compileall` exit 0; import probe OK on all 20 edited
+files; AST pass shows 0 new unused imports; V1 harness re-run **bit-for-bit identical**
+(DSR 0.0168 / 0.0001 / 1.0000, PBO 0.429 / 0.900 / 0.514, purge 2971 -> 2901, trial count 50);
+trial log regenerates identically apart from one reason string. No Alpaca orders placed, no
+swing.db writes, Trading repo untouched, no keys printed.
+
+**STATE:** 28 files modified, uncommitted.
+
+**Next action:** Evan's call on committing. Three items need him: E1 (task credential), E10
+(task time limit), #12 (ledger write). Then `/graphify-windows` as instructed.
+
+**Doc cadence:** prompt #157, entry written same prompt. No miss.
+
+---
+
+# Appendix EF - Knowledge graph rebuilt: AST is complete and good, semantic extraction is PARTIAL because the session limit killed 4 of 5 agents (2026-08-06, ~18:29 CDT)
+
+**TRIGGER:** Evan's "after audit fix all issues then do /graphify-windows", second half.
+
+**WHY A REBUILD WAS DUE:** `graphify-out/` was last built 2026-07-15 and held **381 nodes and
+ZERO edges** -- an edgeless graph is not a graph, it is a node list. The 28 files edited by the
+audit (new `prices.connect_ro`, `costs._check_class`, `run_e8_squeeze._last_bar_date` /
+`_note_vintage`, `test_frozen` importing `scripts/daily_swing_paper`, `build_trial_log`'s
+`NON_ATTEMPT_PREREGS`) were absent from it entirely.
+
+**RESULT -- the graph is a large improvement and it is INCOMPLETE. Both halves are true.**
+
+```
+                       BEFORE (2026-07-15)   AFTER (2026-08-06)
+nodes                  381                   725
+edges                  0                     1094
+communities            n/a                   70 (all labelled)
+```
+
+**AST extraction: COMPLETE.** 64 code files -> **517 nodes, 1099 edges**, deterministic, no LLM
+involved. Every symbol added by the audit is present. This half needs no re-run.
+
+**SEMANTIC extraction: PARTIAL, and this is the honest headline.** 117 doc/paper files needed
+processing; 37 were cache hits from the July run, 80 were dispatched to 5 parallel subagents.
+**The Anthropic session limit was hit mid-run (resets 6pm America/Chicago) and terminated 4 of
+the 5 agents.** What survived, verified by reading each file off disk rather than trusting the
+agents' self-reports:
+
+| chunk | scope | outcome |
+|---|---|---|
+| 01 | codebase-memory + root docs + 10 preregs (20 files) | **KILLED** -- wrote only a malformed bare JSON list, 0 usable nodes |
+| 02 | the append-only Project Record (1 file, ~1MB) | **COMPLETE** -- 82 nodes, 125 edges, 3 hyperedges |
+| 03 | 20 preregs (e14..x9) | **TRUNCATED** -- 25 nodes, **0 edges**, covering 4 of 20 files |
+| 04 | 20 research docs (2026-07-10..07-13) | **KILLED** -- nothing written |
+| 05 | 19 research docs (2026-07-13..08-06) | **KILLED** -- nothing written |
+
+So **43 of 117** doc/paper files are semantically represented (37 cached + 1 record + 4 partial
+preregs + 1 new). **74 are not.** The malformed chunk-01 file was SKIPPED at merge rather than
+crashing it -- the skill's merge does `d.get('nodes')`, which raises AttributeError on a bare
+list; the merge was written to detect and skip non-extraction-shaped payloads.
+
+**GRAPH HEALTH WARNING, surfaced not buried (the skill's own honesty rule):** the diagnostic
+reports **325 dangling-endpoint edges** out of 1425 raw (23%), plus 2 collapsed directed and 6
+collapsed undirected. That is the direct signature of the killed agents -- edges pointing at
+nodes that were never extracted. `missing_endpoint_edges: 0`, `self_loop_edges: 0`,
+`exact_duplicate_edges: 0`, so the graph is not corrupt, just incomplete.
+
+**The shrink-guard did not fire** (725 > 381), so `graph.json` was written. Had the run gone
+worse, it would correctly have refused.
+
+**WHAT THE GRAPH IMMEDIATELY CONFIRMS -- it independently re-found the audit's crit finding.**
+Top god node: **`cache_fetch()` with 36 edges and betweenness centrality 0.193**, bridging
+Squeeze/Shared-Cache to NINETEEN other communities. That is finding #1 restated as topology: one
+un-refreshable cache function is the single highest-traffic junction in the entire codebase, and
+its freshness guard cannot fire. `AlpacaClient` (20) and `client_for_sleeve()` (11) rank 2nd and
+7th, which is the live paper path.
+
+**VERIFIED:** every chunk file validated by parsing it off disk (shape, node/edge counts, source
+files) before merging; `graph.json` 725 nodes / 1094 edges / 70 labelled communities;
+`GRAPH_REPORT.md` regenerated with real labels; `graph.html` written. Nothing was deleted --
+the three chunk files predate this session's naming and were left in place.
+
+**STATE:** `graphify-out/` regenerated (graph.json, GRAPH_REPORT.md, graph.html, manifest.json,
+cost.json). The audit fixes from Appendix EE remain UNCOMMITTED along with this entry.
+
+**Next action:** Evan's call on committing the audit fixes. If a complete semantic graph is
+wanted, re-run `/graphify-windows` after the session limit resets -- the 43 covered files are
+cached, so a re-run only pays for the 74 missing ones.
+
+**Doc cadence:** prompt #157 continued (same prompt as EE). No miss.
