@@ -1,8 +1,8 @@
 {
   ".claude/pm-cadence.json": {
-    "mtime": 1786058747.0784245,
-    "ast_hash": "9b0d1edb66de6f1a77a2d6f5e768400a",
-    "semantic_hash": "9b0d1edb66de6f1a77a2d6f5e768400a"
+    "mtime": 1786098654.1637244,
+    "ast_hash": "309d0a35963d70ae6b2f2e2819dfd023",
+    "semantic_hash": "309d0a35963d70ae6b2f2e2819dfd023"
   },
   "scripts/ablation_fill_timing.py": {
     "mtime": 1786043179.6164303,
@@ -185,9 +185,9 @@
     "semantic_hash": "215eb859ef1c041dc8befd1ee42411e9"
   },
   "docs/Project Record \u2014 Full Chronological History.md": {
-    "mtime": 1786043654.0029604,
-    "ast_hash": "50b7998a2936082c79dd464257702364",
-    "semantic_hash": "50b7998a2936082c79dd464257702364"
+    "mtime": 1786059001.7028217,
+    "ast_hash": "27f660bb356b6617c1507ea04922af58",
+    "semantic_hash": "27f660bb356b6617c1507ea04922af58"
   },
   "docs/findings_2026-07-09_experiment_arc.md": {
     "mtime": 1783658961.6090634,

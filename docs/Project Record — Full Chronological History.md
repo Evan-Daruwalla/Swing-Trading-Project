@@ -5879,3 +5879,102 @@ wanted, re-run `/graphify-windows` after the session limit resets -- the 43 cove
 cached, so a re-run only pays for the 74 missing ones.
 
 **Doc cadence:** prompt #157 continued (same prompt as EE). No miss.
+
+---
+
+# Appendix EG - Audit fixes COMMITTED `d46c1d7`; graph semantic coverage 43 -> 82 of 117 files. CORRECTION: EF misattributed the dangling-edge warning (2026-08-07, ~05:33 CDT)
+
+**TRIGGER:** Evan's "2" -- commit the audit fixes, then re-run graphify for the files the session
+limit had blocked.
+
+## 1. Commit
+
+`d46c1d7`, 35 files, tripwire GREEN at commit time. Three `graphify-out/.graphify_chunk_*.json`
+scratch files were deliberately UNSTAGED (`git restore --staged`) rather than committed -- they
+are extraction intermediates, not deliverables. They were left on disk, not deleted.
+
+## 2. CORRECTION to Appendix EF -- and it inverts EF's conclusion
+
+**EF stated:** the graph health check's 325 dangling-endpoint edges were "the direct signature of
+the killed agents -- edges pointing at nodes that were never extracted."
+
+**That is WRONG.** This run added FOUR complete semantic chunks (486 nodes, 914 edges) and the
+dangling count did not move: **325 before, 325 after.** A count that is invariant to adding a
+third more of the graph cannot be caused by the missing part of it. Enumerating them by source
+file and inspecting the orphan endpoints shows what they actually are:
+
+```
+dangling edges: 325
+  daily_swing_paper.py 13 | run_c1_residual_reversal.py 11 | run_ex_decomp.py 10 | ...
+sample orphan endpoints:
+  imports      -> sys
+  imports_from -> pathlib
+  imports_from -> swing_bot
+```
+
+They are **AST `imports` / `imports_from` edges pointing at stdlib and package-level module
+names that graphify never creates nodes for.** Structural, benign, present in every build of
+every Python repo this tool touches. **The graph was never damaged by the failed run.** EF's
+framing would have led a future reader to distrust a healthy graph and to re-run extraction
+looking for corruption that does not exist -- which is why this correction is worth its own
+entry rather than a footnote. Per the append-only rule, EF is left standing as written.
+
+## 3. Second re-run: what actually happened
+
+Strategy changed after EF: **two waves of four SMALL agents (10 files each)** instead of one wave
+of five large ones, so a limit kill costs less. Wave 1 dispatched; **the session limit was hit
+again** (reset moved to 11pm America/Chicago) and the harness reported chunk A terminated early.
+
+**Verifying on disk contradicted the harness report, in the good direction:** chunk A had
+already WRITTEN its file before being killed during its own validation step. All four wave-1
+chunks are present and well-formed:
+
+| chunk | files | nodes | edges |
+|---|---|---|---|
+| A (codebase-memory + root docs) | 10 | 172 | 288 |
+| B (capstone, M12 plan, 7 preregs) | 10 | 101 | 191 |
+| C (10 preregs incl. V1/V2) | 10 | 114 | 235 |
+| D (6 preregs + 4 research docs) | 10 | 99 | 200 |
+
+**Wave 2 (35 files) was NOT dispatched** -- limit. This is a reported gap, not a silent one.
+
+**The 1MB Project Record was deliberately NOT re-extracted.** It re-entered the uncached list
+only because appendices EE and EF changed its hash. Re-reading 1MB (~175k subagent tokens last
+time) to capture two appendices is poor value, so the COMPLETED extraction from the killed run
+was reused from disk. **Consequence, stated plainly: the record's 82 graph nodes reflect the
+record as of appendix ED, not EE/EF/EG.**
+
+## 4. Result
+
+```
+                     2026-07-15   after EF     now
+nodes                381          725          1199
+edges                0            1094         2003
+communities          n/a          70           123 (34 hand-labelled, 89 derived
+                                                    from each community's top-degree node)
+doc/paper coverage   ~37/117      43/117       82/117
+```
+
+**WHAT THE GRAPH NOW SHOWS THAT IT COULD NOT BEFORE.** With the preregs in, the god-node list
+stops being purely structural and starts describing the PROGRAM: `cache_fetch()` still ties for
+first (36 edges) -- audit finding #1 restated as topology -- but it is now tied with the
+**Capstone Synthesis (36)**, followed by the **prereg TEMPLATE (29)**. The template ranking third
+is the pre-registration discipline showing up as measurable structure: nearly every attempt
+document links back to one policy file. That is the project's central claim about itself,
+visible in the graph rather than asserted in prose.
+
+**VERIFIED:** every chunk validated by parsing it off disk before merging (shape, counts, source
+files) -- not by trusting agent self-reports, which were wrong about chunk A; `graph.json` 1199
+nodes / 2003 edges; shrink-guard passed (1199 > 725); `GRAPH_REPORT.md` and `graph.html`
+regenerated; frozen tripwire GREEN d=+/-0.0000pp. Nothing deleted -- the previous run's chunks
+were MOVED to `graphify-out/.prev_chunks/`, not removed.
+
+**STATE:** audit fixes committed `d46c1d7`. `graphify-out/` regenerated and UNCOMMITTED along
+with this entry.
+
+**Next action:** Evan's call. Wave 2 (35 research docs) needs one more `/graphify-windows` after
+the 11pm reset -- the 82 covered files are cached, so it only pays for the remainder. Still
+BLOCKED-ON-EVAN from the audit: E1 (scheduled-task credential -- the one actively costing
+forward evidence), E10 (task time limit), #12 (ledger UPDATE, classifier-blocked).
+
+**Doc cadence:** prompt #159, cadence hit, entry written same prompt. No miss.
