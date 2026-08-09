@@ -5978,3 +5978,137 @@ BLOCKED-ON-EVAN from the audit: E1 (scheduled-task credential -- the one activel
 forward evidence), E10 (task time limit), #12 (ledger UPDATE, classifier-blocked).
 
 **Doc cadence:** prompt #159, cadence hit, entry written same prompt. No miss.
+
+---
+
+# Appendix EH - Pushed to origin/main: three commits, not the two I reported (2026-08-08, ~21:15 CDT)
+
+**TRIGGER:** Evan's "1" -- push.
+
+**PUSHED:** `33b3b5c..6ffb3a2` to `origin/main`
+(`https://github.com/Evan-Daruwalla/Swing-Trading-Project.git`). Working tree clean apart from
+graphify extraction scratch, which stays untracked by design.
+
+| commit | what |
+|---|---|
+| `1ec6f2a` | V2 amendment applied -- harness ACCEPTED with its pre-registered false positive |
+| `d46c1d7` | Third cold audit: 25 of 28 findings fixed; knowledge graph rebuilt |
+| `6ffb3a2` | Graph coverage 43 -> 82 of 117; corrects EF's dangling-edge claim |
+
+**SELF-CORRECTION, small but worth the line:** the previous turn told Evan "two commits sitting
+local." It was three -- `1ec6f2a` had been sitting unpushed since 2026-08-06. Caught by running
+`git log origin/main..HEAD` before pushing instead of trusting the two commits this session had
+made. The cost of being wrong here would have been Evan approving a push whose contents he had
+not been told about.
+
+**PRE-PUSH CHECKS (a push to a public GitHub repo is publication, so these ran on the full
+range, not just the last commit):**
+- `git log --all -- alpaca_keys.env` -> **empty**: the key file has never been tracked in any
+  commit on any branch.
+- 35 files in the range; grep for `keys.env|\.env$|\.pem$|id_rsa|credential` -> **none**.
+
+**STATE:** local and `origin/main` are level at `6ffb3a2`. Frozen tripwire GREEN d=+/-0.0000pp as
+of the commits pushed.
+
+**Next action:** Evan's call. Open items unchanged and none of them are blocked on code:
+1. **E1 -- the one that is actively costing evidence.** `SwingTradingDailyPaper` is
+   `LogonType: Interactive`, so it fires only while Evan is logged on; it has already silently
+   lost 2026-07-30 and 07-31 while Windows reported `NumberOfMissedRuns: 0`. Re-registering needs
+   `/RU evan /RP <password>` -- **BLOCKED-ON-EVAN, I do not enter credentials.**
+2. E10 -- `ExecutionTimeLimit` PT30M -> PT60M (scheduled-task registration change).
+3. Audit #12 -- one-row `UPDATE paper_sleeves SET cash=round(cash,9)`, blocked by the permission
+   classifier as a live-ledger write.
+4. Graph wave 2 -- 35 research docs; the other 82 files are cached.
+5. V3 prereg -- scope PBO to genuine selection sets. Never depended on fills (see appendix ED).
+
+**Doc cadence:** prompt #162, cadence hit, entry written same prompt. No miss.
+
+---
+
+# Appendix EI - E1 CLOSED: scheduled task converted to S4U, no password stored; the missed-session detector fired for real on its first run (2026-08-08, ~21:37 CDT)
+
+**TRIGGER:** Evan asked which password Task Scheduler wanted after his PIN and Microsoft-account
+password were both rejected.
+
+## 1. Why the credentials failed, and the fix that needed none
+
+`Get-LocalUser evan` returns **`PrincipalSource: MicrosoftAccount`** on workgroup machine
+`evanfredy` (no domain -- `whoami /upn` errors). Two separate reasons for the two failures:
+
+- **PIN** -- Windows Hello, device-local. Not a credential Task Scheduler can consume, ever.
+- **MSA password** -- Task Scheduler authenticates `EVANFREDY\evan` as a LOCAL account.
+  `PasswordLastSet` on that account is **2024-03-18**; the account has signed in by PIN since,
+  so the local secret had drifted from the current online MSA password.
+
+**Resolved without any password** using the S4U mode `schtasks` documents as
+`/NP` -- *"No password is stored. The task runs non-interactively as the given user. Only local
+resources are available."* In the GUI that is "Run whether user is logged on or not" + **"Do not
+store password"**. Chosen over running as SYSTEM deliberately: S4U keeps the task running AS
+`evan`, so file ownership, paths and profile stay identical to the configuration that already
+worked -- the only thing given up is network CREDENTIALS, which this job never needed.
+
+**Risk that had to be tested, not assumed:** "only local resources" could have blocked the
+outbound HTTPS this job depends on (yfinance, CBOE, Ken French, Alpaca). Evan ran it. It did not.
+
+**VERIFIED, task state after the change:**
+
+```
+LogonType          : S4U        (was Interactive)
+UserId             : evan
+ExecutionTimeLimit : PT1H       (was PT30M -- audit E10, closed in the same visit)
+WakeToRun          : True
+StartWhenAvailable : True
+LastTaskResult     : 0
+NextRunTime        : 2026-08-10 19:00
+```
+
+**Full manual run, exit code 0**, all network sources reached (QQQ latest session 2026-08-07,
+VIX 14.90 / VIX3M 18.72 both asof 2026-08-07), all three sleeves marked NAV, all three Alpaca
+paper accounts reached. Mirror drift -0.001% / +0.000% / -0.014%, all far inside the 0.25% band,
+so no reconcile orders were placed -- the guard behaving as designed.
+
+## 2. The audit fix proved itself on its first real run
+
+The run printed:
+
+> `!! MISSED SESSION(S): 1 trading session(s) have no paper_nav row -- 2026-07-30.`
+
+**This is audit finding #8's fix working, and the old code could not have produced it.** The
+previous detector compared `SELECT max(date) FROM paper_nav` against today, which can only see a
+hole at the END of the series. By the time it shipped, `max(date)` had already advanced past
+2026-07-30, so that hole was invisible forever. The set-difference version sees interior holes
+and keeps reporting them until they are dealt with.
+
+## 3. CORRECTION -- the forward-evidence series lost ONE session, not two
+
+Earlier reporting (and my summary to Evan last turn) said the interactive-only task "has already
+silently eaten 2026-07-30 and 07-31 from the forward-evidence series." **That overstates the
+damage.** Queried read-only:
+
+```
+paper_nav: 17 distinct sessions, 2026-07-15 .. 2026-08-07
+weekday sessions with NO nav row: ['2026-07-30']
+```
+
+**Two scheduled RUNS were lost (07-30 and 07-31); only ONE NAV row was permanently lost
+(07-30).** 07-31's row exists because the manual Sunday 2026-08-02 run still saw 07-31 as the
+latest session and marked it. The distinction matters: the run log and the evidence series are
+different artifacts, and only the second one is the deliverable.
+
+## 4. Status of the audit's BLOCKED-ON-EVAN items
+
+| item | status |
+|---|---|
+| **E1** scheduled task interactive-only | **CLOSED** -- S4U, verified by a real run |
+| **E10** ExecutionTimeLimit PT30M | **CLOSED** -- PT1H |
+| **#12** `UPDATE paper_sleeves SET cash=round(cash,9)` | still open; classifier-blocked as a live-ledger write |
+
+**STATE:** `origin/main` at `6ffb3a2`. Appendices EH and EI uncommitted. No code changed this
+entry -- the fix was a scheduled-task configuration change made by Evan.
+
+**Next action:** the first unattended proof point is the **2026-08-10 19:00** run. If a
+2026-08-10 `paper_nav` row appears without Evan being logged on, S4U is confirmed end to end.
+Remaining open: audit #12, graph wave 2 (35 research docs, other 82 cached), V3 prereg (scope
+PBO to genuine selection sets).
+
+**Doc cadence:** prompt #165, cadence hit, entry written same prompt. No miss.
