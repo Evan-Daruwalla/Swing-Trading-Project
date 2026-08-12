@@ -9,6 +9,8 @@ shelved. No tuning.
 NAV (finding-things map): imports swing_bot (backtest, prices, universe).
 Imported by: no other module (standalone runner).
 """
+# DATA CONVENTION: prices are SPLIT-ADJUSTED, DIVIDEND-UNADJUSTED (auto_adjust=False)
+# -- swing_bot/prices.py & the shared cache both enforce it; stated here per CLAUDE.md.
 import sqlite3
 import sys
 from pathlib import Path

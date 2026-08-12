@@ -79,7 +79,8 @@ def run_rotation(conn, fund, signal, ma_len=200, exec_lag=0, cost_bps=5.0,
             # E4rot_1516_switch) were recorded against this form, so switching
             # to the inclusive form used by E6/E18/M12 and the live sleeve turns
             # the tripwire RED. The repo runs both conventions; the full census
-            # is in run_e6_deleveraged.py:61. Do not "harmonise" this line.
+            # is in run_e6_deleveraged.py, rotation_nav() (the big INCLUSIVE/
+            # EXCLUSIVE comment). Do not "harmonise" this line.
             ma = sum(sig_closes_list[si - ma_len:si]) / ma_len
             want = 1 if sig_close[d] > ma else 0
             if want != state and pending is None:

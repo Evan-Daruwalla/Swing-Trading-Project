@@ -61,24 +61,34 @@ def load_trial_count(path=TRIAL_LOG, check_staleness=True):
         raise TrialLogUnavailable("trial log %r unreadable: %s" % (path, e))
 
     if check_staleness:
-        log_mtime = os.path.getmtime(path)
-        # Preregs the log deliberately does NOT count as trials (infrastructure
-        # docs that build no strategy) must not mark the log stale either --
-        # otherwise adding one forces a pointless regeneration and, worse,
-        # trains the reader to ignore a real staleness error.
-        skip = {os.path.basename(e.get("file", ""))
-                for e in doc.get("excluded_non_attempt", [])}
-        newest, newest_f = 0.0, None
-        for f in os.listdir(PREREG_GLOB_DIR):
-            if f.startswith("prereg_") and f.endswith(".md") and f not in skip:
-                m = os.path.getmtime(os.path.join(PREREG_GLOB_DIR, f))
-                if m > newest:
-                    newest, newest_f = m, f
-        if newest > log_mtime:
+        # Compare the SET OF PREREG FILES, not mtimes (audit #4 F8). The old
+        # check compared os.path.getmtime timestamps, which git does not
+        # preserve: on any fresh clone every file carries the same checkout
+        # time, so the guard on DSR's deflation input reported "fresh"
+        # regardless of truth (proven with byte-identical logs at three mtime
+        # orderings -- only log-older raised). File-name sets survive cloning
+        # and catch the failure that matters here: a prereg ADDED (or removed,
+        # or renamed) after the log was built, i.e. an under-counted N, which
+        # inflates DSR. A pure content edit to an existing prereg is not
+        # caught; it also does not change the trial count.
+        def _base(p):
+            # log paths are Windows-style ('docs\\prereg_x.md'); normalize so
+            # basename works on POSIX too, where backslash is not a separator
+            return os.path.basename(str(p).replace("\\", "/"))
+        in_log = ({_base(t.get("prereg_file", "")) for t in doc.get("trials", [])} |
+                  {_base(e.get("file", "")) for e in doc.get("excluded_non_attempt", [])})
+        in_log.discard("")
+        on_disk = {f for f in os.listdir(PREREG_GLOB_DIR)
+                   if f.startswith("prereg_") and f.endswith(".md")
+                   and f != "prereg_TEMPLATE.md"}
+        if in_log != on_disk:
+            added = sorted(on_disk - in_log)
+            gone = sorted(in_log - on_disk)
             raise TrialLogUnavailable(
-                "trial log is STALE: %r is newer than %s. Regenerate with "
-                "`python scripts/build_trial_log.py` -- a stale log under-counts "
-                "trials, which inflates DSR." % (newest_f, path))
+                "trial log is STALE: prereg files on disk do not match the set "
+                "the log was built from (new/renamed: %s; missing: %s). "
+                "Regenerate with `python scripts/build_trial_log.py` -- a stale "
+                "log under-counts trials, which inflates DSR." % (added, gone))
 
     # Larger of the two figures, per trial_log_notes.md: erring toward MORE
     # trials makes DSR more conservative; fewer flatters the strategy.
@@ -130,7 +140,14 @@ def cpcv_splits(n_obs, n_groups=6, n_test=2, label_span=1, embargo_pct=0.01):
 def sharpe(returns, periods_per_year=252):
     """Per-period Sharpe (NOT annualised) plus its annualised twin.
     DSR consumes the PER-PERIOD figure -- annualising first is a common and
-    silent error that shifts the deflation benchmark."""
+    silent error that shifts the deflation benchmark.
+
+    DEFINITION NOTE (audit #4 F15): this uses POPULATION stdev (pstdev, /n),
+    while backtest.py's stats() uses SAMPLE stdev (/(n-1)). Both feed verdicts
+    under the one name "Sharpe"; at the T~2900 sessions used here the gap is
+    ~0.02%, far below any gate threshold, so they are deliberately NOT
+    unified -- backtest.py's refs are pinned by the frozen tripwire and
+    changing its estimator would flip refs RED for zero informational gain."""
     r = [x for x in returns if x is not None]
     if len(r) < 3:
         return None

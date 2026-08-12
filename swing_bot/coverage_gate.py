@@ -100,6 +100,12 @@ def main():
     # run CREATE TABLE IF NOT EXISTS against the live paper ledger.
     conn = prices.connect_ro()
     as_of = latest_common_date(conn)
+    # Empty bars table -> as_of None -> `e.data_start <= None` TypeError in
+    # coverage() (audit #4 E8). A clean "no data" beats a traceback.
+    if as_of is None:
+        print("coverage: bars table is EMPTY -- no as-of date exists. "
+              "Run scripts/backfill_universe.py first.")
+        return 1
     ok, missing = coverage(conn, as_of)
     print(f"coverage as-of {as_of}: {'OK' if ok else 'FAIL'}"
           f"{'' if ok else ' missing=' + ','.join(missing)}")

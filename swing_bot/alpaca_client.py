@@ -72,7 +72,13 @@ def _load_keys_file(path: Path = KEYS_FILE) -> dict:
     out: dict[str, str] = {}
     if not path.exists():
         return out
-    for raw in path.read_text(encoding="utf-8").splitlines():
+    # utf-8-sig, not utf-8 (audit #4 E1): Notepad and PowerShell 5.1's
+    # `Out-File -Encoding utf8` both write a BOM, which utf-8 leaves as
+    # ﻿ glued to the FIRST key name -- 'E6_KEY' becomes '﻿E6_KEY',
+    # the lookup misses, and that sleeve is silently skipped every run while
+    # its DB ledger keeps advancing. utf-8-sig reads BOM-less files
+    # identically, so this is strictly safer.
+    for raw in path.read_text(encoding="utf-8-sig").splitlines():
         line = raw.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
@@ -123,6 +129,29 @@ class AlpacaClient:
     @property
     def is_live(self) -> bool:
         return self.base_url == LIVE_BASE_URL
+
+    def _require_paper(self, action: str, allow_live: bool = False) -> None:
+        """ALLOWLIST scope guard for every account-mutating endpoint (audit #4 F5).
+
+        The old guard was a DENYLIST (`is_live and not allow_live`) applied only
+        to submit_order. Two defects, both found by probe:
+          * one-string equality: `http://api.alpaca.markets`,
+            `https://API.alpaca.markets` and `https://api.alpaca.markets:443`
+            all compared unequal to LIVE_BASE_URL, so is_live said False and the
+            order would have been ALLOWED against a live account.
+          * close_position / cancel_order / cancel_all_orders had NO guard at
+            all -- even the canonical live URL sailed through those.
+        An allowlist fails CLOSED: anything that is not exactly the canonical
+        paper URL is refused, including typos, which is the correct direction
+        for a guard whose failure mode is trading real money."""
+        if self.base_url != PAPER_BASE_URL and not allow_live:
+            raise AlpacaError(
+                0, None,
+                f"Refusing to {action}: base_url {self.base_url!r} is not the "
+                f"canonical paper endpoint {PAPER_BASE_URL!r} and allow_live="
+                f"False. This project's scope guard is paper-only (CLAUDE.md); "
+                f"pass allow_live=True only for a deliberate, Evan-authorized "
+                f"live action.")
 
     def close(self) -> None:
         self._client.close()
@@ -227,16 +256,14 @@ class AlpacaClient:
                      allow_live: bool = False, **extra) -> dict:
         """Submit an order. Exactly one of qty / notional must be given. Note:
         NOTIONAL orders must be type='market' (Alpaca rejects notional+limit).
-        Refuses a live base_url unless allow_live=True (nothing here passes it)."""
+        Refuses any non-paper base_url unless allow_live=True (nothing here
+        passes it) -- allowlist via _require_paper, applied to every mutating
+        endpoint, not just this one."""
         if (qty is None) == (notional is None):
             raise ValueError("Pass exactly one of qty= or notional=.")
         if notional is not None and type != "market":
             raise ValueError("Notional orders must be type='market' (Alpaca constraint).")
-        if self.is_live and not allow_live:
-            raise AlpacaError(
-                0, None,
-                "Refusing to submit: base_url is LIVE and allow_live=False. "
-                "This project's scope guard is paper-only — see CLAUDE.md.")
+        self._require_paper("submit an order", allow_live)
         body: dict[str, Any] = {"symbol": symbol, "side": side, "type": type,
                                 "time_in_force": time_in_force, **extra}
         if qty is not None:
@@ -247,6 +274,7 @@ class AlpacaClient:
 
     def close_position(self, symbol: str) -> dict | None:
         """Liquidate an open position (market order). 404 if none held."""
+        self._require_paper(f"close position {symbol}")
         try:
             return self._request("DELETE", f"/v2/positions/{symbol}")
         except AlpacaError as e:
@@ -255,6 +283,7 @@ class AlpacaClient:
             raise
 
     def cancel_all_orders(self) -> None:
+        self._require_paper("cancel all orders")
         try:
             self._request("DELETE", "/v2/orders")
         except AlpacaError as e:
@@ -265,6 +294,7 @@ class AlpacaClient:
             print(f"    cancel_all_orders failed (continuing): {e}", flush=True)
 
     def cancel_order(self, order_id: str) -> None:
+        self._require_paper(f"cancel order {order_id}")
         self._request("DELETE", f"/v2/orders/{order_id}")
 
 

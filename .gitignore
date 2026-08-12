@@ -30,6 +30,8 @@ Thumbs.db
 .idea/
 graphify-out/.graphify_python
 graphify-out/.graphify_root
+graphify-out/.graphify_chunk_*.json
+graphify-out/.prev_chunks/
 .edgar_cache/
 .finra_cache/
 .regsho_cache/

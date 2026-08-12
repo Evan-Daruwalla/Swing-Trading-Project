@@ -8,8 +8,9 @@ end-of-day, small capital ($100–1,000), Alpaca paper.
 
 A systematic-trading research project whose goal was a **high percentage
 return over short holds** with a small account. It did not find one — and the
-*discipline of how it failed* is the point. Twenty strategies across seven
-families were tested under strict **pre-registration** (rules committed to git
+*discipline of how it failed* is the point. Thirty-seven pre-registered
+attempts across nine equity families (plus credit, non-equity trend and
+market-neutral relative value) were tested under strict **pre-registration** (rules committed to git
 *before* the code that produces results), honest kill-criteria (no re-tuning a
 failed run), and out-of-sample / out-of-regime tests — culminating in an
 international test on five independent markets and a survivorship-aware stock
@@ -20,7 +21,10 @@ high-return EOD strategy was found across seven plausible families — index
 mean reversion, leveraged trend, concentrated stock/sector momentum,
 volatility breakout, deep-dip accumulation, event-driven (post-earnings drift
 & earnings-announcement premium), and calendar/reversal/regime effects
-(**0 passes of the high-return bar in 38 attempts** as of 2026-08-06; one weak risk-adjusted
+(**0 passes of the high-return bar; search phase closed 2026-08-03 at 37
+attempts, with a 38th pre-registered run — M12, a diagnostic — after the
+close** (the two numbers are reconciled in HANDOFF and `docs/trial_log.json`);
+one weak risk-adjusted
 pass — VIX term structure, forward-paper only; one blocked on data, one
 deferred). The single strategy that ever cleared the 15%/yr return bar
 (E16 weekly reversal, 16.8%) did so only on a survivorship-flattered universe
@@ -62,7 +66,7 @@ before the market charged tuition for the same lesson.
 | E16 | Cross-sectional weekly reversal | FAIL (clean) — cleared 15%/yr *once* (16.8%) but on a 66% drawdown, the expected survivorship artifact of dip-buying survivors |
 | E17 | Days-to-cover / short interest | BLOCKED-ON-DATA — no free exchange-listed short-interest history |
 | E18 | Regime-gate bake-off (VIX term structure, credit, breadth vs 200-DMA) | no gate beats plain 200-DMA robustly; VIX-TS clears the risk-adjusted tier but *weakly* (one-crash window, worse drawdown in the bull) — forward-paper candidate only |
-| E19 | Insider opportunistic buys (SEC Form 4) | DEFERRED — data parses but the historical ingestion is heavy with 3 hazards; Evan-gated |
+| E19 | Insider opportunistic buys (SEC Form 4) | FAIL (2026-07-13, clean & robust; full EDGAR ingestion ran — this line said DEFERRED for a month after the verdict landed) |
 | E20 | Dividend capture | FAIL — a real +0.10%/trade ex-date effect that doesn't compound and is eaten by tax |
 
 ## Reproduce
@@ -86,7 +90,8 @@ in the findings write-up's reproducibility section.
 
 **No real money and no dashboard.** There IS live trading, and it is
 **PAPER ONLY**: since 2026-07-15 a nightly Windows task
-(`SwingTradingDailyPaper`) runs `scripts/daily_swing_paper.py --execute`
+(`SwingTradingDailyPaper`) runs `scripts/daily_swing_paper.bat`, which invokes
+`scripts/daily_swing_paper.py --execute`
 against three Alpaca **paper** accounts, forward-testing the three surviving
 candidates (E6-1x, E18-VIXTS, M10-1). No code path in this repo can reach a
 funded account. That series exists to accumulate out-of-sample evidence the

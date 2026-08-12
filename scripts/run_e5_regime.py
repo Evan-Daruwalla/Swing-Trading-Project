@@ -9,6 +9,8 @@ Does NOT touch swing.db — fetches fresh into memory.
 NAV (finding-things map): imports swing_bot (prices). Imported by: no other
 module (standalone runner).
 """
+# DATA CONVENTION: prices are SPLIT-ADJUSTED, DIVIDEND-UNADJUSTED (auto_adjust=False)
+# -- swing_bot/prices.py & the shared cache both enforce it; stated here per CLAUDE.md.
 import math
 import sys
 from pathlib import Path

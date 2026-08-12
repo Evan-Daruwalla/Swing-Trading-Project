@@ -37,7 +37,10 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > self-correcting on share drift. **Disclosed:** the 3 sleeves are ~ONE strategy — a documented
 > consequence of the evidence, since nothing uncorrelated *and* profitable was found to deploy.
 > **Next research direction (Evan, 2026-08-03): RELAX A CONSTRAINT** rather than hunt a 38th
-> rule inside the same box — see the options block below.
+> rule inside the same box. (This line used to point at "the options block below", which does
+> not exist in this file — audit #4 F10. The relaxation plan lives in
+> `docs/M12_constraint_relaxation_plan.md`; M12's factorial answered it: HORIZON binds,
+> breadth does not — record DU.)
 
 > **2026-08-03 — X9 pairs / relative-value = FAIL; attempt #37 (record DP; results
 > `docs/research/2026-08-03_X9_pairs_results.md`).** Evan chose "test a different rule family"
@@ -87,7 +90,7 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
 > instruments cannot be tested fairly.
 
-**Last updated: 2026-08-03 ~01:04 CDT** — this file is the only live snapshot;
+**Last updated: 2026-08-11 ~17:54 CDT** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
@@ -128,13 +131,18 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 >   rewritten to match a broker fill, and placing bookkeeping orders is a trading-behavior
 >   change = Evan's explicit call. Instead `report_mirror_drift()` now prints the gap every
 >   run (flags ≥0.25%), so comparisons are made knowing the offset.
-> - **Open: #8** prices.fetch has no retry (partial-realize risk), **#9** `.bat` is LF-only
->   (latent), **#10** dependency CVE status UNKNOWN (pip-audit not installed; audit rule =
->   never install tooling unasked).
+> - ~~Open: #8/#9/#10~~ **ALL CLOSED, verified 2026-08-11 (audit #4 F10):** #8
+>   prices.fetch retries on a (2,5,15)s ladder; #9 `.gitattributes` pins `*.bat text
+>   eol=crlf` and the file is CRLF on disk; #10 pip-audit is installed and reports
+>   "No known vulnerabilities found". This block had claimed them Open for 8 days
+>   after the code said otherwise.
 
-> **M3 forward paper — RUNNING, 13 sessions (2026-07-15 → 07-27), 27 NAV rows, no gaps.**
-> All three sleeves currently long QQQ. Latest marks (07-27): **e6_1x $958.03 · e18_vixts
-> $952.04 · m10_1_nagel $971.32** (each started at $1,000). Scheduled task
+> **M3 forward paper — RUNNING, 18 sessions (2026-07-15 → 2026-08-10), 54 NAV rows, ONE
+> permanent hole (2026-07-30, record EI).** (The prior version of this line said "13
+> sessions, 27 NAV rows, no gaps" — 13×3 is 39, not 27, and the 07-30 gap was real; both
+> wrong, corrected by audit #4 F10.) All three sleeves currently long QQQ. Latest marks
+> (2026-08-10): **e6_1x $1,012.46 · e18_vixts $1,006.13 · m10_1_nagel $1,026.50** (each
+> started at $1,000). Task now runs S4U — fires with nobody logged on. Scheduled task
 > `SwingTradingDailyPaper` fires 7pm weekdays via `scripts/daily_swing_paper.bat --execute`;
 > logs to `var/daily_swing_paper.log`. **Do NOT fire it manually intraday** — that is what
 > caused the 07-20 round-trip and the e18 fork; the guard now blocks order submission while

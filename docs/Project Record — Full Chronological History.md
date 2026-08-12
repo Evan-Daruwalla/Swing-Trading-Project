@@ -6112,3 +6112,183 @@ Remaining open: audit #12, graph wave 2 (35 research docs, other 82 cached), V3 
 PBO to genuine selection sets).
 
 **Doc cadence:** prompt #165, cadence hit, entry written same prompt. No miss.
+
+---
+
+# Appendix EJ - S4U CONFIRMED unattended; fourth cold audit finds the previous audit's fixes were DETECTIVE, not CORRECTIVE (2026-08-11, ~00:16 CDT)
+
+## 1. E1 closed for real -- the unattended run landed
+
+The 2026-08-10 19:00 run was the first proof point that could not be faked by Evan being logged
+on. It fired.
+
+```
+LastRunTime    : 08/10/2026 19:00:00     LastTaskResult : 0
+LogonType      : S4U                     MissedRuns     : 0
+paper_nav      : 18 sessions, 2026-07-15 .. 2026-08-10  (2026-08-10 present, 3 sleeves)
+weekday sessions with NO nav row: ['2026-07-30']
+```
+
+**S4U is confirmed end to end.** The forward-evidence series still carries exactly one permanent
+hole (2026-07-30) and is now accumulating unattended.
+
+## 2. Fourth cold audit -- 18 findings, 10 edge cases
+
+Spawned cold per the skill: project path, scope, doc pointers as claims under test, no session
+history, no prior findings, no "this part is known-good".
+
+**THE HEADLINE IS A CRITICISM OF MY OWN PREVIOUS WORK, and it is correct.** The auditor's
+summary: *"The failure mode that survives is the one the record itself named: fixes that are
+detective but not corrective. The crit and both highs of the last audit (2026-08-06) were closed
+with a warning, a docstring, and a census comment; the underlying defects are all still live and
+one has grown worse."*
+
+That is accurate. Audit #3's crit (F1, the unreachable cache-freshness guard) got a
+mixed-vintage WARNING; the cache is still frozen at 2026-07-09 and the staleness has grown from
+26 to **33 days**. The liquidity floor (F3) got a corrected docstring; it is still unenforced.
+The 200-DMA split (F2) got a census comment; the split is still there -- **and the census's line
+numbers are now stale in 5 of 12 entries because my own later edits moved them.** A comment that
+points at the wrong lines is worse than no comment.
+
+The honest defence is that all three real fixes MOVE RECORDED NUMBERS and are therefore
+prereg-gated by this project's own rules -- which is true, and which is exactly why they should
+have been queued as prereg tasks rather than logged as closed-with-a-comment.
+
+**FOUR DEFECTS NO PRIOR AUDIT REPORTED:**
+
+- **F5 (HIGH) -- the paper-only guard is a one-string denylist.** `alpaca_client.py:125` is
+  `self.base_url == LIVE_BASE_URL`. Probed (constructor + property only, no network):
+  `http://api.alpaca.markets`, `https://API.alpaca.markets`, and
+  `https://api.alpaca.markets:443` all return `is_live == False` and would therefore be
+  ALLOWED to POST orders. Reachable through `APCA_API_BASE_URL` in the keys file.
+  `README.md:92` claims "No code path in this repo can reach a funded account." **That claim is
+  false as written.** No live path has ever been exercised and no real money is at risk today --
+  but the guard does not do what the README says it does.
+- **F4 (HIGH) -- the scheduled task can never report a failure.** The `.bat`'s last line is
+  `echo exit code %ERRORLEVEL% >> log`, and in cmd a batch's exit code is its last command's --
+  `echo` returns 0. Proven by mimicking the batch around an `exit /b 3` child: exit **0**;
+  adding `exit /b %RC%`: exit **3**. `main()` also never returns non-zero. So the missed-session
+  detector, the partial-realize warning and any traceback all land in a log nothing reads, while
+  `schtasks` reports `Last Result: 0`. **This is why 2026-07-30 was silent, and it is still
+  silent.**
+- **F6 (MED) -- ROOT CAUSE FOUND for the half-inert fidelity instrument.** Appendix ED recorded
+  5 of 10 `fill_divergence` rows having no `alpaca_order_id` as "DIAGNOSIS ONLY -- not
+  investigated to root cause". The cause: `realize_pending` calls `log_divergence` with no order
+  id on BOTH legs (`daily_swing_paper.py:398` sell, `:410` buy), producing one orphan per leg
+  per cycle alongside the real submit-time row at `:755`. `open_divergence_rows` requires a
+  non-null order id, so those rows can never resolve. Fix is 2 lines DELETED.
+- **F8 (MED) -- the trial-log staleness gate measures file mtime, which git does not preserve.**
+  Probed on scratch copies with byte-identical content: log-newer -> OK; log-older -> RAISED;
+  **identical mtimes (what `git clone`/`git checkout` produce) -> OK**. So on any fresh clone the
+  guard on DSR's deflation input reports "fresh" regardless of truth.
+
+**ALSO NOTABLE:** F7 -- two consumers of `pending_json` disagree about what a weight means; the
+DB ledger divides cash equally and ignores `w` while the Alpaca mirror honours it. Demonstrated
+on a temp DB: a `{.50/.30/.20}` target produces $333/$333/$333 in the ledger vs $500/$300/$200 at
+the broker, a **$166.67 divergence on a $1,000 sleeve**. Latent only because every `decide_*`
+currently returns equal weights.
+
+F10 -- `HANDOFF.md`, the ONLY live snapshot, lists three audit findings as "Open" that the code
+shows are closed, and its NAV block is both stale and internally inconsistent ("13 sessions ...
+27 NAV rows" -- 13x3 = 39, and the DB now holds 18 sessions / 54 rows).
+
+**CLEAN:** frozen tripwire GREEN (12 refs d=+/-0.0000pp + 16 invariants), green under
+`-W error`; `compileall` exit 0; `pip check` clean; **`pip-audit` "No known vulnerabilities
+found"**; `alpaca_keys.env` gitignored and absent from all of `git log --all --name-only`;
+`swing.db` `integrity_check ok`, FK check empty, 19 zero-range bars all XLRE exactly matching
+`gotchas.md`. Coverage: M1-M9 and G1-G4 all swept except G3 partial (the D1 gate thresholds were
+NOT inverted -- doing so needs re-running experiments against the cache F1 has frozen, which
+would produce numbers the auditor could not trust; an honest refusal rather than a fabricated
+sweep).
+
+**STATE:** findings pass only -- **nothing was fixed and nothing was changed.** `origin/main` at
+`227ec4b`; this entry uncommitted.
+
+**Next action:** Evan's approval on the fix order. The auditor's ordering leads with F5 (one
+line, real-money guard), then F4+E2 (the change that makes every other silent failure visible),
+then E1-BOM, F6, F9, F7, F8. The three prereg-gated ones (F1/F2/F3) come last and each needs its
+own pre-registration because each moves recorded numbers.
+
+**Doc cadence:** prompt #168, cadence hit, entry written same prompt. No miss.
+
+---
+
+# Appendix EK - Audit #4 fixes applied: 21 of 28 items, every one fed its own trigger; 3 stay prereg-gated, 1 stays blocked (2026-08-11, ~17:56 CDT)
+
+**TRIGGER:** Evan verified the findings ("verify bugs and solutions"), then "do all".
+
+**VERIFICATION CAME FIRST.** Every finding was independently reproduced before any fix -- and
+three of the auditor's SOLUTIONS were amended on evidence:
+
+1. **F5 was WORSE than reported.** The `is_live` guard protected only `submit_order`;
+   `close_position`, `cancel_order`, `cancel_all_orders` had NO guard -- even the canonical
+   live URL sailed through. The auditor's one-line inversion would have left those three open.
+   Fix became a shared `_require_paper()` ALLOWLIST (`base_url == PAPER_BASE_URL` or explicit
+   `allow_live=True`) called by all four mutating endpoints.
+2. **F8's count-check was too weak.** Comparing only `prereg_docs_found` misses a renamed
+   prereg. The fix compares the SET of prereg file names recorded in the log
+   (`trials[].prereg_file` + excluded) against disk -- catches add/remove/rename, clone-safe.
+   E7's backslash-normalisation folded into the same lines.
+3. **E3's fix is a BEHAVIORAL CHANGE TO A LIVE PRE-REGISTERED SLEEVE, disclosed here.** The
+   m10_1 weekly gate now fires as catch-up on the first session after an ISO week with no
+   Friday decision (market-holiday Friday: Good Friday, 2026-12-25). The prereg specifies a
+   weekly decision; `weekday()==4` alone silently SKIPPED such weeks forever. A holiday-delayed
+   decision (signal at that close, execute next open, as always) is closer to the prereg's
+   intent than a skipped one. Cold-start behavior unchanged (still waits for a Friday). This is
+   recorded as a change to a running sleeve, not slipped in as a bug fix.
+
+## Fixed (21), each verified BY ITS TRIGGER, not by reading the patch
+
+| item | fix | trigger fed |
+|---|---|---|
+| F5 | `_require_paper()` allowlist, all 4 mutating endpoints | `http://`, uppercase-host, `:443` variants x submit + the 3 formerly-unguarded endpoints: all REFUSED; paper URL passes through to a real 401 |
+| F4 | `.bat`: `set RC` + `exit /b %RC%`; `main()` returns 0/1; `raise SystemExit(main())`; `RUN_FAILURES` collector | scratch batch pair: child `exit /b 3` -> wrapper 0 before, 3 after |
+| F4b | `ACKNOWLEDGED_NAV_HOLES = {2026-07-30}` | design guard: the permanent hole must not turn every future Last Result red -- that trains the operator to ignore red, un-fixing F4 |
+| E2 | empty QQQ fetch -> loud `return 1` | code path; unreachable without killing the network |
+| E1 | `utf-8-sig` in `_load_keys_file` | REAL parser fed a BOM'd file: `E6_KEY` found; BOM-less unchanged |
+| F6 | DELETED the two orphan `log_divergence` calls | `resolve_divergence` verified to repair sim_price from `paper_transactions` -- nothing lost |
+| F9 | failed close -> skip that sleeve's buys + RUN_FAILURES | code path; `continue` verified to route through `finally: client.close()` |
+| F7 | `qty = (cash_at_entry * w) / px`, snapshot after sell loop | equal weights are the identity case; tripwire's reconcile invariants stay GREEN |
+| E6 | cash persisted after the SELL loop too (2 writes) | `grep -c "UPDATE paper_sleeves SET cash"` = 2 |
+| F8+E7 | file-SET staleness gate, backslash-normalised | 3 triggers: identical-mtime clone sim OK n=50; ADDED prereg RAISED; RENAMED prereg RAISED |
+| E3+F18 | widened weekly gate + condition-specific message | 10 gate cases incl. holiday-Friday catch-up, year-boundary W53 rollover, cold starts: ALL PASS |
+| F13 | convention header inserted in 13 scripts + tripwire invariant | temp violator file: detector names it; after cleanup: `[]`; tripwire now **17 invariants** |
+| E5 | dropped panel tickers now print name+reason | code path |
+| E8 | `as_of is None` -> clean message, exit 1 | code path |
+| E9 | `busy_timeout=30000` in both `connect()`s | pragma applied at connect |
+| E10 | retry-cycle tradeoff DISCLOSED in the comment | doc |
+| F15 | pstdev-vs-sample Sharpe note in validation.sharpe | doc; measured gap at T~2900 is ~0.02%, far below every gate |
+| F17 | `.gitignore` covers chunk files + `.prev_chunks/` | `git status` no longer lists them; `git check-ignore` confirms |
+| F10 | HANDOFF: 3 false "Open" items struck CLOSED with evidence; NAV block corrected (18 sessions / 54 rows / one hole, was "13/27/no gaps" -- 13x3=39, both wrong); stamp 2026-08-11; dead "options block below" pointer -> M12 plan | facts re-queried read-only from swing.db |
+| F11 | README: 37/38 attempt framing, 9 families, E19 FAIL (was DEFERRED a month after the verdict), .bat not .py in the task line | cross-checked against PRD + HANDOFF + schtasks |
+| F12 | PRD: M11 heading struck to DONE-FAIL; M3 row struck to RUNNING-since-07-15; notional+limit claim struck (Alpaca rejects it) | dated strikethroughs per the roadmap rule, never wholesale deletion |
+
+**F2 interim:** the 200-DMA census comment now cites FILE + FUNCTION instead of line numbers
+(5 of 12 line refs had already rotted; two of my first function citations were themselves wrong
+-- `rotation()` not `rotation_nav()` in e7, `run()` not `ma_gate_nav()` in pt_volgate -- caught
+by grepping every cited name before committing to it).
+
+## NOT fixed, stated plainly
+
+- **F1 / F2-real / F3-real** -- each moves recorded numbers; each needs its own
+  pre-registration. F1 (the frozen cache) remains the program's top open defect.
+- **F14** -- the one-row cash `UPDATE`; classifier-blocked live-ledger write, Evan's call.
+- **F16** -- nothing actionable by design.
+
+## Follow-up validation (before -> after)
+
+- `compileall` exit 0. Frozen tripwire **GREEN d=+/-0.0000pp**, 12 refs + **17 invariants**
+  (was 16), also GREEN under `python -W error`.
+- **V1 harness re-run end-to-end: bit-for-bit identical** (DSR 0.0168/0.0001/1.0000, PBO
+  0.429/0.900/0.514, HARNESS ACCEPTED) -- proving F8's new gate passes on a fresh log and E5's
+  visibility change alters no number.
+- Import probe: all 6 edited swing_bot modules + all 15 touched scripts import clean.
+- `.bat` re-verified pure ASCII, all-CRLF after edit.
+
+**STATE:** ~25 files modified, uncommitted. The 19:00 task tonight is the first live run of the
+new exit-code path -- Last Result stays 0 only if the run is genuinely clean.
+
+**Next action:** Evan's call on committing. Open: V3 prereg (PBO scoping), F1/F2/F3 preregs,
+F14, graph wave 2.
+
+**Doc cadence:** entry written at completion of the fix pass (last cadence hit #168 -> EJ).

@@ -9,6 +9,8 @@ its own series, no cache_fetch). LIVE forward-paper twin:
 swing_bot.paper_sleeves.decide_e6_1x (the e6_1x sleeve mirrors this 200-DMA
 gate). Self-contained otherwise.
 """
+# DATA CONVENTION: prices are SPLIT-ADJUSTED, DIVIDEND-UNADJUSTED (auto_adjust=False)
+# -- swing_bot/prices.py & the shared cache both enforce it; stated here per CLAUDE.md.
 import math
 import sys
 from pathlib import Path
@@ -67,17 +69,19 @@ def rotation_nav(dates, sig_close, pos_oc, ma=200, cost_bps=5.0,
             # "every other 200-DMA in the project" includes today's close. That
             # was false -- it named 3 of 13 sites. The project runs BOTH forms
             # and always has; this fix aligned E6 with the live sleeve, it did
-            # not make the repo uniform. Full census:
+            # not make the repo uniform. Full census -- BY FUNCTION, not line
+            # number (audit #4 F2 found 5 of the line refs already stale after
+            # unrelated edits moved them; functions do not rot):
             #   INCLUSIVE  closes[i-ma+1:i+1] / series[-200:]
-            #     swing_bot/paper_sleeves.py:250 (sma), :260 (LIVE e6_1x)
-            #     run_e6_deleveraged.py:75 (here)   run_e18_regime_gates.py:78
-            #     run_m12_factorial.py:202          run_x9_pairs.py:72
-            #     run_x6_crypto_trend.py:59
+            #     swing_bot/paper_sleeves.py  sma() + decide_e6_1x() (LIVE)
+            #     run_e6_deleveraged.py  rotation_nav() (here)
+            #     run_e18_regime_gates.py  sma()    run_m12_factorial.py  e6_nav()
+            #     run_x9_pairs.py  e6_rule_nav()    run_x6_crypto_trend.py  sma()
             #   EXCLUSIVE  closes[i-ma:i]
-            #     swing_bot/rotation.py:77  <-- E4 engine, PINNED by the frozen
-            #                                   tripwire; changing it goes RED
-            #     run_e5_regime.py:74               run_e7_international.py:73
-            #     pt_volgate.py:70                  screens_20260709.py:117,163
+            #     swing_bot/rotation.py  run_rotation()  <-- E4 engine, PINNED
+            #                            by the frozen tripwire; changing it goes RED
+            #     run_e5_regime.py  rotation_nav()   run_e7_international.py  rotation()
+            #     pt_volgate.py  run()               screens_20260709.py  a3_screen()+b1_screen()
             # Consequence worth knowing: E5 and E7 -- the out-of-sample regime
             # and international tests -- use the OPPOSITE convention from the
             # E6 strategy they are tests of. Not fixed here: each is a recorded

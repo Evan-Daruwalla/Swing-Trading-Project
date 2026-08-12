@@ -11,6 +11,8 @@ NAV (finding-things map): imports run_e10_earnings_drift (UNIV);
 run_e8_squeeze (CAP0, COST, cache_fetch). Imported by: no other module
 (standalone runner).
 """
+# DATA CONVENTION: prices are SPLIT-ADJUSTED, DIVIDEND-UNADJUSTED (auto_adjust=False)
+# -- swing_bot/prices.py & the shared cache both enforce it; stated here per CLAUDE.md.
 import bisect
 import json
 import math

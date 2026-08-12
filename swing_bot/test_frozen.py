@@ -45,6 +45,33 @@ import daily_swing_paper as dsp        # noqa: E402  (needs the path insert abov
 Case = namedtuple("Case", ["name", "value", "ref", "unit", "dp"])
 
 
+def _price_scripts_missing_convention_header():
+    """CLAUDE.md: any script touching price data states its adjustment
+    convention in a header comment. Stated in three docs, enforced nowhere
+    (audit #4 F13: 13 violators at zero mechanical checks) -- one guard at the
+    chokepoint beats 13 headers nobody re-checks. A script counts as
+    price-touching if it imports swing_bot.prices or uses the shared
+    cache_fetch; the convention must appear in its FIRST 40 LINES."""
+    import glob
+    import io
+    import re
+    conv = re.compile(r"auto_adjust|split-adj|dividend-unadj", re.I)
+    pricey = re.compile(r"from swing_bot import prices|from swing_bot\.prices"
+                        r"|cache_fetch")
+    bad = []
+    for f in sorted(glob.glob(str(Path(__file__).resolve().parent.parent
+                                  / "scripts" / "*.py"))):
+        src = io.open(f, encoding="utf-8").read()
+        if not pricey.search(src):
+            continue
+        if not conv.search("\n".join(src.splitlines()[:40])):
+            bad.append(Path(f).name)
+    if bad:   # print the offenders -- a bare FAIL with no names is unfixable
+        print("  !! price-touching scripts missing the convention header:",
+              ", ".join(bad))
+    return bad
+
+
 def _ro_connect():
     """Open swing.db READ-ONLY. The tripwire must never take a write handle on
     the live paper ledger (audit #10).
@@ -191,6 +218,10 @@ INVARIANTS = [
     # The m10_1 weekly gate is keyed on this string; a wrong week burns or
     # repeats a decision.
     ("isoweek_str_friday_2026_07_31", dsp.isoweek_str("2026-07-31") == "2026-W31"),
+
+    # --- CONVENTION-HEADER GUARD (audit #4 F13, added 2026-08-11) -----------
+    ("price_scripts_state_adjustment_convention",
+     _price_scripts_missing_convention_header() == []),
 ]
 
 

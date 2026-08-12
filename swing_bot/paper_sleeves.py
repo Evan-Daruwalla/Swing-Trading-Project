@@ -111,6 +111,10 @@ _MIGRATIONS = (
 
 def connect(db_path=DB_PATH):
     conn = sqlite3.connect(str(db_path))
+    # 30s, up from Python's 5s default (audit #4 E9): a hand-run script
+    # overlapping the 19:00 task raised "database is locked" after 5s. 30s
+    # outlasts any single write transaction here without masking a deadlock.
+    conn.execute("PRAGMA busy_timeout=30000")
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
     for table, col, coltype in _MIGRATIONS:

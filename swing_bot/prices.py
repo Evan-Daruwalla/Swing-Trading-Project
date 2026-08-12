@@ -54,6 +54,7 @@ def connect(db_path=DB_PATH):
     ledger and the 19:00 scheduled job writes it.
     """
     conn = sqlite3.connect(str(db_path))
+    conn.execute("PRAGMA busy_timeout=30000")   # see paper_sleeves.connect (audit #4 E9)
     conn.execute(SCHEMA)
     return conn
 

@@ -157,9 +157,12 @@ framing, so they are stale rather than done.
   capital as a parameter so this never hard-codes).
 - Data: EOD only. Signals at close; fills per the model the ablation
   validates. No intraday logic. `next_open` comes from cache, never invented.
-- Alpaca PAPER only. Fractional/notional orders support market **and**
-  limit/stop/stop-limit (confirmed 2026-07-13, record Appendix BO; already
-  noted in the 2026-07-08 small-account brief) — the binding constraint is
+- Alpaca PAPER only. ~~Fractional/notional orders support market **and**
+  limit/stop/stop-limit (confirmed 2026-07-13, record Appendix BO)~~
+  **CORRECTED 2026-08-11 (audit #4 F12): Alpaca REJECTS notional+limit — the
+  live loop's canonical fractional order is market-notional DAY (this file's
+  own M3 task and HANDOFF both say so; Appendix BO's claim did not survive
+  contact with the API)** — the binding constraint is
   **TIF = DAY only** (no GTC — exits re-armed daily or software-managed) and
   **no fractional shorting** (long-only unless whole shares). "DAY-TIF" here
   never meant market-only; use a marketable DAY limit to cap fill price. Do NOT read
@@ -196,7 +199,7 @@ framing, so they are stale rather than done.
 | M2c | E3: concentrated mega-cap stocks (stub — designed after E2 readout) | liquidity-defined stock universe + survivorship caveat; own pre-reg |
 | M2d | Rotation family (E4/E5/E6, done 2026-07-09) | 3× MA rotation PASS-then-regime-FAIL; 1× (E6) robust drawdown overlay |
 | M2e | E7: international validation (added 2026-07-10, record Appendix AF) | genuinely-unseen non-US regimes (Nikkei 1990s bear etc.): Arm 1 confirm E6 1×, Arm 2 a-priori-vol-gated 3× high-return shot |
-| M3 | Live paper (GATED on a passing pre-registered strategy + Evan approval) — **infra BUILT + 3 paper accounts VERIFIED CONNECTED 2026-07-15; ready to run** | deploy the 3 forward-paper candidates (adapted from stale e1_control/e1_llm_veto — E1 failed; record Appendices CP/CQ): e6_1x / e18_vixts / m10_1_nagel, each with its OWN $1,000 Alpaca paper account. Daily loop + sleeve DB + per-account Alpaca mirror BUILT; keys pasted + smoke-test 200 OK all 3. Remaining: authorize/schedule the first `--execute` run (no orders placed yet); scheduling |
+| M3 | Live paper (GATED on a passing pre-registered strategy + Evan approval) — **RUNNING since 2026-07-15 (status updated 2026-08-11, audit #4 F12 — this row still said "ready to run (no orders placed yet)" after 18 live sessions)** | deploy the 3 forward-paper candidates (adapted from stale e1_control/e1_llm_veto — E1 failed; record Appendices CP/CQ): e6_1x / e18_vixts / m10_1_nagel, each with its OWN $1,000 Alpaca paper account. Daily loop + sleeve DB + per-account Alpaca mirror BUILT + LIVE: 18 sessions of NAV through 2026-08-10, 5 executed transactions, task S4U (fires unattended, record EI). ~~Remaining: authorize/schedule the first `--execute` run (no orders placed yet); scheduling~~ |
 | M6 | Portfolio packaging | README → findings doc, record HTML twin, git tag; make the repo readable cold |
 | M4 | Overlay readout (GATED on pre-registered N/horizon) | evaluate veto vs control; continue, add cascade arm, or kill per pre-reg |
 | M5 | Expansion (GATED on M3 stable) | deferred ideas only: exit/stop ablations (#17/#18), sizing (#20), RSI comparison (#2), mega-cap pullback (#5), VIX gate (#11) |
@@ -1123,7 +1126,10 @@ PASS-HR as a forward-paper hypothesis, (3) the E2 mirage closed. **M10 does NOT 
 program** — see M11.
 
 ### M11 — Algorithmic chart-pattern detection (added 2026-07-14; Evan's direction; record
-Appendix CL) — **CURRENT OPEN DIRECTION, UNSTARTED**
+Appendix CL) — ~~CURRENT OPEN DIRECTION, UNSTARTED~~ **DONE 2026-07-14: FAIL (signal-dead)**
+*(heading corrected 2026-08-11, audit #4 F12 — it contradicted this file's own MILESTONES
+row and §status line, both of which recorded the FAIL on 2026-07-14; under the precedence
+rule a reader following this heading got the wrong answer for 4 weeks)*
 
 **Why this exists (Evan, 2026-07-14):** "Many traders teach others by showing the graphs
 and certain patterns that suggest the market is about to go up or down, then buy when those

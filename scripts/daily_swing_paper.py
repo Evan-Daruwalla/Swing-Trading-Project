@@ -65,6 +65,21 @@ from run_e10_earnings_drift import UNIV
 from run_c1_residual_reversal import residual_series, BETA_N
 
 VIX_THR = ps.VIX_STRESS_THR   # single source of truth (audit #6) -- see paper_sleeves
+
+# Anything that should make this RUN report failure appends a line here; main()
+# returns 1 when it is non-empty and the .bat propagates that via exit /b
+# (audit #4 F4). Until 2026-08-11 every failure -- the missed-session banner,
+# a partial realize, a dead sleeve -- was printed to a log nothing reads while
+# Task Scheduler showed Last Result 0. A warning the exit path cannot see is
+# not a warning.
+RUN_FAILURES: list[str] = []
+
+# Permanent, already-recorded holes in paper_nav. Still PRINTED every run (the
+# series genuinely lacks them) but they no longer fail the exit code -- a red
+# Last Result that fires forever on an unfixable past hole trains the operator
+# to ignore red, which un-fixes F4. Add a date here only after it is recorded
+# in the project record as permanently lost.
+ACKNOWLEDGED_NAV_HOLES = {"2026-07-30"}   # lost to the Interactive-only task; record EI
 # Max sessions the VIX3M reading may lag `today` before e18 refuses to decide
 # (audit #3). 2 = tolerate the normal 1-session publish lag + a holiday edge;
 # the 5-session Yahoo lag that inverted the signal (record DC) trips it.
@@ -395,19 +410,45 @@ def realize_pending(conn, sleeve, today, fill_open):
         cash += pos["qty"] * px
         ps.record_fill(conn, sleeve, today, t, "sell", pos["qty"], px, "pending-liquidate")
         ps.upsert_position(conn, sleeve, t, 0.0, px, today)
-        ps.log_divergence(conn, sleeve, today, t, px)
+        # NO log_divergence here (audit #4 F6): this call carried no order id,
+        # so open_divergence_rows could never resolve it -- one permanent
+        # orphan per leg per cycle, 5 of the live table's 10 rows. The sim-side
+        # fill this recorded is already in paper_transactions via record_fill
+        # above, which is exactly where resolve_divergence's repair join reads
+        # it from. Divergence rows are created at SUBMIT time only, with the
+        # Alpaca order id attached.
+    # Persist cash NOW, before the buy loop (audit #4 E6). record_fill and
+    # upsert_position each commit immediately, but cash was only written once,
+    # after the buys -- so a kill between the loops (ExecutionTimeLimit,
+    # reboot) left the position deletions COMMITTED while cash still held its
+    # pre-sale value: the sale proceeds simply vanished from the ledger that
+    # IS the forward evidence. Two writes make every kill window consistent.
+    conn.execute("UPDATE paper_sleeves SET cash=? WHERE sleeve=?",
+                 (round(cash, 9), sleeve))
+    conn.commit()
     if target:
-        per_ticker_cash = cash / len(target)
+        # cash * w, not cash / len(target) (audit #4 F7): the equal-split
+        # ignored the weight the decide_* contract says callers must honour
+        # ("Callers translate weights -> $ notional using the sleeve's NAV",
+        # paper_sleeves.py) -- while the Alpaca mirror DOES honour it
+        # (desired = nav * w). A {.50/.30/.20} target would book $333/$333/$333
+        # in this ledger vs $500/$300/$200 at the broker: a $167 fork on a
+        # $1,000 sleeve. Latent only because every decide_* today returns
+        # equal weights, for which cash*w == cash/len exactly (w = 1/K and the
+        # tripwire pins that identity).
+        cash_at_entry = cash          # snapshot AFTER the sell loop: weights
+                                      # size against the post-liquidation pool,
+                                      # not a balance that shrinks per leg
         for t, w in target.items():
             px = fill_open.get(t)
             if px is None or px <= 0:
                 skipped_buy.append(t)
                 continue
-            qty = per_ticker_cash / px
+            qty = (cash_at_entry * w) / px
             cash -= qty * px
             ps.record_fill(conn, sleeve, today, t, "buy", qty, px, "pending-enter")
             ps.upsert_position(conn, sleeve, t, qty, px, today)
-            ps.log_divergence(conn, sleeve, today, t, px)
+            # no log_divergence here either -- same reason as the sell leg above
     if skipped_sell or skipped_buy:
         # Report BOTH sides (audit E6). The old message divided only skipped_buy
         # by len(target), so a pure sell-side skip printed "buy=- ~0%
@@ -428,6 +469,8 @@ def realize_pending(conn, sleeve, today, fill_open):
               f"sell={skipped_sell or '-'} buy={skipped_buy or '-'}. "
               f"Unfilled BUY legs leave ~{buy_pct:.0f}% of the target unbought."
               f"{note} Check the yfinance feed for those tickers.", flush=True)
+        RUN_FAILURES.append(f"[{sleeve}] partial realize: sell={skipped_sell} "
+                            f"buy={skipped_buy}")
     # Round away float residue (audit E8): full liquidation left cash at
     # -1.14e-13 instead of 0.0. Harmless to arithmetic, but it makes any future
     # `if cash < 0` guard fire on a sleeve that is exactly flat.
@@ -440,6 +483,11 @@ def realize_pending(conn, sleeve, today, fill_open):
     # with no way to recover it. Keeping the pending lets the next run retry the
     # leg; the realize guard (today > pending_signal_date) still prevents a
     # same-session double fill.
+    # DISCLOSED TRADEOFF (audit #4 E10): the retried cycle liquidates and
+    # re-buys EVERY leg at the retry day's open, not the signal's next open --
+    # a deviation from the EOD rule plus one extra round trip of cost on the
+    # already-filled legs. Accepted deliberately: a late fill at a known price
+    # beats a permanently under-invested sleeve. This is a tradeoff, not a bug.
     if skipped_buy:
         print("  [%s] pending KEPT for retry next run (unfilled buy legs: %s)"
               % (sleeve, skipped_buy), flush=True)
@@ -475,6 +523,15 @@ def main():
 
     print("Fetching QQQ + VIX/VIX3M ...", flush=True)
     qdates, qclose, qopen = series("QQQ")
+    # An empty QQQ fetch (rate limit, DNS, feed outage) used to IndexError on
+    # qdates[-1] -- losing the day exactly the way 2026-07-30 was lost, with
+    # exit 0 (audit #4 E2). Fail loud instead: the retry ladder inside
+    # prices.fetch has already done its 3 backoffs by the time this is empty.
+    if not qdates:
+        print("!! QQQ fetch returned NO DATA after retries -- cannot establish "
+              "the session date. Nothing was decided or marked; re-run when the "
+              "feed recovers.", flush=True)
+        return 1
     today = qdates[-1]
     print(f"  latest session: {today}")
     _, vclose, _ = series("^VIX", start="2015-01-01")
@@ -522,6 +579,9 @@ def main():
                   "row -- %s. Those NAV rows are PERMANENTLY absent from the "
                   "forward-evidence series. Check the scheduled task."
                   % (len(missed), ", ".join(missed)), flush=True)
+            new_holes = [d for d in missed if d not in ACKNOWLEDGED_NAV_HOLES]
+            if new_holes:
+                RUN_FAILURES.append("missed session(s): " + ", ".join(new_holes))
 
     # ---- realize any pending from the previous run (needs today's opens for
     # whatever tickers are currently held / newly targeted) ----
@@ -566,8 +626,22 @@ def main():
 
     wk = isoweek_str(today)
     m10_st = ps.get_sleeve(conn, "m10_1_nagel")
-    is_decision_day = (dt.date.fromisoformat(today).weekday() == 4
-                       and m10_st["last_decided_week"] != wk)
+    # Weekly gate = Friday, OR catch-up when an entire ISO week was skipped
+    # (audit #4 E3). `weekday()==4` alone has no slot for a market-holiday
+    # Friday (Good Friday; 2026-12-25): the week's last session is a Thursday,
+    # the gate never fires, and by Monday `wk` is already the NEXT week -- so
+    # that week's m10_1 rebalance was silently never made. The catch-up fires
+    # on the first session after such a week (signal at that close, execute
+    # next open, as always). DISCLOSED BEHAVIORAL CHANGE to a live sleeve,
+    # recorded in the project record 2026-08-11: the prereg specifies a weekly
+    # decision; a holiday-delayed one is closer to that intent than a skipped
+    # one. Cold start (last_decided_week empty) still waits for a Friday.
+    d_today = dt.date.fromisoformat(today)
+    prev_wk = isoweek_str((d_today - dt.timedelta(days=7)).isoformat())
+    last_wk = m10_st["last_decided_week"]
+    is_decision_day = (last_wk != wk) and (
+        d_today.weekday() == 4
+        or bool(last_wk and last_wk not in (wk, prev_wk)))
     if is_decision_day:
         residual_ranks = None
         if vix_today is not None and vix_today > VIX_THR:
@@ -611,8 +685,15 @@ def main():
             conn.execute("UPDATE paper_sleeves SET last_decided_week=? WHERE sleeve='m10_1_nagel'", (wk,))
             conn.commit()
     else:
-        decisions["m10_1_nagel"] = (None, f"not a decision day (week {wk} already "
-                                          f"decided, or today is not Friday)")
+        # Say WHICH condition held (audit #4 F18): the old either/or text
+        # printed "week 2026-W33 already decided" on a Monday when the DB held
+        # W32 -- a false claim about state in the primary evidence log.
+        if last_wk == wk:
+            reason = f"week {wk} already decided"
+        else:
+            reason = (f"not a decision day (today is not Friday; last decided "
+                      f"{last_wk or 'never'}, current week {wk})")
+        decisions["m10_1_nagel"] = (None, reason)
 
     # ---- store new pending where the target differs from what's now held ----
     # If the target MATCHES current holdings, clear any stale pending: a prior
@@ -712,6 +793,10 @@ def main():
                 client = client_for_sleeve(s)
             except AlpacaError as e:
                 print(f"\n--execute [{s}]: SKIPPED (creds): {e}")
+                # The DB ledger keeps advancing while this sleeve's broker
+                # account silently drifts (audit #4 E1's blast radius) -- that
+                # is a failed run, not a quiet skip.
+                RUN_FAILURES.append(f"[{s}] mirror skipped: credentials unavailable")
                 continue
             try:
                 held = {p["symbol"]: p for p in client.list_positions()}
@@ -724,6 +809,7 @@ def main():
                 print(f"\n--execute [{s}]: Alpaca PAPER {client.base_url}  NAV=${nav:,.2f}  "
                       f"held={sorted(held)}  target={sorted(target_syms)} (from DB {src})")
                 client.cancel_all_orders()
+                failed_closes = []
                 for sym in held:                       # flatten what's not wanted
                     if sym not in target_syms:
                         try:
@@ -731,6 +817,19 @@ def main():
                             print(f"    CLOSE {sym}")
                         except AlpacaError as e:
                             print(f"    close {sym} FAILED: {e}")
+                            failed_closes.append(sym)
+                # A failed close must BLOCK the buys (audit #4 F9): proceeding
+                # leaves the broker holding both the unwanted and the wanted
+                # position while the DB shows one -- a silent fork. DELETE
+                # /v2/positions on a 4xx is non-transient, so _request did not
+                # retry; the next run re-attempts the whole flatten-then-buy.
+                if failed_closes:
+                    print(f"    !! {len(failed_closes)} close(s) FAILED "
+                          f"({failed_closes}) -- SKIPPING this sleeve's buys to "
+                          f"avoid holding both old and new positions.", flush=True)
+                    RUN_FAILURES.append(f"[{s}] failed closes: {failed_closes}; "
+                                        f"buys skipped")
+                    continue
                 for t, notional in desired.items():     # enter / repair wanted legs
                     if t in held:
                         print(f"    hold {t} (already held; not re-buying)")
@@ -796,7 +895,16 @@ def main():
     conn.close()
     print("\nDone. Scheduled task 'SwingTradingDailyPaper' runs this daily on weekday "
           "evenings (7pm local, --execute). Log: var\\daily_swing_paper.log.")
+    if RUN_FAILURES:
+        print("\n!! RUN COMPLETED WITH %d FAILURE(S) -- exit 1 so Task Scheduler "
+              "shows a red Last Result instead of 0:" % len(RUN_FAILURES), flush=True)
+        for f in RUN_FAILURES:
+            print("   - " + f, flush=True)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    # SystemExit(main()) not main() (audit #4 F4): a bare call discards the
+    # return value and the process exits 0 no matter what happened above.
+    raise SystemExit(main())

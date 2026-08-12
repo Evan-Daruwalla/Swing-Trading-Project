@@ -45,10 +45,16 @@ def load_panel(tickers, start="2000-01-01"):
     for t in tickers:
         try:
             b = cache_fetch(t)
-        except Exception:
+        except Exception as e:
+            # Say WHICH ticker fell out and why (audit #4 E5): the silent
+            # `continue` let up to 20% of the panel vanish without a line of
+            # output -- the completeness gate below bounds the damage, but a
+            # tolerated drop must still be visible.
+            print(f"  dropped {t}: {type(e).__name__}: {e}", flush=True)
             continue
         d = [x[1] for x in b if x[1] >= start]
         if len(d) < 800:
+            print(f"  dropped {t}: only {len(d)} bars after {start} (<800)", flush=True)
             continue
         o = [x[2] for x in b if x[1] >= start]
         c = [x[5] for x in b if x[1] >= start]

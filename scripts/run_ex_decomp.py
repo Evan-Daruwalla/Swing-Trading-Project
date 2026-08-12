@@ -30,6 +30,8 @@ run_e20_dividend_capture; run_e8_squeeze (COST, cache_fetch);
 swing_bot.universe (UNIVERSE). Imported by: no other module (standalone
 runner).
 """
+# DATA CONVENTION: prices are SPLIT-ADJUSTED, DIVIDEND-UNADJUSTED (auto_adjust=False)
+# -- swing_bot/prices.py & the shared cache both enforce it; stated here per CLAUDE.md.
 import io
 import sys
 from contextlib import redirect_stdout
