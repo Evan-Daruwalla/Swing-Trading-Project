@@ -855,6 +855,12 @@ def main():
                                           alpaca_order_id=o.get("id"))
                     except AlpacaError as e:
                         print(f"    buy {t} FAILED: {e}")
+                        # Reaches the exit gate, like its failed-closes sibling
+                        # above: a wanted leg that never opened leaves the DB
+                        # ledger claiming a position the broker does not hold
+                        # (audit #4 finding 3). Printing alone exited 0 and the
+                        # scheduled task reported green.
+                        RUN_FAILURES.append(f"[{s}] buy {t} failed: {e}")
                 # QTY RECONCILE (audit #4b, authorized by Evan 2026-07-28).
                 # Symbol-level reconcile (record DA) only ever answered WHICH
                 # tickers to hold, never HOW MANY shares -- so the e18 fork
@@ -887,8 +893,20 @@ def main():
                     except AlpacaError as e:
                         print(f"    qty-reconcile {corr['side']} {corr['ticker']} "
                               f"FAILED: {e}")
+                        # Share-count drift left uncorrected is exactly the
+                        # permanent fork this reconcile exists to close, so a
+                        # silent failure defeats its whole purpose
+                        # (audit #4 finding 3).
+                        RUN_FAILURES.append(
+                            f"[{s}] qty-reconcile {corr['side']} "
+                            f"{corr['ticker']} failed: {e}")
             except AlpacaError as e:
                 print(f"\n--execute [{s}]: connection failed: {e}")
+                # The worst of the five handlers: this wraps list_positions,
+                # cancel_all_orders, the closes AND the buys, so it can abort a
+                # sleeve AFTER orders were cancelled -- broker and DB forked --
+                # and still exit 0 with the task green (audit #4 finding 3).
+                RUN_FAILURES.append(f"[{s}] mirror aborted: connection failed: {e}")
             finally:
                 client.close()
 
