@@ -6292,3 +6292,71 @@ new exit-code path -- Last Result stays 0 only if the run is genuinely clean.
 F14, graph wave 2.
 
 **Doc cadence:** entry written at completion of the fix pass (last cadence hit #168 -> EJ).
+
+---
+
+# Appendix EL - Audit #4 fix pass COMMITTED (2026-08-11, ~22:22 CDT)
+
+**TRIGGER:** Evan's "1" -- commit.
+
+**COMMITTED:** `e290b34`, 29 files (+507/-68), tripwire GREEN at commit time. Secrets guard
+clean. Working tree clean afterward -- the graphify extraction scratch no longer shows because
+F17's .gitignore entries landed in this same commit. Appendices EJ and EK ride in it.
+
+**STATE:** local is ONE commit ahead of origin/main (`227ec4b`). Not pushed -- not asked.
+
+**Next action:** tonight's 19:00 task run is the first live exercise of the F4 exit-code path;
+check `schtasks` Last Result + the log tomorrow. Then Evan's pick: F1 prereg (frozen cache --
+top open defect), V3 prereg (PBO scoping), F14 (gated ledger write), graph wave 2, or push.
+
+**Doc cadence:** prompt #171, cadence hit, entry written same prompt. No miss.
+
+# Appendix EM - Audit #4 findings 1/2 closed at the chokepoint: the freshness guard could not arithmetically fire (2026-08-12, ~17:25 CDT)
+
+**Trigger.** Evan's `/audit` sweep across all active projects, then an approved
+fix pass. This entry covers audit #4's findings 1 (detection half) and 2, which
+share one chokepoint.
+
+**The guard could not arithmetically fire.** `_note_vintage` in
+`scripts/run_e8_squeeze.py` — the repo's de-facto shared data layer, imported by
+~19 scripts — reported only when `len(distinct) > 1`, comparing cached series
+against EACH OTHER. With one series in play that bound is exactly **1**, so for a
+single-ticker script (`c4`=QQQ, `c6`=SPY, `x1`=SPY) the branch was unreachable
+**by construction**, and uniform staleness was invisible for the same reason.
+
+Those are precisely the scripts reading a SPY benchmark **18 sessions older** than
+the universe it gets tabulated against: `.e8e9_cache` holds 5 vintages spanning
+2026-07-09..2026-08-04, SPY ends 07-09, the 142-name universe ends 08-04, and
+because `SEC`'s window end is open (`2099-01-01`) each series sets its own window
+end. Strategy CAGR annualized over 3165 sessions; the SPY CAGR printed beside it
+over 3147.
+
+**What changed.**
+1. Staleness is now measured against the **clock**, not against sibling series.
+   This deviates from the audit's suggested fix of comparing against the newest
+   end-date on disk — that cannot close the uniform case, because if every series
+   is equally old the max equals the value under test.
+2. Both checks now **RAISE** instead of printing. Printing WAS the defect: the
+   warning scrolled past and the number was believed. Escape hatch
+   `SWING_ALLOW_STALE_CACHE=1`, tolerance `SWING_MAX_CACHE_STALE_DAYS` (default 5).
+
+**This will bite immediately, and that is the point.** With the cache at 5
+vintages, research scripts refuse until it is refreshed or the override is set.
+Those runs were producing non-comparable numbers quietly.
+
+**Blast radius checked BEFORE committing.** `daily_swing_paper.py` does not import
+this module, so the live paper loop is untouched. `test_frozen` only greps these
+scripts for their adjustment-convention header rather than executing them.
+
+**VERIFICATION.** 5/5 trigger cases: single stale RAISES (the previously
+unreachable one, correctly naming SPY at 2026-07-09); single fresh stays silent;
+mixed vintage raises; the `*_earn` list-of-strings shape is ignored; the override
+downgrades to a warning. **FROZEN TESTS: GREEN (all d=0)**, exit 0.
+
+**Commit** `f00f532`. Not pushed.
+
+**NOT done.** Finding 1's CORRECTION half — threading a real `through=` through
+all 53 call sites — stays open and stays sized **L**: it moves already-recorded
+numbers and needs its own pre-registration. Detection now exists; the correction
+does not. Findings 3-8 and E2-E7 from audit #4 are also still open, including the
+three Alpaca handlers that never reach the exit gate.
