@@ -17,6 +17,7 @@ swing_bot engines + the live M3 loop instead). Returns rows as
 (ticker, date, open, high, low, close, ...); most callers use b[1]=date,
 b[2]=open, b[5]=close.
 """
+import datetime
 import json
 import math
 import os
@@ -80,6 +81,36 @@ def cache_last_date(ticker):
 # call site would move recorded numbers and needs its own pre-registration.
 _VINTAGES = {}
 _VINTAGE_REPORTED = set()
+_STALE_REPORTED = set()
+
+# Audit #2 (2026-08-12). Two changes, both to guards that could not do their job.
+#
+# 1. The mixed-vintage check requires len(distinct) > 1, comparing series against
+#    EACH OTHER. With one series in play that bound is exactly 1, so for a
+#    single-ticker script (c4=QQQ, c6=SPY, x1=SPY) the branch was unreachable BY
+#    CONSTRUCTION -- and uniform staleness was invisible to it for the same
+#    reason. Those are precisely the scripts that read a SPY benchmark 18 sessions
+#    older than the universe it was tabulated against. Staleness is now measured
+#    against the CLOCK, which neither blind spot can hide from. (Measuring against
+#    the newest date on disk would not close the uniform case: if every series is
+#    equally old, the max equals the value under test.)
+# 2. Both checks now RAISE. Printing WAS the defect -- SEC's window end is open
+#    (2099-01-01), so a stale series silently sets its own evaluation-window end
+#    and the CAGR denominator with it, the warning scrolls past, and the number is
+#    believed. Deliberate historical run: SWING_ALLOW_STALE_CACHE=1.
+_ALLOW_STALE = os.environ.get("SWING_ALLOW_STALE_CACHE") == "1"
+_MAX_STALE_DAYS = int(os.environ.get("SWING_MAX_CACHE_STALE_DAYS", "5"))
+
+
+def _vintage_fail(msg):
+    if _ALLOW_STALE:
+        print("  !! " + msg + "\n     [SWING_ALLOW_STALE_CACHE=1 -- continuing]", flush=True)
+        return
+    raise RuntimeError(
+        msg + "\n     Refresh the cache (delete the stale .e8e9_cache entries and "
+        "re-run), or set SWING_ALLOW_STALE_CACHE=1 if this run is deliberately "
+        "historical."
+    )
 
 
 def _note_vintage(ticker, bars):
@@ -92,14 +123,29 @@ def _note_vintage(ticker, bars):
         _VINTAGE_REPORTED.update(distinct)
         newest = max(distinct)
         behind = sorted(t for t, d in _VINTAGES.items() if d != newest)
-        print("  !! MIXED-VINTAGE CACHE: %d distinct end-dates in play (%s .. %s). "
-              "%d of %d series stop before %s: %s%s. Cross-sectional results "
-              "computed over this panel are NOT comparable -- a short series that "
-              "ends mid-window is what overstated M12's headline effect 3x. "
-              "Delete the stale files or pass through= to refetch."
-              % (len(distinct), min(distinct), newest, len(behind),
-                 len(_VINTAGES), newest, ", ".join(behind[:8]),
-                 " ..." if len(behind) > 8 else ""), flush=True)
+        _vintage_fail(
+            "MIXED-VINTAGE CACHE: %d distinct end-dates in play (%s .. %s). "
+            "%d of %d series stop before %s: %s%s. Cross-sectional results "
+            "computed over this panel are NOT comparable -- a short series that "
+            "ends mid-window is what overstated M12's headline effect 3x."
+            % (len(distinct), min(distinct), newest, len(behind),
+               len(_VINTAGES), newest, ", ".join(behind[:8]),
+               " ..." if len(behind) > 8 else ""))
+        return
+    if ticker in _STALE_REPORTED:
+        return
+    try:
+        age = (datetime.date.today() - datetime.date.fromisoformat(last)).days
+    except ValueError:
+        return
+    if age > _MAX_STALE_DAYS:
+        _STALE_REPORTED.add(ticker)
+        _vintage_fail(
+            "STALE CACHE: %s ends %s, %d calendar days ago (tolerance %d days, "
+            "SWING_MAX_CACHE_STALE_DAYS). The evaluation window terminates "
+            "wherever the data stops, so this series sets its own window end -- "
+            "and a benchmark read at a different vintage is not comparable to it."
+            % (ticker, last, age, _MAX_STALE_DAYS))
 
 
 def cache_fetch(ticker, through=None):
