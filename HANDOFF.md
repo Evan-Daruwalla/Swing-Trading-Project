@@ -683,6 +683,16 @@ Full descriptions as Evan gave them: record Phase 0.
   Trading's DB.
 - If Trading's `price_cache` is reused: read-only from here, and honor
   split-adjusted / dividend-UNadjusted everywhere.
+- **Research scripts now REFUSE a stale or mixed-vintage cache (2026-08-12,
+  record Appendix EM).** `_note_vintage` in `scripts/run_e8_squeeze.py` — the
+  shared data layer ~19 scripts import — raises instead of printing. Expect this
+  to fire immediately: `.e8e9_cache` holds **5 vintages spanning 2026-07-09 to
+  2026-08-04**, so a run mixing SPY (07-09) with the 142-name universe (08-04)
+  now stops rather than quietly annualizing strategy CAGR over 3165 sessions and
+  the benchmark over 3147. **This is not a bug — refresh the cache.** Deliberate
+  historical run: `SWING_ALLOW_STALE_CACHE=1`; tolerance
+  `SWING_MAX_CACHE_STALE_DAYS` (default 5). The live M3 paper loop is unaffected
+  — `daily_swing_paper.py` does not import that module.
 
 ## Decisions taken 2026-07-08 (details in record Appendices B–C)
 
