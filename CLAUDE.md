@@ -2,8 +2,9 @@
 
 Read `HANDOFF.md` FIRST in a fresh session. Append-only record:
 `docs/Project Record — Full Chronological History.md` (ground truth when
-anything disagrees). No PRD yet — once `PRD_ROADMAP.md` exists, its next open
-task is the default work.
+anything disagrees). `PRD_ROADMAP.md` exists (written 2026-07-08) — its next
+open task is the default work. (This line said "No PRD yet" for five weeks;
+corrected 2026-08-13, record EO.)
 
 ## Project identity
 - Swing-trading bot: holds of days to a few weeks, small capital
@@ -34,7 +35,7 @@ task is the default work.
 ## Definition of done (additive to global standards)
 - REQUIRED done-check: `.venv\Scripts\python.exe -m swing_bot.test_frozen`
   must print `FROZEN TESTS: GREEN (all d=0)` — 12 pinned refs at d=±0.0000pp
-  + 16 invariants. Run after ANY change to `swing_bot/` or to
+  + 17 invariants. Run after ANY change to `swing_bot/` or to
   `scripts/daily_swing_paper.py`. (This line said "no test suite exists yet"
   until 2026-08-06; the tripwire has been green since 2026-07-09. Corrected by
   audit #3. Detail in `.claude/codebase-memory/testing.md`.)

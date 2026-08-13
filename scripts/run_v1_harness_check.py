@@ -25,7 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from run_e8_squeeze import cache_fetch
+from run_e8_squeeze import cache_fetch, StaleCacheError
 # M11's pinned detector, reused verbatim (prereg 6.1): signals_for() runs the
 # causal confirmation loop (a pivot at j is only visible from j+W), so no
 # look-ahead is introduced by calling it here.
@@ -45,6 +45,11 @@ def load_panel(tickers, start="2000-01-01"):
     for t in tickers:
         try:
             b = cache_fetch(t)
+        except StaleCacheError:
+            # A vintage verdict stops the run; it is not a tolerated drop. The
+            # completeness gate below bounds MISSING names, not WRONG-VINTAGE
+            # ones -- a uniformly stale cache dropped every ticker (record EO).
+            raise
         except Exception as e:
             # Say WHICH ticker fell out and why (audit #4 E5): the silent
             # `continue` let up to 20% of the panel vanish without a line of

@@ -42,7 +42,10 @@ before the market charged tuition for the same lesson.
   the deliverable: the full E1→E7 arc, method, results, and honest conclusion.
 - **[HANDOFF.md](HANDOFF.md)** — current one-page state.
 - **[Project record](docs/Project%20Record%20%E2%80%94%20Full%20Chronological%20History.md)**
-  — the append-only, dated build log (Appendices A–AF), ground truth.
+  — the append-only, dated build log, ground truth. (Appendix letters
+  deliberately not enumerated here: this line said "A–AF" while the record had
+  reached EN, and any endpoint written down goes stale the next time an entry
+  is appended.)
 - **[PRD_ROADMAP.md](PRD_ROADMAP.md)** — the standing execution plan.
 
 ## The experiments (all pre-registered, all committed)

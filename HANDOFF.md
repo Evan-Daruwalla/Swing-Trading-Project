@@ -90,7 +90,7 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
 > instruments cannot be tested fairly.
 
-**Last updated: 2026-08-11 ~17:54 CDT** — this file is the only live snapshot;
+**Last updated: 2026-08-13 ~01:26 CDT** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
@@ -137,12 +137,13 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 >   "No known vulnerabilities found". This block had claimed them Open for 8 days
 >   after the code said otherwise.
 
-> **M3 forward paper — RUNNING, 18 sessions (2026-07-15 → 2026-08-10), 54 NAV rows, ONE
+> **M3 forward paper — RUNNING, 20 sessions (2026-07-15 → 2026-08-12), 60 NAV rows, ONE
 > permanent hole (2026-07-30, record EI).** (The prior version of this line said "13
 > sessions, 27 NAV rows, no gaps" — 13×3 is 39, not 27, and the 07-30 gap was real; both
-> wrong, corrected by audit #4 F10.) All three sleeves currently long QQQ. Latest marks
-> (2026-08-10): **e6_1x $1,012.46 · e18_vixts $1,006.13 · m10_1_nagel $1,026.50** (each
-> started at $1,000). Task now runs S4U — fires with nobody logged on. Scheduled task
+> wrong, corrected by audit #4 F10. Counts re-derived from `paper_nav` 2026-08-13, record
+> EO — they had gone two sessions stale.) All three sleeves currently long QQQ. Latest
+> marks (2026-08-12): **e6_1x $1,016.43 · e18_vixts $1,010.08 · m10_1_nagel $1,030.53**
+> (each started at $1,000). Task now runs S4U — fires with nobody logged on. Scheduled task
 > `SwingTradingDailyPaper` fires 7pm weekdays via `scripts/daily_swing_paper.bat --execute`;
 > logs to `var/daily_swing_paper.log`. **Do NOT fire it manually intraday** — that is what
 > caused the 07-20 round-trip and the e18 fork; the guard now blocks order submission while
@@ -634,9 +635,9 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 | E4 leverage rotation (3×) | M2d | **PASS backtest, FAILED regime test** | `313d88a` PASS 2014-26; E5 `09a3a31` FAIL 2000-13 (92.7% DD). De-authorized |
 | E6 de-leveraged rotation (1×) | M2d | **PASS, later downgraded** | `0526ea2`; robust in US, but E7 showed market-dependent (3/5). Risk-mgmt overlay, not high-return |
 | E7 international validation | M2e | **Both arms FAIL** | `70ed2a1`; closed the high-return-robust question on 5 unseen non-US regimes |
-| Live paper | M3 | **BLOCKED — Evan go + Alpaca acct** | E6 (1×) the only candidate, market-dependent risk-mgmt; deploy is Evan's call |
+| Live paper | M3 | **RUNNING since 2026-07-15** | 3 sleeves (e6_1x / e18_vixts / m10_1_nagel), one $1,000 Alpaca paper account each; 20 sessions, task S4U green. Row said BLOCKED for 4 weeks after deploy — corrected 2026-08-13, record EO |
 | Program write-up + packaging | M6 | **Done** | Findings doc updated to E1→E7; `README.md` added; git tag |
-| Live paper: control + LLM-veto sleeves | M3 | **BLOCKED — gate not open** | E1 did NOT pass M2→M3; needs a new pre-registered strategy that passes + Evan go + Alpaca account |
+| Live paper: LLM-veto overlay sleeve | M3/M4 | **NOT BUILT — spec superseded** | the `e1_control`/`e1_llm_veto` pair died with E1 (M2b); M3 deployed 3 mechanical sleeves instead. Evan's go and the Alpaca accounts are no longer blockers — an overlay arm needs its own prereg (corrected 2026-08-13, record EO) |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
 | Expansion (deferred ideas) | M5 | **GATED** | On M3 stable |
 
@@ -684,15 +685,36 @@ Full descriptions as Evan gave them: record Phase 0.
 - If Trading's `price_cache` is reused: read-only from here, and honor
   split-adjusted / dividend-UNadjusted everywhere.
 - **Research scripts now REFUSE a stale or mixed-vintage cache (2026-08-12,
-  record Appendix EM).** `_note_vintage` in `scripts/run_e8_squeeze.py` — the
-  shared data layer ~19 scripts import — raises instead of printing. Expect this
-  to fire immediately: `.e8e9_cache` holds **5 vintages spanning 2026-07-09 to
-  2026-08-04**, so a run mixing SPY (07-09) with the 142-name universe (08-04)
-  now stops rather than quietly annualizing strategy CAGR over 3165 sessions and
-  the benchmark over 3147. **This is not a bug — refresh the cache.** Deliberate
-  historical run: `SWING_ALLOW_STALE_CACHE=1`; tolerance
-  `SWING_MAX_CACHE_STALE_DAYS` (default 5). The live M3 paper loop is unaffected
-  — `daily_swing_paper.py` does not import that module.
+  record Appendix EM; the three sites that SWALLOWED that refusal were closed
+  2026-08-13, record Appendix EO).** `_note_vintage` in
+  `scripts/run_e8_squeeze.py` — the shared data layer **31** files import (30
+  experiment runners + the standing proof script), 28 of them naming
+  `cache_fetch` itself — raises `StaleCacheError` instead of printing.
+  Expect this to fire immediately: `.e8e9_cache` holds **5 vintages spanning
+  2026-07-09 to 2026-08-04**, so a run mixing SPY (07-09) with the 142-name
+  universe (08-04) now stops rather than quietly annualizing strategy CAGR over
+  3165 sessions and the benchmark over 3147. **This is not a bug.**
+  **But "refresh the cache" is not a one-liner.** It means deleting **every**
+  price-series `*.json` in `.e8e9_cache`, not a subset — as of 2026-08-13 all 5
+  vintages are stale, the newest (2026-08-04) included at 9 calendar days
+  against a 5-day tolerance, so there is no subset worth keeping — and then
+  re-running **every** consumer in one sitting, because `cache_fetch` refetches
+  only on a MISS for the tickers the running script happens to name, so a
+  one-script re-run just replaces the old mixed vintage with a new one. No
+  refresh tool exists and none should be built (181 price files, deleted by
+  hand). The `*_div` / `*_earn` / index side-files carry no bar date, are
+  invisible to the guard by design, and are not refreshed by this.
+  Deliberate historical run: `SWING_ALLOW_STALE_CACHE=1` — strict `=1`, so
+  `true`/`yes` silently do nothing and the run still raises (deliberate: an
+  override that disables a correctness guard must fail closed); tolerance
+  `SWING_MAX_CACHE_STALE_DAYS` (default 5).
+  **The live M3 paper loop is unaffected**, but not for the reason this file
+  used to give. It DOES import the module, transitively, on every run
+  (`daily_swing_paper.py:64` → `run_e10_earnings_drift:27`; `:65` →
+  `run_c1_residual_reversal:29`) — it pulls only `UNIV`, `residual_series` and
+  `BETA_N`, none of which call `cache_fetch`, the guard's only caller. The
+  earlier wording, "`daily_swing_paper.py` does not import that module", was
+  false; the conclusion was right for the wrong reason (record EO).
 
 ## Decisions taken 2026-07-08 (details in record Appendices B–C)
 
@@ -714,8 +736,10 @@ Full descriptions as Evan gave them: record Phase 0.
   Appendices P/Q.**
 - **Capital range**: brief says $100–1,000; inventory header said $100–10,000.
   Assuming $100–1,000; sizing is parameterized regardless.
-- **Alpaca PAPER account** (PRD M3.15): which of ~3 paper accounts — only
-  relevant once a strategy passes and live is authorized.
+- ~~**Alpaca PAPER account** (PRD M3.15): which of ~3 paper accounts~~
+  **RESOLVED 2026-07-15 (record Appendix CQ): 3 NEW dedicated paper accounts,
+  $1,000 each, one per sleeve — none of Trading's.** (Left sitting unstruck
+  under BLOCKED-ON-EVAN for 4 weeks; corrected 2026-08-13, record EO.)
 - **M2.12 survivorship bound**: deferred as moot for failed ETF-only E1; run
   only if a stock strategy enters scope.
 
@@ -723,9 +747,11 @@ Full descriptions as Evan gave them: record Phase 0.
 - `docs/Project Record — Full Chronological History.md` — append-only
   chronological record; the ground truth. No HTML twin yet.
 - `PRD_ROADMAP.md` — the standing plan (written 2026-07-08). Source of truth
-  for what to build and in what order; next open task = M0.1.
+  for what to build and in what order; no unstarted task remains — M3 forward
+  paper is the only open lever and it needs elapsed time, not a task (this line
+  still read "next open task = M0.1" until 2026-08-13; M0.1 shipped 2026-07-08).
 - `docs/research/` — evidence brief, experiment-ideas list (+ council
   outcome pointer), future power calc / ablation docs.
-- `.claude/codebase-memory/` — binned technical memory (INDEX + 6 bins).
+- `.claude/codebase-memory/` — binned technical memory (INDEX + 11 bins).
 - `.claude/pm-cadence.json` — record entry every 3 prompts;
   handoff/PRD/bins event-driven.

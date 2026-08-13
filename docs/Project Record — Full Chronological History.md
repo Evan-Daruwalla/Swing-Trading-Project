@@ -6360,3 +6360,448 @@ all 53 call sites — stays open and stays sized **L**: it moves already-recorde
 numbers and needs its own pre-registration. Detection now exists; the correction
 does not. Findings 3-8 and E2-E7 from audit #4 are also still open, including the
 three Alpaca handlers that never reach the exit gate.
+
+---
+
+# Appendix EN - Pushed `e290b34..67ce5e4`; the F1 chokepoint fix is now on the remote, and audit #4's top defect is CLOSED (2026-08-12, ~21:46 CDT)
+
+**TRIGGER:** Evan's "make a handoff prompt", then "push it".
+
+**PUSHED:** `e290b34..67ce5e4` -> `origin/main`. Local and remote level at `67ce5e4`.
+Working tree clean apart from `.claude/pm-cadence.json` and this entry.
+
+| commit | what |
+|---|---|
+| `f00f532` | `_note_vintage` raises instead of printing; staleness measured against the CLOCK |
+| `41ab41c` | Record Appendix EM |
+| `9249f53` | three more Alpaca handlers reach the exit gate (F4 completed) |
+| `67ce5e4` | HANDOFF warns the guard will fire on sight |
+
+**THESE FOUR WERE NOT MINE.** Authored by Evan 2026-08-12 17:24-17:30, between this session's
+`e290b34` and the handoff request. I found them only because building the handoff prompt started
+with `git log` rather than with what I remembered doing -- HEAD was four commits past where I
+had left it. Recording that explicitly: **a session's recollection is not a source of truth
+about the repo.** Had the handoff been written from memory it would have described F1 as the
+top open defect when F1 was already closed, and pointed a fresh session at work already done.
+
+**WHAT THE F1 FIX ACTUALLY DOES, and why it is better than what audit #4 proposed.** The audit's
+surgical suggestion was to default `through=` from a process-level max vintage. The shipped fix
+instead measures staleness against `datetime.date.today()`, and its own comment names the reason
+the audit missed: the mixed-vintage check needs `len(distinct) > 1`, comparing series against
+EACH OTHER -- so for a SINGLE-TICKER script (c4=QQQ, c6=SPY, x1=SPY) that branch is unreachable
+BY CONSTRUCTION, and uniform staleness is invisible for the same reason. Measuring against the
+newest date on disk would not have closed it either: if every series is equally old, the max
+equals the value under test. Only the clock is outside the set being tested.
+
+**This is the fourth consecutive audit whose headline finding was a guard that could not fire**
+-- a threshold below the mathematical minimum of what it guards (liquidity floor, 28x), a
+parameter no caller passes (`through=`, 53 sites), a check needing two series in a single-series
+script (`len(distinct) > 1`). The pattern is now explicit in the handoff prompt as a standing
+rule: when you add a guard, prove it fires by feeding it the trigger.
+
+**Second change in the same push:** printing WAS the defect. SEC's window end is open
+(2099-01-01), so a stale series silently sets its own evaluation-window end and the CAGR
+denominator with it; the warning scrolls past and the number is believed. Both checks now RAISE.
+Escape hatch for a deliberately historical run: `SWING_ALLOW_STALE_CACHE=1`, tolerance
+`SWING_MAX_CACHE_STALE_DAYS` (default 5).
+
+**PRE-PUSH CHECKS** (a push to a public repo is publication, so these ran on the full range):
+4 files; no path matching `keys.env|\.env$|\.pem$|id_rsa|credential`; `git log --all --
+alpaca_keys.env` **empty** -- the key file has never been tracked on any branch.
+
+**VERIFIED AT PUSH TIME:** frozen tripwire **GREEN d=+/-0.0000pp** (12 refs + 17 invariants);
+`paper_nav` **20 sessions, 2026-07-15 .. 2026-08-12**, still exactly one hole (2026-07-30);
+scheduled task S4U, last run 2026-08-12 19:00 **result 0** -- the first result-0 that is
+*evidence* rather than an artifact of an exit code that could not be non-zero.
+
+**STATE:** `origin/main` at `67ce5e4`. A handoff prompt was written to the session scratchpad and
+delivered to Evan (not committed -- it is a session artifact, not a project doc; HANDOFF.md
+remains the live snapshot).
+
+**Next action:** Evan's call. Open, unchanged in substance: refresh `.e8e9_cache` to one vintage
+(the new guard will halt most research scripts until then -- **expected, not a bug**); V3 prereg
+(scope PBO to genuine selection sets); audit #4 F14 (one-row ledger `UPDATE`, BLOCKED-ON-EVAN);
+F2/F3 (200-DMA convention split, liquidity floor -- each needs its own pre-registration because
+each moves recorded numbers); graph wave 2 (35 research docs, 82 of 117 cached).
+
+**Doc cadence:** prompt #174, cadence hit, entry written same prompt. No miss.
+
+---
+
+# Appendix EO - `/landing-check` on the 08-12 push: the new freshness guard is SWALLOWED at three sites; 16 doc defects confirmed and 8 asserted defects REFUTED (2026-08-13, ~01:17 CDT)
+
+**TRIGGER:** Evan ran `/landing-check`, then "do all outstanding work, using
+`/landing-check` along the way".
+
+**NOTHING IS FIXED IN THIS ENTRY.** Findings only. The fixes and their
+verification are the next entry, written after they land.
+
+**METHOD, and why it is different from an audit.** One fresh agent got the
+artifacts ONLY -- `git status`/`git diff`/`git log`, the four commit messages,
+HANDOFF.md, Appendices EM/EN, and the handoff prompt itself as a specimen -- and
+was explicitly NOT given any session account of what the work had done. Then a
+29-agent read-only sweep over five questions (doc drift, the raise's blast
+radius, env-var parsing, whether "refresh the cache" is actionable, the bins
+obligation), each claimed doc defect then handed to an independent agent
+instructed to REFUTE it. Total 1.96M subagent tokens, 551 tool calls, 0 errors.
+
+**HEADLINE -- THE GUARD SHIPPED 2026-08-12 CANNOT FIRE AT THREE OF ITS REACHABLE
+SITES. This is the fifth consecutive instance of the same defect class, and the
+first one this project created for itself while fixing the fourth.**
+
+1. **`scripts/run_e8_squeeze.py:190-198` -- `cache_fetch` swallows its own
+   guard.** On the REFETCH path `_note_vintage(ticker, bars)` at `:194` sits
+   inside the `try:` opened at `:191`, whose `except Exception as e:` at `:196`
+   catches it, prints it as `"{ticker} attempt N error"`, sleeps `20*(attempt+1)`
+   seconds and REFETCHES -- four times -- before dying with
+   `"could not fetch {ticker}"`. A stale-cache verdict is reported as a network
+   failure, after ~200s of sleeps and four unnecessary yfinance calls.
+2. **`scripts/run_m12_factorial.py:41-43`** -- `except Exception` -> `WARN ...
+   EXCLUDED` + `continue`, inside `for t in TICKERS:`. `_STALE_REPORTED` is
+   per-ticker, so a uniformly stale cache raises once per ticker and every
+   ticker is excluded in turn. The guard converts "refuse to run" into "run on a
+   silently emptied universe" -- strictly WORSE than the printing behaviour it
+   replaced. M12 is the very result the guard exists to protect.
+3. **`scripts/run_v1_harness_check.py:47-49`** -- same per-ticker mass-drop; it
+   at least prints the real exception type.
+
+The pattern across five audits, restated: a threshold below the mathematical
+minimum of what it guards (liquidity floor, 28x) -- a parameter no caller passes
+(`through=`, all call sites) -- a check needing two series in a single-series
+script (`len(distinct) > 1`) -- and now **a raise caught by the function that
+raises it.** Appendix EN's closing rule ("prove it fires by feeding it the
+trigger") was followed for the ISOLATED function and passed 5/5 there. It was
+not followed for the CALLERS. Feeding a guard its trigger proves the guard
+works; it does not prove anyone lets the failure through.
+
+**CORRECTION TO APPENDICES EM AND EN: 52 `cache_fetch` call sites, not 53.**
+Two independent methods agree. `grep -rn "cache_fetch(" --include=*.py .` = 54
+lines, of which two are not calls (`run_e8_squeeze.py:12`, a docstring mention,
+and `:151`, the `def`). An AST pass counting `ast.Call` nodes named
+`cache_fetch` outside `.venv` also returns 52. The earlier 53 counted the
+docstring mention. Append-only: EM and EN stand as written; this is the
+correction of record.
+
+**LANDING WAS CLEAN.** Every file in `e290b34..67ce5e4` is single-copy across all
+of `D:\ClaudeCode` -- no shadowing, no stale twin. The scheduled task's exec
+chain was walked end to end and the new exit code genuinely reaches the
+scheduler: task -> `daily_swing_paper.bat` -> `.venv\Scripts\python.exe
+scripts\daily_swing_paper.py --execute` -> appends at `:863,:900,:909` -> gate
+`:916` -> `return 1` -> `raise SystemExit(main())` at `:929` -> `.bat`
+`exit /b %RC%`.
+
+**16 DOC DEFECTS CONFIRMED, 8 ASSERTED DEFECTS REFUTED, 4 LEFT UNVERIFIED.** The
+refute pass is the load-bearing half and it changed the answer. Six of the eight
+rejections were **dated historical statements that were exact when written** and
+would have been corrupted by "fixing" them -- `HANDOFF.md:140`
+("18 sessions ... (2026-07-15 -> 2026-08-10)" states its own span endpoint),
+`PRD_ROADMAP.md:202` and `:124`, `swing_bot/prices.py:23`,
+`.claude/codebase-memory/features.md:3` and `performance.md:3`. A seventh,
+`HANDOFF.md:629` ("89,666 rows"), is still the exact live count of the dataset
+M0 scoped -- the asserter had collapsed "rows in the file" into "rows in the M0
+universe". The verifier's standing instruction was to default to REFUTED when
+uncertain, which is the right asymmetry for a repo whose deliverable is the
+record. 4 findings were never sent to a verifier because the workflow script
+capped the fan-out at 24 of 28 -- a silent cap, disclosed here rather than
+papered over; they are held as UNVERIFIED and were re-derived by hand before any
+of them was acted on.
+
+**THIS CORRECTS A CLAIM MADE TO EVAN EARLIER IN THIS SESSION.** The landing-check
+agent reported "four wrong importer counts -- 26, 29, 26, 19 -- against an actual
+30", and that was relayed. The refute pass overturned two of the four:
+`run_e8_squeeze.py:153` ("~29") was numerically exact on 2026-08-04 when commit
+`4b8002ff` wrote it and is off by at most 1 today, inside its own "~";
+`swing_bot/prices.py:23` ("~26") was exact when `e5a4e94` wrote it 2026-07-15.
+Only two are real defects: `run_e8_squeeze.py:13` ("~26 scripts/ runners",
+actually 30, and it contradicts `:153` 140 lines later in the same file) and
+`HANDOFF.md:688` ("~19 scripts", actually 30 files importing the module, 28 of
+them importing `cache_fetch` by name).
+
+**"REFRESH THE CACHE" IS NOT AN ACTIONABLE INSTRUCTION AS WRITTEN.** Established
+read-only, no network call, nothing written:
+- `.e8e9_cache` holds 292 files in one filename namespace over three shapes: 181
+  bar lists (the only ones the guard can see), 72 dicts (`*_div`, `ff3_daily`,
+  `*_idx`, `fred_*`), 39 lists of date strings (`*_earn`). The 111 non-bar files
+  have no vintage and are invisible to the guard **by design** --
+  `_last_bar_date` returns None and `_note_vintage` exits at `:118-119`.
+- **All five vintages are stale, including the newest.** Against `date` =
+  2026-08-13: 2026-08-04 (n=142) is 9 days, 2026-07-31 (n=5) 13, 2026-07-13
+  (n=4) 31, 2026-07-10 (n=1) 34, 2026-07-09 (n=29) 35 -- every one past the
+  5-day tolerance. So "delete the stale entries" has **no non-empty complement**:
+  it means all 181, and the reader cannot know that without doing the arithmetic.
+- **No refresh tool exists** -- not in `scripts/`, `README.md`, `docs/`, or
+  `.claude/`. No script enumerates the cache (`CACHE.glob`/`iterdir`: zero hits),
+  so nothing can iterate all 181. The write path `:193` is per-ticker and
+  cache-miss-driven.
+- **A partial refresh manufactures a fresh mixed vintage**, and the mixed branch
+  fires BEFORE the stale branch (`:122` raises and `:134` returns before the
+  staleness block) -- so a half-refreshed run hits the same wall with a message
+  that no longer describes the situation. Restoring even today's state would
+  require re-running every consumer in one sitting.
+- Verdict: **documentation gap, not a tooling gap. No refresh tool should be
+  built.** A full refetch of 181 tickers is a real network operation with a
+  documented way to leave the cache worse than it is; it is Evan's call, not a
+  default action.
+
+**THREE CODE ITEMS EXAMINED AND DELIBERATELY NOT CHANGED** -- recorded so the
+next session does not re-litigate them:
+- `_MAX_STALE_DAYS = int(os.environ.get(...))` at `:102` is unguarded and runs at
+  MODULE IMPORT on the nightly path (proven: `daily_swing_paper.py:64` ->
+  `run_e10_earnings_drift.py:27` -> `run_e8_squeeze`). A non-integer value is an
+  uncaught `ValueError` at import. NOT PATCHED: nothing sets the variable in the
+  `.bat`, HKCU, HKLM or the process env; when it does fail it fails in the right
+  direction -- loud, at import, before any Alpaca call, with the `.bat`
+  propagating a non-zero RC -- and the obvious `try/except`-to-default hardening
+  would silently discard the operator's stated tolerance, which is precisely the
+  "the number is believed" failure the guard was written to eliminate.
+- `_ALLOW_STALE = ... == "1"` at `:101` rejects `true`/`TRUE`/`yes`. NOT PATCHED:
+  it fails CLOSED, the correct direction for a switch that DISABLES a
+  correctness guard, and every documented spelling is literally `=1`.
+- The tolerance compares CALENDAR days against a market-session cadence. NOT
+  PATCHED: derived from the repo's own cached SPY series (8,417 sessions,
+  1993-2026, read-only), the worst routine weekend/holiday gap is 4 calendar
+  days against a tolerance of 5; the only historical exceedances are inside the
+  2001-09-11 closure, when the data genuinely WAS 7 days old. Converting to
+  trading sessions needs a market calendar this repo does not have and must not
+  fetch.
+
+**BINS OBLIGATION UNMET SINCE 2026-08-12.** `.claude/codebase-memory/` is 11 bins
++ INDEX. Zero hits, confirmed three independent ways (Grep tool regex, a Git-Bash
+`grep -rniF` per-term loop, and PowerShell `Select-String -SimpleMatch`), for all
+of: `SWING_ALLOW_STALE_CACHE`, `SWING_MAX_CACHE_STALE_DAYS`, `_note_vintage`,
+`MIXED-VINTAGE`, `STALE CACHE`, `RUN_FAILURES`, `cache_fetch`, `.e8e9_cache`. The
+entire `.e8e9_cache` research data layer has never been documented in a bin --
+every "cache" hit in the bins refers to Trading's `price_cache`. Project
+CLAUDE.md cadence 5 requires bins in the same session as a fact-changing change.
+
+**Doc cadence:** prompt #177, cadence hit, entry written before continuing. No
+miss.
+
+---
+
+# Appendix EP - EO's findings applied: the swallowed guard is closed at the chokepoint and now has a standing proof; 16 doc defects corrected across 12 files (2026-08-13, ~01:26 CDT)
+
+**TRIGGER:** Evan's "do all outstanding work, using `/landing-check` along the
+way", continuing directly from Appendix EO.
+
+**THE CODE FIX -- three sites, one chokepoint each.**
+
+| site | was | now |
+|---|---|---|
+| `run_e8_squeeze.py` `_vintage_fail` | `raise RuntimeError(...)` | `raise StaleCacheError(...)`, a named `RuntimeError` subclass so nothing that already caught `RuntimeError` changes, but a consumer can re-raise it by name |
+| `run_e8_squeeze.py` `cache_fetch` | `_note_vintage` called INSIDE the `try:` guarding `prices.fetch` | moved OUT; the retry loop now guards `prices.fetch` and nothing else |
+| `run_m12_factorial.py:41`, `run_v1_harness_check.py:47` | `except Exception` -> drop the ticker, `continue` | `except StaleCacheError: raise` ahead of the broad handler |
+
+The error string was fixed at the same chokepoint, because that string is where
+a reader actually meets the problem: it used to say "delete the stale
+.e8e9_cache entries and re-run", which reads as a subset and a one-script
+re-run, and both are wrong (EO). It now says delete EVERY price-series `*.json`
+and re-run every consumer in one sitting, and says why -- `cache_fetch`
+refetches only on a MISS for the tickers the running script names.
+
+**PROOF THAT IT FIRES -- the rule from EN, applied to the CALLERS this time.**
+New standing check `scripts/prove_cache_guard.py`, 8 cases, writes nothing
+(`E8E9_CACHE` redirected to a temp dir before import, `prices.fetch`
+monkeypatched, no network). Real output:
+
+```
+proving the .e8e9_cache freshness guard fires at every swallow site:
+  PASS  1 cache-HIT stale         -> raises
+  PASS  2 cache-REFETCH stale     -> raises, fetch NOT retried
+  PASS  3 two vintages            -> raises MIXED-VINTAGE
+  PASS  4 fresh single vintage    -> silent
+  BOOM attempt 1 error: simulated network error
+  BOOM attempt 2 error: simulated network error
+  BOOM attempt 3 error: simulated network error
+  BOOM attempt 4 error: simulated network error
+  PASS  5 real fetch failure      -> still a fetch failure, 4 attempts
+  PASS  6 run_m12_factorial       -> re-raises, no mass-drop
+  PASS  7 run_v1_harness_check    -> re-raises, no mass-drop
+  !! STALE CACHE: OVR ends 2026-07-04, 40 calendar days ago (tolerance 5 days, SWING_MAX_CACHE_STALE_DAYS). The evaluation window terminates wherever the data stops, so this series sets its own window end -- and a benchmark read at a different vintage is not comparable to it.
+     [SWING_ALLOW_STALE_CACHE=1 -- continuing]
+  PASS  8 SWING_ALLOW_STALE_CACHE -> downgrades to a print
+
+CACHE GUARD PROOF: 8/8 PASS
+```
+
+(Verbatim, including the interleaved `BOOM` lines from case 5 and the override
+print from case 8. An earlier draft of this entry showed only the PASS lines
+under the label "Real output" -- abridged, not fabricated, but a block labelled
+real must be verbatim in this record. Caught by the second `/landing-check`,
+record EQ.)
+
+Case 2 is the one that was failing before this change (it would have retried 4x
+and reported "could not fetch"). Case 5 exists to prove the fix did not break
+the retry loop it moved -- a real network error is still retried exactly 4 times
+and still reported as a fetch failure. Case 4 exists because a guard that always
+fires is as useless as one that never does.
+
+**REQUIRED DONE-CHECK, real output:** `.venv\Scripts\python.exe -m
+swing_bot.test_frozen` -> `FROZEN TESTS: GREEN (all d=0)`, exit 0, 12 pinned
+refs + 17 invariants. Notably `price_scripts_state_adjustment_convention`
+PASSES with the new script present -- that invariant scans every `scripts/*.py`
+mentioning `cache_fetch` for an adjustment-convention header in its first 40
+lines, so adding `prove_cache_guard.py` was itself a live test of the 17th
+invariant, and it caught the requirement before the suite did.
+
+**DOC DEFECTS CORRECTED -- 16 confirmed in EO, all applied, across 12 files.**
+- `HANDOFF.md`: live-paper counts 18 sessions/54 rows/2026-08-10 -> 20/60/
+  2026-08-12 with latest marks **e6_1x $1,016.43 / e18_vixts $1,010.08 /
+  m10_1_nagel $1,030.53**; the "~19 scripts" importer count -> 30; the false
+  "`daily_swing_paper.py` does not import that module" -> the true reason the
+  live loop is unaffected; the refresh remedy expanded per EO; the M3 workstream
+  row un-BLOCKED after 4 weeks; the LLM-veto row re-scoped to NOT BUILT /
+  superseded; the Alpaca-account "open decision" struck as RESOLVED 2026-07-15;
+  "next open task = M0.1" retired; "INDEX + 6 bins" -> 11; stamp refreshed.
+- `CLAUDE.md`: "No PRD yet" (false for five weeks) -> the PRD exists;
+  16 invariants -> 17.
+- `README.md`: record described as Appendices A-AF -> A-EO.
+- `PRD_ROADMAP.md`: M12 "PLANNED, NOT RUN" -> RUN 2026-08-03, and its OPEN
+  DECISION on the universe struck as CLOSED at 142 names (record DT).
+- `scripts/run_e8_squeeze.py:13`: "~26 scripts/ runners" -> 30. Line 153's
+  "~29" was left alone deliberately -- EO's refute pass showed it was exact when
+  written and is inside its own "~".
+- `.claude/codebase-memory/`: the 2026-08-12 obligation, unmet until now.
+  `gotchas.md` gets the swallowed-raise trap as a dated, measured entry;
+  `data.md` documents `.e8e9_cache` as the SECOND data layer and its freshness
+  contract (it had never appeared in any bin -- every "cache" hit referred to
+  Trading's `price_cache`); `tooling.md` gets the three env knobs and has its
+  self-contradictory "CST (UTC-5)" replaced with the DST-aware rule (HANDOFF had
+  the identical wording fixed 2026-07-28 by audit #7; this bin was missed);
+  `testing.md` 16 -> 17 with the 17th named; `conventions.md` records that the
+  frozen-test pattern is no longer "planned"; `features.md` is no longer "empty
+  -- no code yet"; `INDEX.md` re-dated for every bin touched.
+
+**WHAT WAS DELIBERATELY NOT DONE, each with its reason.**
+- **`.e8e9_cache` NOT refreshed.** 181 price files, no tool, no enumerator, and
+  a documented way to end up worse than now (EO). A full refetch is a real
+  network operation and a judgement call about spending it -- **Evan's, not a
+  default action.** The docs now tell the truth about what it costs.
+- **Audit #4 F14** (one-row `UPDATE paper_sleeves SET cash=round(cash,9)`)
+  untouched -- BLOCKED-ON-EVAN, a live-ledger write.
+- **F2/F3 and V3 prereg** untouched -- each moves already-recorded numbers and
+  needs its own pre-registration. Patching them would be exactly the discipline
+  breach this project exists to avoid.
+- **Three env-parsing items NOT patched** -- the reasoning is in EO and is not
+  repeated; the summary is that all three currently fail in the SAFE direction
+  and each obvious hardening is worse than the status quo.
+- **Eight asserted doc defects NOT "fixed"** -- refuted in EO as dated
+  historical statements that were exact when written.
+
+**RESIDUAL RISK, stated rather than papered over.** `StaleCacheError` subclasses
+`RuntimeError`, so any FUTURE broad `except Exception` (or `except
+RuntimeError`) placed around a `cache_fetch` call re-opens exactly this hole.
+Python offers no way to make an exception un-catchable that is not worse. The
+standing defence is `scripts/prove_cache_guard.py` cases 6 and 7, which fail the
+moment a consumer starts swallowing again -- but it only covers the two
+consumers that exist today. A new consumer with a broad handler would not be
+caught by anything. Named here so the sixth audit does not have to rediscover it.
+
+**SCOPE DISCLOSURE.** 16 tracked files modified, plus one new file
+(`scripts/prove_cache_guard.py`, 207 lines). The FUNCTIONAL change is small --
+36 lines in `run_e8_squeeze.py` and 16 across the two consumers; everything else
+is documentation, bins, and this record. That is far more than the four items
+reported to Evan at the start of the session; the growth is entirely the 16
+verified doc defects the 29-agent sweep found beyond the landing-check's
+original list. Every changed line traces to a finding that was independently
+re-derived, and the 8 that failed re-derivation were left alone. (An earlier
+draft of this paragraph said "404 insertions" -- a figure taken before this
+entry was appended, and false by the time it would have been committed. A line
+count that includes the entry stating it is not a stable number, so scope is
+given by file instead. Caught by the second `/landing-check`, record EQ.)
+
+**Doc cadence:** entry written same prompt as the work. No miss.
+
+---
+
+# Appendix EQ - Second `/landing-check`, on the fix itself: the change broke the very count it corrected, and four other pre-commit defects (2026-08-13, ~01:38 CDT)
+
+**TRIGGER:** Evan's instruction was "do all outstanding work, using
+`/landing-check` along the way" -- so the remediation in EP was itself swept by
+a second fresh agent before anything was committed. Artifacts only: the
+uncommitted diff, HANDOFF, and Appendices EO/EP as the specimen. It was not told
+what the session believed it had done.
+
+**VERDICT: FIX FIRST.** Five findings, four of them mine, all corrected below
+before commit.
+
+**F1 -- THE CHANGE BROKE THE COUNT IT HAD JUST CORRECTED.** EP corrected the
+importer count from "~19"/"~26" to **30**, in three places. Adding
+`scripts/prove_cache_guard.py`, which does `import run_e8_squeeze as e8` at its
+line 42, made it **31** the moment the fix landed. The corrected number was
+false in the same commit that corrected it. Re-derived by AST (a different
+method from the grep that produced 30): **31 files import the module, 30 of them
+via `from run_e8_squeeze import ...`, 28 of those naming `cache_fetch`
+specifically.** All three sites now carry 31 with the breakdown, so the next
+reader can tell which question a number answers -- that ambiguity between
+"imports the module", "from-imports it" and "imports `cache_fetch`" is what let
+four different counts (19/26/26/29) coexist for weeks.
+
+**F2 -- `README.md` named an endpoint that goes stale on every entry.** It read
+"Appendices A-AF" while the record had reached EN. Setting it to the current
+letter would merely restart the same clock, so the enumeration was REMOVED
+rather than updated. Killing the defect class beats fixing the instance.
+
+**F3 -- the scope-disclosure line in EP was self-referentially false.** It said
+"404 insertions", a figure measured before EP itself was appended; the real diff
+at commit time is larger, and the 207-line new file was omitted entirely. A line
+count that includes the entry stating it cannot be stable. EP now states scope
+by FILE, and says so.
+
+**F4 -- a block labelled "Real output" was abridged.** EP showed the eight PASS
+lines from `prove_cache_guard.py` but dropped six interleaved stdout lines (four
+`BOOM attempt N error` from case 5, the two-line `!! STALE CACHE: OVR` print
+from case 8). Not fabrication -- every line shown was real and the summary was
+exact -- but in a record whose whole claim is honesty, a block labelled real must
+be verbatim. Replaced with the full capture.
+
+**F5 -- two live planning docs disagreed on the same live number.**
+`PRD_ROADMAP.md:202` reads "18 sessions of NAV through 2026-08-10" while HANDOFF
+now reads 20 through 2026-08-12. EO had refuted this as a dated status stamp and
+that reading stands -- the row self-stamps 2026-08-11 -- so the historical
+sentence was NOT rewritten. An "as of 2026-08-13" clause was appended beside it
+instead, which removes the contradiction without editing a dated statement.
+
+**NEW HAZARD FOUND, BINNED, NOT PRESENT TODAY.** `scripts/` has no
+`__init__.py` and the repo root is on `sys.path`, so it is an implicit namespace
+package: `import run_e8_squeeze` and `import scripts.run_e8_squeeze` both
+succeed and yield TWO DIFFERENT `StaleCacheError` classes, at which point
+`except StaleCacheError` silently stops matching and the guard is swallowed
+again -- the sixth variant of this project's one recurring defect. Today's code
+is safe, proven by identity rather than assumption: both consumers catch the
+same class object (`is` -> True), and the dotted import form has zero hits
+repo-wide (confirmed two ways, `grep -rn` and `git grep`). Recorded in
+`gotchas.md` as a rule for every cross-script `except` in `scripts/`, not just
+this one. EP's residual-risk paragraph named the future-broad-`except` hazard
+and missed this one.
+
+**DISCLOSURE: APPENDIX EP WAS EDITED IN PLACE.** F3 and F4 are defects in EP's
+own text, so EP was corrected rather than contradicted by a later entry. The
+append-only rule exists to stop history being rewritten to look better; EP was
+uncommitted and had never entered history, and both edits make it LESS
+flattering, not more. Each correction is marked inside EP and cross-referenced
+here. Had EP already been committed, the correction would have gone here only.
+
+**NOT DONE, FLAGGED.** `graphify-out/` is 6 TRACKED files that still encode "16
+invariants" and the old "CST (UTC-5)" rationale, and know nothing of
+`StaleCacheError` or `prove_cache_guard.py`. The standing instruction is to
+query `/graphify` first for codebase questions, so it is now a stale oracle
+pointed at by a live rule. Regenerating it is the already-open "graph wave 2"
+item, not a pre-commit fix -- but it is worse than merely out of date now,
+because three of the facts it contradicts were corrected today.
+
+**VERIFICATION AFTER THE F1-F5 FIXES:** `.venv\Scripts\python.exe -m
+swing_bot.test_frozen` -> `FROZEN TESTS: GREEN (all d=0)`, exit 0;
+`scripts\prove_cache_guard.py` -> `CACHE GUARD PROOF: 8/8 PASS`, exit 0.
+
+**THE LESSON, stated plainly because it is the fifth time.** EN's rule was
+"when you add a guard, prove it fires by feeding it the trigger." EO showed that
+rule is not sufficient: the guard fired 5/5 in isolation and was still inert,
+because nobody checked what CAUGHT it. EQ shows the rule is not sufficient in
+the other direction either: a fix that corrects a count can invalidate that
+count by existing. **The general form: a change is not verified until it has
+been checked against the state it creates, not the state it found.** Both
+misses were caught by the same mechanism -- a fresh agent given the artifacts
+and denied the session's account of them.
+
+**Doc cadence:** entry written same prompt as the work. No miss.

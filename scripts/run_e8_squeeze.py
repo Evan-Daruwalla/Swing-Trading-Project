@@ -10,7 +10,8 @@ dividend-UNADJUSTED. Fetched live from inception; does NOT touch swing.db
 
 NAV (finding-things map): this file is E8's own experiment, BUT its
 `cache_fetch(ticker)` (below) + `CACHE, COST, CAP0` are the repo's de-facto
-SHARED DATA LAYER — imported by ~26 scripts/ runners (e18, m10-1, m11, x7,
+SHARED DATA LAYER — imported by 31 files (30 experiment runners + the standing
+proof script; 28 name `cache_fetch` itself: e18, m10-1, m11, x7,
 c1, c4, c7, x1, ...). If you are hunting for "where do the experiments get
 their prices," it is here, not swing_bot/prices.py (that store feeds the
 swing_bot engines + the live M3 loop instead). Returns rows as
@@ -102,14 +103,26 @@ _ALLOW_STALE = os.environ.get("SWING_ALLOW_STALE_CACHE") == "1"
 _MAX_STALE_DAYS = int(os.environ.get("SWING_MAX_CACHE_STALE_DAYS", "5"))
 
 
+class StaleCacheError(RuntimeError):
+    """A VINTAGE VERDICT, not a fetch failure. Subclasses RuntimeError so
+    nothing that already caught RuntimeError changes behaviour, but it is named
+    so that a consumer with a broad `except Exception` around cache_fetch can
+    re-raise it instead of dropping the ticker. Two did exactly that
+    (run_m12_factorial, run_v1_harness_check) and turned "refuse to run" into
+    "run on a silently emptied universe" -- record EO, 2026-08-13."""
+
+
 def _vintage_fail(msg):
     if _ALLOW_STALE:
         print("  !! " + msg + "\n     [SWING_ALLOW_STALE_CACHE=1 -- continuing]", flush=True)
         return
-    raise RuntimeError(
-        msg + "\n     Refresh the cache (delete the stale .e8e9_cache entries and "
-        "re-run), or set SWING_ALLOW_STALE_CACHE=1 if this run is deliberately "
-        "historical."
+    raise StaleCacheError(
+        msg + "\n     Refresh the cache: delete EVERY price-series *.json in "
+        ".e8e9_cache, not a subset, and re-run every consumer in one sitting "
+        "-- cache_fetch refetches only on a MISS for the tickers the running "
+        "script names, so a one-script re-run just replaces the old mixed "
+        "vintage with a new one. Or set SWING_ALLOW_STALE_CACHE=1 if this run "
+        "is deliberately historical."
     )
 
 
@@ -189,12 +202,18 @@ def cache_fetch(ticker, through=None):
     for attempt in range(4):
         try:
             bars = prices.fetch(ticker, start="1990-01-01")
-            if bars:
-                f.write_text(json.dumps(bars))
-                _note_vintage(ticker, bars)
-                return bars
         except Exception as e:
             print(f"  {ticker} attempt {attempt+1} error: {e}", flush=True)
+            bars = None
+        # OUTSIDE the try on purpose. _note_vintage used to sit inside it, so a
+        # StaleCacheError was caught by the fetch handler, printed as an
+        # "attempt N error", and the fetch retried 4x before dying with
+        # "could not fetch" -- a vintage verdict reported as a network failure
+        # (record EO). The retry loop guards prices.fetch, nothing else.
+        if bars:
+            f.write_text(json.dumps(bars))
+            _note_vintage(ticker, bars)
+            return bars
         time.sleep(20 * (attempt + 1))
     raise RuntimeError(f"could not fetch {ticker}")
 

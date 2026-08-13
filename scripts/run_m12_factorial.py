@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_e8_squeeze import cache_fetch
+from run_e8_squeeze import cache_fetch, StaleCacheError
 from swing_bot.universe_m12 import TICKERS
 
 FORM_LONG = 252        # 12-month formation
@@ -39,6 +39,13 @@ def load():
     for t in TICKERS:
         try:
             b = cache_fetch(t)
+        except StaleCacheError:
+            # A vintage verdict must STOP the run. Dropping the ticker here
+            # excluded every name in turn on a uniformly stale cache -- the
+            # guard turned "refuse to run" into "run on a silently emptied
+            # universe", which is what corrupted M12 in the first place
+            # (record EO).
+            raise
         except Exception as e:
             print("  WARN %s unfetchable (%r) -- EXCLUDED" % (t, e), flush=True)
             continue
