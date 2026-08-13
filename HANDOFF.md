@@ -90,7 +90,7 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
 > instruments cannot be tested fairly.
 
-**Last updated: 2026-08-13 ~01:26 CDT** — this file is the only live snapshot;
+**Last updated: 2026-08-13 ~15:46 CDT** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
@@ -690,20 +690,26 @@ Full descriptions as Evan gave them: record Phase 0.
   `scripts/run_e8_squeeze.py` — the shared data layer **31** files import (30
   experiment runners + the standing proof script), 28 of them naming
   `cache_fetch` itself — raises `StaleCacheError` instead of printing.
-  Expect this to fire immediately: `.e8e9_cache` holds **5 vintages spanning
-  2026-07-09 to 2026-08-04**, so a run mixing SPY (07-09) with the 142-name
-  universe (08-04) now stops rather than quietly annualizing strategy CAGR over
-  3165 sessions and the benchmark over 3147. **This is not a bug.**
-  **But "refresh the cache" is not a one-liner.** It means deleting **every**
-  price-series `*.json` in `.e8e9_cache`, not a subset — as of 2026-08-13 all 5
-  vintages are stale, the newest (2026-08-04) included at 9 calendar days
-  against a 5-day tolerance, so there is no subset worth keeping — and then
-  re-running **every** consumer in one sitting, because `cache_fetch` refetches
-  only on a MISS for the tickers the running script happens to name, so a
-  one-script re-run just replaces the old mixed vintage with a new one. No
-  refresh tool exists and none should be built (181 price files, deleted by
-  hand). The `*_div` / `*_earn` / index side-files carry no bar date, are
-  invisible to the guard by design, and are not refreshed by this.
+  **CACHE REFRESHED 2026-08-13 (record Appendix ER) — the guard is currently
+  SILENT and research scripts run.** `.e8e9_cache` is **181 price series at ONE
+  vintage, 2026-08-12**, verified with the guard ON and no override. It had held
+  5 vintages spanning 2026-07-09 to 2026-08-04, every one of them stale.
+  **When it goes stale again, "refresh the cache" is not a one-liner.** It means
+  refetching **every** price series, not a subset, and in one sitting: use
+  `cache_fetch(t, through=<last settled session>)`, which refetches on a
+  short series, with `SWING_ALLOW_STALE_CACHE=1` set FOR THE REFRESH ITSELF
+  (a refresh is inherently mixed-vintage while in flight and the guard would
+  abort it). A one-script re-run only touches the tickers that script names and
+  just replaces the old mixed vintage with a new one. No refresh tool is
+  committed and none should be built. The `*_div` / `*_earn` / index side-files
+  carry no bar date, are invisible to the guard by design, and are not
+  refreshed by this.
+  **CHECK THE LAST BAR BEFORE TRUSTING A REFRESH.** Run after the close but
+  before the next session and yfinance will hand you a FORMING bar for today.
+  The tell is the volume format: a settled day is rounded to hundreds (SPY
+  2026-08-12 = 33,179,100), a forming one is not (30,258,928). The 2026-08-13
+  refresh wrote one such row into all 181 files and it was trimmed back out.
+  Truncate to the last session `paper_nav` actually completed.
   Deliberate historical run: `SWING_ALLOW_STALE_CACHE=1` — strict `=1`, so
   `true`/`yes` silently do nothing and the run still raises (deliberate: an
   override that disables a correctness guard must fail closed); tolerance
