@@ -17,8 +17,15 @@
       "input_tokens": 0,
       "output_tokens": 0,
       "files": 181
+    },
+    {
+      "date": "2026-08-13T07:00:00+00:00",
+      "input_tokens": 520540,
+      "output_tokens": 0,
+      "files": 38,
+      "note": "incremental --update; harness reports combined subagent tokens, no in/out split"
     }
   ],
-  "total_input_tokens": 287944,
+  "total_input_tokens": 808484,
   "total_output_tokens": 0
 }

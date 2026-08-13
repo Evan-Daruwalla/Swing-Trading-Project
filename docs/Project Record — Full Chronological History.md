@@ -6805,3 +6805,91 @@ misses were caught by the same mechanism -- a fresh agent given the artifacts
 and denied the session's account of them.
 
 **Doc cadence:** entry written same prompt as the work. No miss.
+
+---
+
+# Appendix ER - Cache refreshed to one settled vintage (a same-day forming bar caught before it landed); knowledge graph re-indexed 1199 -> 1351 nodes; push BLOCKED by tooling (2026-08-13, ~15:44 CDT)
+
+**TRIGGER:** Evan, on the three options offered after EQ: "all 3" -- push, regenerate
+the graph, refresh `.e8e9_cache`.
+
+**1. PUSH: BLOCKED, NOT DONE.** `git push origin main` was refused by the harness
+permission classifier. No workaround was attempted -- that is the correct
+response to a denial, not an obstacle to route around. **`4c6e2f0` is committed
+locally and remains unpushed**, along with this entry's commit. Pre-push checks
+had already passed and are reusable: no secret-shaped path in the range, and
+`git log --all -- alpaca_keys.env` empty (never tracked on any branch).
+BLOCKED-ON-EVAN.
+
+**2. `.e8e9_cache` REFRESHED -- and the first attempt wrote a bar that had not
+happened yet.** The refresh used the EXISTING mechanism rather than a new tool:
+`cache_fetch(t, through=TARGET)` refetches whenever a series ends before TARGET,
+with `SWING_ALLOW_STALE_CACHE=1` set for the refresh itself (a refresh is
+inherently mixed-vintage while in flight, and the guard would otherwise abort
+it). TARGET came from the live ledger -- `MAX(date)` of `paper_nav`, read-only --
+not from a guess about market hours. **181/181 refreshed, 0 failures, 126s.**
+
+**THE CATCH.** The run finished at ~01:47 CDT and every series came back ending
+**2026-08-13** -- a session that had not opened yet. The tell was not the date,
+it was the VOLUME FORMAT: every settled day is rounded to hundreds (SPY
+2026-08-12 = 33,179,100) while every 08-13 row was unrounded (SPY = 30,258,928).
+Yahoo returns a live/forming bar that way. Had that stood, all 181 series would
+carry one fabricated-looking session, the guard would have reported a clean
+uniform vintage, and the corruption would have been invisible -- the exact shape
+of the mixed-vintage defect that overstated M12 3x, but harder to see because it
+would have been uniform. **181 trailing rows dropped, one per file**, truncating
+to the last session the paper ledger actually completed (2026-08-12).
+
+**VERIFIED, guard ON, no override**, on tickers drawn from all five former
+vintages: `DIA GS HYG GLD AAPL SPY QQQ` all end 2026-08-12; vintages seen in the
+process = `['2026-08-12']`; age 1 calendar day against a tolerance of 5; guard
+silent. `.e8e9_cache` is now **181 price series at ONE vintage** and the research
+scripts that have refused to run since 2026-08-12 will run.
+(Note for the next reader: this entry was written at 15:44 CDT, after the 08-13
+session had closed. The cache is one settled session behind, which is correct and
+inside tolerance -- the 01:47 trim was right for the moment it ran.)
+
+**3. KNOWLEDGE GRAPH RE-INDEXED.** `graphify --update` over 38 changed files (26
+code + 12 docs). AST 313 nodes / 621 edges; three semantic subagents over the
+bins+CLAUDE+README, HANDOFF+PRD, and the record. **1199 -> 1351 nodes, 2003 ->
+2433 edges, 117 communities.** Health check clean: 0 dangling, 0 missing, 0
+self-loop, 0 collapsed edges. 92% EXTRACTED / 8% INFERRED / 0% AMBIGUOUS.
+The oracle now knows `StaleCacheError`, `prove_cache_guard.py`, the 17th
+invariant, the DST-aware timestamp rule, `.e8e9_cache` as a second data layer,
+and -- worth its own node -- the **"guard that cannot fire" defect class linked
+as ONE family across its five instances** rather than five unrelated bugs.
+
+**A MERGE HAZARD WAS AVOIDED, NOT FIXED.** Four chunk files from the previous
+graph wave (`graphify-out/.graphify_chunk_A..D.json`) are still on disk and
+TRACKED. The documented merge step globs `.graphify_chunk_*.json`, so a future
+run following the procedure verbatim will silently merge wave-1 chunks --
+including their "16 invariants" claim -- back into a fresh graph. This build
+merged from an EXPLICIT three-path list instead. The files were left in place
+rather than deleted (not this session's to remove). **Open landmine.**
+
+**AND THE REGENERATED GRAPH SHIPPED ITS OWN FALSE FACT.** Spot-checking the two
+strings the regeneration existed to kill found `handoff_test_frozen` asserting
+"12 pinned refs ... plus **16 invariants**" -- sourced to HANDOFF.md, which no
+longer contains that number anywhere. The likely path is bleed from
+`PRD_ROADMAP.md:124`, in the same chunk, where "16 invariants (re-run
+2026-08-06)" is a correct dated attestation. Corrected in `graph.json` to 17.
+**Stated plainly: an LLM-built graph can introduce new errors while removing old
+ones, and only two strings were checked.** The remaining 1,350 nodes are not
+verified. Treat `/graphify` as a navigation aid, never as a citation -- the
+record and the code stay the ground truth.
+
+**TOKEN ACCOUNTING, CORRECTED MID-TASK.** The extraction was first stamped
+`output_tokens: 47000` -- a guessed number, caught before the report was
+finalised. The harness reports ONE combined `subagent_tokens` figure per agent
+with no input/output split, so the only honest figure is the measured total:
+**520,540** (142,238 + 204,535 + 173,767), recorded as input with output 0 and
+the limitation noted in `cost.json`.
+
+**NOT RE-RUN:** the frozen tripwire and `prove_cache_guard.py` were both GREEN /
+8-8 earlier this session and nothing in this entry touched `swing_bot/` or
+`scripts/`. The cache refresh changes DATA, not code; it does not move any
+recorded backtest number, because no experiment was re-run against the new
+vintage. **Any future re-run WILL produce different numbers than the record's --
+that is expected, and is why every prior result is stamped with its own window.**
+
+**Doc cadence:** entry written same prompt as the work. No miss.
