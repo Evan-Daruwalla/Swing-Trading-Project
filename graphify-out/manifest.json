@@ -1,8 +1,8 @@
 {
   ".claude/pm-cadence.json": {
-    "mtime": 1786651822.7950418,
-    "ast_hash": "2a7f14c89bc1c75d50ac2ff4900645c8",
-    "semantic_hash": "2a7f14c89bc1c75d50ac2ff4900645c8"
+    "mtime": 1786681308.016883,
+    "ast_hash": "5ba328a1e58c39c8d52b0ce07c4e69d5",
+    "semantic_hash": "5ba328a1e58c39c8d52b0ce07c4e69d5"
   },
   "scripts/ablation_fill_timing.py": {
     "mtime": 1786043179.6164303,
@@ -170,9 +170,9 @@
     "semantic_hash": "6457fdaee2156e842dc56ca1df15b3d4"
   },
   "HANDOFF.md": {
-    "mtime": 1786603035.7187119,
-    "ast_hash": "04ac4dcf0e53c8890f293ee1687e9603",
-    "semantic_hash": "04ac4dcf0e53c8890f293ee1687e9603"
+    "mtime": 1786653979.1876254,
+    "ast_hash": "f948f2c8b6fe5b82f98ce1690d65cb2a",
+    "semantic_hash": "f948f2c8b6fe5b82f98ce1690d65cb2a"
   },
   "PRD_ROADMAP.md": {
     "mtime": 1786603042.3751,
@@ -185,9 +185,9 @@
     "semantic_hash": "e173c0bf23f24e15cf10fc503c4dc6f3"
   },
   "docs/Project Record \u2014 Full Chronological History.md": {
-    "mtime": 1786603130.5915754,
-    "ast_hash": "9cc557c69be524de45193ac855dd166b",
-    "semantic_hash": "9cc557c69be524de45193ac855dd166b"
+    "mtime": 1786675932.0731008,
+    "ast_hash": "9b6a639f209c68f6b6026237c471b461",
+    "semantic_hash": "9b6a639f209c68f6b6026237c471b461"
   },
   "docs/findings_2026-07-09_experiment_arc.md": {
     "mtime": 1783658961.6090634,
@@ -908,5 +908,10 @@
     "mtime": 1786602115.8481493,
     "ast_hash": "106282fa8f2b83a35e3bee607c1a0663",
     "semantic_hash": "106282fa8f2b83a35e3bee607c1a0663"
+  },
+  "docs/prereg_v3_pbo_scoping.md": {
+    "mtime": 1786676233.0648737,
+    "ast_hash": "a50898b7aff90e87f1e5be3472986558",
+    "semantic_hash": "a50898b7aff90e87f1e5be3472986558"
   }
 }

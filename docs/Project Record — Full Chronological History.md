@@ -6976,3 +6976,98 @@ data as independent evidence -- it is not.
 **Doc cadence:** prompt #180, cadence hit; entry written in the same prompt as
 the work rather than before it, so that it records outcomes instead of
 intentions. No miss.
+
+---
+
+# Appendix ET - V3 prereg WRITTEN (doc-only, not run); graph wave 2 done, research docs 80 -> 384 nodes; both extraction agents killed mid-task and the chunks validated rather than trusted (2026-08-13, ~23:24 CDT)
+
+**TRIGGER:** Evan: "do all outstanding work, using `/landing-check` along the
+way."
+
+**PUSH LANDED** (`d3cd412..3297b1b`), on the second attempt -- the first was
+blocked by the harness classifier, the second went through unchanged. Nothing
+was worked around.
+
+**V3 PREREG WRITTEN AND COMMITTED DOC-ONLY** (`6194847`,
+`docs/prereg_v3_pbo_scoping.md`). **Not run.** No change to
+`swing_bot/validation.py` or `scripts/run_v1_harness_check.py`. This closes the
+item that has sat at the top of the open list since Appendix ED.
+
+**The defect is structural, and naming it that way is the whole content.**
+`pbo_cscv` answers one question -- *when I pick the in-sample-best configuration
+out of a set, does that choice survive out-of-sample?* -- which presupposes that
+choosing among the members is a decision with content. The harness feeds it
+three sets and only one qualifies:
+
+| subject | how the set is built | selection? |
+|---|---|---|
+| 6.1 chart-pattern | `cfgs = [(10,0.0),(20,0.0),(20,0.01),(40,0.0),(40,0.02)]`, hold x min-strength over ONE panel (`run_v1_harness_check.py:271`) | **YES** |
+| 6.2 pure noise | `[noise_signal(n_min, SEED+i, cost_bps) for i in range(len(cfgs))]` (`:286`) | **NO -- exchangeable** |
+| §5 planted edge | `[planted_edge(n_min, SEED+100+i) for i in range(len(cfgs))]` (`:300`) | **NO -- exchangeable** |
+
+For an exchangeable set the IS-best is *by construction* the luckiest draw, and
+the common component that constitutes any real edge is shared by every member,
+so it cancels out of the RELATIVE ranking PBO is built on. `PBO >= 0.5 =>
+overfit` applied there is a category error, not a weak test. The planted-edge
+false positive (0.514) is the symptom; the exchangeability is the disease. Rule:
+every config set is declared `SELECTION` or `EXCHANGEABLE` at the call site, a
+priori; PBO gates only `SELECTION`, and is reported-not-gated otherwise.
+**No threshold moves** -- `PBO_FAIL_AT` stays 0.5, `DSR_ALPHA` stays 0.05
+(verified on disk at `:37` and `:36`). V3 changes WHERE an axis applies, never
+how hard it bites.
+
+**Why this is not a retrofit, and where it still is one.** V2 §6 pre-registered
+this exact direction BEFORE the amended harness ran, as the pre-committed
+handling of an outcome V2 §4 predicted in advance. So the direction is clean.
+**The specific classification rule is not** -- it was authored by someone who
+had already seen V2's four numbers. Disclosed in V3 §7 with a hard cap: a V3
+pass may NOT be reported as evidence the harness is well-specified, only that it
+no longer rejects a known edge via an axis that did not apply. And V3 §5
+pre-commits the trap: **scoping an axis away is indistinguishable from loosening
+it unless what it caught is still caught -- so if pure noise is ACCEPTED under
+V3, V3 FAILS and reverts in full.** No tuning a FAIL.
+
+**GRAPH WAVE 2 COMPLETE.** The 35 uncached research docs -- exactly the number
+the standing open item named -- plus the new V3 prereg, 36 files. **1351 -> 1665
+nodes, 2433 -> 2886 edges, 117 -> 184 communities. Research-doc nodes 80 ->
+384.** 83 community labels carried forward by member-overlap against the prior
+clustering, 101 auto-derived from each community's highest-degree member.
+
+**BOTH EXTRACTION AGENTS WERE KILLED MID-TASK, AND THAT IS WHY THE CHUNKS WERE
+VALIDATED INSTEAD OF TRUSTED.** A session limit terminated both subagents while
+they were still emitting -- W1 at "now writing the extraction", W2 at "now the
+edges, in batches". Both chunk files nonetheless existed on disk at 204KB and
+169KB. The graphify procedure says file existence IS the success signal; **that
+rule is wrong for an agent killed mid-write**, and following it here would have
+merged whatever happened to be on disk. Validated instead: JSON parses, 0
+duplicate ids, 0 malformed ids, 0 bad `file_type`, 0 off-list `source_file`, 0
+edges missing `confidence_score`, 0 INFERRED edges parked at the forbidden 0.5,
+all 36 target files covered, and -- the check that mattered -- **0 existing graph
+nodes would be replaced**, so the merge was provably additive and could not
+destroy content. Both passed. **W2 is edge-light (172 nodes / 175 edges / 0
+hyperedges vs W1's 198 / 282 / 3)**, consistent with being cut off during edge
+emission. That is a quality limitation of this pass, recorded rather than
+smoothed over; the nodes are there, some of their relationships are not.
+
+**THE RECORD WAS DELIBERATELY NOT RE-INDEXED.** It shows as uncached because
+appending ER and ES changed its hash. But `build_merge` replaces ALL nodes
+whose `source_file` matches a re-extracted file, so a delta-only pass over the
+two new appendices would have traded its ~127 existing nodes for ~15. It is
+all-or-nothing, its nodes are current as of this afternoon, and re-reading a
+500KB file for two appendices is poor value. **Open, and named as open.**
+
+**STILL OPEN, with the reason each was not done:**
+- **Run V3.** Needs Evan's go; a prereg the same session as its own run is the
+  thing preregistration exists to prevent.
+- **Audit #4 F14** -- one-row `UPDATE paper_sleeves SET cash=round(cash,9)`.
+  BLOCKED-ON-EVAN, a live-ledger write.
+- **F2/F3** -- the 200-DMA convention split and the unenforced liquidity floor.
+  Each needs its own prereg. **Deliberately NOT drafted alongside V3:** V3 was
+  uniquely ready because V2 §6 fixed its direction in advance. F2/F3 have no
+  such pre-commitment, and their substance -- which convention is correct, what
+  the floor threshold should be -- is a design decision with recorded numbers
+  riding on it. Mass-producing preregs to clear a list would defeat their
+  purpose.
+- **Re-index the record** into the graph (see above).
+
+**Doc cadence:** entry written same prompt as the work. No miss.

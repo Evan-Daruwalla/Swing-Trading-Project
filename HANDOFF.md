@@ -90,7 +90,7 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
 > instruments cannot be tested fairly.
 
-**Last updated: 2026-08-13 ~15:46 CDT** — this file is the only live snapshot;
+**Last updated: 2026-08-13 ~23:25 CDT** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
@@ -748,6 +748,22 @@ Full descriptions as Evan gave them: record Phase 0.
   under BLOCKED-ON-EVAN for 4 weeks; corrected 2026-08-13, record EO.)
 - **M2.12 survivorship bound**: deferred as moot for failed ETF-only E1; run
   only if a stock strategy enters scope.
+- **RUN V3?** `docs/prereg_v3_pbo_scoping.md` is WRITTEN and committed doc-only
+  (`6194847`, 2026-08-13, record ET) and **not run**. It scopes PBO to config
+  sets where selection is real: sets are declared `SELECTION` or `EXCHANGEABLE`
+  at the call site, PBO gates only the former. No threshold moves. Running it
+  means editing `swing_bot/validation.py` + `scripts/run_v1_harness_check.py`
+  and re-running the harness. **Deliberately left for Evan** — a prereg run in
+  the same session it was written is what pre-registration exists to prevent.
+  Pre-committed failure condition: if pure noise is ACCEPTED under V3, V3 FAILS
+  and reverts in full.
+- **Audit #4 F14** — one-row `UPDATE paper_sleeves SET cash=round(cash,9)` to
+  clear a −1.14e-13 residue. A write to the live paper ledger, so Evan's call.
+- **F2/F3 preregs** — the 200-DMA convention split (7 inclusive / 6 exclusive;
+  E5 and E7 use the opposite convention from the E6 strategy they test) and the
+  unenforced liquidity floor. Each moves already-recorded numbers, so each needs
+  its own pre-registration; not drafted, because unlike V3 neither has a
+  direction fixed in advance and both turn on a judgement Evan should make.
 
 ## Documentation
 - `docs/Project Record — Full Chronological History.md` — append-only
