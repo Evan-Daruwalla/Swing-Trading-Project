@@ -6893,3 +6893,86 @@ vintage. **Any future re-run WILL produce different numbers than the record's --
 that is expected, and is why every prior result is stamped with its own window.**
 
 **Doc cadence:** entry written same prompt as the work. No miss.
+
+---
+
+# Appendix ES - Push landed; the guard exercised in anger on M12 (142/142, silent); and a correction to ER I made by trusting an agent instead of `git ls-files` (2026-08-13, ~21:51 CDT)
+
+**TRIGGER:** Evan: "1. Delete the four stale chunk files... 2. Re-run a research
+script now that the cache is live."
+
+**PUSH LANDED.** `git ls-remote origin main` -> `d3cd412`; `origin/main..HEAD`
+count 0. The three commits from ER are on the remote. The block in ER was the
+harness permission classifier, not git; Evan ran it. **The command handed over
+was itself wrong** -- written `cd "..." && git push`, which is a parser error in
+PowerShell 5.1, a constraint this project's own notes and the `shell-portability`
+skill both state. Re-issued with `;`.
+
+**CORRECTION TO APPENDIX ER: the four chunk files were NEVER TRACKED.** ER says
+they are "still on disk and TRACKED" and calls them an open landmine partly on
+that basis. Re-derived: `git ls-files graphify-out/` returns exactly six files
+(`.graphify_labels.json`, `GRAPH_REPORT.md`, `cost.json`, `graph.html`,
+`graph.json`, `manifest.json`) and none is a chunk; `git check-ignore` returns
+YES for all four, matched by `.gitignore:33`
+(`graphify-out/.graphify_chunk_*.json`). **They were untracked, ignored, local
+build artifacts.**
+
+The provenance of the error matters more than the error. The second
+`/landing-check` agent reported "`graphify-out/` (6 **tracked** files:
+`graph.json:7842`, `GRAPH_REPORT.md:217`, `.graphify_chunk_A.json:53,59`,
+cache)". The count 6 was right and the membership was wrong -- chunk_A is not in
+the tracked six. **I repeated it into a committed record entry without running
+`git ls-files` myself.** That is precisely the failure this session spent two
+sweeps documenting, committed by the person documenting it: the whole method is
+"re-derive every claim from disk," and a claim arriving from a verification
+agent got a pass that a claim from a doc would not have. **An agent's output is
+an artifact to be checked, not a source of truth.** Append-only: ER stands as
+written; this is the correction of record.
+
+**DELETED, and it was a smaller act than ER implied** -- four gitignored files,
+`rm` only, no git operation, nothing to commit. The merge hazard was real
+regardless of tracking: the documented Part-C merge globs
+`.graphify_chunk_*.json`, so a future run would have silently merged wave-1
+chunks (including their "16 invariants") into a fresh graph. That is now
+closed by removal rather than by remembering to merge from an explicit list.
+`graphify-out/.prev_chunks/` still holds three older chunk files but sits one
+directory down, out of reach of the `-maxdepth 1` glob -- left alone.
+
+**THE GUARD IN ANGER: M12, the experiment it exists to protect.** First run of a
+real research script against the refreshed cache, guard ARMED (both env vars
+unset, `_ALLOW_STALE = False`). `scripts/run_m12_factorial.py`, 142 names:
+
+```
+tickers requested : 142
+tickers in panel  : 142
+common date axis  : 9220 sessions, 1990-01-02 -> 2026-08-12
+EXCLUDED warnings : 0
+guard STALE msgs  : 0
+guard MIXED msgs  : 0
+vintages seen     : ['2026-08-12']
+ALLOW_STALE       : False (False = guard armed)
+```
+
+Full factorial ran to completion, **exit 0**. This is the end-to-end
+confirmation the earlier work could not give on its own: `prove_cache_guard.py`
+proved the guard FIRES on a bad cache, and this proves it stays SILENT on a good
+one and that the `except StaleCacheError: raise` inserted into `load()` does not
+disturb the normal path. A guard that always fires is as useless as one that
+never does; both halves are now demonstrated.
+
+**THE M12 DIRECTION REPRODUCES ON A NEW VINTAGE -- AND THIS IS NOT A RE-TEST.**
+At 15 bps/side: GATE baseline (hold=10, K=3) +1.04% CAGR; **horizon alone
++12.29 pp, breadth alone +1.21 pp, interaction -7.90 pp**; benchmark EW-hold
+GATE +10.42% / DD 51.2% / Sh 0.59. `corr(cell 4, e6 rule) = +0.5871` over 6,692
+sessions. The recorded M12 finding -- **HORIZON binds, breadth does not**
+(record DU) -- holds on data extended to 2026-08-12.
+**Explicitly NOT a verdict and NOT an attempt.** The tally stays where it is.
+This was an infrastructure smoke test that happened to recompute a diagnostic;
+the numbers differ from DU/DV's because the window is longer, which is exactly
+why every recorded result is stamped with its own window. Reading this as
+corroboration would be reading a re-run of the same construction on overlapping
+data as independent evidence -- it is not.
+
+**Doc cadence:** prompt #180, cadence hit; entry written in the same prompt as
+the work rather than before it, so that it records outcomes instead of
+intentions. No miss.
