@@ -26,10 +26,23 @@ run, as the pre-committed handling of an outcome V2 §4 predicted in advance:
 > separately, never patched in after seeing output."
 
 The predicted outcome occurred (planted edge rejected via PBO 0.514). So the
-DIRECTION of this amendment was fixed before the number existed. **The specific
-classification rule in §2 was not** — it is written by an author who has seen
-V2's outputs. That contamination is real, is not cured by V2 §6, and is
-disclosed in §7 with a cap on what a V3 pass may claim.
+DIRECTION of this amendment was fixed **before the amended harness ran**.
+
+**It was NOT fixed before the number existed, and an earlier draft of this
+section said it was.** That was false: 0.514 came out of the **V1** run, and V2
+quotes it three times — including in §4, where the rejection is *predicted* on
+the strength of it. What V2 §6 fixed in advance is the RESPONSE to a result it
+had already forecast, which is a weaker and more honest claim. The earlier
+wording also contradicted this document's own §7.1, which lists 0.514 among the
+numbers already known to its author. Corrected 2026-08-13 after a
+`/landing-check` caught it (record Appendix EU); the correction is left visible
+rather than silently patched, because a pre-registration that overstates its own
+independence is worth less than one that does not.
+
+**The specific classification rule in §2 was likewise not fixed in advance** —
+it is written by an author who has seen V2's outputs. That contamination is
+real, is not cured by V2 §6, and is disclosed in §7 with a cap on what a V3 pass
+may claim.
 
 ---
 

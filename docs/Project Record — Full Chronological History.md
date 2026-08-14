@@ -7071,3 +7071,91 @@ all-or-nothing, its nodes are current as of this afternoon, and re-reading a
 - **Re-index the record** into the graph (see above).
 
 **Doc cadence:** entry written same prompt as the work. No miss.
+
+---
+
+# Appendix EU - Third `/landing-check`: the wave-2 merge DESTROYED 9 hyperedges while ET claimed it could not, and the V3 prereg overstated its own independence (2026-08-13, ~23:36 CDT)
+
+**TRIGGER:** the `/landing-check` Evan asked to be run "along the way", this
+time over `3297b1b..HEAD` — the V3 prereg and the wave-2 graph merge. Fresh
+agent, artifacts only, no session account.
+
+**VERDICT: FIX FIRST. Three defects, all mine, all now fixed.**
+
+**DEFECT 1 — THE PREREG OVERSTATED ITS OWN INDEPENDENCE.** V3 §0 said the
+direction "was fixed before the number existed." **False.** PBO 0.514 came out
+of the **V1** run; V2 quotes it three times, including in §4 where the
+rejection is *predicted* on the strength of it. The defensible claim is the
+weaker one: V2 §6 fixed the RESPONSE before the AMENDED HARNESS RAN. Worse, the
+sentence contradicted this same document's §7.1, which lists 0.514 among the
+numbers already known to its author — the document argued against itself two
+sections apart. Corrected in place, with the correction left visible in the
+text: **a pre-registration that overstates its independence is worth less than
+one that does not**, and quietly patching it would destroy the only thing it
+has. This is the single most important defect of the three, because it is a
+defect in the instrument rather than in a number.
+
+**DEFECT 2 — "0 EXISTING NODES REPLACED" WAS TRUE OF THE WRONG STAGE.** ET says
+the merge was "provably additive and could not destroy content." Three node ids
+are in fact gone from HEAD: `prd_roadmap_michaely_thaler_womack_1995`,
+`research_2026_07_10_swing_strategy_catalog_moskowitz_ooi_pedersen_2012`, and
+`docs_prereg_c3_vol_breakout_moskowitz_ooi_pedersen_2012`, canonicalised into
+`paper_michaely_thaler_womack_1995` and `paper_moskowitz_ooi_pedersen_2012`.
+The content survives and no link dangles, so the substance is fine — but **the
+validation I wrote ran on the CHUNKS, before the merge, and therefore could not
+speak for the canonicalisation stage that ran after it.** The proof did not
+reach as far as the sentence did.
+
+**DEFECT 3 — AND THIS IS THE ONE THAT MATTERS: THE MERGE DELETED 9 HYPEREDGES,
+INCLUDING THE ONE ET SINGLED OUT FOR PRAISE.** Hyperedges went **9 → 3**.
+`build_merge` REPLACED the hyperedge list with the new extraction's instead of
+unioning it — contrary to its own documented behaviour, which states it
+"combines" hyperedges from the existing graph and the new extraction. Lost were
+`research_cache_freshness_guard`, `live_paper_sleeve_pipeline`,
+`frozen_tripwire_done_check`, `three_live_paper_sleeves`, `d1_verdict_machinery`,
+`stale_cache_refusal_chain`, `three_sleeve_forward_paper_loop`,
+`v1_validation_harness_stack`, and **`guard_that_cannot_fire_defect_family`** —
+the last of which Appendix ET explicitly celebrated as "worth its own node ...
+linked as ONE family across its five instances", in the same entry, having just
+deleted it.
+
+**RECOVERED IN FULL.** All nine were read back out of
+`git show 3297b1b:graphify-out/graph.json`; every member id still exists in the
+current graph, so none had to be dropped. Restored by union with the 3 new ones.
+Verified from disk: **12 hyperedges, 0 with dangling members, 1665 nodes / 2886
+links unchanged.**
+
+**COLLATERAL — HANDOFF CONTAINED THE WORD "GRAPH" ZERO TIMES.** ET listed four
+open items; HANDOFF's new block listed three. The missing one — *re-index the
+record into the graph* — existed **only in the append-only record**, which
+CLAUDE.md explicitly does NOT designate as the live snapshot. A fresh session
+reading HANDOFF first, exactly as instructed, would never have seen it. The
+entire wave-2 rebuild was also absent. Fixed: HANDOFF now carries the graph's
+size, what wave 2 covered, the record-reindex item, and the standing warning
+that the graph is navigation and not citation.
+
+**WHAT THE SWEEP CONFIRMED TRUE**, so the fixes are not mistaken for a failed
+change: the DOC-ONLY provenance claim is genuine — `swing_bot/validation.py`
+and `scripts/run_v1_harness_check.py` have **identical blob SHAs at `3297b1b`
+and `HEAD`**, and no threshold was edited; all four line citations
+(`:271`, `:286`, `:300`, `:37`/`:36`) are exact; the prereg's description of
+`pbo_cscv` matches the code; the V2 §6 quotation is verbatim from V2:104-111;
+1351→1665 nodes, 2433→2886 edges, 117→184 communities and research-doc nodes
+80→384 all re-derive; tripwire GREEN; guard proof 8/8.
+
+**THE LESSON, and it is the sixth variant of this project's one recurring
+defect.** I wrote a validation gate specifically because two agents had been
+killed mid-write and their output could not be trusted. The gate was real, it
+was thorough, and it ran **before the transformation that actually mutated the
+graph**. A guard placed upstream of the destructive step cannot see what the
+destructive step does. The five earlier variants were a threshold below the
+minimum it guarded, a parameter no caller passed, a check needing two series in
+a single-series script, a raise caught by the function that raised it, and a
+namespace split that would silently unmatch an `except`. **This one is a guard
+in the wrong place in the pipeline** — and it was caught only because a fresh
+agent diffed the artifact against its predecessor instead of reading my
+validation output. Add to the standing rule: prove a guard fires, prove the
+callers let it through, **and prove it is downstream of what it claims to
+protect.**
+
+**Doc cadence:** entry written same prompt as the work. No miss.

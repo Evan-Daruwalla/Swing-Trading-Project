@@ -775,5 +775,14 @@ Full descriptions as Evan gave them: record Phase 0.
 - `docs/research/` — evidence brief, experiment-ideas list (+ council
   outcome pointer), future power calc / ablation docs.
 - `.claude/codebase-memory/` — binned technical memory (INDEX + 11 bins).
+- `graphify-out/` — the knowledge graph (`/graphify` queries it). **1665 nodes /
+  2886 edges / 184 communities / 12 hyperedges as of 2026-08-13** (record ET).
+  Wave 2 indexed the last 35 research docs; research-doc nodes went 80 → 384.
+  **Still NOT indexed: the project record itself** — it re-reads as uncached
+  every time an appendix is appended, and `build_merge` replaces ALL nodes for a
+  re-extracted file, so a delta pass would trade its 126 existing nodes for a
+  handful. All-or-nothing; open. **Treat the graph as navigation, never as a
+  citation** — it is LLM-built and has shipped at least one false fact (record
+  EQ). The record and the code are ground truth.
 - `.claude/pm-cadence.json` — record entry every 3 prompts;
   handoff/PRD/bins event-driven.
