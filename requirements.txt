@@ -6,5 +6,13 @@
 # code around it. See docs record Appendix E.
 yfinance==1.5.1
 httpx==0.28.1
+# Pinned 2026-08-16 (audit finding ST-2): pandas/numpy are DIRECT imports
+# (scripts/run_c1_residual_reversal.py, scripts/run_e10_earnings_drift.py)
+# that were previously pinned only in requirements.lock's transitive freeze —
+# a clean-machine `pip install -r requirements.txt` would have resolved them
+# to whatever's newest, straight into the pandas-3.0.x default-changing edge
+# this file's own header warns about. Versions match requirements.lock.
+pandas==3.0.3
+numpy==2.5.1
 # pytest optional — frozen-regression tests run via their own __main__
 # (swing_bot/test_frozen.py), matching the Trading project's pattern.

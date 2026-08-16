@@ -7159,3 +7159,71 @@ callers let it through, **and prove it is downstream of what it claims to
 protect.**
 
 **Doc cadence:** entry written same prompt as the work. No miss.
+
+# Appendix EV - Scheduled daily-audit: secret gate wired, pandas/numpy pinned, and ES's "one lost session" claim was itself wrong (2026-08-16, ~13:26 CDT)
+
+## EV.1 What ran
+
+The `daily-audit` scheduled task ran a cross-project cold audit; Evan replied
+"do all." Two fixes landed here (ST-1, ST-2); one finding (ST-3) has no code
+fix and is recorded as a correction to ES instead.
+
+## EV.2 Fixes applied
+
+**ST-1 - secret gate wired.** This repo holds live Alpaca credentials
+(`alpaca_keys.env`, gitignored) but had `core.hooksPath` unset and no
+`.git/hooks/pre-commit` - no secret scanner ran on any commit. Added
+`scripts/git-hooks/pre-commit` (secret-gate delegation only - unlike
+Trading's copy, this repo has no HTML-twin record to keep in sync) and set
+`core.hooksPath scripts/git-hooks`. Verified live: staged this file and ran
+the hook directly - clean, exit 0, delegated to the canonical
+`~/.claude/skills/commit-gate/hooks/pre-commit`.
+
+**ST-2 - pandas/numpy pinned in requirements.txt.** They are direct imports
+(`scripts/run_c1_residual_reversal.py`, `scripts/run_e10_earnings_drift.py`),
+pinned only in `requirements.lock`'s transitive freeze - a clean-machine
+`pip install -r requirements.txt` would resolve them to whatever's newest,
+into the pandas-3.0.x default-changing edge this file's own header already
+warns about. Pinned to `requirements.lock`'s exact versions (pandas 3.0.3,
+numpy 2.5.1); confirmed those match what's actually installed in `.venv`.
+
+## EV.3 ST-3 - ES's "one lost session" claim corrected, no code fix exists
+
+A landing-check run against this session's audit report caught this: ES
+(record above, 2026-08-13) states the forward-evidence series lost ONE
+session. Re-checking `var/daily_swing_paper.log`'s run headers against every
+weekday from 07-13 to 08-14 shows **two** gaps - 2026-07-14 (Tuesday) and
+2026-07-30 (Thursday), neither a market holiday. ES was wrong.
+
+Root cause **could not be determined**. The header line (`=== YYYY-MM-DD - M3
+forward-paper daily loop (EXECUTE) ===`) is the FIRST thing
+`daily_swing_paper.bat` writes after `cd`, and it is absent for both dates -
+so `SwingTradingDailyPaper` either didn't fire at all, or something killed it
+before that line. `schtasks /query` only retains the most recent run.
+Checked `Microsoft-Windows-TaskScheduler/Operational` for a forensic trail:
+**that log is disabled** (`wevtutil gl ...` -> `enabled: false`), so there is
+no OS-level record for these dates or for any future miss. No code bug was
+found - the guard (`daily_swing_paper.bat`'s own `RC` capture, audit #4
+finding F4/F5) is downstream of the miss, not upstream of it, so it cannot
+explain a run that never started.
+
+**Recommendation, not applied (system-setting change, Evan's call):**
+`wevtutil sl Microsoft-Windows-TaskScheduler/Operational /e:true` would make
+a future miss diagnosable. Cost stated plainly: the M3 kill-switch
+review (12mo/30 picks) reads this series as continuous evidence; it is not,
+by two sessions, and that is now the documented true count.
+
+## EV.4 Verification
+
+- Frozen tests, re-run before this entry (no python change since the last
+  green run this session): `FROZEN TESTS: GREEN (all d=0)`.
+- ST-1: hook run live on staged content, exit 0.
+- ST-2: `pandas 3.0.3` / `numpy 2.5.1` confirmed installed, matching the new pins.
+- No live-DB writes, no order submission.
+
+## EV.5 Status
+
+- ST-1, ST-2: closed.
+- ST-3: no code fix exists; ES corrected; a system-setting recommendation
+  left for Evan.
+- Not pushed - Evan has not authorized a push.
