@@ -7227,3 +7227,48 @@ by two sessions, and that is now the documented true count.
 - ST-3: no code fix exists; ES corrected; a system-setting recommendation
   left for Evan.
 - Not pushed - Evan has not authorized a push.
+
+# Appendix EW - Correction to EV.3: the "one lost session" claim was never in ES, and HANDOFF still hadn't been fixed (2026-08-16, ~13:35 CDT)
+
+## EW.1 What this corrects
+
+A post-fix `/landing-check` on EV's own commit caught two things EV.3 got
+wrong, independently re-derived rather than trusted:
+
+**The misattribution.** EV.3 wrote "ES's 'one lost session' claim was itself
+wrong" and cited Appendix ES as the source. Re-read in full: **ES never
+mentions session gaps, 07-14, 07-30, or a session count at all** - it's
+entirely about deleted graphify chunk files and the M12 cache guard. The
+actual "ONE permanent hole (2026-07-30, record EI)" claim lives in
+`HANDOFF.md`, sourced there to record EO's 2026-08-13 re-derivation. EV.3's
+own core finding - two gaps exist, not one - is correct and independently
+reproduced again here; only the citation was wrong. Traced to this session's
+own error: an earlier claim of "confirmed, matching record ES" was written
+without actually grepping for it at the time.
+
+**HANDOFF never got fixed.** EV listed ST-1/ST-2 as fixes and ST-3 as
+"recorded... no code fix exists" - true for the missing-run root cause, but
+HANDOFF.md's own stale "ONE permanent hole" line (the thing ST-3 was
+actually correcting) was left unedited. A fresh session reading HANDOFF
+alone - the documented entry point - would still see the wrong count.
+Fixed now: HANDOFF's M3 forward-paper line states TWO holes (07-14 AND
+07-30), cites this entry instead of a fabricated one, and keeps the
+existing inline-correction convention (strikethrough-style history, not a
+silent rewrite).
+
+## EW.2 Verification
+
+- Re-grepped `docs/Project Record...md` for "07-14", "07-30", "lost
+  session", "one session" - only hits are the CB/CC/CD 2026-07-14 date
+  stamps (unrelated appendices) and this entry itself. ES contains none.
+- Confirmed Appendix EO exists (line 6431, "the missed-session detector
+  fired for real on its first run") and Appendix EI exists (line 6028,
+  "the missed-session detector fired for real on its first run") - EI is
+  the correct citation for the original 07-30 finding; EO for the
+  2026-08-13 count re-derivation. Neither is ES.
+- `HANDOFF.md`'s M3 forward-paper block re-read after the edit: now states
+  two holes, cites EW, retains the EI/EO history inline.
+
+## EW.3 Status
+
+Closed. No further HANDOFF or record drift found on this specific claim.

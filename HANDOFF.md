@@ -137,12 +137,17 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 >   "No known vulnerabilities found". This block had claimed them Open for 8 days
 >   after the code said otherwise.
 
-> **M3 forward paper — RUNNING, 20 sessions (2026-07-15 → 2026-08-12), 60 NAV rows, ONE
-> permanent hole (2026-07-30, record EI).** (The prior version of this line said "13
+> **M3 forward paper — RUNNING, 20 sessions (2026-07-15 → 2026-08-12), 60 NAV rows, TWO
+> permanent holes (2026-07-14 AND 2026-07-30, record EW — corrected 2026-08-16; this line
+> said ONE hole, 07-30 only, for 3 days).** (Before that, the prior version said "13
 > sessions, 27 NAV rows, no gaps" — 13×3 is 39, not 27, and the 07-30 gap was real; both
 > wrong, corrected by audit #4 F10. Counts re-derived from `paper_nav` 2026-08-13, record
-> EO — they had gone two sessions stale.) All three sleeves currently long QQQ. Latest
-> marks (2026-08-12): **e6_1x $1,016.43 · e18_vixts $1,010.08 · m10_1_nagel $1,030.53**
+> EO — they had gone two sessions stale. The 07-14 gap was never caught by any of those
+> passes; found 2026-08-16 by a landing-check re-grepping `var/daily_swing_paper.log`'s run
+> headers against every weekday, not the NAV table.) Root cause for neither gap could be
+> determined - Windows Task Scheduler history logging is disabled (record EW). All three
+> sleeves currently long QQQ. Latest marks (2026-08-12): **e6_1x $1,016.43 · e18_vixts
+> $1,010.08 · m10_1_nagel $1,030.53**
 > (each started at $1,000). Task now runs S4U — fires with nobody logged on. Scheduled task
 > `SwingTradingDailyPaper` fires 7pm weekdays via `scripts/daily_swing_paper.bat --execute`;
 > logs to `var/daily_swing_paper.log`. **Do NOT fire it manually intraday** — that is what
