@@ -1,6 +1,6 @@
 # codebase-memory index — Swing Trading
 
-- security.md — API-key handling for Alpaca/data sources (updated 2026-07-08)
+- security.md — API-key handling for Alpaca/data sources; the native-git secret gate (`core.hooksPath` -> `scripts/git-hooks`) (updated 2026-08-18)
 - performance.md — empty; no runtime facts measured yet (updated 2026-08-13)
 - architecture.md — relationship to the Trading repo; data-layer facts (updated 2026-07-08)
 - features.md — the 3 live paper sleeves: e6_1x / e18_vixts / m10_1_nagel (updated 2026-08-13)

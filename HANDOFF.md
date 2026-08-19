@@ -90,7 +90,7 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
 > instruments cannot be tested fairly.
 
-**Last updated: 2026-08-13 ~23:25 CDT** — this file is the only live snapshot;
+**Last updated: 2026-08-18 ~23:52 CDT** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
@@ -137,17 +137,24 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 >   "No known vulnerabilities found". This block had claimed them Open for 8 days
 >   after the code said otherwise.
 
-> **M3 forward paper — RUNNING, 20 sessions (2026-07-15 → 2026-08-12), 60 NAV rows, TWO
-> permanent holes (2026-07-14 AND 2026-07-30, record EW — corrected 2026-08-16; this line
-> said ONE hole, 07-30 only, for 3 days).** (Before that, the prior version said "13
-> sessions, 27 NAV rows, no gaps" — 13×3 is 39, not 27, and the 07-30 gap was real; both
-> wrong, corrected by audit #4 F10. Counts re-derived from `paper_nav` 2026-08-13, record
-> EO — they had gone two sessions stale. The 07-14 gap was never caught by any of those
-> passes; found 2026-08-16 by a landing-check re-grepping `var/daily_swing_paper.log`'s run
-> headers against every weekday, not the NAV table.) Root cause for neither gap could be
-> determined - Windows Task Scheduler history logging is disabled (record EW). All three
-> sleeves currently long QQQ. Latest marks (2026-08-12): **e6_1x $1,016.43 · e18_vixts
-> $1,010.08 · m10_1_nagel $1,030.53**
+> **M3 forward paper — RUNNING, 24 sessions (2026-07-15 → 2026-08-18), 72 NAV rows, ONE
+> permanent hole (2026-07-30, record EI).** (This line has now been wrong three separate
+> ways, so its history stays visible. It once said "13 sessions, 27 NAV rows, no gaps" —
+> 13×3 is 39, not 27, and the 07-30 gap was real; corrected by audit #4 F10. Counts
+> re-derived from `paper_nav` 2026-08-13, record EO. Then on 2026-08-16 records EV/EW
+> changed it to "TWO holes (07-14 AND 07-30)" — **that correction was itself wrong and is
+> REVERTED here (record EY, 2026-08-18).** The task's `<StartBoundary>` is
+> 2026-07-15T19:00:00-05:00, so it did not exist on 07-14; the series begins 2026-07-15;
+> and the log's session header carries the SESSION date, so the `=== 2026-07-13 ===` header
+> is the pre-reset manual fire of records CS/CT, not evidence of a 07-14 miss. A date
+> before the series began is not a hole in it — and record EI:6082 had already made exactly
+> this correction under the heading "the forward-evidence series lost ONE session, not
+> two".) Root cause of the 07-30 miss could not be determined — Windows Task Scheduler
+> history logging is disabled (record EV.3; still `enabled: false` as of 2026-08-18). All
+> three sleeves currently long QQQ. Latest marks (2026-08-18, written after that
+> evening's 19:00 run): **e6_1x $1,007.74 · e18_vixts $1,001.44 · m10_1_nagel
+> $1,021.72** — all three down ~1.7% on the 08-18 session (08-17 was $1,025.10 /
+> $1,018.69 / $1,039.32)
 > (each started at $1,000). Task now runs S4U — fires with nobody logged on. Scheduled task
 > `SwingTradingDailyPaper` fires 7pm weekdays via `scripts/daily_swing_paper.bat --execute`;
 > logs to `var/daily_swing_paper.log`. **Do NOT fire it manually intraday** — that is what
@@ -762,8 +769,12 @@ Full descriptions as Evan gave them: record Phase 0.
   the same session it was written is what pre-registration exists to prevent.
   Pre-committed failure condition: if pure noise is ACCEPTED under V3, V3 FAILS
   and reverts in full.
-- **Audit #4 F14** — one-row `UPDATE paper_sleeves SET cash=round(cash,9)` to
-  clear a −1.14e-13 residue. A write to the live paper ledger, so Evan's call.
+- **Audit #4 F14** — `UPDATE paper_sleeves SET cash=round(cash,9)` to clear a
+  floating-point residue. **THREE rows, not one** — re-derived 2026-08-18 (record
+  EY): `e6_1x −1.1368683772161603e-13`, `e18_vixts` and `m10_1_nagel` both
+  **+1.1368683772161603e-13**. Every prior statement of this item said "one-row";
+  the statement was wrong, the un-`WHERE`d UPDATE was always the right scope. A
+  write to the live paper ledger, so Evan's call.
 - **F2/F3 preregs** — the 200-DMA convention split (7 inclusive / 6 exclusive;
   E5 and E7 use the opposite convention from the E6 strategy they test) and the
   unenforced liquidity floor. Each moves already-recorded numbers, so each needs

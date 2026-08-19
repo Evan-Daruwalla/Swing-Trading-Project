@@ -7272,3 +7272,231 @@ silent rewrite).
 ## EW.3 Status
 
 Closed. No further HANDOFF or record drift found on this specific claim.
+
+---
+
+# Appendix EX - Outstanding-work survey, derived from artifacts after a five-day gap; two claims flagged for verification, not asserted (2026-08-18, ~18:24 CDT)
+
+**TRIGGER:** Evan: "find any outstanding work (no hallucinating) then use
+`/landing-check` with `/opus-workers`."
+
+**GAP DISCLOSED.** This session's last entry was EU (2026-08-13). Appendices EV
+and EW (2026-08-16) and commits `f3bdc24`, `105518c` were written by a
+scheduled `daily-audit` session this one has no memory of. Everything below is
+re-derived from disk at 2026-08-18 18:23 CDT, not from recollection. Repo level
+with `origin/main` at `105518c`; only `.claude/pm-cadence.json` dirty.
+
+**LIVE LOOP, read-only:** `paper_nav` **69 rows / 23 sessions, 2026-07-15 ..
+2026-08-17**; latest marks e6_1x $1,025.10 · e18_vixts $1,018.69 · m10_1_nagel
+$1,039.32. Weekday holes INSIDE the series: **exactly one, 2026-07-30.**
+Scheduled task last run 2026-08-17 19:00 result 0, next 2026-08-18 19:00,
+Status Ready. Log's last four session headers 08-12, 08-13, 08-14, 08-17;
+last line `exit code 0`.
+
+**OUTSTANDING, each with its source artifact:**
+1. **Run V3** — `HANDOFF.md` Open decisions; record ET. Evan-gated.
+2. **Audit #4 F14** ledger write — HANDOFF; ET. Evan-gated.
+3. **F2/F3 preregs** — HANDOFF; ET. Deliberately undrafted; Evan judgement.
+4. **Re-index the record into the graph** — HANDOFF:783 block; ET. Graph is
+   1665 / 2886 / 12 hyperedges, record still un-indexed.
+5. **Enable `Microsoft-Windows-TaskScheduler/Operational`** — EV.3's
+   recommendation, a system-setting change, Evan's call. Without it a future
+   missed run has no OS-level trail.
+6. **HANDOFF live-paper counts stale again**: `:140` says 20 sessions through
+   2026-08-12; the ledger says 23 through 2026-08-17. Latest marks also stale.
+   Same drift class as EO/EQ; the file's own stamp is 2026-08-13 23:25.
+7. **`.e8e9_cache` stale again, by design**: 181 series at ONE vintage
+   2026-08-12, now 6 calendar days old against a 5-day tolerance. Every
+   research script will refuse to run until refreshed. Not a bug; the
+   forming-bar trap (ER) applies to any refresh run outside market hours.
+
+**TWO CLAIMS FLAGGED FOR THE LANDING-CHECK, NOT ASSERTED HERE:**
+- **(a) EV.3 / EW / HANDOFF:140 say TWO holes, 2026-07-14 and 2026-07-30.**
+  The ledger shows the series BEGINS 2026-07-15 with one hole inside it. The
+  log's first header (`var/daily_swing_paper.log:7`) reads session
+  `2026-07-13`, i.e. the header carries the SESSION date, and record CS/CT
+  document a clean reset launched off 07-15 data. If 07-14 predates the
+  series, it is not a lost session and HANDOFF's "TWO holes" is a
+  miscorrection of a line that was right. To be re-derived by a fresh agent,
+  because this session has a stake in EO's original "one hole" count.
+- **(b) `schtasks` now prints `Logon Mode: Interactive/Background`**; HANDOFF
+  says the task runs S4U. Whether that display string is what S4U renders as,
+  or whether the logon type changed, is decidable only from the task XML
+  (`<LogonType>`), which this survey did not read.
+
+**Doc cadence:** prompt #183, cadence hit; entry written before the
+landing-check so it records the survey and not the sweep's outcome. No miss.
+
+---
+
+# Appendix EY - Landing-check via /opus-workers on EV/EW: ST-1 and ST-2 landed, but EV.3's "two lost sessions" is FALSE and EW baked it into HANDOFF, overturning a correction EI had already made (2026-08-18, ~18:31 CDT)
+
+**TRIGGER:** continuation of EX. Method per `/opus-workers`: two Opus-tier
+workers ran in parallel -- one the `/landing-check` over `1b8a390..105518c`,
+one an adversarial verifier of EX's outstanding-work list -- and this session
+reviewed both against an 8-item rubric **pre-registered before either output
+existed** (evidence-per-claim; file coverage derived independently; the two
+flagged claims resolved with named evidence; universals re-derived a second
+way; zero-results re-run; read-only attestation; two numbers re-derived by
+hand; missed items hunted by grep not recall). Every rubric item was executed
+by this session, not read. All passed; no redo round. The Agent tool carries no
+effort parameter, so both workers inherited session effort. Nothing in the
+repo was changed by either worker; `git status` identical before and after.
+
+**LANDED (verified by me, not taken from the workers):** `core.hooksPath` =
+`scripts/git-hooks`; `scripts/git-hooks/pre-commit` (1,040 B) exists and
+delegates to `~/.claude/skills/commit-gate/hooks/pre-commit` (1,732 B), which
+exists and ran live to `TOTAL: 0 unique finding(s)`, exit 0; no competing
+`.git/hooks/pre-commit`. `pandas==3.0.3` / `numpy==2.5.1` agree across
+`requirements.txt:15-16`, `requirements.lock:26-27`, and `pip show`. Frozen
+tripwire GREEN. **EV.5's "not pushed" is now false** -- `origin/main` is level
+at `105518c` (push time not determinable).
+
+**FLAGGED CLAIM (a) -- FALSE. There is ONE lost session, not two, and HANDOFF
+now says two.** Reconciled from three independent sources, each re-run by me:
+- `paper_nav` (ro): 23 sessions, 2026-07-15 .. 2026-08-17; weekday holes
+  INSIDE the series = **`['2026-07-30']`**.
+- `var/daily_swing_paper.log`: first banner **`Wed 07/15/2026 2:43:32`**
+  (line 2); first session header **`=== 2026-07-13 ...`** (line 7). The
+  header carries the SESSION date, printed by `daily_swing_paper.py:719` --
+  NOT, as EV.3 states, "the FIRST thing `daily_swing_paper.bat` writes after
+  `cd`" (the `.bat` writes the wall-clock banner). That misreading is the
+  root of the error: EV.3 swept session-header dates "from 07-13" and treated
+  the absent 07-14 as a missed run.
+- Task XML: `<StartBoundary>2026-07-15T19:00:00-05:00</StartBoundary>`;
+  record CR registers the task ~02:40 on 07-15, CS documents the 02:43 manual
+  fire off session 07-13, CT documents the ledger RESET and relaunch off
+  session 07-15. **The task did not exist on 2026-07-14 and the series is
+  defined to begin 2026-07-15. A date before the series began is not a hole in
+  it.**
+- **And EI:6082 already said so** -- heading "CORRECTION -- the forward-evidence
+  series lost ONE session, not two", derived by set difference over
+  `paper_nav`. EO's HANDOFF line ("ONE permanent hole (2026-07-30, record
+  EI)") was correct and cited correctly. EV.3 overturned it; EW propagated the
+  overturn into `HANDOFF.md:140-141`, which now reads "TWO permanent holes
+  (2026-07-14 AND 2026-07-30, record EW)". **A right line was corrected into a
+  wrong one, in the live snapshot, on the number the M3 kill-switch review
+  reads.** EW.2's own zero-hit grep for "07-30" also cannot have run as
+  described: `grep -c` returns 23 hits.
+- Consequence for EV.3's recommendation: enabling the TaskScheduler
+  Operational log is still sound hygiene, but the "two misses" that motivated
+  it were one.
+
+**FLAGGED CLAIM (b) -- NOT AN ISSUE.** Task XML `<LogonType>S4U</LogonType>`.
+`Logon Mode: Interactive/Background` is merely how `schtasks /fo LIST /v`
+renders S4U. HANDOFF is right. Closed.
+
+**ONE UNIVERSAL DOWNGRADED TO PARTIALLY TRUE.** EV.2's "no secret scanner ran
+on any commit" holds for the native git path (hooksPath was unset, no
+`.git/hooks/pre-commit`) but `~/.claude/settings.json:38` already wired a
+PreToolUse commit-gate for commits the model makes via Bash -- verified by
+grep. ST-1 closed the shell-commit path, which was the real gap; the sentence
+overstated the prior exposure.
+
+**SURVEY VERDICT (worker 2, re-derived by me where numeric):** items 1, 3, 5,
+6, 7 STILL OPEN as written. **Item 2 misdescribed:** the F14 residue is
+**three rows, not one** -- `e6_1x −1.1368683772161603e-13`, `e18_vixts` and
+`m10_1_nagel` **+1.1368683772161603e-13**; the "one-row" wording is inherited
+(record 6275/6423/6680/7062, `HANDOFF.md:767`) and EX repeated it. The bare
+`UPDATE ... SET cash=round(cash,9)` has no `WHERE` and would touch all three,
+which is the right scope, but the description of it was wrong. **Item 4
+overstated:** the record is not "un-indexed" -- it carries 126 nodes at a stale
+vintage, the largest single source in the graph; the open work is a
+RE-index. **Missed items found by grep, none by recall:** (M3) `PRD_ROADMAP.md`
+success-criteria boxes `:96`, `:98` unchecked though M1 is Done, `:106`
+(control + LLM-veto sleeves) should be struck as superseded, `:104` (>=20
+CONSECUTIVE unattended sessions) genuinely open -- the 07-30 hole reset the
+count and only 12 consecutive have run since; (M4) `HANDOFF.md:203`
+`fill_divergence` still lacks broker fill price on **6 of 10** rows;
+`HANDOFF.md:775` "No HTML twin yet" while M6 is marked Done with the twin in
+its scope.
+
+**NOTHING WAS FIXED IN THIS ENTRY.** `/landing-check` is findings-only by
+its own rule and this prompt asked for the check, not the repair. The
+corrections are Evan's to authorise; they are listed as options in the
+session summary.
+
+**Doc cadence:** entry written same prompt as the work. No miss.
+
+---
+
+# Appendix EZ - EY's findings APPLIED: HANDOFF's "two holes" reverted to one, F14 restated as three rows, security bin caught up, cache refreshed to one vintage (2026-08-18, ~23:51 CDT)
+
+**TRIGGER:** Evan, on EY's option list: "do all then run /landing-check."
+Options 1 and 2 — apply the corrections and refresh the cache.
+
+**1. THE FALSE HOLE COUNT IS REVERTED.** `HANDOFF.md:140-152` now reads **ONE
+permanent hole (2026-07-30, record EI)**, with the full three-way history of
+the line kept visible: the original "13 sessions / 27 NAV rows / no gaps"
+error, EO's re-derivation, and EV/EW's 2026-08-16 "TWO holes" correction —
+which is named as wrong and reverted, with the reasons on the line itself
+(`<StartBoundary>` 2026-07-15T19:00:00-05:00, series begins 07-15, the log
+header carries the SESSION date so `=== 2026-07-13 ===` is the CS/CT pre-reset
+manual fire).
+
+**INDEPENDENT CORROBORATION FOUND WHILE SWEEPING FOR RESIDUAL CLAIMS:**
+`scripts/daily_swing_paper.py:82` reads
+`ACKNOWLEDGED_NAV_HOLES = {"2026-07-30"}   # lost to the Interactive-only task;
+record EI`. **The live loop's own whitelist has said ONE hole all along**, and
+EV/EW never touched it — so for two days the code and the live snapshot
+disagreed, and the code was right. Every other `07-14` hit in the repo (grep
+across `*.md`, ~90 hits) is an unrelated 2026-07-14 date stamp on M11/C-series
+result docs and preregs. No other file asserted the two-hole count.
+
+**2. F14 RESTATED.** `HANDOFF.md` now says **THREE rows, not one**, with the
+measured values (`e6_1x −1.1368683772161603e-13`; `e18_vixts` and `m10_1_nagel`
+both **+1.1368683772161603e-13`**) and the note that the un-`WHERE`d UPDATE was
+always the right scope even while its description was wrong. Still Evan-gated;
+still not executed.
+
+**3. SECURITY BIN CAUGHT UP** (`.claude/codebase-memory/security.md`, INDEX
+re-dated). ST-1's bin obligation had gone unmet since 2026-08-16. The entry
+records what the gate actually is, and carries EY's downgrade: the pre-fix
+exposure was the SHELL commit path only — model-made commits were already
+gated by the PreToolUse hook at `~/.claude/settings.json` — so EV.2's "no
+secret scanner ran on any commit" overstated it. A second bullet retires the
+bin's stale conditional "*If* this project gets its own keys file": it has one,
+`alpaca_keys.env`, and **`git log --all -- alpaca_keys.env` is empty — never
+tracked on any branch** (re-derived here, not carried forward), ignored via
+`.gitignore:18`.
+
+**4. CACHE REFRESHED — and the run exposed how fast this file goes stale.**
+181/181 refetched, 0 failures, 120s. Two things worth recording:
+- **The refresh read `TARGET = 2026-08-18` because the 19:00 scheduled run
+  fired while this session was idle**, adding a 24th session. So the HANDOFF
+  numbers written earlier in THIS session (23 sessions / 2026-08-17) were stale
+  within hours and were corrected again before commit: **24 sessions,
+  2026-07-15 → 2026-08-18, 72 NAV rows.** Marks 2026-08-18: **e6_1x $1,007.74 ·
+  e18_vixts $1,001.44 · m10_1_nagel $1,021.72** — all three down ~1.7% on the
+  session (08-17 was 1,025.10 / 1,018.69 / 1,039.32).
+- **The refetch landed MIXED: 124 series at 2026-08-18, 57 still at
+  2026-08-17.** The 08-18 bars are genuinely SETTLED — volumes round to
+  hundreds (SPY 43,840,200; QQQ 48,736,100), unlike the forming-bar signature
+  ER caught (unrounded, e.g. 30,258,928) — so this is Yahoo propagation lag on
+  57 symbols, not a partial-bar trap. **Resolved by truncating all 181 series
+  to the common denominator, 2026-08-17: 124 rows dropped, one per affected
+  file.** That deliberately discards one settled session of data on 124
+  symbols; the trade is stated plainly — a uniform panel is worth more to this
+  project than one extra day on two-thirds of it, and the mixed alternative
+  makes every research script refuse to run. Same convention
+  `run_m12_factorial.load()` already applies to its own date axis.
+- **VERIFIED, guard ARMED (both env vars unset):** SPY/QQQ/AAPL/DIA/GLD/HYG/GS
+  all end 2026-08-17; `vintages seen: ['2026-08-17']`; age **1 day** against a
+  5-day tolerance; guard silent.
+
+**DONE-CHECKS:** `FROZEN TESTS: GREEN (all d=0)`, exit 0.
+`CACHE GUARD PROOF: 8/8 PASS`, exit 0.
+
+**NOT DONE, unchanged and still Evan-gated:** run V3; execute the F14 ledger
+write; draft the F2/F3 preregs; re-index the record into the graph (126 stale
+nodes); enable `Microsoft-Windows-TaskScheduler/Operational`. Plus EY's newly
+surfaced doc drift, NOT touched this entry: `PRD_ROADMAP.md:96/:98` unchecked
+though M1 is Done, `:106` superseded and needing a dated strikethrough, `:104`
+(>=20 CONSECUTIVE unattended sessions) genuinely open — the 07-30 hole reset
+that count and 13 consecutive have now run (07-31 .. 08-18); `HANDOFF.md:203`
+`fill_divergence` still missing broker fill price on 6 of 10 rows;
+`HANDOFF.md:775` "No HTML twin yet" while M6 is marked Done with the twin in
+its scope.
+
+**Doc cadence:** entry written same prompt as the work. No miss.
+
