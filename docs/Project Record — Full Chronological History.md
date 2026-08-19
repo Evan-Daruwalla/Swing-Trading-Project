@@ -7500,3 +7500,54 @@ its scope.
 
 **Doc cadence:** entry written same prompt as the work. No miss.
 
+---
+
+# Appendix FA - Correction to EZ: three line-number citations were stale by the shift EZ's own edits caused (2026-08-19, ~00:01 CDT)
+
+**TRIGGER:** the `/landing-check` Evan asked for after "do all". Verdict on
+`1956619` was **SAFE** — every substantive claim re-derived TRUE by an
+independent method, and the riskiest one held: the in-place rewrite of 124
+`.e8e9_cache` files passed a full integrity sweep (0 unparseable, 0 empty, 0
+non-monotonic date sequences, 0 duplicate dates, across all 181 series; one
+vintage `2026-08-17`; guard armed and silent). Re-run by me, not taken on
+report.
+
+**THE DEFECT: EZ cited HANDOFF line numbers from BEFORE its own edits.** EZ's
+"NOT DONE" list carried citations forward from EY (written 18:31, pre-edit)
+without re-resolving them against the file EZ had just changed. The M3-block
+and F14-block edits shifted everything below them by +7 and +11 lines:
+
+| EZ says | actually |
+|---|---|
+| `HANDOFF.md:203` (`fill_divergence` missing broker price) | **`:210`** |
+| `HANDOFF.md:775` ("No HTML twin yet") | **`:786`** |
+| `HANDOFF.md:140-152` (the M3 block) | **`:140-157`** |
+
+Verified by grep for the quoted strings. The PRD citations in the same
+paragraph (`:96`, `:98`, `:104`, `:106`) are all correct — they were never
+touched by these edits, which is exactly why they survived.
+
+**The general form, worth more than the three numbers:** a line citation is a
+claim about a file, and editing that file invalidates every citation below the
+edit — including citations written earlier in the same session. This is the
+same shape as EQ's self-referential line count ("404 insertions", true before
+the entry stating it was appended) and EY's finding that a validation gate ran
+upstream of the step that mutates. **A reference is only as current as the last
+write to what it references.** Re-resolve citations after editing, not before.
+
+**ALSO FIXED, cosmetic:** `.claude/codebase-memory/security.md` still opened
+with "If this project gets its own keys file" — accurate-as-dated, and the
+2026-08-18 bullet below already superseded it, but a reader hits the stale
+conditional first. Now struck inline with a pointer, matching the bins'
+supersede-don't-delete convention. The `1956619` commit message said this
+bullet was "retired"; it was annotated, not removed — the message overstated
+by one word.
+
+**NOT DEFECTS, checked and cleared:** the remaining `TWO holes` strings in the
+record are historical entries (EV/EW/EY/EZ) preserved by the append-only rule,
+and `HANDOFF.md:145` is the reverted claim quoted inside its own retraction.
+`HANDOFF.md:775`'s "one-row" is likewise inside the correction that replaces
+it. No live assertion of either error survives anywhere in `*.md` or `*.py`.
+
+**Doc cadence:** entry written same prompt as the work. No miss.
+
