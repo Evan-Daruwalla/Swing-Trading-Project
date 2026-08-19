@@ -7732,3 +7732,101 @@ blanket authorisation. Command given to Evan to run elevated:
 
 **Doc cadence:** entry written same prompt as the work. No miss.
 
+---
+
+# Appendix FD - F2 CLOSED: E5 and E7 now implement the rule they test; every pre-registered prediction held and no verdict moved (2026-08-19, ~16:48 CDT)
+
+**TRIGGER:** Evan authorised "align E5/E7 to E6 and re-run". Prereg
+`docs/prereg_f2_ma_convention_alignment.md` committed DOC-ONLY as `9be5719`
+before either file changed.
+
+## FD.1 The change
+
+One line each, slice and boundary guard copied from E6 verbatim:
+
+| file | was | now |
+|---|---|---|
+| `scripts/run_e5_regime.py` `rotation_nav()` | `sum(closes[i - ma:i]) / ma` | `sum(closes[i - ma + 1:i + 1]) / ma` |
+| `scripts/run_e7_international.py` `rotation()` | `sum(closes[i-MA:i])/MA` | `sum(closes[i-MA+1:i+1])/MA` |
+
+`swing_bot/rotation.py` NOT touched, per prereg 2.5 — it is the E4 engine and is
+tripwire-pinned. **Frozen tripwire GREEN before AND after**, which was the
+stated condition for the change having stayed in scope.
+
+## FD.2 A protocol refinement the prereg did not specify, and why it mattered
+
+The prereg required old and new numbers side by side. The obvious reading is
+"compare against the recorded historical figures" — **and that would have been
+wrong.** The recorded numbers were computed on an older `.e8e9_cache` vintage,
+so that comparison conflates the CONVENTION change with a DATA change. This is
+exactly the confound found hours earlier in FC.5, where the planted edge's PBO
+moved 0.514 -> 0.486 purely because the panel got longer.
+
+So both scripts were run on the CURRENT cache (uniform 2026-08-17) with the OLD
+convention first, and that is the baseline. **The delta below is a pure
+convention effect**, with the data held fixed.
+
+## FD.3 Results — old vs new, same data, convention only
+
+**E5 (3x rotation regime test, kill criteria prereg `09a3a31`):**
+
+| window | metric | old (exclusive) | new (inclusive) | delta |
+|---|---|---|---|---|
+| 2000-2013 UNSEEN | CAGR | -3.37% | **-4.13%** | -0.76pp |
+| 2000-2013 UNSEEN | maxDD | 92.7% | **93.5%** | +0.8pp |
+| 2014-2026 seen | CAGR | 34.31% | **34.31%** | **0.00** |
+| 2014-2026 seen | maxDD | 60.1% | **60.1%** | **0.00** |
+| 2000-2026 full | CAGR | 12.77% | **12.30%** | -0.47pp |
+
+**E5 VERDICT: FAIL, unchanged**, failing the same three criteria (CAGR>0,
+maxDD<=65, CAGR>=BH-QQQ).
+
+**E7 Arm 1 (does E6's 1x overlay generalise?):** per-market pass/fail
+**identical** — N225 YES, GDAXI YES, FTSE no, HSI YES, AXJO no, GSPC YES.
+CAGRs moved by at most 0.15pp (N225 4.71->4.66, GDAXI 8.24->8.39, FTSE
+1.64->1.54, HSI 5.64->5.67, AXJO 2.49->2.50, GSPC 7.23->7.15); HSI's maxDD moved
+most, 45.7% -> 44.5%. **3/5 -> 3/5, FAIL (needs >=4), unchanged.**
+
+**E7 Arm 2 (vol-gated 3x):** mean CAGR 4.66% -> 4.68%; all four criteria still
+FAIL; worst drawdown 97.3% -> 97.2%. **FAIL, unchanged.**
+
+## FD.4 Every pre-registered prediction held
+
+- *"Magnitude small, single-digit pp of drawdown, <=0.10 Sharpe, sign not
+  predictable a priori"* — **held.** Largest move is 0.8pp of drawdown; signs
+  are genuinely mixed (E5 CAGR down, E7 Arm 2 mean CAGR up, GDAXI up, FTSE down).
+- *"E5 still FAIL, high confidence"* — **held.**
+- *"E7 still FAIL both arms; MODERATE confidence on Arm 1 because 3-of-5 is a
+  count that could flip without a headline number moving much"* — **held, and
+  the stated risk was real but did not fire**: the count stayed 3/5 and no
+  market crossed its threshold.
+- *"Tripwire stays GREEN"* — **held.**
+
+**Prereg section 5's flip-handling was NOT triggered.** No verdict moved, so
+nothing is reported as `PROVISIONAL — CONVENTION-FLIP` and PASS-HR stays 0. Per
+section 5 this outcome **buys nothing**: it does not strengthen E5's or E7's
+original findings. It only removes the inconsistency that E5 and E7 were testing
+a rule the project does not run.
+
+## FD.5 The one genuinely interesting number
+
+**E5's 2014-2026 window is byte-identical under both conventions** — CAGR
+34.31%, maxDD 60.1%, unchanged to the decimal — while 2000-2013 moved. The two
+forms produce the SAME signal sequence in the recent window and different ones
+in the older, more volatile one. That echoes the 2026-08-06 observation that a
+2,946-session sample showed no signal disagreement while E6's ~6,600-session run
+did. **A convention difference can be invisible on a quiet sample and material
+on a hostile one**, which is a decent argument for aligning conventions on
+principle rather than waiting for a measurement to justify it.
+
+## FD.6 Status
+
+F2 CLOSED. E5 and E7 keep their attempt numbers; `docs/trial_log.json` is
+unchanged (this restates recorded attempts, it does not add any). The old
+numbers stay in the record and in the results docs; these supersede them by
+dated entry. **F3 (liquidity floor) is next and is a separate prereg.**
+
+**Done-check:** `FROZEN TESTS: GREEN (all d=0)`, exit 0, before and after.
+
+**Doc cadence:** entry written same prompt as the work. No miss.
+

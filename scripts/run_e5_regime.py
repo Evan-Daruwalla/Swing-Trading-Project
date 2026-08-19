@@ -73,7 +73,12 @@ def rotation_nav(dates, sig_close, pos_oc, ma=200, cost_bps=5.0,
         if (start is None or d >= start) and (end is None or d <= end):
             nav.append(v)
         if i >= ma:
-            m = sum(closes[i - ma:i]) / ma
+            # F2 ALIGNMENT 2026-08-19 (prereg docs/prereg_f2_ma_convention_alignment.md,
+            # committed doc-only as 9be5719 BEFORE this line changed). Was
+            # closes[i-ma:i] -- EXCLUSIVE of today's close -- while E6 and the LIVE
+            # sleeve are INCLUSIVE. A test must implement the rule it tests; this
+            # file is a test OF E6. Slice and boundary guard copied from E6 verbatim.
+            m = sum(closes[i - ma + 1:i + 1]) / ma
             want = 1 if closes[i] > m else 0
             if want != state and pend is None:
                 pend = (want, i)

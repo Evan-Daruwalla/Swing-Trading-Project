@@ -72,7 +72,12 @@ def rotation(dates, sig_close, pos_oc, vthr=None, vol=None, cost_bps=5.0):
             pend = None
         nav.append(cash + sh*c)
         if i >= MA:
-            m = sum(closes[i-MA:i])/MA
+            # F2 ALIGNMENT 2026-08-19 (prereg docs/prereg_f2_ma_convention_alignment.md,
+            # committed doc-only as 9be5719 BEFORE this line changed). Was
+            # closes[i-MA:i] -- EXCLUSIVE of today's close -- while E6 and the LIVE
+            # sleeve are INCLUSIVE. A test must implement the rule it tests; this
+            # file is a test OF E6. Slice and boundary guard copied from E6 verbatim.
+            m = sum(closes[i-MA+1:i+1])/MA
             trend = closes[i] > m
             volok = (vthr is None) or (vol[i] is not None and vol[i] < vthr)
             want = 1 if (trend and volok) else 0
