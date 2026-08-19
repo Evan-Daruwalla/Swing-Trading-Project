@@ -93,19 +93,41 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 - [x] Git history proves pre-registration: commit of
       `docs/prereg_E1_ibs.md` predates the first commit of any backtest
       engine code (`git log --follow --oneline` pasted in the record).
-- [ ] Power calc documented: IBS<0.20 signal counts/year across the ETF
+- [x] Power calc documented: IBS<0.20 signal counts/year across the ETF
       universe, computed WITHOUT looking at post-signal returns.
-- [ ] Fill-timing ablation (#15+#13) produces per-ETF close-to-close vs
+      *(DONE 2026-07-09, commit `2a9edde` "M1.6: power calc — E1 powerable
+      (19.6% IBS<0.20 signal rate)"; `docs/research/2026-07-09_E1_power.md`.
+      Box left unchecked for 5+ weeks after the work landed; ticked
+      2026-08-19 after re-deriving the artifact, record FB.)*
+- [x] Fill-timing ablation (#15+#13) produces per-ETF close-to-close vs
       next-open haircut numbers, saved in docs + record.
+      *(DONE 2026-07-09: `scripts/ablation_fill_timing.py` +
+      `docs/research/2026-07-09_E1_fill_timing_ablation.md`. Headline carried
+      through the whole program: ~54% of the IBS edge lives in the
+      close→next-open gap. Ticked 2026-08-19, record FB.)*
 - [x] E1 (ETF IBS MR) backtest run against pre-registered gates; PASS or
       FAIL stated plainly in a record entry either way.
 - [x] Frozen-regression tripwire pinned and green:
       `python -m swing_bot.test_frozen` prints d=±0.0000pp.
 - [ ] (Gated) Live paper sleeve ≥20 consecutive trading days unattended;
       `fill_divergence` table populated; NAV table in a record entry.
-- [ ] (Gated) Control and LLM-veto treatment sleeves both live from M3 day
+      *(STILL OPEN, and the reason is specific: the 2026-07-30 miss RESET the
+      consecutive count. As of 2026-08-19 the run is **13 consecutive**
+      sessions, 2026-07-31 → 2026-08-18, against a bar of 20 — re-derived from
+      `paper_nav`, record FB. 24 sessions total, but the criterion says
+      CONSECUTIVE. `fill_divergence` is populated but only 6 of 10 rows carry a
+      broker fill price, so "populated" is met and "usable for slippage" is
+      not.)*
+- ~~[ ] (Gated) Control and LLM-veto treatment sleeves both live from M3 day
       one; control sleeve provably unaffected by overlay decisions
-      (assertion in code); every decision logged with UNIQUE(date,ticker).
+      (assertion in code); every decision logged with UNIQUE(date,ticker).~~
+      **SUPERSEDED 2026-08-19 (record FB), not achieved and not abandoned
+      silently.** The `e1_control`/`e1_llm_veto` pair was specified against E1,
+      which FAILED (M2b), so the spec died with its strategy; M3 deployed three
+      MECHANICAL sleeves instead (`e6_1x` / `e18_vixts` / `m10_1_nagel`) — see
+      `HANDOFF.md` workstream row "Live paper: LLM-veto overlay sleeve …
+      NOT BUILT — spec superseded". An overlay arm is still possible but needs
+      its own pre-registration; it is NOT a checkbox this milestone can tick.
 - [ ] Overlay readout happens at the pre-registered N / time horizon, not
       before; interim numbers labeled descriptive-only in every doc.
 - [x] (M2b) Git history proves `docs/prereg_E2_leveraged_ibs.md` predates the

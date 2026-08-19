@@ -7551,3 +7551,61 @@ it. No live assertion of either error survives anywhere in `*.md` or `*.py`.
 
 **Doc cadence:** entry written same prompt as the work. No miss.
 
+---
+
+# Appendix FB - PRD success-criteria drift cleared: two boxes were done for five weeks, one was superseded and sitting open, and the >=20-consecutive gate is further from met than the session count suggests (2026-08-19, ~00:06 CDT)
+
+**TRIGGER:** Evan: "1 and 2" — push, then clear the PRD drift EY surfaced.
+
+**PUSHED:** `105518c..340c525` -> `origin/main`. Remote confirmed at `340c525`
+by `git ls-remote`.
+
+**THE DRIFT, and why it mattered more than a tick-box exercise.** `## 3.
+SUCCESS CRITERIA` is the PRD's own definition of what M0-M3 must deliver.
+Four of its nine lines disagreed with reality:
+
+**Two boxes were unchecked though the work shipped 2026-07-09.** Both verified
+by artifact BEFORE ticking, not on HANDOFF's say-so:
+- *Power calc* — commit `2a9edde` ("M1.6: power calc — E1 powerable, 19.6%
+  IBS<0.20 signal rate"), artifact `docs/research/2026-07-09_E1_power.md`, 102
+  lines. Unchecked for **five weeks** after landing.
+- *Fill-timing ablation* — `scripts/ablation_fill_timing.py` plus
+  `docs/research/2026-07-09_E1_fill_timing_ablation.md`. Its headline (~54% of
+  the IBS edge lives in the close→next-open gap) is quoted throughout the
+  program's later work, so the criterion was not merely met, it was
+  load-bearing — and its box was still empty.
+
+**One criterion was superseded and left sitting OPEN, which reads as
+outstanding work that nobody will ever do.** "Control and LLM-veto treatment
+sleeves both live from M3 day one" was specified against E1, and **E1 FAILED
+(M2b), so the spec died with its strategy.** M3 deployed three MECHANICAL
+sleeves instead. Struck with a dated strikethrough per the roadmap's own
+convention — ADD by appending, REMOVE by dated strikethrough — with the reason
+inline, so it reads as *superseded*, never as *quietly dropped*. An overlay arm
+remains possible; it needs its own pre-registration and is not a box this
+milestone can tick.
+
+**THE ONE THAT GOT WORSE ON INSPECTION.** The gate reads "**≥20 CONSECUTIVE**
+trading days unattended". The forward-evidence series is at 24 sessions, which
+looks comfortably past it. It is not: **the 2026-07-30 miss RESET the count**,
+and the current run is **13 consecutive** (2026-07-31 → 2026-08-18) — re-derived
+from `paper_nav`, not assumed. Seven more clean sessions to go, and any further
+miss restarts it. The second clause is also only half-met: `fill_divergence` is
+populated, but **6 of its 10 rows carry no broker fill price**, so it satisfies
+"populated" and fails "usable for slippage". Both facts are now written into
+the criterion instead of living only in a record entry.
+
+**AFTER:** 7 done / 2 open / 1 struck. The two genuinely open are the ≥20
+consecutive gate and the M4 overlay readout, which is correctly gated on it.
+
+**NOT TOUCHED, and named so the next session does not assume otherwise:** the
+milestone TABLE rows (`PRD_ROADMAP.md:195-211`) were not audited in this pass —
+only the success-criteria block. `HANDOFF.md:786` "No HTML twin yet" versus M6
+marked **Done** with "record HTML twin" inside its own scope
+(`PRD_ROADMAP.md:203`) is a real contradiction and is still open; it needs a
+decision — build the twin or narrow M6's stated scope — and that is Evan's
+call, not a doc edit.
+
+**Doc cadence:** prompt #186, cadence hit; entry written in the same prompt as
+the work so it records outcomes rather than intentions. No miss.
+
