@@ -7609,3 +7609,126 @@ call, not a doc edit.
 **Doc cadence:** prompt #186, cadence hit; entry written in the same prompt as
 the work so it records outcomes rather than intentions. No miss.
 
+---
+
+# Appendix FC - F14 ledger write EXECUTED; V3 implemented and ACCEPTED - but the false positive it was written to remove did not reproduce, so the repair is UNDEMONSTRATED (2026-08-19, ~16:28 CDT)
+
+**TRIGGER:** Evan: "i approve all things and do all. ask questions if needed."
+That is the authorisation the gated items had been waiting on.
+
+## FC.1 Audit #4 F14 - CLOSED
+
+Backup first (`var/swing.db.pre-F14.bak`, 10,432,512 B, 16:24 CDT), executed
+before the 19:00 nightly run.
+
+```
+update paper_sleeves set cash = round(cash, 9) where cash != round(cash, 9)
+rows updated: 3
+  e18_vixts:    1.1368683772161603e-13 -> 0.0
+  e6_1x:       -1.1368683772161603e-13 -> 0.0
+  m10_1_nagel:  1.1368683772161603e-13 -> 0.0
+other tables unchanged: True {'paper_nav': 72, 'paper_positions': 3,
+  'paper_transactions': 5, 'fill_divergence': 10, 'bars': 105396}
+```
+
+Asserted rather than eyeballed: every residue is exactly `0.0`, and no other
+table's row count moved. **Three rows, as FA corrected.**
+
+## FC.2 V3 implemented - and it landed in ONE file, not two
+
+The prereg anticipated editing `swing_bot/validation.py` AND
+`scripts/run_v1_harness_check.py`. Only the harness needed it: `pbo_cscv`
+computes the same quantity, and V3 changes only WHERE that quantity may gate.
+`validation.py` is byte-identical. **The prereg overestimated its own blast
+radius** - a smaller error than understating it, but recorded.
+
+`evaluate()` now takes a REQUIRED `cfg_class` validated against
+`("SELECTION", "EXCHANGEABLE")`; missing or wrong RAISES rather than defaulting,
+so the declaration cannot be skipped. PBO gates only SELECTION.
+
+**Criterion 5 ("no threshold differs, verified by diff, not by assertion") -
+verified by diff:** the only constant change is the ADDITION of `CFG_CLASSES`;
+`DSR_ALPHA = 0.05`, `PBO_FAIL_AT = 0.5`, `HOLD = 20`, `SEED = 20260806`
+unchanged.
+
+## FC.3 An unanticipated blocker: the trial log
+
+The first run died - correctly - in V1's criterion-5 guard: adding
+`prereg_v3_pbo_scoping.md` made `docs/trial_log.json` STALE, and DSR refuses to
+guess a trial count. The machinery working.
+
+Resolving it needed a judgement the prereg does not cover.
+`build_trial_log.py` carries an explicit `NON_ATTEMPT_PREREGS` set holding V1
+and V2. **V3 is the same class and its own section 7.4 says so, so it was
+added.**
+
+**THE DIRECTION IS DISCLOSED BECAUSE IT IS THE UNSAFE ONE.** That list's comment
+states the asymmetry: forgetting to exclude makes N too LARGE, which only makes
+DSR more conservative. **Excluding one lowers N and INFLATES DSR.** The change
+was made because the classification is correct and consistent with V1/V2, not
+because it helps. In the event it changed nothing: **37 trials / 50 declared
+variants / live trial count 50**, identical to prior runs, so V3's figures
+compare directly with V2's. Counted, it would have been 38 / 51.
+
+## FC.4 The run
+
+| subject | class | DSR | PBO | verdict |
+|---|---|---|---|---|
+| 6.1 chart-pattern | SELECTION | 0.0211 not sig | 0.429 below threshold | REJECTED [DSR] |
+| 6.2 pure noise | EXCHANGEABLE | 0.0001 not sig | **0.871** reported, not gated | REJECTED [DSR] |
+| sec5 planted edge | EXCHANGEABLE | 1.0000 SIGNIFICANT | 0.486 reported, not gated | **NOT REJECTED** |
+
+All five acceptance criteria PASS. **HARNESS ACCEPTED.** Panel 40/40 tickers,
+1,459 M11 detections, purge removes 70 observations.
+
+## FC.5 THE FINDING: the repair is UNDEMONSTRATED
+
+**The planted edge's PBO here is 0.486; under V2 it was 0.514.** The panel is
+longer at the 2026-08-17 cache vintage, and CSCV blocks over the series, so
+series length moves the statistic.
+
+**0.486 < PBO_FAIL_AT 0.5, so V2's rule would ALSO not have rejected it** -
+`fired_b = (0.486 >= 0.5)` is False and DSR is significant, so `rejected` is
+False under either rule. **This run does not demonstrate V3 fixing anything.**
+The false positive V3 exists to remove did not reproduce; the falsifier passes
+for a reason unrelated to the amendment. By this project's own standard - a
+claim true for a different reason than stated is a finding - the outcome matched
+V3 section 3's prediction while its mechanism did not.
+
+**What IS demonstrated is the half that could have gone wrong.** The noise
+control is EXCHANGEABLE with **PBO 0.871**, well over threshold, which V2 WOULD
+have gated on. V3 stopped gating it and noise was still rejected, by DSR at
+0.0001. That is V3 section 5's pre-committed failure condition - "if pure noise
+is ACCEPTED under V3, V3 FAILS and reverts in full" - not triggering, on a
+subject where the removed axis was genuinely firing. **The scoping is shown
+SAFE. It is not shown NECESSARY.**
+
+Standing per V3 section 7.1, now doubly binding: a V3 pass may NOT be reported
+as evidence the harness is well-specified.
+
+## FC.6 A CONCURRENT SESSION IS EDITING THIS REPO, and its work is NOT in this commit
+
+While this work ran, `scripts/daily_swing_paper.py` gained an uncommitted
+18-line change and `scripts/prove_refusal_gate.py` (6,269 B, 16:26 CDT) appeared
+untracked - **neither authored here.** They are a 2026-08-19 daily-audit finding:
+`decisions[s] = (None, err)` printed "SKIPPED" and was DROPPED, so a sleeve that
+REFUSED to decide (VIX3M stale, VIX feed empty, <200 sessions) still exited 0
+while `paper_nav` recorded the session. The fix prefixes routine non-decision
+days with `ROUTINE_SKIP` so the gate can tell an ordinary skip from a refusal.
+It looks well-formed and is in the project's own idiom, but **it was not
+verified here and is deliberately NOT staged** - committing another session's
+in-flight work under this entry's message would misattribute it and bundle
+unreviewed changes. `git add -A` would have done exactly that; files were staged
+explicitly instead. **Left on disk, uncommitted, flagged for whoever owns it.**
+
+## FC.7 Handed back
+
+**Enabling `Microsoft-Windows-TaskScheduler/Operational` was DECLINED** -
+modifying system or security settings is outside what this agent does even under
+blanket authorisation. Command given to Evan to run elevated:
+`wevtutil sl Microsoft-Windows-TaskScheduler/Operational /e:true`.
+
+**Done-check:** `FROZEN TESTS: GREEN (all d=0)`, exit 0.
+
+**Doc cadence:** entry written same prompt as the work. No miss.
+

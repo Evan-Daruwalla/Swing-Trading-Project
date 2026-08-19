@@ -25,6 +25,10 @@
     {
       "file": "docs\\prereg_v2_harness_acceptance_amendment.md",
       "reason": "infrastructure, not an attempt (explicit NON_ATTEMPT_PREREGS entry)"
+    },
+    {
+      "file": "docs\\prereg_v3_pbo_scoping.md",
+      "reason": "infrastructure, not an attempt (explicit NON_ATTEMPT_PREREGS entry)"
     }
   ],
   "trials": [

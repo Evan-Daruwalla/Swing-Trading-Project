@@ -70,6 +70,14 @@ DECLARED_VARIANTS = {
 NON_ATTEMPT_PREREGS = frozenset({
     "v1_cost_model_and_validation_harness",
     "v2_harness_acceptance_amendment",
+    # V3 scopes WHERE the PBO axis applies; it builds no strategy and claims no
+    # edge, and its own section 7.4 states the attempt tally does not move --
+    # same class as V1/V2 (added 2026-08-19, record FC).
+    # DIRECTION DISCLOSED: excluding a prereg LOWERS N, which INFLATES DSR --
+    # the unsafe direction this list's own comment warns about. It is done here
+    # because the classification is correct and consistent with V1/V2, not
+    # because it helps; the record states N and the DSR consequence BOTH ways.
+    "v3_pbo_scoping",
 })
 
 # Kept only to FLAG a mismatch between the list above and what a doc says about

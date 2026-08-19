@@ -137,10 +137,34 @@ def planted_edge(n, seed, strength=0.05):
     return [rng.gauss(strength * 0.01, 0.01) for _ in range(n)]
 
 
-def evaluate(name, series_by_cfg, n_trials, gated=True):
-    """Run one subject through CPCV -> DSR -> PBO and print the verdict."""
+CFG_CLASSES = ("SELECTION", "EXCHANGEABLE")
+
+
+def evaluate(name, series_by_cfg, n_trials, cfg_class, gated=True):
+    """Run one subject through CPCV -> DSR -> PBO and print the verdict.
+
+    `cfg_class` is REQUIRED and declared by the CALL SITE (prereg V3 sec 2.1,
+    `docs/prereg_v3_pbo_scoping.md`). It is a judgement about how the
+    configuration set was CONSTRUCTED, not a measured quantity, and it is
+    deliberately not inferred -- an inferred version would be a guard nobody
+    can audit:
+      SELECTION    members differ by a parameter/design choice applied to the
+                   SAME underlying data; a researcher would really pick among
+                   them. PBO is computed and GATED.
+      EXCHANGEABLE members are independent realisations of ONE process
+                   (different seeds/resamples). PBO is computed and REPORTED,
+                   never gated.
+    """
+    if cfg_class not in CFG_CLASSES:
+        raise ValueError("cfg_class must be one of %r, got %r (prereg V3 sec 2.1 "
+                         "requires an explicit declaration at the call site)"
+                         % (CFG_CLASSES, cfg_class))
     print("\n" + "=" * 74)
     print("SUBJECT: %s   (%d configuration(s))" % (name, len(series_by_cfg)))
+    print("  config set               %s%s" % (
+        cfg_class,
+        "" if cfg_class == "SELECTION"
+        else "   <- PBO reported, NOT gated (prereg V3 sec 2.4)"))
     print("=" * 74)
     base = series_by_cfg[0]
     n = len(base)
@@ -192,8 +216,22 @@ def evaluate(name, series_by_cfg, n_trials, gated=True):
     # things -- DSR is strategy-level (does the Sharpe survive the trial count),
     # PBO is selection-level (is config selection overfit). Thresholds are
     # UNCHANGED; only the combinator changed.
+    #
+    # V3 AMENDMENT (prereg docs/prereg_v3_pbo_scoping.md, committed doc-only as
+    # 6194847 BEFORE this code changed). PBO answers "does picking the IS-best
+    # configuration out of this set survive out-of-sample" -- which presupposes
+    # that choosing among the members is a decision with content. For an
+    # EXCHANGEABLE set the IS-best is BY CONSTRUCTION the luckiest draw, and the
+    # common component that constitutes any real edge is shared by every member,
+    # so it cancels out of the RELATIVE ranking PBO is built on. Gating on it
+    # there is a category error, not a weak test. So PBO still gates SELECTION
+    # sets and only REPORTS on EXCHANGEABLE ones.
+    # THRESHOLDS ARE UNCHANGED (prereg V3 sec 2.5): PBO_FAIL_AT 0.5,
+    # DSR_ALPHA 0.05. V3 changes WHERE an axis applies, never how hard it bites.
     fired_a = not dsr_sig                                    # strategy-level
-    fired_b = p.get("pbo") is not None and p["pbo"] >= PBO_FAIL_AT   # selection
+    fired_b = (cfg_class == "SELECTION"                      # selection-level
+               and p.get("pbo") is not None
+               and p["pbo"] >= PBO_FAIL_AT)
     rejected = fired_a or fired_b
     axes = [n for n, f in (("DSR", fired_a), ("PBO", fired_b)) if f] or ["none"]
     # Which axis fired is REQUIRED output (prereg V2 section 5.4): a bare
@@ -279,12 +317,17 @@ def main():
         return 1
     n_min = min(len(x) for x in pat)
     pat = [x[:n_min] for x in pat]
+    # SELECTION: hold x min-strength swept over the SAME panel -- a researcher
+    # really would pick among these, which is exactly what PBO is built for.
     r_pat = evaluate("6.1 classical chart-pattern rule (M11 detector)",
-                     pat, n_trials)
+                     pat, n_trials, cfg_class="SELECTION")
 
     # 6.2 pure noise
     noise = [noise_signal(n_min, SEED + i, cost_bps) for i in range(len(cfgs))]
-    r_noise = evaluate("6.2 pure-noise control (seeded PRNG)", noise, n_trials)
+    # EXCHANGEABLE: len(cfgs) independent draws of ONE generator, differing only
+    # by seed. Nothing to select among -> PBO reported, not gated (prereg V3).
+    r_noise = evaluate("6.2 pure-noise control (seeded PRNG)", noise, n_trials,
+                       cfg_class="EXCHANGEABLE")
 
     # criterion 3: purging must demonstrably bite
     print("\n[criterion 3] purge+embargo must change the result")
@@ -298,8 +341,11 @@ def main():
 
     # section 5 falsifier: a KNOWN edge should NOT be rejected
     planted = [planted_edge(n_min, SEED + 100 + i) for i in range(len(cfgs))]
+    # EXCHANGEABLE: same construction as the noise control -- independent draws
+    # of one process. This is the set whose PBO 0.514 rejected a KNOWN edge
+    # under V2, which is the false positive V3 exists to remove.
     r_plant = evaluate("5 planted-edge falsifier (DIAGNOSTIC, not gated)",
-                       planted, n_trials, gated=False)
+                       planted, n_trials, cfg_class="EXCHANGEABLE", gated=False)
 
     # --- acceptance ----------------------------------------------------------
     print("\n" + "=" * 74)
