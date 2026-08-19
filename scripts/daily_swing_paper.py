@@ -74,6 +74,14 @@ VIX_THR = ps.VIX_STRESS_THR   # single source of truth (audit #6) -- see paper_s
 # not a warning.
 RUN_FAILURES: list[str] = []
 
+# Marks a decision-skip that is ORDINARY OPERATION, not a failure (audit
+# 2026-08-19 finding 1). `err` in the decisions dict was one channel carrying
+# two very different things: "today is not a decision day" and "the VIX3M feed
+# is stale, I REFUSE to decide". Both printed SKIPPED and neither reached the
+# exit gate, so a sleeve that refused to run its rule still exited 0. Prefixing
+# the routine case is what lets the gate tell them apart.
+ROUTINE_SKIP = "ROUTINE: "
+
 # Permanent, already-recorded holes in paper_nav. Still PRINTED every run (the
 # series genuinely lacks them) but they no longer fail the exit code -- a red
 # Last Result that fires forever on an unfixable past hole trains the operator
@@ -693,7 +701,7 @@ def main():
         else:
             reason = (f"not a decision day (today is not Friday; last decided "
                       f"{last_wk or 'never'}, current week {wk})")
-        decisions["m10_1_nagel"] = (None, reason)
+        decisions["m10_1_nagel"] = (None, ROUTINE_SKIP + reason)
 
     # ---- store new pending where the target differs from what's now held ----
     # If the target MATCHES current holdings, clear any stale pending: a prior
@@ -727,6 +735,15 @@ def main():
         print(f"    filled-today: {fills[s]}   held: {held_str}   NAV: ${nav:,.2f}")
         if err:
             print(f"    today's decision: SKIPPED ({err})")
+            # Audit 2026-08-19 finding 1: this was printed and DROPPED. A
+            # genuine refusal (VIX3M stale, VIX feed empty, <200 sessions of
+            # history) left the sleeve not running its rule, while the run
+            # exited 0 and paper_nav recorded the session anyway -- forward
+            # evidence with a silent hole in it. OBSERVED 2026-07-13:
+            # "VIX or VIX3M unavailable today". Routine non-decision days are
+            # excluded so the red Last Result stays meaningful.
+            if not err.startswith(ROUTINE_SKIP):
+                RUN_FAILURES.append(f"[{s}] refused to decide: {err}")
         elif target is not None:
             same = set(target) == set(positions)
             tgt_str = ", ".join(f"{t}:{w:.2f}" for t, w in target.items()) or "cash"
