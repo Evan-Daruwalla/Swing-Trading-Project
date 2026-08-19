@@ -40,38 +40,38 @@ the dated entry, not the digest.
 - [A — Strategy research brief; PDT rule found eliminated](#appendix-a---strategy-research-brief-pdt-rule-found-eliminated-2026-07-08) (07-08)
 - [B — 30 experiment ideas; council verdict selects the program](#appendix-b---30-experiment-ideas-council-verdict-selects-the-program-2026-07-08) (07-08)
 - [C — PRD written; Evan keeps LLM overlays as gated shadow mode](#appendix-c---prd-written-evan-keeps-llm-overlays-as-gated-shadow-mode-2026-07-08) (07-08)
-- [D — Overlay amended shadow→live-acting: control + veto sleeves from M3 day one](#appendix-d---overlay-amended-shadowlive-acting-control--veto-sleeves-from-m3-day-one-2026-07-08) (07-08)
-- [E — M0.1 executed: skeleton, venv, git init (first commit)](#appendix-e---m01-executed-skeleton-venv-git-init-first-commit-2026-07-08) (07-08)
-- [F — M0.2: price_cache lacks OHLC → own fetcher (swing_bot/prices.py)](#appendix-f---m02-price_cache-lacks-ohlc--own-fetcher-swing_botpricespy-2026-07-08) (07-08)
-- [G — M0.3: frozen 29-ETF universe + full backfill](#appendix-g---m03-frozen-29-etf-universe--full-backfill-2026-07-08) (07-08)
-- [H — M0.4: coverage+quality gate; found XLRE zero-range bars](#appendix-h---m04-coveragequality-gate-found-xlre-zero-range-bars-2026-07-08) (07-08)
-- [I — M0.5: frozen-regression harness; M0 complete](#appendix-i---m05-frozen-regression-harness-m0-complete-2026-07-09) (07-09)
-- [J — Design Q&A: return prior + high-risk (leveraged-ETF) direction](#appendix-j---design-qa-return-prior--high-risk-leveraged-etf-direction-2026-07-09) (07-09)
-- [K — M1.6: power calc; E1 is powerable (19.6% signal rate)](#appendix-k---m16-power-calc-e1-is-powerable-196-signal-rate-2026-07-09) (07-09)
-- [L — M1.7: E1 PRE-REGISTRATION committed (8963e49) before any engine](#appendix-l---m17-e1-pre-registration-committed-8963e49-before-any-engine-2026-07-09) (07-09)
-- [M — M1.8: fill-timing ablation; M1 complete](#appendix-m---m18-fill-timing-ablation-m1-complete-2026-07-09) (07-09)
-- [N — M2.9: backtest engine (hand-checked P&L exact)](#appendix-n---m29-backtest-engine-hand-checked-pl-exact-2026-07-09) (07-09)
-- [O — M2.10: E1 backtest VERDICT = FAIL (honest, no tuning)](#appendix-o---m210-e1-backtest-verdict--fail-honest-no-tuning-2026-07-09) (07-09)
-- [P — M2.11: real E1 frozen refs pinned; STOP at M2.13 gate](#appendix-p---m211-real-e1-frozen-refs-pinned-stop-at-m213-gate-2026-07-09) (07-09)
-- [Q — E1b: broad_us OOS test = FAIL (near-miss, Sharpe 0.496)](#appendix-q---e1b-broad_us-oos-test--fail-near-miss-sharpe-0496-2026-07-09) (07-09)
-- [R — GOAL REDEFINED by Evan: high-return concentrated swing, risk accepted](#appendix-r---goal-redefined-by-evan-high-return-concentrated-swing-risk-accepted-2026-07-09) (07-09)
-- [S — M2b.1: frozen LEVERAGED universe (5 ETFs) + backfill](#appendix-s---m2b1-frozen-leveraged-universe-5-etfs--backfill-2026-07-09) (07-09)
-- [T — M2b.2-3: E2 prereg (865c09e) + run = FAIL; IBS family SHELVED](#appendix-t---m2b2-3-e2-prereg-865c09e--run--fail-ibs-family-shelved-2026-07-09) (07-09)
-- [U — M2b.4: E2 refs pinned; M2b complete; STOP at gate](#appendix-u---m2b4-e2-refs-pinned-m2b-complete-stop-at-gate-2026-07-09) (07-09)
-- [V — Experiment catalog v2 (data-grounded, 20 items) + %/mo verdicts](#appendix-v---experiment-catalog-v2-data-grounded-20-items--mo-verdicts-2026-07-09) (07-09)
-- [W — Evan overrides IBS stop for A3; C1+screens sitting begins](#appendix-w---evan-overrides-ibs-stop-for-a3-c1screens-sitting-begins-2026-07-09) (07-09)
-- [X — C1: engine v2 (NAV-proportional, cash-capped) verified](#appendix-x---c1-engine-v2-nav-proportional-cash-capped-verified-2026-07-09) (07-09)
-- [Y — Screens: A3 dead, B1 dead, B4 rotation +2.15%/mo holdout standout](#appendix-y---screens-a3-dead-b1-dead-b4-rotation-215mo-holdout-standout-2026-07-09) (07-09)
-- [Z — Findings write-up (E1→B4 arc) produced; session close](#appendix-z---findings-write-up-e1b4-arc-produced-session-close-2026-07-09) (07-09)
-- [AA — E4 leverage rotation: pre-reg (313d88a), engine, VERDICT = PASS; STOP at live gate](#appendix-aa---e4-leverage-rotation-pre-reg-313d88a-engine-verdict--pass-stop-at-live-gate-2026-07-09) (07-09)
-- [AB — E5 regime test: E4 loses 93% in 2000-2013; VERDICT = FAIL; E4 de-authorized for paper](#appendix-ab---e5-regime-test-e4-loses-93-in-2000-2013-verdict--fail-e4-de-authorized-for-paper-2026-07-09) (07-09)
-- [AC — E6 de-leveraged rotation VERDICT = PASS (robust drawdown overlay, not high-return)](#appendix-ac---e6-de-leveraged-rotation-verdict--pass-robust-drawdown-overlay-not-high-return-2026-07-09) (07-09)
-- [AD — Full E1→E6 program write-up (option 1); program complete](#appendix-ad---full-e1e6-program-write-up-option-1-program-complete-2026-07-09) (07-09)
-- [AE — Pressure-test: buy-hold-TQQQ claim retracted; clean test data exhausted](#appendix-ae---pressure-test-buy-hold-tqqq-claim-retracted-clean-test-data-exhausted-2026-07-10) (07-10)
-- [AF — E7 international validation: BOTH arms FAIL; high-return-robust question CLOSED](#appendix-af---e7-international-validation-both-arms-fail-high-return-robust-question-closed-2026-07-10) (07-10)
-- [AG — Write-up updated to E7 + M6 packaging; at the deploy wall](#appendix-ag---write-up-updated-to-e7--m6-packaging-readme-tag-at-the-deploy-wall-2026-07-10) (07-10)
-- [AH — Evan opens E3 (stock momentum); survivorship-bias design problem](#appendix-ah---evan-opens-e3-stock-momentum-survivorship-bias-design-problem-2026-07-10) (07-10)
-- [AI — E3 stock momentum FAIL (clean); all three families now falsified](#appendix-ai---e3-stock-momentum-fail-clean-all-three-families-now-falsified-2026-07-10) (07-10)
+- [D — Overlay amended shadow→live-acting: control + veto sleeves from M3 day one](#appendix-d---overlay-amended-shadowlive-acting-control--veto-sleeves-from-m3-day-one-2026-07-08-2315) (07-08)
+- [E — M0.1 executed: skeleton, venv, git init (first commit)](#appendix-e---m01-executed-skeleton-venv-git-init-first-commit-2026-07-08-2315) (07-08)
+- [F — M0.2: price_cache lacks OHLC → own fetcher (swing_bot/prices.py)](#appendix-f---m02-price_cache-lacks-ohlc--own-fetcher-swing_botpricespy-2026-07-08-2335) (07-08)
+- [G — M0.3: frozen 29-ETF universe + full backfill](#appendix-g---m03-frozen-29-etf-universe--full-backfill-2026-07-08-2350) (07-08)
+- [H — M0.4: coverage+quality gate; found XLRE zero-range bars](#appendix-h---m04-coveragequality-gate-found-xlre-zero-range-bars-2026-07-08-0005-07-09-local) (07-08)
+- [I — M0.5: frozen-regression harness; M0 complete](#appendix-i---m05-frozen-regression-harness-m0-complete-2026-07-09-0020-local) (07-09)
+- [J — Design Q&A: return prior + high-risk (leveraged-ETF) direction](#appendix-j---design-qa-return-prior--high-risk-leveraged-etf-direction-2026-07-09-0035-local) (07-09)
+- [K — M1.6: power calc; E1 is powerable (19.6% signal rate)](#appendix-k---m16-power-calc-e1-is-powerable-196-signal-rate-2026-07-09-0050-local) (07-09)
+- [L — M1.7: E1 PRE-REGISTRATION committed (8963e49) before any engine](#appendix-l---m17-e1-pre-registration-committed-8963e49-before-any-engine-2026-07-09-0105-local) (07-09)
+- [M — M1.8: fill-timing ablation; M1 complete](#appendix-m---m18-fill-timing-ablation-m1-complete-2026-07-09-0125-local) (07-09)
+- [N — M2.9: backtest engine (hand-checked P&L exact)](#appendix-n---m29-backtest-engine-hand-checked-pl-exact-2026-07-09-0145-local) (07-09)
+- [O — M2.10: E1 backtest VERDICT = FAIL (honest, no tuning)](#appendix-o---m210-e1-backtest-verdict--fail-honest-no-tuning-2026-07-09-0210-local) (07-09)
+- [P — M2.11: real E1 frozen refs pinned; STOP at M2.13 gate](#appendix-p---m211-real-e1-frozen-refs-pinned-stop-at-m213-gate-2026-07-09-0230-local) (07-09)
+- [Q — E1b: broad_us OOS test = FAIL (near-miss, Sharpe 0.496)](#appendix-q---e1b-broad_us-oos-test--fail-near-miss-sharpe-0496-2026-07-09-0300-local) (07-09)
+- [R — GOAL REDEFINED by Evan: high-return concentrated swing, risk accepted](#appendix-r---goal-redefined-by-evan-high-return-concentrated-swing-risk-accepted-2026-07-09-1425-local) (07-09)
+- [S — M2b.1: frozen LEVERAGED universe (5 ETFs) + backfill](#appendix-s---m2b1-frozen-leveraged-universe-5-etfs--backfill-2026-07-09-1445-local) (07-09)
+- [T — M2b.2-3: E2 prereg (865c09e) + run = FAIL; IBS family SHELVED](#appendix-t---m2b2-3-e2-prereg-865c09e--run--fail-ibs-family-shelved-2026-07-09-1505-local) (07-09)
+- [U — M2b.4: E2 refs pinned; M2b complete; STOP at gate](#appendix-u---m2b4-e2-refs-pinned-m2b-complete-stop-at-gate-2026-07-09-1520-local) (07-09)
+- [V — Experiment catalog v2 (data-grounded, 20 items) + %/mo verdicts](#appendix-v---experiment-catalog-v2-data-grounded-20-items--mo-verdicts-2026-07-09-1540-local) (07-09)
+- [W — Evan overrides IBS stop for A3; C1+screens sitting begins](#appendix-w---evan-overrides-ibs-stop-for-a3-c1screens-sitting-begins-2026-07-09-1450-local) (07-09)
+- [X — C1: engine v2 (NAV-proportional, cash-capped) verified](#appendix-x---c1-engine-v2-nav-proportional-cash-capped-verified-2026-07-09-1500-local) (07-09)
+- [Y — Screens: A3 dead, B1 dead, B4 rotation +2.15%/mo holdout standout](#appendix-y---screens-a3-dead-b1-dead-b4-rotation-215mo-holdout-standout-2026-07-09-1515-local) (07-09)
+- [Z — Findings write-up (E1→B4 arc) produced; session close](#appendix-z---findings-write-up-e1-b4-arc-produced-session-close-2026-07-09-1530-local) (07-09)
+- [AA — E4 leverage rotation: pre-reg (313d88a), engine, VERDICT = PASS; STOP at live gate](#appendix-aa---e4-leverage-rotation-pre-reg-313d88a-engine-verdict--pass-stop-at-live-gate-2026-07-09-1630-local) (07-09)
+- [AB — E5 regime test: E4 loses 93% in 2000-2013; VERDICT = FAIL; E4 de-authorized for paper](#appendix-ab---e5-regime-test-e4-loses-93-in-2000-2013-verdict--fail-e4-de-authorized-for-paper-2026-07-09-1730-local) (07-09)
+- [AC — E6 de-leveraged rotation VERDICT = PASS (robust drawdown overlay, not high-return)](#appendix-ac---e6-de-leveraged-rotation-verdict--pass-robust-drawdown-overlay-not-high-return-2026-07-09-1830-local) (07-09)
+- [AD — Full E1→E6 program write-up (option 1); program complete](#appendix-ad---full-e1-e6-program-write-up-option-1-program-complete-2026-07-09-1845-local) (07-09)
+- [AE — Pressure-test: buy-hold-TQQQ claim retracted; clean test data exhausted](#appendix-ae---pressure-test-buy-hold-tqqq-claim-retracted-clean-test-data-exhausted-2026-07-10-0010-local) (07-10)
+- [AF — E7 international validation: BOTH arms FAIL; high-return-robust question CLOSED](#appendix-af---e7-international-validation-both-arms-fail-high-return-robust-question-closed-2026-07-10-0045-local) (07-10)
+- [AG — Write-up updated to E7 + M6 packaging; at the deploy wall](#appendix-ag---write-up-updated-to-e7--m6-packaging-readme-tag-at-the-deploy-wall-2026-07-10-0110-local) (07-10)
+- [AH — Evan opens E3 (stock momentum); survivorship-bias design problem](#appendix-ah---evan-opens-e3-stock-momentum-survivorship-bias-design-problem-2026-07-10-0130-local) (07-10)
+- [AI — E3 stock momentum FAIL (clean); all three families now falsified](#appendix-ai---e3-stock-momentum-fail-clean-all-three-families-now-falsified-2026-07-10-0155-local) (07-10)
 
 ---
 
@@ -7827,6 +7827,83 @@ numbers stay in the record and in the results docs; these supersede them by
 dated entry. **F3 (liquidity floor) is next and is a separate prereg.**
 
 **Done-check:** `FROZEN TESTS: GREEN (all d=0)`, exit 0, before and after.
+
+**Doc cadence:** entry written same prompt as the work. No miss.
+
+---
+
+# Appendix FE - M6's HTML twin BUILT, closing a scope gap open since 2026-07-10 - and building it proved the record's own Table of Contents had 32 dead links (2026-08-19, ~16:56 CDT)
+
+**TRIGGER:** Evan chose BUILD over narrowing the milestone, and approved pinning
+a dependency for it.
+
+## FE.1 What was built
+
+`scripts/render_record_html.py`, **ported not imported** from Trading's renderer
+of the same name (the repos are separate and Trading is read-only from here) —
+the same precedent as `swing_bot/alpaca_client.py`. Output:
+`docs/Project Record — Full Chronological History.html`, 601,461 bytes,
+self-contained, no external assets, light/dark via `prefers-color-scheme`.
+
+**Dependency pinned, as authorised:** `markdown==3.10.3` added to BOTH
+`requirements.txt` and `requirements.lock`. This project pins deliberately and
+had no markdown renderer of any kind; `markdown-it-py` was present only
+transitively and is a different library.
+
+**The twin is DERIVED and committed.** `HANDOFF.md` now carries the standing
+rule: regenerate after EVERY append or it drifts, never hand-edit the `.html`,
+and **the `.md` wins on any conflict**. A committed derived artifact that nobody
+regenerates is a liability, so the obligation is written where a fresh session
+reads first.
+
+## FE.2 THE FINDING — building it exposed 32 dead links in the record itself
+
+The renderer verifies every internal anchor and **exits 1 if any is broken**;
+a twin with dead links looks navigable and is not. First run: **32 broken of 36
+internal links.**
+
+That was not a porting bug. The record's own in-document Table of Contents
+pointed at anchors like `#appendix-aa---e4-leverage-rotation-...-2026-07-09`,
+while the actual heading is
+`# Appendix AA - E4 leverage rotation: ... (2026-07-09, ~16:30 local)` — which
+slugifies with the time-of-day appended. **The TOC was written against an
+earlier form of the headings, before times were added, and never re-pointed.**
+
+**So 32 of the record's 36 TOC links have been dead — including on GitHub —
+for weeks, and nobody noticed because nobody clicked them.** They were repointed
+at the ids the headings actually generate, derived from the rendered HTML rather
+than by re-deriving the slug rule (so the match is guaranteed, not inferred).
+3 links were already correct and were left alone; 0 headings were missing.
+Re-render: **36 links, 212 heading ids, 0 broken.**
+
+Navigation metadata only — no historical entry text was altered. Fixing dead
+links is not rewriting history.
+
+**Related, NOT fixed, and named so it is not mistaken for done:** the TOC covers
+only 36 entries against 160 appendix headings. **Roughly 124 appendices have no
+TOC entry at all.** That is a gap, not a defect — the missing entries were never
+written rather than written wrong — and generating them is a separate change.
+
+## FE.3 An error I made and had to repair mid-task
+
+Writing the HANDOFF block, `scriptsender_record_html.py` was passed through a
+non-raw Python string, so `` became a CARRIAGE RETURN and the path was
+written as `scripts` + CR + `ender_record_html.py`. The first repair attempt
+then FAILED to find it, because reading the file back without `newline=''`
+silently converted that lone CR to a newline — the search string and the file
+content had genuinely diverged in memory. Repaired by reading with `newline=''`
+and matching on `chr(13)` explicitly; verified afterwards that the file contains
+**0 lone CRs**. Recorded because a stray CR inside a documented command is
+exactly the kind of thing that survives review and then fails for whoever copies
+the line.
+
+## FE.4 Status
+
+M6's stated scope is now actually met. `PRD_ROADMAP.md`'s M6 row and
+`HANDOFF.md` both say so, and both note that the row was marked **Done** for
+weeks with the twin missing from its own scope (record FB).
+
+**Done-check:** renderer exits 0 with 0 broken anchors; frozen tripwire GREEN.
 
 **Doc cadence:** entry written same prompt as the work. No miss.
 

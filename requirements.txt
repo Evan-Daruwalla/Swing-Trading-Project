@@ -16,3 +16,4 @@ pandas==3.0.3
 numpy==2.5.1
 # pytest optional — frozen-regression tests run via their own __main__
 # (swing_bot/test_frozen.py), matching the Trading project's pattern.
+markdown==3.10.3

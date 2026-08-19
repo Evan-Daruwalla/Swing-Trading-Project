@@ -783,7 +783,14 @@ Full descriptions as Evan gave them: record Phase 0.
 
 ## Documentation
 - `docs/Project Record — Full Chronological History.md` — append-only
-  chronological record; the ground truth. No HTML twin yet.
+  chronological record; **the ground truth**.
+- `docs/Project Record — Full Chronological History.html` — the HTML twin
+  (built 2026-08-19, record FE, closing the M6 gap FB flagged). **DERIVED and
+  committed: regenerate with `.venv\Scripts\python.exe
+  scripts\render_record_html.py` after EVERY append, or it drifts.** Never edit
+  the `.html` by hand; if the two disagree the `.md` wins. The renderer EXITS 1
+  on any broken internal anchor — which is how the record's own TOC was found to
+  have 32 dead links, now repointed.
 - `PRD_ROADMAP.md` — the standing plan (written 2026-07-08). Source of truth
   for what to build and in what order; no unstarted task remains — M3 forward
   paper is the only open lever and it needs elapsed time, not a task (this line
