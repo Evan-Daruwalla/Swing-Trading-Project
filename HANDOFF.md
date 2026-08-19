@@ -775,7 +775,13 @@ Full descriptions as Evan gave them: record Phase 0.
   **+1.1368683772161603e-13**. Every prior statement of this item said "one-row";
   the statement was wrong, the un-`WHERE`d UPDATE was always the right scope. A
   write to the live paper ledger, so Evan's call.
-- **F2/F3 preregs** — the 200-DMA convention split (7 inclusive / 6 exclusive;
+- ~~**F2/F3 preregs**~~ **F2 CLOSED 2026-08-19 (record FD)** — E5/E7 now
+  implement E6's convention; no verdict moved. **F3 STILL OPEN, and its scope is
+  INVERTED (record FG):** the floor provably NEVER fires on the 39-name stock
+  universe (0 of 260,363 ticker-sessions), while the 29-ETF universe breaches it
+  on 16.07% (26 of 29 names). Re-running the stock experiments would install a
+  guard that cannot fire — this project's signature defect, a fifth time.
+  Awaiting Evan's redirect. Original wording follows: the 200-DMA convention split (7 inclusive / 6 exclusive;
   E5 and E7 use the opposite convention from the E6 strategy they test) and the
   unenforced liquidity floor. Each moves already-recorded numbers, so each needs
   its own pre-registration; not drafted, because unlike V3 neither has a

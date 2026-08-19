@@ -7956,3 +7956,101 @@ the milestone-table audit, and — handed back, not doable here — enabling
 
 **Doc cadence:** prompt #189, cadence hit; entry written same prompt. No miss.
 
+---
+
+# Appendix FG - F3 SCOPING INVERTS THE PREMISE: the floor can NEVER fire on the stock universe, and the real exposure is the ETF experiments nobody looked at (2026-08-19, ~17:02 CDT)
+
+**TRIGGER:** Evan authorised F3 as "prereg + re-run affected backtests". Before
+writing that prereg, the affected set was scoped by measurement rather than
+assumption. **The measurement overturns the premise, and no F3 prereg has been
+written.**
+
+## FG.1 The finding, verified twice
+
+`MIN_MEDIAN_DOLLAR_VOL = 20_000_000` (`swing_bot/universe.py:49`). Sweeping the
+20-session median dollar volume (close x volume) over every cached session from
+2000-01-01:
+
+| universe | ticker-sessions below the floor | names ever below |
+|---|---|---|
+| **39-name survivor set** (11 of 13 stock experiments) | **0 of 260,363 = 0.00%** | **0 of 39** |
+| **29-ETF frozen universe** | **28,776 of 179,055 = 16.07%** | **26 of 29** |
+
+Least-liquid 20-session median ever seen: **39-name set — COP, 2000-02-01,
+$26.1M = 1.3x the floor. 29-ETF set — EWZ, 2000-10-30, $3,619 = 0.0002x the
+floor.** Both figures re-derived here independently of the scoping agent, which
+reported 0/261,104 and 16.24% by a slightly different windowing; the two agree
+to within rounding and agree exactly on the conclusion.
+
+**So the stock-picking experiments Evan authorised for re-run are PROVABLY
+IMMUNE.** Applying the floor to E3, E10, E15, E16, E19, C1, M10-1, M11, X2, X2b
+and X3 would remove zero names on zero dates and reproduce byte-identical
+numbers. **Re-running them would be pure compute for a guaranteed null.**
+
+## FG.2 Why this matters more than a scoping correction
+
+**Wiring the floor into the 39-name backtests would ship this project's
+signature defect for the FIFTH time: a guard that cannot fire.** The prior four
+are named in EN/EO — a threshold below the mathematical minimum of what it
+guards, a parameter no caller passes, a check needing two series in a
+single-series script, a raise caught by the function that raises it. This would
+be the same shape, installed deliberately, in the name of closing an audit
+finding.
+
+**Refinement to the recorded "28x" claim.** EN and EO both cite "a threshold
+below the mathematical minimum of what it guards (liquidity floor, 28x)" and
+neither sources the number. The scoping agent reconstructed it as
+min-ADV/threshold at recent dates (MMM, ~27.5x on 2026-08-06). **That
+reconstruction is right for recent dates and wrong as a statement about the
+history:** at the 2000 trough COP's 20-session median was only **1.3x** the
+floor, not 28x. The floor is 28x too low *today*; it came within 30% of binding
+in 2000. It still never actually binds — 0 breaches — so the conclusion holds,
+but "28x" is a snapshot, not a property of the series.
+
+## FG.3 Where F3 actually has teeth — and it is where nobody looked
+
+The ETF experiments were excluded from F3's scope on the assumption that ETFs
+are liquid. **26 of the 29 frozen ETFs breach the floor at some point**, led by
+EWU (2,886 sessions), EWG (2,231), EWC (1,898), EWA (1,809), EWH (1,677), EWW
+(1,468), XLY (1,453), XLP (1,416). Several ETF experiments do genuine
+cross-sectional top-K selection — E1/E1b/E2 via `swing_bot/backtest.py:129`,
+plus E8, E9, E11, E12, E14, E20, C3 and X9 — so the floor would really change
+which names they pick.
+
+Two ETF cases were measured and are NOT exposed: **E1b** trades `broad_us`
+(SPY/QQQ/DIA/IWM) with zero breaches, and **E2**'s only breaching name is SOXL,
+whose breaches fall entirely before 2017 — inside E2's train window and outside
+its 2022+ gate, so **E2's verdict cannot move**.
+
+**M12** (142 names) sits in between: 2.69% of ticker-sessions, and replaying the
+12-1 momentum ranking shows the floor would remove **5.2% of gate-window picks
+at K=3**, touching 13.6% of rebalances. At K=3 one removed pick is a third of
+the book — but M12 issues no PASS/FAIL, so what moves there is a magnitude, not
+a verdict.
+
+## FG.4 A blocker for any implementation
+
+`median_dollar_volume` is pure and reusable, and `swing_bot/test_frozen.py:43`
+already imports `daily_swing_paper`, so importability is proven. **But
+`daily_swing_paper.py:64-65` imports `run_e10_earnings_drift` and
+`run_c1_residual_reversal` at module level, ABOVE the function's definition at
+:143** — so those scripts importing it back would hit a partially-initialised
+module. The clean fix is to move the function into `swing_bot/universe.py`
+beside the constant it enforces, making threshold and enforcement one unit.
+Separately, **all thirteen stock scripts discard volume at load** (it is index 7
+of the cached bar and present in every path, 0 nulls across 105,396 `bars`
+rows); they would need to stop dropping it.
+
+## FG.5 Status — DELIBERATELY NOT PROCEEDING
+
+**No F3 prereg written. No F3 code changed.** Evan authorised re-running a set
+that measurement shows is immune, while the set with real exposure was excluded
+by an assumption I supplied. Writing the authorised prereg would install a
+guard that cannot fire; writing the other one silently would be substituting my
+scope for his. **The redirect is his call and is put to him with the numbers.**
+
+Also corrected: `HANDOFF.md` listed "F2/F3 preregs" as jointly open. F2 closed
+2026-08-19 (record FD); the F3 half stands.
+
+**Doc cadence:** entry written same prompt as the work. No miss.
+
