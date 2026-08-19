@@ -7907,3 +7907,52 @@ weeks with the twin missing from its own scope (record FB).
 
 **Doc cadence:** entry written same prompt as the work. No miss.
 
+---
+
+# Appendix FF - Pushed `01c9ab3..ece0671`; and a correction to FC.6, which is no longer true (2026-08-19, ~16:59 CDT)
+
+**TRIGGER:** Evan: "push".
+
+**PUSHED:** `01c9ab3..ece0671` to `origin/main`, five commits, verified level by
+`git ls-remote` (`ece06717940feac65880d932c51b2e7c8964d2be`) with 0 unpushed.
+
+| commit | what |
+|---|---|
+| `df74f9c` | F14 ledger write executed; V3 implemented and ACCEPTED (record FC) |
+| `e65629b` | sleeve refusals reach the exit gate — **the other session's work** |
+| `9be5719` | prereg F2, doc-only (record FD) |
+| `3e8e82b` | F2 CLOSED: E5/E7 aligned and re-run (record FD) |
+| `ece0671` | M6 HTML twin built; 32 dead TOC links repointed (record FE) |
+
+**CORRECTION TO FC.6.** That section states the concurrent session's work —
+`scripts/daily_swing_paper.py` plus `scripts/prove_refusal_gate.py` — was
+"deliberately NOT staged" and "left on disk, uncommitted". **That is no longer
+true, and it stopped being true later in the same working turn.** Evan confirmed
+that session had finished, so the work was VERIFIED and then committed as
+`e65629b`, with authorship stated in the commit message rather than absorbed
+silently. Verification before committing, not after:
+`scripts/prove_refusal_gate.py` -> `REFUSAL GATE PROOF: 10/10 PASS`, exit 0, and
+the frozen tripwire GREEN with the change in the tree.
+
+FC.6 stands as written — it was accurate at the moment it was written, and the
+append-only rule means it is corrected here rather than edited. Recorded because
+a reader hitting FC.6 alone would look for uncommitted work that is no longer
+there.
+
+**A CONSEQUENCE OF THAT COMMIT WORTH STATING PLAINLY:** every "FROZEN TESTS:
+GREEN" reported between roughly 16:26 and 16:44 was run against a tree
+containing that session's UNCOMMITTED change, because `swing_bot/test_frozen.py`
+imports `daily_swing_paper`. Those results were real and they passed, but they
+were not clean-tree results. Every GREEN after `e65629b` is.
+
+**STILL RUNNING:** the F3 scoping investigation (which backtests select
+individual stocks, where the liquidity floor would attach, and which recorded
+verdicts could move) was dispatched before this push and has not yet reported.
+**No F3 prereg exists and no F3 code has changed.**
+
+**STILL OPEN:** F3 (prereg + re-runs), re-indexing the record into the graph,
+the milestone-table audit, and — handed back, not doable here — enabling
+`Microsoft-Windows-TaskScheduler/Operational`.
+
+**Doc cadence:** prompt #189, cadence hit; entry written same prompt. No miss.
+

@@ -7165,6 +7165,67 @@ the line.</p>
 weeks with the twin missing from its own scope (record FB).</p>
 <p><strong>Done-check:</strong> renderer exits 0 with 0 broken anchors; frozen tripwire GREEN.</p>
 <p><strong>Doc cadence:</strong> entry written same prompt as the work. No miss.</p>
+<hr />
+<h1 id="appendix-ff---pushed-01c9ab3ece0671-and-a-correction-to-fc6-which-is-no-longer-true-2026-08-19-1659-cdt">Appendix FF - Pushed <code>01c9ab3..ece0671</code>; and a correction to FC.6, which is no longer true (2026-08-19, ~16:59 CDT)</h1>
+<p><strong>TRIGGER:</strong> Evan: "push".</p>
+<p><strong>PUSHED:</strong> <code>01c9ab3..ece0671</code> to <code>origin/main</code>, five commits, verified level by<br />
+<code>git ls-remote</code> (<code>ece06717940feac65880d932c51b2e7c8964d2be</code>) with 0 unpushed.</p>
+<table>
+<thead>
+<tr>
+<th>commit</th>
+<th>what</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>df74f9c</code></td>
+<td>F14 ledger write executed; V3 implemented and ACCEPTED (record FC)</td>
+</tr>
+<tr>
+<td><code>e65629b</code></td>
+<td>sleeve refusals reach the exit gate — <strong>the other session's work</strong></td>
+</tr>
+<tr>
+<td><code>9be5719</code></td>
+<td>prereg F2, doc-only (record FD)</td>
+</tr>
+<tr>
+<td><code>3e8e82b</code></td>
+<td>F2 CLOSED: E5/E7 aligned and re-run (record FD)</td>
+</tr>
+<tr>
+<td><code>ece0671</code></td>
+<td>M6 HTML twin built; 32 dead TOC links repointed (record FE)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CORRECTION TO FC.6.</strong> That section states the concurrent session's work —<br />
+<code>scripts/daily_swing_paper.py</code> plus <code>scripts/prove_refusal_gate.py</code> — was<br />
+"deliberately NOT staged" and "left on disk, uncommitted". <strong>That is no longer<br />
+true, and it stopped being true later in the same working turn.</strong> Evan confirmed<br />
+that session had finished, so the work was VERIFIED and then committed as<br />
+<code>e65629b</code>, with authorship stated in the commit message rather than absorbed<br />
+silently. Verification before committing, not after:<br />
+<code>scripts/prove_refusal_gate.py</code> -&gt; <code>REFUSAL GATE PROOF: 10/10 PASS</code>, exit 0, and<br />
+the frozen tripwire GREEN with the change in the tree.</p>
+<p>FC.6 stands as written — it was accurate at the moment it was written, and the<br />
+append-only rule means it is corrected here rather than edited. Recorded because<br />
+a reader hitting FC.6 alone would look for uncommitted work that is no longer<br />
+there.</p>
+<p><strong>A CONSEQUENCE OF THAT COMMIT WORTH STATING PLAINLY:</strong> every "FROZEN TESTS:<br />
+GREEN" reported between roughly 16:26 and 16:44 was run against a tree<br />
+containing that session's UNCOMMITTED change, because <code>swing_bot/test_frozen.py</code><br />
+imports <code>daily_swing_paper</code>. Those results were real and they passed, but they<br />
+were not clean-tree results. Every GREEN after <code>e65629b</code> is.</p>
+<p><strong>STILL RUNNING:</strong> the F3 scoping investigation (which backtests select<br />
+individual stocks, where the liquidity floor would attach, and which recorded<br />
+verdicts could move) was dispatched before this push and has not yet reported.<br />
+<strong>No F3 prereg exists and no F3 code has changed.</strong></p>
+<p><strong>STILL OPEN:</strong> F3 (prereg + re-runs), re-indexing the record into the graph,<br />
+the milestone-table audit, and — handed back, not doable here — enabling<br />
+<code>Microsoft-Windows-TaskScheduler/Operational</code>.</p>
+<p><strong>Doc cadence:</strong> prompt #189, cadence hit; entry written same prompt. No miss.</p>
 </main>
 </body>
 </html>
