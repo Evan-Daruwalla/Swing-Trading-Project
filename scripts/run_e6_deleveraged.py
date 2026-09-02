@@ -77,15 +77,12 @@ def rotation_nav(dates, sig_close, pos_oc, ma=200, cost_bps=5.0,
             #     run_e6_deleveraged.py  rotation_nav() (here)
             #     run_e18_regime_gates.py  sma()    run_m12_factorial.py  e6_nav()
             #     run_x9_pairs.py  e6_rule_nav()    run_x6_crypto_trend.py  sma()
+            #     run_e5_regime.py  rotation_nav()   run_e7_international.py  rotation()
+            #                       (moved here by prereg F2, record FD, 2026-08-19)
             #   EXCLUSIVE  closes[i-ma:i]
             #     swing_bot/rotation.py  run_rotation()  <-- E4 engine, PINNED
             #                            by the frozen tripwire; changing it goes RED
-            #     run_e5_regime.py  rotation_nav()   run_e7_international.py  rotation()
             #     pt_volgate.py  run()               screens_20260709.py  a3_screen()+b1_screen()
-            # Consequence worth knowing: E5 and E7 -- the out-of-sample regime
-            # and international tests -- use the OPPOSITE convention from the
-            # E6 strategy they are tests of. Not fixed here: each is a recorded
-            # result, and moving one needs its own pre-registration.
             # MEASURED EFFECT of the fix -- the numbers DID move, contrary to a
             # 2,946-session sample that showed no signal disagreement (E6 runs
             # ~6,600 sessions, where the two forms do diverge):

@@ -222,7 +222,7 @@
 ## Import Cycles
 - None detected.
 
-## Hyperedges (group relationships)
+## Hyperedges (group relationships) (12 total, 9 omitted)
 - **V3 PBO-scoping gate — three subjects, two axes, one pre-committed failure condition** — docs_prereg_v3_pbo_scoping_selection_vs_exchangeable, docs_prereg_v3_pbo_scoping_pure_noise_control, docs_prereg_v3_pbo_scoping_planted_edge_falsifier, docs_prereg_v3_pbo_scoping_chart_pattern_subject, docs_prereg_v3_pbo_scoping_dsr_axis, swing_bot_validation_pbo_cscv [EXTRACTED 1.00]
 - **Execution-vs-signal decomposition — the ladder and the two killers it names** — research_2026_07_13_ex_decomp_results_three_rung_ladder, research_2026_07_13_ex_decomp_results_signal_dead, research_2026_07_13_ex_decomp_results_cost_gated, research_2026_07_13_ex_decomp_results_survives_null, research_2026_07_13_ex_decomp_results_gap_dweller, overnight_gap_killer, cost_model_5bps_side [EXTRACTED 1.00]
 - **The structural reason the high-return retail-EOD cell is empty** — research_2026_07_12_swing_method_full_survey_concentration_destroys_edge, research_2026_07_12_swing_method_full_survey_edge_lives_where_you_cant_trade, liquidity_floor, paper_mclean_pontiff_2016, paper_hou_xue_zhang_2020, overnight_gap_killer [EXTRACTED 1.00]

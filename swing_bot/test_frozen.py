@@ -9,6 +9,14 @@ regressions from "obviously unrelated" changes.
 Runs via its OWN __main__ (no pytest needed):
     .venv\\Scripts\\python.exe -m swing_bot.test_frozen
 
+DATA CONVENTION: every reference below is priced SPLIT-ADJUSTED,
+DIVIDEND-UNADJUSTED (yfinance auto_adjust=False), the convention
+swing_bot/prices.py declares and this harness inherits through
+swing_bot.{prices, signals, universe}. The pinned values are only
+reproducible under it. Stated here 2026-08-25 because the convention
+guard below was widened to scan swing_bot/ and correctly caught that
+the file pinning the numbers never named the convention they depend on.
+
 M2.11 STATUS: real E1 references pinned. The numeric cases run the E1 engine
 (frozen pre-reg `8963e49`: next-open, 5bps/side) on two fixed windows of the
 backfilled `swing.db` and pin total-return% (unit 'pp', dp 4) and closed-
@@ -57,10 +65,12 @@ def _price_scripts_missing_convention_header():
     import re
     conv = re.compile(r"auto_adjust|split-adj|dividend-unadj", re.I)
     pricey = re.compile(r"from swing_bot import prices|from swing_bot\.prices"
-                        r"|cache_fetch")
+                        r"|cache_fetch|yfinance")
     bad = []
-    for f in sorted(glob.glob(str(Path(__file__).resolve().parent.parent
-                                  / "scripts" / "*.py"))):
+    root = Path(__file__).resolve().parent.parent
+    files = glob.glob(str(root / "scripts" / "*.py")) + \
+        glob.glob(str(root / "swing_bot" / "*.py"))
+    for f in sorted(files):
         src = io.open(f, encoding="utf-8").read()
         if not pricey.search(src):
             continue

@@ -50,6 +50,8 @@ import argparse
 import bisect
 import datetime as dt
 import io
+import os
+import sqlite3
 import sys
 import urllib.request
 import zipfile
@@ -191,7 +193,7 @@ def vix3m_close(start="2015-01-01"):
 
 
 def market_is_open():
-    """Is the US equity market open RIGHT NOW -> True/False (never None).
+    """Is the US equity market open RIGHT NOW -> (is_open: bool, creds_outage: bool).
 
     Gates --execute order submission to AFTER-HOURS only (record DF): a
     market-notional order placed while the market is OPEN fills intraday
@@ -208,25 +210,42 @@ def market_is_open():
     weekday the market is never open, so a "closed" verdict is trustworthy;
     inside that window it may be a holiday (really closed) and we
     conservatively say OPEN, which costs only a skipped mirror that the next
-    after-hours run reconciles."""
+    after-hours run reconciles.
+
+    creds_outage (finding 1b, 2026-08-25): True only when EVERY sleeve's
+    client_for_sleeve() failed, so the loop below never even reached a market
+    clock. That used to be indistinguishable from "clock reachable but this
+    one sleeve's call failed" AND from "genuinely inside market hours" --
+    both landed on the identical local-ET fallback with no signal either way,
+    so a total credential outage during 09:30-16:00 ET read exactly like the
+    market being open. The fallback's safe DIRECTION is unchanged; only the
+    total-outage case is now visible to the caller and to RUN_FAILURES."""
     from swing_bot.alpaca_client import client_for_sleeve, AlpacaError
+    all_creds_dead = True
     for s in ps.SLEEVES:
         try:
             c = client_for_sleeve(s)
         except AlpacaError:
             continue
+        all_creds_dead = False
         try:
-            return bool(c.get_clock().get("is_open"))
+            return bool(c.get_clock().get("is_open")), False
         except AlpacaError as e:
             print(f"  market clock unavailable ({e}) -- using local ET fallback",
                   flush=True)
             break
         finally:
             c.close()
+    if all_creds_dead:
+        print("  !! every sleeve's Alpaca credentials are unavailable -- cannot "
+              "reach the market clock via ANY account -- using local ET fallback",
+              flush=True)
+        RUN_FAILURES.append("market_is_open: every sleeve's Alpaca credentials "
+                            "unavailable; fell back to local ET clock")
     now = dt.datetime.now(ZoneInfo("America/New_York"))
     if now.weekday() >= 5:                       # Sat/Sun
-        return False
-    return dt.time(9, 30) <= now.time() < dt.time(16, 0)
+        return False, all_creds_dead
+    return (dt.time(9, 30) <= now.time() < dt.time(16, 0)), all_creds_dead
 
 
 def backfill_divergence(conn):
@@ -255,6 +274,13 @@ def backfill_divergence(conn):
                     clients[s] = client_for_sleeve(s)
                 except AlpacaError as e:
                     print(f"    [{s}] SKIPPED (creds): {e}")
+                    # Finding 1a (2026-08-25): this used to print and drop it --
+                    # a dead credential here means fill_divergence's provisional
+                    # sim price can never be repaired for this sleeve, and the
+                    # run still exited 0. Mirrors the message shape at the
+                    # --execute mirror's own credential-failure site below.
+                    RUN_FAILURES.append(f"[{s}] fill-divergence backfill skipped: "
+                                        f"credentials unavailable")
                     clients[s] = None
             client = clients[s]
             if client is None:
@@ -322,6 +348,12 @@ def report_mirror_drift(conn):
             c = client_for_sleeve(s)
         except AlpacaError as e:
             print(f"    [{s}] SKIPPED (creds): {e}")
+            # Finding 1a (2026-08-25): printed and dropped -- a dead credential
+            # here means the drift report cannot see this sleeve's broker side
+            # at all, yet the run still exited 0. Mirrors the message shape at
+            # the --execute mirror's own credential-failure site below.
+            RUN_FAILURES.append(f"[{s}] mirror drift check skipped: "
+                                f"credentials unavailable")
             continue
         try:
             ap = {p["symbol"]: p for p in c.list_positions()}
@@ -505,16 +537,95 @@ def realize_pending(conn, sleeve, today, fill_open):
 
 
 def mark_nav(conn, sleeve, today, close_px):
-    """close_px: {ticker: close_price_today}."""
+    """close_px: {ticker: close_price_today}. Returns the NAV, or None if it
+    REFUSED to write today's row (finding 2, 2026-08-25).
+
+    close_px[t] is SET to None when a ticker has no bar today (line ~756
+    `cl.get(today)`), so the key EXISTS holding None. The old code did
+    `close_px.get(t) or p["entry_price"]` -- on a missing price it silently
+    marked that leg at cost basis and wrote the result into paper_nav, the
+    forward-evidence series this whole project rests on, as if it were a real
+    observation. The missed-session guard above only checks that a row EXISTS
+    for a date, so it structurally cannot see a row that exists but is wrong.
+    A hole is visible to that guard next run; a fabricated flat point never
+    will be -- so refuse instead of substitute."""
     st = ps.get_sleeve(conn, sleeve)
     positions = ps.get_positions(conn, sleeve)
-    # `or` not a dict default (audit #3): close_px[t] is SET to None when a
-    # ticker has no bar today (line ~531 `cl.get(today)`), so the key EXISTS
-    # holding None and a `.get(t, default)` fallback can never fire.
-    nav = st["cash"] + sum(p["qty"] * (close_px.get(t) or p["entry_price"])
-                            for t, p in positions.items())
+    missing = [t for t in positions if close_px.get(t) is None]
+    if missing:
+        print(f"  !! [{sleeve}] no close price for held {missing} -- REFUSING "
+              f"to write today's paper_nav row rather than fabricate it at "
+              f"cost basis. Check the yfinance feed for those tickers.",
+              flush=True)
+        RUN_FAILURES.append(f"[{sleeve}] NAV not recorded: no close price for "
+                            f"{missing}")
+        return None
+    nav = st["cash"] + sum(p["qty"] * close_px[t] for t, p in positions.items())
     ps.record_nav(conn, sleeve, today, nav)
     return nav
+
+
+LOCK_ACQUIRE_TIMEOUT_MS = 3000   # fail fast: this is a mutual-exclusion CHECK,
+                                  # not a data write -- ps.connect()'s 30s
+                                  # busy_timeout is for real write contention.
+
+
+def _acquire_run_lock():
+    """Single-row advisory lock in swing.db (finding 3, 2026-08-25). Returns
+    an open sqlite3 connection HOLDING the lock (caller releases it via
+    _release_run_lock, in a finally, on every exit path including exceptions),
+    or None if another run already holds it.
+
+    CREATE TABLE + the existence check + the INSERT all happen inside one
+    BEGIN IMMEDIATE, so the check-then-write is atomic: two processes racing
+    to acquire at the same instant cannot both see an empty table and both
+    insert. Once inserted and committed, the ROW itself -- not a held SQLite
+    lock -- is what blocks a second run for as long as the first is alive;
+    that lets the first run commit ordinary data writes on its OWN connection
+    for the rest of its (multi-minute) lifetime without holding this table
+    locked the whole time.
+
+    shortcut: no staleness bound -- a crashed/killed holder (ExecutionTimeLimit,
+    reboot; both documented risks elsewhere in this file, e.g. realize_pending's
+    two-phase cash write) leaves this row forever and blocks every future run
+    until it is cleared manually: `DELETE FROM run_lock WHERE id = 1`. Upgrade
+    trigger: a real stuck-lock incident."""
+    conn = sqlite3.connect(str(ps.DB_PATH))
+    conn.execute(f"PRAGMA busy_timeout={LOCK_ACQUIRE_TIMEOUT_MS}")
+    conn.execute("CREATE TABLE IF NOT EXISTS run_lock ("
+                 "id INTEGER PRIMARY KEY CHECK (id = 1), "
+                 "held_at TEXT NOT NULL, pid INTEGER NOT NULL)")
+    conn.commit()
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+    except sqlite3.OperationalError as e:
+        print(f"!! run_lock: could not get swing.db's write lock ({e}) -- "
+              f"another process is writing right now. Exiting without "
+              f"deciding or submitting anything.", flush=True)
+        conn.close()
+        return None
+    row = conn.execute("SELECT held_at, pid FROM run_lock WHERE id = 1").fetchone()
+    if row is not None:
+        held_at, pid = row
+        conn.rollback()
+        print(f"!! run_lock: another daily_swing_paper run already holds it "
+              f"(started {held_at} UTC, pid {pid}) -- exiting without "
+              f"deciding or submitting anything, rather than racing it.",
+              flush=True)
+        conn.close()
+        return None
+    conn.execute("INSERT INTO run_lock (id, held_at, pid) VALUES (1, ?, ?)",
+                 (dt.datetime.now(dt.timezone.utc).isoformat(), os.getpid()))
+    conn.commit()
+    return conn
+
+
+def _release_run_lock(lock_conn):
+    if lock_conn is None:
+        return
+    lock_conn.execute("DELETE FROM run_lock WHERE id = 1")
+    lock_conn.commit()
+    lock_conn.close()
 
 
 def main():
@@ -524,6 +635,23 @@ def main():
                           "Default is dry-run (no network order calls).")
     args = ap.parse_args()
 
+    # RUN LOCK (finding 3, 2026-08-25): is_decision_day is read from state
+    # hundreds of lines before the state write-back below it, with a real
+    # multi-minute fetch (39-name residual universe + FF3) in between -- a
+    # check-then-slow-work-then-write race. Two overlapping runs (the
+    # scheduled task's StartWhenAvailable re-firing, or a manual --execute
+    # during one; record Appendix CS already saw this fork e18's share count)
+    # would both decide and both submit orders for the same target.
+    lock_conn = _acquire_run_lock()
+    if lock_conn is None:
+        return 1
+    try:
+        return _run(args)
+    finally:
+        _release_run_lock(lock_conn)
+
+
+def _run(args):
     for s in ps.SLEEVES:
         conn = ps.connect()
         ps.init_sleeve(conn, s)
@@ -732,7 +860,8 @@ def main():
         target, err = decisions[s]
         held_str = ", ".join(f"{t}:{p['qty']:.3f}" for t, p in positions.items()) or "cash"
         print(f"\n  [{s}]")
-        print(f"    filled-today: {fills[s]}   held: {held_str}   NAV: ${nav:,.2f}")
+        nav_str = f"${nav:,.2f}" if nav is not None else "N/A (refused -- see failures below)"
+        print(f"    filled-today: {fills[s]}   held: {held_str}   NAV: {nav_str}")
         if err:
             print(f"    today's decision: SKIPPED ({err})")
             # Audit 2026-08-19 finding 1: this was printed and DROPPED. A
@@ -784,12 +913,17 @@ def main():
         # DB/Alpaca desync (record DE). The DB ledger already advanced above and
         # is next-open disciplined on its own; the next after-hours run
         # reconciles Alpaca to it, so skipping order submission here is safe.
-        mkt = market_is_open()
+        mkt, creds_outage = market_is_open()
         if mkt:
             print("\n--execute: US MARKET IS OPEN -- SKIPPING all Alpaca order "
                   "submission to avoid intraday fills (EOD/execute-next-open rule). "
                   "Re-run after the close; the DB ledger stands and the next "
                   "after-hours run will reconcile the broker to it.")
+            if creds_outage:
+                print("  (this OPEN verdict is UNCONFIRMED -- every sleeve's "
+                      "Alpaca credentials failed, so this is the local-ET "
+                      "fallback, not a real market-clock reading; see "
+                      "RUN_FAILURES above)")
         for s in ps.SLEEVES:
             if mkt:
                 break                      # market open -> place no orders (guard above)
@@ -797,6 +931,17 @@ def main():
             pending = json.loads(st["pending_json"]) if st["pending_json"] else None
             positions = ps.get_positions(conn, s)
             nav = mark_nav(conn, s, today, close_px)
+            if nav is None:
+                # mark_nav refused (finding 2, 2026-08-25): at least one held
+                # ticker has no close price today, so neither a pending
+                # rebuild's nav*w sizing nor a steady-state qty*close notional
+                # can be trusted this run -- sizing either off a fabricated or
+                # a zeroed-out price is exactly the defect this closes (a
+                # zeroed notional for a held ticker would silently drop it
+                # from `desired` below and CLOSE the real position at the
+                # broker). RUN_FAILURES already carries the reason.
+                print(f"\n--execute [{s}]: SKIPPED (no NAV -- see failures above)")
+                continue
             # {symbol: notional$} the Alpaca account should hold. Pending has
             # explicit weights (nav*w); steady-state positions mirror their
             # current DB dollar exposure (qty*close).

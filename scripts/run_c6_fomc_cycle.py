@@ -12,8 +12,10 @@ NAV (finding-things map): imports run_e8_squeeze (CAP0, cache_fetch).
 Imported by: no other module (standalone runner).
 """
 import bisect
+import datetime
 import json
 import math
+import os
 import sys
 from pathlib import Path
 
@@ -26,6 +28,32 @@ SEC = ("2014-01-01", "2099-01-01")
 EVEN = [(0, 4), (10, 14), (20, 24), (30, 34)]
 FOMC = json.loads((Path(__file__).resolve().parent.parent /
                    "data/fomc_announcement_dates.json").read_text())["dates"]
+
+# Finding 8 (2026-08-25 audit). Every bar with date > max(FOMC) is anchored
+# to the LATEST-BEFORE announcement per the docstring's cycle rule -- which
+# is silently wrong once a real (uncalendared) meeting has actually occurred
+# in that gap. Mirrors the _MAX_STALE_DAYS / StaleCacheError idiom in
+# run_e8_squeeze.py (env-var override, raise loudly, no exception swallowed
+# upstream). Default 60 days: measured off data/fomc_announcement_dates.json
+# itself, the largest gap between consecutive scheduled announcements in the
+# modern (2015+) 8-meeting/year regime, excluding the 2020-01-29..2020-04-29
+# COVID gap, is 56 calendar days -- the summer gap (late-Jul or early-Aug
+# into Sep), tied 6x: 2016, 2017, 2018, 2021, 2022, 2023. 2018 is the one
+# that starts in August (2018-08-01 -> 2018-09-26). 60 clears 56 with a
+# 4-day margin without waiting a full extra cycle to fire.
+# (Corrected 2026-08-25: this comment first read "58 calendar days
+# (Mar->Apr/May) ... 2-day margin". Re-derived from the JSON: no 58-day
+# gap exists, the true maximum is 56, and the widest pairs are summer,
+# not Mar->Apr/May.)
+_MAX_FOMC_STALE_DAYS = int(os.environ.get("SWING_MAX_FOMC_STALE_DAYS", "60"))
+
+
+class StaleFOMCCalendarError(RuntimeError):
+    """The bar range under test extends past the FOMC calendar's coverage by
+    more than _MAX_FOMC_STALE_DAYS -- every bar past that point is anchored
+    to a STALE latest-announcement, not an error-free flat/even classification.
+    Refresh data/fomc_announcement_dates.json with real, published meeting
+    dates (federalreserve.gov) -- never inferred or extrapolated ones."""
 
 
 def stats(nav):
@@ -49,6 +77,16 @@ def main():
     op = [b[2] for b in bars]
     cl = [b[5] for b in bars]
     n = len(dates)
+    stale_days = (datetime.date.fromisoformat(dates[-1])
+                  - datetime.date.fromisoformat(max(FOMC))).days
+    if stale_days > _MAX_FOMC_STALE_DAYS:
+        raise StaleFOMCCalendarError(
+            "FOMC calendar stale: last bar %s is %d calendar days past the "
+            "calendar's latest announcement %s (tolerance %d days, "
+            "SWING_MAX_FOMC_STALE_DAYS). Bars past that point are scored "
+            "against a stale anchor. Refresh data/fomc_announcement_dates.json "
+            "with real published meeting dates -- do not extrapolate."
+            % (dates[-1], stale_days, max(FOMC), _MAX_FOMC_STALE_DAYS))
     # cycle position t per session: sessions since (incl.) latest announcement
     ann_idx = sorted({bisect.bisect_left(dates, a) for a in FOMC
                       if a <= dates[-1]})

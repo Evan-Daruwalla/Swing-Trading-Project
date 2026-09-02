@@ -12,5 +12,9 @@
 *.sh  text eol=lf
 *.bash text eol=lf
 
+# The live hook (core.hooksPath=scripts/git-hooks) is extensionless, so *.sh
+# above does not cover it; pin it explicitly or autocrlf can CRLF its shebang.
+scripts/git-hooks/pre-commit text eol=lf
+
 # SQLite DBs and caches are binary; never let git touch their bytes.
 *.db binary

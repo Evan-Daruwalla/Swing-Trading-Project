@@ -21,10 +21,10 @@ assumed_bps=, and every result then carries friction_source="ASSUMED".
 from __future__ import annotations
 
 import math
-import sqlite3
 import statistics
 from dataclasses import dataclass, field
 
+from swing_bot import prices
 from swing_bot.paper_sleeves import DB_PATH
 
 MIN_FILLS_FOR_ESTIMATE = 20      # pre-registered, prereg section 2.2
@@ -53,8 +53,7 @@ class FrictionEstimate:
 
 
 def _ro_conn(db_path=DB_PATH):
-    return sqlite3.connect("file:%s?mode=ro" % str(db_path).replace("\\", "/"),
-                           uri=True)
+    return prices.connect_ro(db_path)
 
 
 def _check_class(instrument_class):
