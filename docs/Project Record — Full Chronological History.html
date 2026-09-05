@@ -251,7 +251,8 @@ the dated entry, not the digest.</p>
 - <a href="#appendix-fi---scheduled-daily-audit-fh-itself-never-landed-in-git-so-its-two-highs-are-still-live-five-days-on-2026-08-25-0721-cdt">FI — Scheduled daily-audit: FH itself never landed in git, so its two HIGHs are still live five days on</a> (08-25)<br />
 - <a href="#appendix-fj---the-live-ledger-has-been-contaminated-since-2026-08-25-and-e6_1x-has-recorded-nothing-for-five-sessions-every-guard-fired-correctly-nobody-was-listening-2026-09-01-2215-cdt">FJ — The LIVE LEDGER has been contaminated since 2026-08-25 and e6_1x has recorded NOTHING for five sessions. Every guard fired correctly; nobody was listening</a> (09-01)<br />
 - <a href="#appendix-fk---the-record-itself-had-been-wedged-for-54-days---one-malformed-heading-refused-every-append-which-is-why-the-2026-09-05-audit-left-no-trace-plus-a-missed-session-detector-blind-per-sleeve-2026-09-05-1622-cdt">FK — The record itself had been WEDGED for 54 days - one malformed heading refused every append, which is why the 2026-09-05 audit left no trace; plus a missed-session detector blind per sleeve</a> (09-05)<br />
-- <a href="#appendix-fl---evans-three-calls-the-five-e6_1x-nav-holes-are-permanent-the-post-09-01-ledger-write-stays-unattributed---but-reading-the-cleanup-script-bounded-it-to-two-synthetic-rows-and-the-arithmetic-reconciles-to-the-row-2026-09-05-1748-cdt">FL — Evan's three calls: the five e6_1x NAV holes are permanent, the post-09-01 ledger write stays unattributed - but reading the cleanup script bounded it to two synthetic rows and the arithmetic reconciles to the row</a> (09-05)</p>
+- <a href="#appendix-fl---evans-three-calls-the-five-e6_1x-nav-holes-are-permanent-the-post-09-01-ledger-write-stays-unattributed---but-reading-the-cleanup-script-bounded-it-to-two-synthetic-rows-and-the-arithmetic-reconciles-to-the-row-2026-09-05-1748-cdt">FL — Evan's three calls: the five e6_1x NAV holes are permanent, the post-09-01 ledger write stays unattributed - but reading the cleanup script bounded it to two synthetic rows and the arithmetic reconciles to the row</a> (09-05)<br />
+- <a href="#appendix-fm---committed-87db1c2-not-pushed-the-append-only-guard-fired-on-exactly-one-line-and-was-bypassed-on-evans-call-with-the-blast-radius-measured-first-2026-09-05-1755-cdt">FM — Committed 87db1c2 (not pushed); the append-only guard fired on exactly one line and was bypassed on Evan's call, with the blast radius measured first</a> (09-05)</p>
 <hr />
 <h2 id="phase-0--inception-and-doc-system-bootstrap-2026-07-08">Phase 0 — Inception and doc-system bootstrap (2026-07-08)</h2>
 <p><strong>WHAT:</strong> Project created. Evan's brief: build a bot that swing trades —<br />
@@ -8005,6 +8006,43 @@ every <code>.bat</code> never executed.</p>
   write one wedges the same way, for the same 54-day-shaped reason.</li>
 <li><strong>Graph re-index</strong> against the new TOC, FK and FL.</li>
 </ul>
+<h1 id="appendix-fm---committed-87db1c2-not-pushed-the-append-only-guard-fired-on-exactly-one-line-and-was-bypassed-on-evans-call-with-the-blast-radius-measured-first-2026-09-05-1755-cdt">Appendix FM - Committed 87db1c2 (not pushed); the append-only guard fired on exactly one line and was bypassed on Evan's call, with the blast radius measured first (2026-09-05, ~17:55 CDT)</h1>
+<p><strong>Session:</strong> 2026-09-05, ~17:55 CDT. Short entry, following the record-FF<br />
+precedent: what landed, and the one guard that was deliberately bypassed to land<br />
+it. Not pushed - no push was authorised.</p>
+<h2 id="commit-87db1c2---8-files-1816-insertions-37-deletions">Commit <code>87db1c2</code> - 8 files, 1,816 insertions, 37 deletions</h2>
+<p>Carries FK and FL in full: the record unwedged (heading demoted, 131 TOC lines<br />
+backfilled), the per-sleeve missed-session detector, the fail-closed liquidity<br />
+floor plus <code>scripts/prove_liquidity_floor.py</code>, the five e6_1x holes acknowledged<br />
+as permanent, the <code>STRESS_K = 4</code> dated exception in <code>CLAUDE.md</code>, the HANDOFF sync<br />
+with two stale BLOCKED rows struck, and <code>clean_ledger_2026-08-25.py</code> tracked at<br />
+last.</p>
+<h2 id="the-append-only-guard-fired-and-was-bypassed-on-evans-explicit-call">The append-only guard FIRED, and was bypassed on Evan's explicit call</h2>
+<p><code>scripts/git-hooks/pre-commit</code> refused the commit:</p>
+<pre><code>record INVALID: APPEND-ONLY VIOLATION: a previously committed line was modified or removed
+record invariants FAILED -- commit BLOCKED.
+</code></pre>
+<p><strong>The guard was right.</strong> Unwedging the record was impossible without touching a<br />
+previously-committed line - the <code># Appendix BR-note</code> heading at record line 2504,<br />
+demoted to <code>## BR-note</code> (FK section 1). Before bypassing anything, the blast<br />
+radius was measured rather than assumed:</p>
+<pre><code>git diff --cached &quot;docs/Project Record ...&quot; | grep -c '^-[^-]'   -&gt;   1
+</code></pre>
+<p><strong>Exactly one removed line</strong>, and it is the intended one. Every other record<br />
+change in the commit - the 131 TOC lines, FK, FL - is pure addition.</p>
+<p>Committed with <code>--no-verify</code> after Evan approved it as a one-off, with the reason<br />
+written into the commit message so the bypass is visible from <code>git log</code> and not<br />
+only from here. Nothing else skipped a check: <code>FROZEN TESTS: GREEN (all d=0)</code> and<br />
+the secret scan reported <code>TOTAL: 0 unique finding(s)</code> before the block fired.</p>
+<p>The guard was <strong>not weakened, disabled, or edited</strong>. The next commit that edits a<br />
+committed record line will be blocked exactly the same way, which is the point.</p>
+<h2 id="standing-note-for-whoever-hits-this-next">Standing note for whoever hits this next</h2>
+<p>The permanent fix is still not in place: <code>append-record-entry.js</code> refuses<br />
+<code>&lt;LETTERS&gt;-note</code> headings in all six repos that share it. Writing one in any of<br />
+them wedges that repo's record silently, and the wedge is only visible when a<br />
+session tries to append - which is how this one went 54 days unnoticed. Patching<br />
+the shared checker needs write access to <code>~/.claude/skills/project-memory/</code>,<br />
+which was denied to the session that first tried.</p>
 </main>
 </body>
 </html>

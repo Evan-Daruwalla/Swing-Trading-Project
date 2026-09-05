@@ -205,6 +205,7 @@ the dated entry, not the digest.
 - [FJ — The LIVE LEDGER has been contaminated since 2026-08-25 and e6_1x has recorded NOTHING for five sessions. Every guard fired correctly; nobody was listening](#appendix-fj---the-live-ledger-has-been-contaminated-since-2026-08-25-and-e6_1x-has-recorded-nothing-for-five-sessions-every-guard-fired-correctly-nobody-was-listening-2026-09-01-2215-cdt) (09-01)
 - [FK — The record itself had been WEDGED for 54 days - one malformed heading refused every append, which is why the 2026-09-05 audit left no trace; plus a missed-session detector blind per sleeve](#appendix-fk---the-record-itself-had-been-wedged-for-54-days---one-malformed-heading-refused-every-append-which-is-why-the-2026-09-05-audit-left-no-trace-plus-a-missed-session-detector-blind-per-sleeve-2026-09-05-1622-cdt) (09-05)
 - [FL — Evan's three calls: the five e6_1x NAV holes are permanent, the post-09-01 ledger write stays unattributed - but reading the cleanup script bounded it to two synthetic rows and the arithmetic reconciles to the row](#appendix-fl---evans-three-calls-the-five-e6_1x-nav-holes-are-permanent-the-post-09-01-ledger-write-stays-unattributed---but-reading-the-cleanup-script-bounded-it-to-two-synthetic-rows-and-the-arithmetic-reconciles-to-the-row-2026-09-05-1748-cdt) (09-05)
+- [FM — Committed 87db1c2 (not pushed); the append-only guard fired on exactly one line and was bypassed on Evan's call, with the blast radius measured first](#appendix-fm---committed-87db1c2-not-pushed-the-append-only-guard-fired-on-exactly-one-line-and-was-bypassed-on-evans-call-with-the-blast-radius-measured-first-2026-09-05-1755-cdt) (09-05)
 
 ---
 
@@ -8831,3 +8832,55 @@ every `.bat` never executed.
   in all six repos that use it. This project no longer has one; the next repo to
   write one wedges the same way, for the same 54-day-shaped reason.
 - **Graph re-index** against the new TOC, FK and FL.
+
+# Appendix FM - Committed 87db1c2 (not pushed); the append-only guard fired on exactly one line and was bypassed on Evan's call, with the blast radius measured first (2026-09-05, ~17:55 CDT)
+**Session:** 2026-09-05, ~17:55 CDT. Short entry, following the record-FF
+precedent: what landed, and the one guard that was deliberately bypassed to land
+it. Not pushed - no push was authorised.
+
+## Commit `87db1c2` - 8 files, 1,816 insertions, 37 deletions
+
+Carries FK and FL in full: the record unwedged (heading demoted, 131 TOC lines
+backfilled), the per-sleeve missed-session detector, the fail-closed liquidity
+floor plus `scripts/prove_liquidity_floor.py`, the five e6_1x holes acknowledged
+as permanent, the `STRESS_K = 4` dated exception in `CLAUDE.md`, the HANDOFF sync
+with two stale BLOCKED rows struck, and `clean_ledger_2026-08-25.py` tracked at
+last.
+
+## The append-only guard FIRED, and was bypassed on Evan's explicit call
+
+`scripts/git-hooks/pre-commit` refused the commit:
+
+```
+record INVALID: APPEND-ONLY VIOLATION: a previously committed line was modified or removed
+record invariants FAILED -- commit BLOCKED.
+```
+
+**The guard was right.** Unwedging the record was impossible without touching a
+previously-committed line - the `# Appendix BR-note` heading at record line 2504,
+demoted to `## BR-note` (FK section 1). Before bypassing anything, the blast
+radius was measured rather than assumed:
+
+```
+git diff --cached "docs/Project Record ..." | grep -c '^-[^-]'   ->   1
+```
+
+**Exactly one removed line**, and it is the intended one. Every other record
+change in the commit - the 131 TOC lines, FK, FL - is pure addition.
+
+Committed with `--no-verify` after Evan approved it as a one-off, with the reason
+written into the commit message so the bypass is visible from `git log` and not
+only from here. Nothing else skipped a check: `FROZEN TESTS: GREEN (all d=0)` and
+the secret scan reported `TOTAL: 0 unique finding(s)` before the block fired.
+
+The guard was **not weakened, disabled, or edited**. The next commit that edits a
+committed record line will be blocked exactly the same way, which is the point.
+
+## Standing note for whoever hits this next
+
+The permanent fix is still not in place: `append-record-entry.js` refuses
+`<LETTERS>-note` headings in all six repos that share it. Writing one in any of
+them wedges that repo's record silently, and the wedge is only visible when a
+session tries to append - which is how this one went 54 days unnoticed. Patching
+the shared checker needs write access to `~/.claude/skills/project-memory/`,
+which was denied to the session that first tried.

@@ -98,7 +98,16 @@ reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
 2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
 self-contradictory and was corrected 2026-07-28 by audit #7).**
 
-> **2026-09-05 - DAILY-AUDIT FIX PASS (record FK). The record itself had been
+> **2026-09-05 - DAILY-AUDIT FIX PASS, committed `87db1c2`, NOT pushed (records
+> FK, FL, FM). The commit needed `--no-verify` on Evan's explicit call:** the
+> append-only pre-commit guard fired on exactly ONE removed line - the
+> `# Appendix BR-note` heading demoted below - with every other record change
+> purely additive (`grep -c '^-[^-]'` on the staged record returned 1). The
+> guard was right and was not weakened; the reason is in the commit message and
+> in record FM. `FROZEN TESTS: GREEN (all d=0)` and the secret scan were clean
+> before the block.
+>
+> **The original finding (record FK). The record itself had been
 > WEDGED for 54 days, which is why the 2026-09-05 audit left no trace.**
 > `append-record-entry.js` refused EVERY append to this project: the heading
 > `# Appendix BR-note - ...` (record line 2504, written 2026-07-13) is invisible
