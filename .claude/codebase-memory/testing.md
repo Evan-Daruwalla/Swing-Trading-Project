@@ -43,3 +43,20 @@ tool installed, no CI, and no git hooks — the suite is run by hand.
 
 Discipline (independent of risk appetite): prereg before results; NEVER tune a
 FAIL.
+
+## Added 2026-09-05 (record FK)
+
+- **Standalone check, NOT part of the suite**: `scripts/prove_liquidity_floor.py`
+  (**6/6**) pins the fail-closed liquidity floor at `daily_swing_paper.py`.
+  Pure in-memory - no DB, no network, no orders. Two of its six cases assert
+  that the PRE-FIX branch ranked the data-starved names, so the check would
+  still catch a silent revert. Run it after any change to
+  `median_dollar_volume()` or to the stress-basket screen that calls it.
+- **CORRECTION to "no git hooks" above:** this project HAS a native git
+  pre-commit hook (`core.hooksPath` -> `scripts/git-hooks`, see security.md). It
+  runs a secret scan AND the record's append-only + TOC-balance invariants, and
+  it BLOCKS the commit on failure. It fired for real on 2026-09-05 -
+  `APPEND-ONLY VIOLATION: a previously committed line was modified or removed` -
+  and the commit went through only with a disclosed `--no-verify` on Evan's
+  explicit call (record FM). The "no CI, no coverage tool, run by hand" half of
+  that sentence still holds.

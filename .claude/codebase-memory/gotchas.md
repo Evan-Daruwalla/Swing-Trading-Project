@@ -64,3 +64,43 @@ they apply to any yfinance-based pipeline built here:
   repo-wide for the dotted form, confirmed by `grep -rn` and `git grep`). This
   applies to EVERY cross-script `except` in `scripts/`, not just the cache
   guard. Rule: import sibling scripts as bare `run_x`, never `scripts.run_x`.
+- 2026-09-05 (record FK, measured): **the same "guard that cannot fire" family,
+  in a new shape - AGGREGATION COLLAPSE.** `daily_swing_paper.py`'s
+  missed-session detector read `SELECT DISTINCT date FROM paper_nav`, but that
+  table's primary key is `(sleeve, date)`. Collapsing a composite key to one of
+  its columns made a date count as covered when ANY ONE sleeve had written it,
+  so the detector printed clean for 11 nights while `e6_1x` recorded nothing for
+  2026-08-25, 08-26, 08-27, 08-28 and 08-31 and both peers recorded normally.
+  The one real vanish it has ever had to catch was the one kind it structurally
+  could not see. Fixed as a per-sleeve set difference over `ps.SLEEVES` reporting
+  `(sleeve, date)` pairs. **Rule: never `DISTINCT` one column of a composite key
+  and then treat presence as coverage - the aggregate is true when ANY member
+  is, which is the opposite of what a completeness check needs.** Second half of
+  the same fix: `ACKNOWLEDGED_NAV_HOLES` had to become pairs too, because a
+  date-scoped acknowledgement forgives that date for every sleeve, re-creating
+  the blindness inside the acknowledgement path.
+- 2026-09-05 (record FK, measured): **a fail-open guard can be written INTO a
+  docstring, and then the call site is bug-compatible with its own contract.**
+  `median_dollar_volume()` returns None when fewer than `max(5, n//2)` sessions
+  carry usable close AND volume, and its docstring instructed callers not to
+  treat that as illiquid. The one caller obeyed - `if adv is not None and adv <
+  FLOOR` - so a data-starved name (feed gap, halt, thin history) skipped the
+  liquidity floor entirely and could enter the live K=4 stress basket. Both were
+  fixed together; fixing only the call site would have left the next caller
+  reading instructions to re-introduce it. Standing check:
+  `scripts/prove_liquidity_floor.py` (6/6), which includes two cases asserting
+  the OLD branch ranked those names. **Rule: when a helper returns "unknown",
+  its docstring must say FAIL CLOSED, or the next caller will fail open with a
+  clear conscience.**
+- 2026-09-05 (record FK): **one malformed record heading silently blocks EVERY
+  append to a project, and nothing surfaces it until a session tries to write.**
+  `# Appendix BR-note - ...` (written 2026-07-13) does not match
+  `^# Appendix ([A-Z]+)<dash>`, so `append-record-entry.js` refused every append
+  for **54 days** - which is why the 2026-09-05 scheduled audit left no trace at
+  all. The refusal is correct (an unparseable heading is invisible to the letter
+  scan, so a duplicate could be written), but it is only visible at write time.
+  Fixing it exposed a SECOND wedge behind it: the checker's TOC invariant then
+  refused with `TOC lines (36) != appendix headings (167)`, because the record's
+  Table of Contents had stopped at Appendix AI. **The shared checker still
+  refuses `<LETTERS>-note` in all six repos that use it; this project no longer
+  has one, but the next repo to write one wedges the same way.**

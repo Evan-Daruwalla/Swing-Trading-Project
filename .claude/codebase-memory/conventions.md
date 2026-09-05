@@ -17,3 +17,17 @@
   described: refs are pinned at d=±0.0000pp, not ">5bps drift". See testing.md.
 - 2026-07-08: `.bat` files pure ASCII; JSON data files never rewritten via
   PowerShell (machine-wide gotchas, inherited).
+- 2026-09-05 (record FK): **record CORRECTIONS are written as `## <X>-note -
+  ...` sub-heads, NEVER as `# Appendix <X>-note - ...`.** The latter is
+  unparseable to `append-record-entry.js` and wedges every future append to the
+  project (it did, for 54 days). Existing precedent in this record:
+  `## 2. CORRECTION to Appendix EF`. A top-level `# Appendix <LETTERS> -`
+  heading must use a fresh, unused letter with no suffix.
+- 2026-09-05 (record FK): **a hard rule the code must contradict gets a DATED
+  EXCEPTION in CLAUDE.md plus a pointer comment at the code line - never a
+  silent divergence and never a "fix" that breaks the evidence.** Live case:
+  `swing_bot/paper_sleeves.py:43` `STRESS_K = 4` exceeds the K=1-3 ceiling.
+  K=4 is the parameter C1 and M10-1 were backtested at, so dropping to 3 would
+  make the live sleeve run a rule no backtest has tested. The exception states
+  its scope (M10-1 stress branch only) and its reversal path (re-run both at
+  K=3 under a fresh prereg).

@@ -45,3 +45,30 @@ Trading-read-only + EOD-only rules are also always-load INDEX invariants.
   every consumer.
 - **Liquidity floor is MANDATORY** in any universe filter — at $100–1,000 capital,
   spread/slippage dominate.
+
+## M3 paper ledger (added 2026-09-05, record FK/FL)
+- **`paper_nav`'s primary key is `(sleeve, date)`.** Never aggregate it to a bare
+  date set for a completeness check - see gotchas.md 2026-09-05. Coverage
+  questions are per-sleeve questions.
+- **The three sleeves do NOT have equal-length NAV series.** As of 2026-09-05:
+  `e18_vixts` 36 marks, `m10_1_nagel` 36, **`e6_1x` 31** (2026-07-15 -> 09-03,
+  103 rows total). Holes: 2026-07-30 across all three (record EI), plus
+  2026-08-25, 08-26, 08-27, 08-28 and 08-31 for `e6_1x` only (record FJ).
+  **All are ACKNOWLEDGED AS PERMANENT, not backfilled** (Evan, 2026-09-05,
+  record FL) - forward evidence is not reconstructed after the fact. They live
+  as `(sleeve, date)` pairs in `ACKNOWLEDGED_NAV_HOLES`
+  (`scripts/daily_swing_paper.py`), still PRINTED every run but no longer
+  failing it. **Consequence: any cross-sleeve return or NAV comparison MUST
+  align on dates and must never assume equal series.**
+- **Provenance caveat on the forward-paper evidence (record FL):** one
+  unattributed write to the live ledger after 2026-09-01, bounded to two
+  provably synthetic rows a landing-check agent left on 2026-08-25 (the fake
+  `paper_nav` row implied a QQQ close of 812.00 against the same day's real
+  ~710.7; the `ZZZZ` position had no matching transactions). The deletions match
+  `clean_ledger_2026-08-25.py` exactly and the row arithmetic reconciles
+  (86 + 17 marks over 08-26..09-03 = the 103 rows on disk). What happened is
+  known and surgical; who ran it and when is not.
+- **The liquidity floor now FAILS CLOSED** (2026-09-05, record FK): unmeasurable
+  volume excludes the name rather than skipping the check. The INDEX invariant
+  "liquidity floor is MANDATORY" was previously unenforceable on exactly the
+  names most likely to need it.
