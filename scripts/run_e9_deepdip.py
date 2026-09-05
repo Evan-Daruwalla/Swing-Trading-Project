@@ -20,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from swing_bot.universe import UNIVERSE
 from run_e8_squeeze import cache_fetch, window_stats, SIM_START, GATE_END, \
-    SEC_START, COST
+    SEC_START, COST, f3_masks
 
 K = 5
 CAP0 = 1000.0
@@ -30,7 +30,13 @@ TICKERS = [e.ticker for e in UNIVERSE if e.group in ("broad_us",
                                                      "spdr_sector")]
 
 
-def simulate(data):
+def simulate(data, liq=None):
+    """    liq (F3, 2026-09-05): optional {ticker: [bool]} from
+    swing_bot.universe.liquidity_mask, aligned to that ticker's bars.
+    A candidate that is not liquid AS OF THE SIGNAL BAR is dropped BEFORE
+    the ranking sort. liq=None reproduces the pre-F3 path exactly and is
+    what SWING_F3_FLOOR=0 selects.
+    """
     all_dates = sorted({b[1] for t in data for b in data[t][0]
                         if b[1] >= SIM_START})
     cash, nav_prev = CAP0, CAP0
@@ -86,7 +92,7 @@ def simulate(data):
             if d in idx and t not in pos and t not in pend_in:
                 i = idx[d]
                 c = bars[i][5]
-                if c <= DIP * ath[i]:
+                if c <= DIP * ath[i] and (liq is None or liq[t][i]):
                     cands.append((c / ath[i], t))   # deepest first
         cands.sort()
         free = K - len(pos) - len(pend_in)
@@ -108,7 +114,7 @@ def main():
         data[t] = (bars, ath, idx)
         print(f"loaded {t}: {bars[0][1]}..{bars[-1][1]} ({len(bars)} bars)",
               flush=True)
-    nav_path, trades, open_pos, last_close, idle, ndays = simulate(data)
+    nav_path, trades, open_pos, last_close, idle, ndays = simulate(data, f3_masks(data))
 
     print(f"\ntotal closed trades: {len(trades)}")
     gate = window_stats(nav_path, trades, SIM_START, GATE_END)

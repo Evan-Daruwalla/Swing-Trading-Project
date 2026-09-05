@@ -44,8 +44,18 @@ from collections import namedtuple
 
 ETF = namedtuple("ETF", ["ticker", "name", "group", "data_start", "reason"])
 
-# 20-day median dollar-volume floor for live eligibility (guard only; every
-# current member clears it by a wide margin). Enforcement lives in M0.4.
+# 20-day median dollar-volume floor. CLAUDE.md calls this floor MANDATORY in
+# any universe filter.
+#
+# CORRECTED 2026-09-05 (F3, record FG): this said "guard only; every current
+# member clears it by a wide margin". That was a present-tense snapshot read
+# as a property of the series, and it is false as history -- **26 of the 29
+# members have breached this floor at some point**, on 28,776 of 179,055
+# ticker-sessions (16.07%). Worst: EWZ 2000-10-30 at $3,619, which is
+# 0.0002x the floor. Top breachers by session count: EWU 2,886, EWG 2,231,
+# EWC 1,898, EWA 1,809, EWH 1,677, EWW 1,468, XLY 1,453, XLP 1,416.
+#
+# The value and the 20-session window were set at M0.4 and are NOT tuned.
 MIN_MEDIAN_DOLLAR_VOL = 20_000_000
 
 UNIVERSE = [
@@ -139,6 +149,88 @@ LEVERAGED = [
         "2008-11-19",
         "3x wrapper of IWM-class small caps (E1b universe member); $0.4B/day"),
 ]
+
+
+def median_dollar_volume(dates, close, vol, n=20, asof=None):
+    """Median close*volume over the last `n` sessions up to and including `asof`.
+    Past-only -- never looks beyond `asof`. Returns None when fewer than
+    max(5, n//2) sessions carry usable close AND volume -- i.e. LIQUIDITY IS
+    UNKNOWN, not "known adequate".
+
+    (2026-09-05, finding 4) This docstring used to instruct callers NOT to treat
+    the name as illiquid on missing data alone, and the one caller obeyed it by
+    testing `adv is not None and adv < FLOOR` -- which waved every data-starved
+    name straight past the floor CLAUDE.md calls mandatory. Callers must now
+    FAIL CLOSED on None: exclude the name, because a feed gap, a halt, or thin
+    history is exactly the condition under which the floor matters most.
+    """
+    ds = [d for d in dates if asof is None or d <= asof][-n:]
+    vals = [close[d] * vol[d] for d in ds
+            if close.get(d) is not None and vol.get(d)]
+    if len(vals) < max(5, n // 2):
+        return None
+    vals.sort()
+    m = len(vals) // 2
+    return vals[m] if len(vals) % 2 else (vals[m - 1] + vals[m]) / 2.0
+
+
+def is_liquid(dates, close, vol, asof=None, n=20, floor=None):
+    """Is this name eligible under the liquidity floor as of `asof`? -> bool.
+
+    THE single eligibility predicate; F3 (2026-09-05) exists because the floor
+    above was enforced NOWHERE in the research runners while CLAUDE.md called it
+    mandatory. Fails closed: unmeasurable volume returns False, matching the
+    live loop's screen in scripts/daily_swing_paper.py (record FK). A feed gap,
+    a halt, or thin history is exactly the condition under which the floor
+    matters most, so "unknown" is never read as "fine".
+
+    `floor` defaults to MIN_MEDIAN_DOLLAR_VOL; it is a parameter only so a
+    caller can PROVE the guard fires (a floor no name can clear), never so a
+    runner can pick its own threshold.
+    """
+    adv = median_dollar_volume(dates, close, vol, n=n, asof=asof)
+    if adv is None:
+        return False
+    return adv >= (MIN_MEDIAN_DOLLAR_VOL if floor is None else floor)
+
+
+def liquidity_mask(bars, n=20, floor=None, close_ix=5, vol_ix=7):
+    """Per-bar eligibility under the liquidity floor -> list[bool], aligned to
+    `bars` by index.
+
+    Added 2026-09-05 for F3 (prereg_f3_liquidity_floor_etf_scope.md). The
+    research runners screen candidates through this BEFORE ranking them, which
+    is the point CLAUDE.md's "mandatory in any universe filter" was previously
+    true nowhere: until today the floor was enforced only in the live M10-1
+    stress screen, and 26 of the 29 ETFs in UNIVERSE breach it at some point.
+
+    Past-only at every index: mask[i] uses bars[..i] and never a later bar, so
+    it cannot leak future liquidity into a historical decision. FAILS CLOSED --
+    an index with too few usable bars behind it is False, matching is_liquid()
+    and the live loop (record FK).
+
+    `bars` is the cached-bar layout shared by prices.fetch and
+    run_e8_squeeze.cache_fetch: (ticker, date, o, h, l, c, adj, vol), hence the
+    close_ix=5 / vol_ix=7 defaults; they are parameters only so a caller with a
+    different tuple can say so, never so a runner can point them elsewhere.
+    """
+    out = []
+    need = max(5, n // 2)
+    floor_v = MIN_MEDIAN_DOLLAR_VOL if floor is None else floor
+    for i in range(len(bars)):
+        vals = []
+        for b in bars[max(0, i - n + 1):i + 1]:
+            c, v = b[close_ix], b[vol_ix]
+            if c is not None and v:
+                vals.append(c * v)
+        if len(vals) < need:
+            out.append(False)
+            continue
+        vals.sort()
+        m = len(vals) // 2
+        med = vals[m] if len(vals) % 2 else (vals[m - 1] + vals[m]) / 2.0
+        out.append(med >= floor_v)
+    return out
 
 
 def tickers(group=None):

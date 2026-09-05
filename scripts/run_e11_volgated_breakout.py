@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from swing_bot.universe import UNIVERSE
 from run_e8_squeeze import (cache_fetch, indicators, simulate, window_stats,
+                            f3_masks,
                             SIM_START, GATE_END, SEC_START)
 
 RVOL_MIN = 1.5
@@ -56,7 +57,7 @@ def main():
         print(f"loaded {e.ticker}: {bars[0][1]}..{bars[-1][1]} "
               f"({len(bars)} bars, {sum(ind['entry'])} gated entries)",
               flush=True)
-    nav_path, trades, open_pos, last_close = simulate(data)
+    nav_path, trades, open_pos, last_close = simulate(data, f3_masks(data))
     print(f"\ntotal closed trades: {len(trades)}; open at end: {list(open_pos)}")
     gate = window_stats(nav_path, trades, SIM_START, GATE_END)
     sec = window_stats(nav_path, trades, SEC_START, "2099-01-01")

@@ -166,27 +166,19 @@ def series_with_volume(ticker, start="1999-01-01"):
     return dates, close, vol
 
 
-def median_dollar_volume(dates, close, vol, n=20, asof=None):
-    """Median close*volume over the last `n` sessions up to and including `asof`.
-    Past-only -- never looks beyond `asof`. Returns None when fewer than
-    max(5, n//2) sessions carry usable close AND volume -- i.e. LIQUIDITY IS
-    UNKNOWN, not "known adequate".
+# median_dollar_volume MOVED to swing_bot/universe.py on 2026-09-05 (F3,
+# prereg_f3_liquidity_floor_etf_scope.md section 2.1), so the threshold and its
+# enforcement are one unit and the ETF runners can import it without importing
+# THIS module -- which imports run_e10_earnings_drift and
+# run_c1_residual_reversal at module level, above where the function used to be
+# defined, so a runner importing it back hit a partially-initialised module
+# (record FG.4). Re-bound here so this file's call site, test_frozen's
+# median_dollar_volume_refuses_thin_sample invariant (which reaches it as
+# dsp.median_dollar_volume) and scripts/prove_liquidity_floor.py all keep
+# working unchanged.
+median_dollar_volume = universe.median_dollar_volume
+is_liquid = universe.is_liquid
 
-    (2026-09-05, finding 4) This docstring used to instruct callers NOT to treat
-    the name as illiquid on missing data alone, and the one caller obeyed it by
-    testing `adv is not None and adv < FLOOR` -- which waved every data-starved
-    name straight past the floor CLAUDE.md calls mandatory. Callers must now
-    FAIL CLOSED on None: exclude the name, because a feed gap, a halt, or thin
-    history is exactly the condition under which the floor matters most.
-    """
-    ds = [d for d in dates if asof is None or d <= asof][-n:]
-    vals = [close[d] * vol[d] for d in ds
-            if close.get(d) is not None and vol.get(d)]
-    if len(vals) < max(5, n // 2):
-        return None
-    vals.sort()
-    m = len(vals) // 2
-    return vals[m] if len(vals) % 2 else (vals[m - 1] + vals[m]) / 2.0
 
 
 VIX3M_CBOE_URL = "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX3M_History.csv"

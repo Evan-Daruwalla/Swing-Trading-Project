@@ -206,6 +206,8 @@ the dated entry, not the digest.
 - [FK — The record itself had been WEDGED for 54 days - one malformed heading refused every append, which is why the 2026-09-05 audit left no trace; plus a missed-session detector blind per sleeve](#appendix-fk---the-record-itself-had-been-wedged-for-54-days---one-malformed-heading-refused-every-append-which-is-why-the-2026-09-05-audit-left-no-trace-plus-a-missed-session-detector-blind-per-sleeve-2026-09-05-1622-cdt) (09-05)
 - [FL — Evan's three calls: the five e6_1x NAV holes are permanent, the post-09-01 ledger write stays unattributed - but reading the cleanup script bounded it to two synthetic rows and the arithmetic reconciles to the row](#appendix-fl---evans-three-calls-the-five-e6_1x-nav-holes-are-permanent-the-post-09-01-ledger-write-stays-unattributed---but-reading-the-cleanup-script-bounded-it-to-two-synthetic-rows-and-the-arithmetic-reconciles-to-the-row-2026-09-05-1748-cdt) (09-05)
 - [FM — Committed 87db1c2 (not pushed); the append-only guard fired on exactly one line and was bypassed on Evan's call, with the blast radius measured first](#appendix-fm---committed-87db1c2-not-pushed-the-append-only-guard-fired-on-exactly-one-line-and-was-bypassed-on-evans-call-with-the-blast-radius-measured-first-2026-09-05-1755-cdt) (09-05)
+- [FN — F3 redirect EXECUTED across all 8 ETF experiments: no verdict flipped to PASS, E11 lost its verdict to sample starvation, and 3 of 5 pre-registered predictions were falsified. Also: FH's two HIGHs were already fixed and I had reported them open](#appendix-fn---f3-redirect-executed-across-all-8-etf-experiments-no-verdict-flipped-to-pass-e11-lost-its-verdict-to-sample-starvation-and-3-of-5-pre-registered-predictions-were-falsified-also-fhs-two-highs-were-already-fixed-and-i-had-reported-them-open-2026-09-05-1822-cdt) (09-05)
+- [FO — Graph re-indexed (1,728 nodes, health OK) - but build_merge deleted 9 hyperedges again and 4 are unrecoverable in this run; plus corrections to FN's timestamp and to a token count recorded as zero](#appendix-fo---graph-re-indexed-1728-nodes-health-ok---but-build_merge-deleted-9-hyperedges-again-and-4-are-unrecoverable-in-this-run-plus-corrections-to-fns-timestamp-and-to-a-token-count-recorded-as-zero-2026-09-05-1825-cdt) (09-05)
 
 ---
 
@@ -8884,3 +8886,287 @@ them wedges that repo's record silently, and the wedge is only visible when a
 session tries to append - which is how this one went 54 days unnoticed. Patching
 the shared checker needs write access to `~/.claude/skills/project-memory/`,
 which was denied to the session that first tried.
+
+# Appendix FN - F3 redirect EXECUTED across all 8 ETF experiments: no verdict flipped to PASS, E11 lost its verdict to sample starvation, and 3 of 5 pre-registered predictions were falsified. Also: FH's two HIGHs were already fixed and I had reported them open (2026-09-05, ~18:22 CDT)
+**Session:** 2026-09-05, ~17:55-18:20 CDT. Continues FM. Evan asked for four
+things: FH's two HIGHs, the F3 redirect from FG, and a graph re-index. One of
+those four turned out to be already done, and saying so is the first item.
+
+## 1. FH's two HIGHs were ALREADY FIXED. I reported them as open without checking
+
+FH (2026-08-20) recorded two HIGH findings and the line "nothing fixed". HANDOFF
+carried that forward. I repeated it in this session's summary. **All three of us
+were wrong** — the 2026-08-25 audit session fixed both, and they landed in
+commit `509852e`.
+
+- **"The run exits 0 when credentials die during market hours."** FIXED.
+  `market_is_open()` now returns `(is_open, creds_outage)` and a total
+  credential outage appends to `RUN_FAILURES`
+  (`scripts/daily_swing_paper.py:275`). The fill-divergence backfill path
+  (`:314`) and the mirror path (`:387`) flag their own credential failures too.
+  The code is labelled "finding 1a / 1b, 2026-08-25".
+- **"A missing price marks NAV at cost basis, silently."** FIXED. `mark_nav()`
+  REFUSES and returns None (`:586-593`). The old expression
+  `close_px.get(t) or p["entry_price"]` survives only inside the docstring that
+  explains the bug. Labelled "finding 2, 2026-08-25". **This is the same refusal
+  that FJ found halting e6_1x for five sessions** -- the fix worked, and nobody
+  read the exit code.
+- Also closed since FH: `costs.py:56` now calls `prices.connect_ro` instead of
+  holding a second copy of the connection string.
+
+**Still open from FH, all LOW:** `DB_PATH` defined independently in
+`prices.py:33` and `paper_sleeves.py:40`; `universe.py`'s present-tense "wide
+margin" claim (now fixed as part of F3, see below); possibly-unused imports at
+`run_m10_1_nagel_switch.py:28-29`; and 5 of 10 `fill_divergence` rows carrying a
+NULL `alpaca_order_id`, structurally excluded from backfill and therefore
+permanently unmeasurable, with nothing reporting that half of M3's only fidelity
+instrument is dark.
+
+**The lesson is not "FH was wrong."** FH was right on 2026-08-20. The failure is
+that a status line written once was still being quoted 16 days later by me,
+without anyone re-reading the code. That is the same defect class as the stale
+BLOCKED rows in FL section 5, and this is its fourth appearance.
+
+## 2. F3 REDIRECT: executed end to end. No verdict flipped to PASS; one lost its verdict
+
+Full results: `docs/research/2026-09-05_F3_liquidity_floor_etf_results.md`.
+Pre-registration `docs/prereg_f3_liquidity_floor_etf_scope.md` committed
+DOC-ONLY at `6a23a9a`, amendment at `2f0a8a4`, both BEFORE any runner code
+changed. That ordering is checkable in `git log` and is the only thing that
+makes the predictions below meaningful.
+
+### 2a. The prereg had to be amended before running, for a data reason
+
+`.e8e9_cache` was **19 days stale** -- every price series ends 2026-08-17 against
+a 5-day tolerance -- and `cache_fetch` raised `StaleCacheError` and refused to
+run, exactly as designed. So the parent prereg's fourth stop condition
+("floor-OFF must reproduce the recorded FAIL numbers") was unmeetable for a
+reason having nothing to do with the floor: the recorded verdicts came from
+earlier vintages.
+
+Measured before choosing: **all 181 price-series files share the SAME end date.**
+Stale, but NOT mixed -- the failure mode that overstated M12's headline 3x
+(record EM/EO) is absent. So the vintage was PINNED at 2026-08-17 rather than
+refreshed, because F3 asks whether the floor changes these experiments, and that
+is only answerable if the floor is the only thing differing between the arms. A
+refresh changes the data and the floor at once. The stop condition was replaced,
+not dropped: everything halts if a floor-OFF baseline produces a different
+VERDICT from the recorded one. None did.
+
+### 2b. Results
+
+| experiment | verdict OFF -> ON | trades OFF -> ON |
+|---|---|---|
+| E1 IBS | FAIL -> FAIL | 3,559 -> 3,534 |
+| E8 squeeze | FAIL -> FAIL | 341 -> 276 |
+| E9 deep-dip | FAIL -> FAIL | 53 -> 52 |
+| **E11 vol-gated** | **FAIL -> INCONCLUSIVE** | 61 -> 39 |
+| E12 capitulation | FAIL -> FAIL | 130 -> 106 |
+| C3 vol breakout | FAIL -> FAIL | 607 -> 488 |
+| E20 dividend capture | FAIL -> FAIL | 2,345 -> 2,011 |
+| X9 pairs | FAIL -> FAIL | 2,196 -> **2,502** |
+
+Every arm run twice, every pair byte-identical.
+
+**The two findings worth carrying forward:**
+
+**The floor can destroy a verdict by starving the sample.** E11's gate sample
+fell from 46 closed trades to 24, under its own pre-registered n>=30 minimum, so
+E11 no longer returns FAIL -- it returns INCONCLUSIVE. Not better, not worse:
+the experiment lost the right to a verdict. E11 is E8's rules plus RVOL>=1.5, so
+it already had the thinnest sample in the set. The prereg anticipated the shape
+of this (section 4's "coverage result" clause) but predicted it as a
+basket-formation failure, not a sample-size one.
+
+**The illiquid names were carrying half of C3's drawdown.** C3's gate maxDD fell
+31.7% -> 17.1%, a 46% cut, while gate CAGR moved only 3.62% -> 3.20% and Sharpe
+0.37 -> 0.36. Risk removed almost without removing return. C3 still FAILs both
+bars so nothing is banked, but it is the clearest evidence the floor does real
+work. E12 points the same way (maxDD 55.0% -> 45.5%).
+
+### 2c. Three of five pre-registered predictions FALSIFIED
+
+- **P1** (picks move) CONFIRMED -- all six named experiments changed picks.
+- **P2** (no FAIL flips to PASS) HELD -- section 4's central protection was
+  never needed.
+- **P3** (E9 most affected, because K=5 with no stop holds an illiquid name
+  longest) **FALSIFIED** -- E9 moved LEAST of that set (-1.9%); E11 moved most
+  (-36%).
+- **P4** (E20 moves least, because ex-dates drive it rather than a ranking)
+  **FALSIFIED** -- E20 moved -14% against E1's -0.7%. Having no ranking is not
+  protection; it means every screened-out name is simply a capture not taken.
+- **P5** (X9's pair count drops) **FALSIFIED IN THE OPPOSITE DIRECTION** -- X9
+  opened MORE trades, 2,196 -> 2,502. Removing illiquid names from the formation
+  pool changes WHICH pairs are the K=3 lowest-SSD, and the replacements converge
+  more often. The candidate pool shrinks; activity rises.
+
+Every one of P3, P4 and P5 reasoned from strategy mechanics -- hold duration,
+selection style, pool size. In all three cases the answer turned on candidate
+SUPPLY instead. That is the transferable lesson, and it exists only because the
+predictions were written down before the runs.
+
+### 2d. How the frozen tripwire survived a change to backtest.py
+
+`swing_bot/backtest.py` is what `test_frozen` pins (E1/E1b/E2 at d=+-0.0000pp).
+The screen was added as `run_backtest(..., liq=None)` where **None is the pre-F3
+path byte-for-byte**; the tripwire calls the function without the argument, so
+the 12 references are untouched BY DESIGN, and the docstring says so, so nobody
+"tidies up" the default later. `_load`'s SELECT still deliberately drops volume:
+widening its `(o,h,l,c)` tuple would break every `bar[1]/bar[2]/bar[3]` index on
+the pinned paths, so E1's runner builds the mask from `swing.db` itself.
+
+**Vintage caveat, stated because it changes how E1's numbers may be used:**
+`swing.db bars` spans 2014-01-02 to 2026-07-08 and excludes the 2000s entirely,
+which is where the ETF illiquidity lives. E1 therefore shows only 6 of 29 names
+with sub-floor bars (635 bars) against 27 of 29 (38,573 bars) in the
+`.e8e9_cache`. E1's two arms are comparable to each other and NOT to the other
+seven.
+
+### 2e. A wrong number caught before it was published
+
+The first run banner reported "29 of 29 names blocked". It was counting the
+unmeasurable warm-up prefix -- the first 9 bars of every series, 261 bars in
+total, where the mask fails closed because there is nothing yet to measure --
+together with genuine sub-floor bars. The banner now reports the two separately.
+The substantive figure is **27 names / 38,573 bars**. Separately, that 27
+differs from FG's 26 because FG swept from 2000-01-01 while `liquidity_mask`
+covers each series in full, so EWJ (listed 1996) enters this count.
+
+Also caught: `prove_liquidity_floor.py` printed "GREEN (12/12)" while 11 cases
+ran, because the total was a hand-written literal. Counts are now derived. A
+checker that miscounts itself is not a checker.
+
+### 2f. What F3 did NOT cover
+
+**E14** (top-3 of the 11 SPDR sectors) was scoped in the prereg as a reported
+count rather than a verdict test, and **was not run** -- the one in-scope item
+this pass did not measure. M12 has no PASS/FAIL to move. E1b and E2 were
+measured out of scope by FG. The 39-name stock set was deliberately not run: 0
+of 260,363 ticker-sessions breach, so wiring the floor there would install a
+guard that cannot fire.
+
+## 3. Graph re-index
+
+Incremental `--update` against the existing `graphify-out/`: 40 changed files
+detected (23 code, 17 documents), of which the record's generated HTML twin was
+excluded -- it is a byte-for-byte restatement of the `.md` in the same list, so
+extracting both would double every entity in the record. AST extraction over the
+changed code produced **227 nodes / 431 edges**. Semantic extraction over the 16
+changed documents was dispatched to two parallel agents (the record on its own,
+everything else together) and is reported separately from this entry.
+
+## Done-check
+
+`swing_bot.test_frozen` -> **`FROZEN TESTS: GREEN (all d=0)`**, run after every
+`swing_bot/` change including `backtest.py`.
+`scripts/prove_liquidity_floor.py` -> **GREEN (11/11)**.
+Every arm of all eight experiments run twice, byte-identical.
+No writes to `swing.db`; `daily_swing_paper.py` and every `.bat` never executed.
+
+## Open after this entry
+
+- **E14** under the floor -- the one in-scope F3 item not measured.
+- **FH's LOWs**, above, including the 5 NULL-`alpaca_order_id` fidelity rows
+  that can never be resolved and that nothing reports.
+- **The shared `append-record-entry.js`** still refuses `<LETTERS>-note`
+  headings in all six repos that use it.
+- **`.e8e9_cache` is 19 days stale** and the whole-cache refresh is still
+  outstanding. It must be all-or-nothing: delete every price-series `*.json` and
+  re-run every consumer in one sitting, or the next partial refresh manufactures
+  a mixed vintage.
+
+# Appendix FO - Graph re-indexed (1,728 nodes, health OK) - but build_merge deleted 9 hyperedges again and 4 are unrecoverable in this run; plus corrections to FN's timestamp and to a token count recorded as zero (2026-09-05, ~18:25 CDT)
+**Session:** 2026-09-05, ~18:25 CDT. Closes the graph re-index Evan asked for,
+and carries two corrections that belong in the record rather than in a chat
+message.
+
+## 1. CORRECTION to FN's own timestamp
+
+FN is stamped **~18:22 CDT**. The `date` call made immediately before writing it
+returned **18:20:50 CDT**. I rounded a timestamp forward, which is inventing one,
+against the standing order that timestamps are read from the clock and never
+estimated. FN is append-only so its heading stands; **the true write time of FN
+is 2026-09-05 ~18:20 CDT.** This is the fourth future-stamp in this project's
+history (three earlier ones are in the record); the earlier three were each
+corrected the same way.
+
+## 2. Graph re-indexed against FK/FL/FM and the backfilled TOC
+
+Incremental `--update`, not a rebuild. **40 changed files** (23 code, 17
+documents); the record's generated HTML twin was excluded, because it is a
+byte-for-byte restatement of the `.md` sitting in the same list and extracting
+both would double every entity in the record.
+
+- AST (deterministic, no LLM): **227 nodes / 431 edges** over the changed code.
+- Semantic: two parallel agents, the record alone and everything else,
+  **382 nodes / 685 edges / 6 hyperedges**.
+- Merged graph: **1,728 nodes, 2,876 edges, 186 communities**, up from 1,665
+  nodes. Health check clean: **0 dangling, 0 missing, 0 self-loop, 0 collapsed
+  edges.** 18 communities named from their own node labels; the remaining 168
+  keep numbered labels rather than invented ones.
+- Highest-degree node is now the record's **Table of Contents at 169 edges** --
+  a direct consequence of FK's backfill, since before today it linked 36 entries
+  and now links every one.
+
+## 3. THE HYPEREDGE-DELETING MERGE BUG RECURRED, and this time 9 were not recoverable
+
+`build_merge` **replaced** the hyperedge set instead of unioning it: 12 existing
+hyperedges went to 6, exactly the 6 produced by this run. This is the same defect
+that deleted 9 hyperedges in the wave-2 merge and was recovered then from
+`git show 3297b1b:graphify-out/graph.json`. The skill's own inline comment claims
+`G.graph["hyperedges"]` holds both sides; it does not.
+
+Caught because `graph.json` was backed up before the merge and the counts were
+compared. Unioning by id restored 18 -- **but 9 of those 18 had dangling
+members**, because the old hyperedges point at nodes from files that were
+re-extracted this run under different ids. A hyperedge asserting a relationship
+among nodes that are not in the graph is worse than no hyperedge, so the 9 were
+dropped rather than restored:
+
+**Superseded by a new equivalent, so the concept survives:**
+`guard_that_cannot_fire_defect_family` -> `guard_that_cannot_fire_family`;
+`three_sleeve_forward_paper_loop` -> `m3_forward_evidence_loop`;
+`three_live_paper_sleeves` -> `live_paper_sleeve_pipeline`;
+`research_cache_freshness_guard` (1 of 8 members missing) and
+`frozen_tripwire_done_check` (6 of 7).
+
+**GENUINELY LOST, with no replacement in this run's extraction:**
+`v1_validation_harness_stack`, `d1_verdict_machinery`,
+`stale_cache_refusal_chain`, `v3_pbo_scoping_gate`. Those four encoded
+relationships nothing else in the graph now states. They are recoverable from
+`git show 30a5bfa:graphify-out/graph.json` if a later session wants them back
+under re-mapped ids.
+
+**Standing hazard:** any future `--update` on this project will do this again.
+Back up `graphify-out/graph.json` before the merge and compare hyperedge counts
+after -- the merge reports node and edge counts, which both went UP, so nothing
+in its output signals the loss.
+
+## 4. A token count that was recorded as a measurement and was not
+
+The cost tracker wrote `input_tokens: 0, output_tokens: 0` for this run, because
+the chunk files carry placeholder zeros and I did not write the agents' real
+usage back into them before merging. Zero is not a measurement of an extraction
+that plainly cost something.
+
+Corrected in `graphify-out/cost.json`: the two extraction agents reported
+**120,256 and 155,017 tokens, combined 275,273**, and the harness gave no
+input/output split -- so the combined figure is recorded under its own field with
+a note saying the 0/0 are NOT a measurement. **The split was not invented**,
+which is the specific error made on 2026-08-13 with a fabricated
+`output_tokens: 47000` and corrected then. AST extraction used no LLM at all.
+
+## Done-check
+
+`swing_bot.test_frozen` -> `FROZEN TESTS: GREEN (all d=0)`.
+`scripts/prove_liquidity_floor.py` -> GREEN (11/11).
+Graph health check -> OK. Nothing run against `swing.db` except `mode=ro` reads.
+
+## Open after this entry
+
+- **Four hyperedges genuinely lost**, listed above, recoverable from `30a5bfa`.
+- **`build_merge` hyperedge replacement** -- upstream defect in a shared skill,
+  affecting every project that runs `/graphify --update`, not just this one.
+- **E14 under the F3 floor** -- still the one in-scope item not measured.
+- **`.e8e9_cache` whole-cache refresh** still outstanding; it must be
+  all-or-nothing.

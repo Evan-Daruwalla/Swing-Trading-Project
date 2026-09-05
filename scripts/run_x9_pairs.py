@@ -30,7 +30,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_e8_squeeze import cache_fetch
+from run_e8_squeeze import cache_fetch, f3_masks_by_date
 from run_e18_regime_gates import stats
 from swing_bot.universe import UNIVERSE
 
@@ -101,6 +101,10 @@ def corr(a, b):
 
 def main():
     px = load()
+    # F3 (2026-09-05): masks come from the SAME cache_fetch bars load() reads;
+    # load() keeps only (open, close) per date and drops volume, so they are
+    # built here rather than by reshaping px.
+    LIQ = f3_masks_by_date({t: cache_fetch(t) for t in sorted(px)})
     tickers = sorted(px)
     all_dates = sorted(set().union(*[set(v) for v in px.values()]))
     dates = [d for d in all_dates if sum(1 for t in tickers if d in px[t]) >= 10]
@@ -145,7 +149,11 @@ def main():
         # ---------- re-form every TRADE_N sessions ----------
         if i - form_end >= TRADE_N:
             w = dates[i - FORM_N:i]
-            elig = [t for t in tickers if all(dd in px[t] for dd in w)]
+            # F3: a name that is not liquid at the formation window's LAST
+            # session never becomes a pair candidate. Past-only -- w ends at
+            # dates[i-1], before this decision.
+            elig = [t for t in tickers if all(dd in px[t] for dd in w)
+                    and (LIQ is None or LIQ[t].get(w[-1], False))]
             norm = {}
             for t in elig:
                 base = px[t][w[0]][1]

@@ -72,3 +72,21 @@ Trading-read-only + EOD-only rules are also always-load INDEX invariants.
   volume excludes the name rather than skipping the check. The INDEX invariant
   "liquidity floor is MANDATORY" was previously unenforceable on exactly the
   names most likely to need it.
+
+## The two price stores have DIFFERENT WINDOWS (added 2026-09-05, record FN)
+- `swing.db` `bars` spans **2014-01-02 -> 2026-07-08** (105,396 rows, 34
+  tickers). `.e8e9_cache` spans **1998-12-22 -> 2026-08-17**. They are not
+  interchangeable and results from one are NOT comparable to the other.
+- **Consequence measured in F3:** under the same liquidity floor, `swing.db`
+  shows 6 of 29 names with a sub-floor bar (635 bars) while `.e8e9_cache` shows
+  27 of 29 (38,573 bars). The difference is entirely the 2000s, which `swing.db`
+  does not contain and which is where the ETF illiquidity lives. Any claim about
+  how often the floor binds MUST name which store it was measured on.
+- As of 2026-09-05 `.e8e9_cache` is **19 days stale** -- all 181 price-series
+  files end 2026-08-17, uniformly. Stale but NOT mixed. `SWING_ALLOW_STALE_CACHE=1`
+  is the documented escape hatch for a deliberately historical run and is what
+  the F3 A/B used, so both arms read a byte-identical snapshot.
+- **The liquidity floor is now enforced in the RESEARCH runners too** (E1, E8,
+  E9, E11, E12, C3, E20, X9), not only the live loop. The INDEX invariant
+  "liquidity floor is MANDATORY in any universe filter" was true nowhere in
+  research until 2026-09-05.

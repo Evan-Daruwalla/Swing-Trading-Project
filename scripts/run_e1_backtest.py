@@ -12,6 +12,7 @@ Imported by: no other module (standalone runner).
 """
 # DATA CONVENTION: prices are SPLIT-ADJUSTED, DIVIDEND-UNADJUSTED (auto_adjust=False)
 # -- swing_bot/prices.py & the shared cache both enforce it; stated here per CLAUDE.md.
+import os
 import sqlite3
 import sys
 from pathlib import Path
@@ -40,12 +41,60 @@ def subset_db(src, start=None, end=None):
 
 def show(label, conn, entries=None, fill="next_open", cost_bps=5.0):
     m = backtest.metrics(backtest.run_backtest(
-        conn, entries=entries, fill=fill, cost_bps=cost_bps))
+        conn, entries=entries, fill=fill, cost_bps=cost_bps,
+        liq=f3_liq(conn, entries)))
     print(f"{label:28} n={m['n_trades']:>5} "
           f"exp/trade={m['mean_net_ret']*10000:>7.1f}bps "
           f"Sharpe={m['ann_sharpe']:>6.2f} maxDD={m['max_dd']*100:>5.1f}% "
           f"CAGR={m['cagr']*100:>6.2f}% hold={m['mean_hold']:.1f}")
     return m
+
+
+F3_FLOOR = os.environ.get("SWING_F3_FLOOR", "1") != "0"
+_F3_CACHE = {}
+
+
+def f3_liq(conn, entries):
+    """{ticker: {date: eligible}} under the liquidity floor, or None when the arm
+    is OFF (F3, 2026-09-05, prereg_f3_liquidity_floor_etf_scope.md).
+
+    Reads close+volume from swing.db directly rather than through
+    backtest._load, which drops volume — see the note in run_backtest's
+    docstring. Cached per entry-set because show() is called many times per run
+    and the mask does not change between them.
+
+    DATA VINTAGE: swing.db `bars` is the BACKTEST store and is stale since
+    2026-07-08 (record FH). That is fine for an A/B — both arms read the same
+    rows — but E1's numbers here are NOT comparable to the .e8e9_cache runs
+    (E8/E9/E11/E12/C3), which are pinned at 2026-08-17.
+    """
+    if not F3_FLOOR:
+        print("  [F3 liquidity floor: OFF -- pre-F3 path, SWING_F3_FLOOR=0]")
+        return None
+    key = tuple(e.ticker for e in (entries or universe.UNIVERSE))
+    if key in _F3_CACHE:
+        return _F3_CACHE[key]
+    from swing_bot import universe as _u
+    out, sub = {}, {}
+    for tk in key:
+        rows = conn.execute(
+            "SELECT date, close, volume FROM bars WHERE ticker=? ORDER BY date",
+            (tk,)).fetchall()
+        # liquidity_mask wants the shared bar layout; close_ix/vol_ix name where
+        # they are in THIS tuple rather than reshaping the rows.
+        mask = _u.liquidity_mask(rows, close_ix=1, vol_ix=2)
+        out[tk] = {r[0]: m for r, m in zip(rows, mask)}
+        n = sum(1 for i in range(9, len(mask)) if not mask[i])
+        if n:
+            sub[tk] = n
+    print("  [F3 liquidity floor: ON at $%.0fM/day -- %d of %d names have a "
+          "MEASURABLE sub-floor bar (%d bars); swing.db vintage]"
+          % (_u.MIN_MEDIAN_DOLLAR_VOL / 1e6, len(sub), len(key), sum(sub.values())))
+    if sub:
+        top = sorted(sub.items(), key=lambda kv: -kv[1])[:8]
+        print("   sub-floor bars: " + ", ".join("%s %d" % kv for kv in top))
+    _F3_CACHE[key] = out
+    return out
 
 
 def main():

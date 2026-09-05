@@ -104,3 +104,29 @@ they apply to any yfinance-based pipeline built here:
   Table of Contents had stopped at Appendix AI. **The shared checker still
   refuses `<LETTERS>-note` in all six repos that use it; this project no longer
   has one, but the next repo to write one wedges the same way.**
+- 2026-09-05 (F3, record FN, measured): **a filter can destroy a verdict without
+  changing a single return -- by starving the sample.** Adding the liquidity
+  floor cut E11's gate sample from 46 closed trades to 24, under its own
+  pre-registered `n>=30` minimum, so E11 stopped returning FAIL and started
+  returning INCONCLUSIVE. Not better, not worse: the experiment lost the right
+  to a verdict. **Rule: when adding any screen to a closed experiment, check the
+  post-screen n against that experiment's own minimum BEFORE reading its
+  metrics** -- otherwise a sample-size failure gets read as a performance result.
+- 2026-09-05 (F3, record FN, measured): **candidate SUPPLY, not strategy
+  mechanics, governs how much a universe screen moves a backtest.** Three
+  pre-registered predictions reasoned from mechanics -- hold duration (E9 holds
+  longest so should move most), selection style (E20 has no ranking so should
+  move least), pool size (X9 should trade less) -- and all three were wrong. E9
+  moved LEAST (-1.9%), E20 moved -14%, and X9 traded MORE (2,196 -> 2,502
+  opens), because removing names changes WHICH pairs are the K=3 lowest-SSD and
+  the replacements converge more often. A screen's impact tracks how many
+  candidates a strategy had to begin with.
+- 2026-09-05: **`.py` files in this repo are NOT uniformly LF.**
+  `run_e8_squeeze.py`, `daily_swing_paper.py`, `backtest.py`, `universe.py` and
+  `run_x9_pairs.py` are LF; `run_e11_volgated_breakout.py`,
+  `run_e12_confirmed_capitulation.py`, `run_e9_deepdip.py`,
+  `run_c3_vol_breakout.py`, `run_e20_dividend_capture.py` and
+  `run_e1_backtest.py` are CRLF. A patch script that inserts LF newlines into a
+  CRLF file creates mixed endings silently -- and a multi-line search pattern
+  written with LF simply does NOT MATCH a CRLF file, which reads like the code
+  having changed. Detect the file's EOL and convert patterns to it.

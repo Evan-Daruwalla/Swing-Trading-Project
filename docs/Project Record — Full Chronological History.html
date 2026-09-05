@@ -252,7 +252,9 @@ the dated entry, not the digest.</p>
 - <a href="#appendix-fj---the-live-ledger-has-been-contaminated-since-2026-08-25-and-e6_1x-has-recorded-nothing-for-five-sessions-every-guard-fired-correctly-nobody-was-listening-2026-09-01-2215-cdt">FJ — The LIVE LEDGER has been contaminated since 2026-08-25 and e6_1x has recorded NOTHING for five sessions. Every guard fired correctly; nobody was listening</a> (09-01)<br />
 - <a href="#appendix-fk---the-record-itself-had-been-wedged-for-54-days---one-malformed-heading-refused-every-append-which-is-why-the-2026-09-05-audit-left-no-trace-plus-a-missed-session-detector-blind-per-sleeve-2026-09-05-1622-cdt">FK — The record itself had been WEDGED for 54 days - one malformed heading refused every append, which is why the 2026-09-05 audit left no trace; plus a missed-session detector blind per sleeve</a> (09-05)<br />
 - <a href="#appendix-fl---evans-three-calls-the-five-e6_1x-nav-holes-are-permanent-the-post-09-01-ledger-write-stays-unattributed---but-reading-the-cleanup-script-bounded-it-to-two-synthetic-rows-and-the-arithmetic-reconciles-to-the-row-2026-09-05-1748-cdt">FL — Evan's three calls: the five e6_1x NAV holes are permanent, the post-09-01 ledger write stays unattributed - but reading the cleanup script bounded it to two synthetic rows and the arithmetic reconciles to the row</a> (09-05)<br />
-- <a href="#appendix-fm---committed-87db1c2-not-pushed-the-append-only-guard-fired-on-exactly-one-line-and-was-bypassed-on-evans-call-with-the-blast-radius-measured-first-2026-09-05-1755-cdt">FM — Committed 87db1c2 (not pushed); the append-only guard fired on exactly one line and was bypassed on Evan's call, with the blast radius measured first</a> (09-05)</p>
+- <a href="#appendix-fm---committed-87db1c2-not-pushed-the-append-only-guard-fired-on-exactly-one-line-and-was-bypassed-on-evans-call-with-the-blast-radius-measured-first-2026-09-05-1755-cdt">FM — Committed 87db1c2 (not pushed); the append-only guard fired on exactly one line and was bypassed on Evan's call, with the blast radius measured first</a> (09-05)<br />
+- <a href="#appendix-fn---f3-redirect-executed-across-all-8-etf-experiments-no-verdict-flipped-to-pass-e11-lost-its-verdict-to-sample-starvation-and-3-of-5-pre-registered-predictions-were-falsified-also-fhs-two-highs-were-already-fixed-and-i-had-reported-them-open-2026-09-05-1822-cdt">FN — F3 redirect EXECUTED across all 8 ETF experiments: no verdict flipped to PASS, E11 lost its verdict to sample starvation, and 3 of 5 pre-registered predictions were falsified. Also: FH's two HIGHs were already fixed and I had reported them open</a> (09-05)<br />
+- <a href="#appendix-fo---graph-re-indexed-1728-nodes-health-ok---but-build_merge-deleted-9-hyperedges-again-and-4-are-unrecoverable-in-this-run-plus-corrections-to-fns-timestamp-and-to-a-token-count-recorded-as-zero-2026-09-05-1825-cdt">FO — Graph re-indexed (1,728 nodes, health OK) - but build_merge deleted 9 hyperedges again and 4 are unrecoverable in this run; plus corrections to FN's timestamp and to a token count recorded as zero</a> (09-05)</p>
 <hr />
 <h2 id="phase-0--inception-and-doc-system-bootstrap-2026-07-08">Phase 0 — Inception and doc-system bootstrap (2026-07-08)</h2>
 <p><strong>WHAT:</strong> Project created. Evan's brief: build a bot that swing trades —<br />
@@ -8043,6 +8045,288 @@ them wedges that repo's record silently, and the wedge is only visible when a<br
 session tries to append - which is how this one went 54 days unnoticed. Patching<br />
 the shared checker needs write access to <code>~/.claude/skills/project-memory/</code>,<br />
 which was denied to the session that first tried.</p>
+<h1 id="appendix-fn---f3-redirect-executed-across-all-8-etf-experiments-no-verdict-flipped-to-pass-e11-lost-its-verdict-to-sample-starvation-and-3-of-5-pre-registered-predictions-were-falsified-also-fhs-two-highs-were-already-fixed-and-i-had-reported-them-open-2026-09-05-1822-cdt">Appendix FN - F3 redirect EXECUTED across all 8 ETF experiments: no verdict flipped to PASS, E11 lost its verdict to sample starvation, and 3 of 5 pre-registered predictions were falsified. Also: FH's two HIGHs were already fixed and I had reported them open (2026-09-05, ~18:22 CDT)</h1>
+<p><strong>Session:</strong> 2026-09-05, ~17:55-18:20 CDT. Continues FM. Evan asked for four<br />
+things: FH's two HIGHs, the F3 redirect from FG, and a graph re-index. One of<br />
+those four turned out to be already done, and saying so is the first item.</p>
+<h2 id="1-fhs-two-highs-were-already-fixed-i-reported-them-as-open-without-checking">1. FH's two HIGHs were ALREADY FIXED. I reported them as open without checking</h2>
+<p>FH (2026-08-20) recorded two HIGH findings and the line "nothing fixed". HANDOFF<br />
+carried that forward. I repeated it in this session's summary. <strong>All three of us<br />
+were wrong</strong> — the 2026-08-25 audit session fixed both, and they landed in<br />
+commit <code>509852e</code>.</p>
+<ul>
+<li><strong>"The run exits 0 when credentials die during market hours."</strong> FIXED.<br />
+<code>market_is_open()</code> now returns <code>(is_open, creds_outage)</code> and a total<br />
+  credential outage appends to <code>RUN_FAILURES</code><br />
+  (<code>scripts/daily_swing_paper.py:275</code>). The fill-divergence backfill path<br />
+  (<code>:314</code>) and the mirror path (<code>:387</code>) flag their own credential failures too.<br />
+  The code is labelled "finding 1a / 1b, 2026-08-25".</li>
+<li><strong>"A missing price marks NAV at cost basis, silently."</strong> FIXED. <code>mark_nav()</code><br />
+  REFUSES and returns None (<code>:586-593</code>). The old expression<br />
+<code>close_px.get(t) or p["entry_price"]</code> survives only inside the docstring that<br />
+  explains the bug. Labelled "finding 2, 2026-08-25". <strong>This is the same refusal<br />
+  that FJ found halting e6_1x for five sessions</strong> -- the fix worked, and nobody<br />
+  read the exit code.</li>
+<li>Also closed since FH: <code>costs.py:56</code> now calls <code>prices.connect_ro</code> instead of<br />
+  holding a second copy of the connection string.</li>
+</ul>
+<p><strong>Still open from FH, all LOW:</strong> <code>DB_PATH</code> defined independently in<br />
+<code>prices.py:33</code> and <code>paper_sleeves.py:40</code>; <code>universe.py</code>'s present-tense "wide<br />
+margin" claim (now fixed as part of F3, see below); possibly-unused imports at<br />
+<code>run_m10_1_nagel_switch.py:28-29</code>; and 5 of 10 <code>fill_divergence</code> rows carrying a<br />
+NULL <code>alpaca_order_id</code>, structurally excluded from backfill and therefore<br />
+permanently unmeasurable, with nothing reporting that half of M3's only fidelity<br />
+instrument is dark.</p>
+<p><strong>The lesson is not "FH was wrong."</strong> FH was right on 2026-08-20. The failure is<br />
+that a status line written once was still being quoted 16 days later by me,<br />
+without anyone re-reading the code. That is the same defect class as the stale<br />
+BLOCKED rows in FL section 5, and this is its fourth appearance.</p>
+<h2 id="2-f3-redirect-executed-end-to-end-no-verdict-flipped-to-pass-one-lost-its-verdict">2. F3 REDIRECT: executed end to end. No verdict flipped to PASS; one lost its verdict</h2>
+<p>Full results: <code>docs/research/2026-09-05_F3_liquidity_floor_etf_results.md</code>.<br />
+Pre-registration <code>docs/prereg_f3_liquidity_floor_etf_scope.md</code> committed<br />
+DOC-ONLY at <code>6a23a9a</code>, amendment at <code>2f0a8a4</code>, both BEFORE any runner code<br />
+changed. That ordering is checkable in <code>git log</code> and is the only thing that<br />
+makes the predictions below meaningful.</p>
+<h3 id="2a-the-prereg-had-to-be-amended-before-running-for-a-data-reason">2a. The prereg had to be amended before running, for a data reason</h3>
+<p><code>.e8e9_cache</code> was <strong>19 days stale</strong> -- every price series ends 2026-08-17 against<br />
+a 5-day tolerance -- and <code>cache_fetch</code> raised <code>StaleCacheError</code> and refused to<br />
+run, exactly as designed. So the parent prereg's fourth stop condition<br />
+("floor-OFF must reproduce the recorded FAIL numbers") was unmeetable for a<br />
+reason having nothing to do with the floor: the recorded verdicts came from<br />
+earlier vintages.</p>
+<p>Measured before choosing: <strong>all 181 price-series files share the SAME end date.</strong><br />
+Stale, but NOT mixed -- the failure mode that overstated M12's headline 3x<br />
+(record EM/EO) is absent. So the vintage was PINNED at 2026-08-17 rather than<br />
+refreshed, because F3 asks whether the floor changes these experiments, and that<br />
+is only answerable if the floor is the only thing differing between the arms. A<br />
+refresh changes the data and the floor at once. The stop condition was replaced,<br />
+not dropped: everything halts if a floor-OFF baseline produces a different<br />
+VERDICT from the recorded one. None did.</p>
+<h3 id="2b-results">2b. Results</h3>
+<table>
+<thead>
+<tr>
+<th>experiment</th>
+<th>verdict OFF -&gt; ON</th>
+<th>trades OFF -&gt; ON</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1 IBS</td>
+<td>FAIL -&gt; FAIL</td>
+<td>3,559 -&gt; 3,534</td>
+</tr>
+<tr>
+<td>E8 squeeze</td>
+<td>FAIL -&gt; FAIL</td>
+<td>341 -&gt; 276</td>
+</tr>
+<tr>
+<td>E9 deep-dip</td>
+<td>FAIL -&gt; FAIL</td>
+<td>53 -&gt; 52</td>
+</tr>
+<tr>
+<td><strong>E11 vol-gated</strong></td>
+<td><strong>FAIL -&gt; INCONCLUSIVE</strong></td>
+<td>61 -&gt; 39</td>
+</tr>
+<tr>
+<td>E12 capitulation</td>
+<td>FAIL -&gt; FAIL</td>
+<td>130 -&gt; 106</td>
+</tr>
+<tr>
+<td>C3 vol breakout</td>
+<td>FAIL -&gt; FAIL</td>
+<td>607 -&gt; 488</td>
+</tr>
+<tr>
+<td>E20 dividend capture</td>
+<td>FAIL -&gt; FAIL</td>
+<td>2,345 -&gt; 2,011</td>
+</tr>
+<tr>
+<td>X9 pairs</td>
+<td>FAIL -&gt; FAIL</td>
+<td>2,196 -&gt; <strong>2,502</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Every arm run twice, every pair byte-identical.</p>
+<p><strong>The two findings worth carrying forward:</strong></p>
+<p><strong>The floor can destroy a verdict by starving the sample.</strong> E11's gate sample<br />
+fell from 46 closed trades to 24, under its own pre-registered n&gt;=30 minimum, so<br />
+E11 no longer returns FAIL -- it returns INCONCLUSIVE. Not better, not worse:<br />
+the experiment lost the right to a verdict. E11 is E8's rules plus RVOL&gt;=1.5, so<br />
+it already had the thinnest sample in the set. The prereg anticipated the shape<br />
+of this (section 4's "coverage result" clause) but predicted it as a<br />
+basket-formation failure, not a sample-size one.</p>
+<p><strong>The illiquid names were carrying half of C3's drawdown.</strong> C3's gate maxDD fell<br />
+31.7% -&gt; 17.1%, a 46% cut, while gate CAGR moved only 3.62% -&gt; 3.20% and Sharpe<br />
+0.37 -&gt; 0.36. Risk removed almost without removing return. C3 still FAILs both<br />
+bars so nothing is banked, but it is the clearest evidence the floor does real<br />
+work. E12 points the same way (maxDD 55.0% -&gt; 45.5%).</p>
+<h3 id="2c-three-of-five-pre-registered-predictions-falsified">2c. Three of five pre-registered predictions FALSIFIED</h3>
+<ul>
+<li><strong>P1</strong> (picks move) CONFIRMED -- all six named experiments changed picks.</li>
+<li><strong>P2</strong> (no FAIL flips to PASS) HELD -- section 4's central protection was<br />
+  never needed.</li>
+<li><strong>P3</strong> (E9 most affected, because K=5 with no stop holds an illiquid name<br />
+  longest) <strong>FALSIFIED</strong> -- E9 moved LEAST of that set (-1.9%); E11 moved most<br />
+  (-36%).</li>
+<li><strong>P4</strong> (E20 moves least, because ex-dates drive it rather than a ranking)<br />
+<strong>FALSIFIED</strong> -- E20 moved -14% against E1's -0.7%. Having no ranking is not<br />
+  protection; it means every screened-out name is simply a capture not taken.</li>
+<li><strong>P5</strong> (X9's pair count drops) <strong>FALSIFIED IN THE OPPOSITE DIRECTION</strong> -- X9<br />
+  opened MORE trades, 2,196 -&gt; 2,502. Removing illiquid names from the formation<br />
+  pool changes WHICH pairs are the K=3 lowest-SSD, and the replacements converge<br />
+  more often. The candidate pool shrinks; activity rises.</li>
+</ul>
+<p>Every one of P3, P4 and P5 reasoned from strategy mechanics -- hold duration,<br />
+selection style, pool size. In all three cases the answer turned on candidate<br />
+SUPPLY instead. That is the transferable lesson, and it exists only because the<br />
+predictions were written down before the runs.</p>
+<h3 id="2d-how-the-frozen-tripwire-survived-a-change-to-backtestpy">2d. How the frozen tripwire survived a change to backtest.py</h3>
+<p><code>swing_bot/backtest.py</code> is what <code>test_frozen</code> pins (E1/E1b/E2 at d=+-0.0000pp).<br />
+The screen was added as <code>run_backtest(..., liq=None)</code> where <strong>None is the pre-F3<br />
+path byte-for-byte</strong>; the tripwire calls the function without the argument, so<br />
+the 12 references are untouched BY DESIGN, and the docstring says so, so nobody<br />
+"tidies up" the default later. <code>_load</code>'s SELECT still deliberately drops volume:<br />
+widening its <code>(o,h,l,c)</code> tuple would break every <code>bar[1]/bar[2]/bar[3]</code> index on<br />
+the pinned paths, so E1's runner builds the mask from <code>swing.db</code> itself.</p>
+<p><strong>Vintage caveat, stated because it changes how E1's numbers may be used:</strong><br />
+<code>swing.db bars</code> spans 2014-01-02 to 2026-07-08 and excludes the 2000s entirely,<br />
+which is where the ETF illiquidity lives. E1 therefore shows only 6 of 29 names<br />
+with sub-floor bars (635 bars) against 27 of 29 (38,573 bars) in the<br />
+<code>.e8e9_cache</code>. E1's two arms are comparable to each other and NOT to the other<br />
+seven.</p>
+<h3 id="2e-a-wrong-number-caught-before-it-was-published">2e. A wrong number caught before it was published</h3>
+<p>The first run banner reported "29 of 29 names blocked". It was counting the<br />
+unmeasurable warm-up prefix -- the first 9 bars of every series, 261 bars in<br />
+total, where the mask fails closed because there is nothing yet to measure --<br />
+together with genuine sub-floor bars. The banner now reports the two separately.<br />
+The substantive figure is <strong>27 names / 38,573 bars</strong>. Separately, that 27<br />
+differs from FG's 26 because FG swept from 2000-01-01 while <code>liquidity_mask</code><br />
+covers each series in full, so EWJ (listed 1996) enters this count.</p>
+<p>Also caught: <code>prove_liquidity_floor.py</code> printed "GREEN (12/12)" while 11 cases<br />
+ran, because the total was a hand-written literal. Counts are now derived. A<br />
+checker that miscounts itself is not a checker.</p>
+<h3 id="2f-what-f3-did-not-cover">2f. What F3 did NOT cover</h3>
+<p><strong>E14</strong> (top-3 of the 11 SPDR sectors) was scoped in the prereg as a reported<br />
+count rather than a verdict test, and <strong>was not run</strong> -- the one in-scope item<br />
+this pass did not measure. M12 has no PASS/FAIL to move. E1b and E2 were<br />
+measured out of scope by FG. The 39-name stock set was deliberately not run: 0<br />
+of 260,363 ticker-sessions breach, so wiring the floor there would install a<br />
+guard that cannot fire.</p>
+<h2 id="3-graph-re-index">3. Graph re-index</h2>
+<p>Incremental <code>--update</code> against the existing <code>graphify-out/</code>: 40 changed files<br />
+detected (23 code, 17 documents), of which the record's generated HTML twin was<br />
+excluded -- it is a byte-for-byte restatement of the <code>.md</code> in the same list, so<br />
+extracting both would double every entity in the record. AST extraction over the<br />
+changed code produced <strong>227 nodes / 431 edges</strong>. Semantic extraction over the 16<br />
+changed documents was dispatched to two parallel agents (the record on its own,<br />
+everything else together) and is reported separately from this entry.</p>
+<h2 id="done-check_2">Done-check</h2>
+<p><code>swing_bot.test_frozen</code> -&gt; <strong><code>FROZEN TESTS: GREEN (all d=0)</code></strong>, run after every<br />
+<code>swing_bot/</code> change including <code>backtest.py</code>.<br />
+<code>scripts/prove_liquidity_floor.py</code> -&gt; <strong>GREEN (11/11)</strong>.<br />
+Every arm of all eight experiments run twice, byte-identical.<br />
+No writes to <code>swing.db</code>; <code>daily_swing_paper.py</code> and every <code>.bat</code> never executed.</p>
+<h2 id="open-after-this-entry_2">Open after this entry</h2>
+<ul>
+<li><strong>E14</strong> under the floor -- the one in-scope F3 item not measured.</li>
+<li><strong>FH's LOWs</strong>, above, including the 5 NULL-<code>alpaca_order_id</code> fidelity rows<br />
+  that can never be resolved and that nothing reports.</li>
+<li><strong>The shared <code>append-record-entry.js</code></strong> still refuses <code>&lt;LETTERS&gt;-note</code><br />
+  headings in all six repos that use it.</li>
+<li><strong><code>.e8e9_cache</code> is 19 days stale</strong> and the whole-cache refresh is still<br />
+  outstanding. It must be all-or-nothing: delete every price-series <code>*.json</code> and<br />
+  re-run every consumer in one sitting, or the next partial refresh manufactures<br />
+  a mixed vintage.</li>
+</ul>
+<h1 id="appendix-fo---graph-re-indexed-1728-nodes-health-ok---but-build_merge-deleted-9-hyperedges-again-and-4-are-unrecoverable-in-this-run-plus-corrections-to-fns-timestamp-and-to-a-token-count-recorded-as-zero-2026-09-05-1825-cdt">Appendix FO - Graph re-indexed (1,728 nodes, health OK) - but build_merge deleted 9 hyperedges again and 4 are unrecoverable in this run; plus corrections to FN's timestamp and to a token count recorded as zero (2026-09-05, ~18:25 CDT)</h1>
+<p><strong>Session:</strong> 2026-09-05, ~18:25 CDT. Closes the graph re-index Evan asked for,<br />
+and carries two corrections that belong in the record rather than in a chat<br />
+message.</p>
+<h2 id="1-correction-to-fns-own-timestamp">1. CORRECTION to FN's own timestamp</h2>
+<p>FN is stamped <strong>~18:22 CDT</strong>. The <code>date</code> call made immediately before writing it<br />
+returned <strong>18:20:50 CDT</strong>. I rounded a timestamp forward, which is inventing one,<br />
+against the standing order that timestamps are read from the clock and never<br />
+estimated. FN is append-only so its heading stands; <strong>the true write time of FN<br />
+is 2026-09-05 ~18:20 CDT.</strong> This is the fourth future-stamp in this project's<br />
+history (three earlier ones are in the record); the earlier three were each<br />
+corrected the same way.</p>
+<h2 id="2-graph-re-indexed-against-fkflfm-and-the-backfilled-toc">2. Graph re-indexed against FK/FL/FM and the backfilled TOC</h2>
+<p>Incremental <code>--update</code>, not a rebuild. <strong>40 changed files</strong> (23 code, 17<br />
+documents); the record's generated HTML twin was excluded, because it is a<br />
+byte-for-byte restatement of the <code>.md</code> sitting in the same list and extracting<br />
+both would double every entity in the record.</p>
+<ul>
+<li>AST (deterministic, no LLM): <strong>227 nodes / 431 edges</strong> over the changed code.</li>
+<li>Semantic: two parallel agents, the record alone and everything else,<br />
+<strong>382 nodes / 685 edges / 6 hyperedges</strong>.</li>
+<li>Merged graph: <strong>1,728 nodes, 2,876 edges, 186 communities</strong>, up from 1,665<br />
+  nodes. Health check clean: <strong>0 dangling, 0 missing, 0 self-loop, 0 collapsed<br />
+  edges.</strong> 18 communities named from their own node labels; the remaining 168<br />
+  keep numbered labels rather than invented ones.</li>
+<li>Highest-degree node is now the record's <strong>Table of Contents at 169 edges</strong> --<br />
+  a direct consequence of FK's backfill, since before today it linked 36 entries<br />
+  and now links every one.</li>
+</ul>
+<h2 id="3-the-hyperedge-deleting-merge-bug-recurred-and-this-time-9-were-not-recoverable">3. THE HYPEREDGE-DELETING MERGE BUG RECURRED, and this time 9 were not recoverable</h2>
+<p><code>build_merge</code> <strong>replaced</strong> the hyperedge set instead of unioning it: 12 existing<br />
+hyperedges went to 6, exactly the 6 produced by this run. This is the same defect<br />
+that deleted 9 hyperedges in the wave-2 merge and was recovered then from<br />
+<code>git show 3297b1b:graphify-out/graph.json</code>. The skill's own inline comment claims<br />
+<code>G.graph["hyperedges"]</code> holds both sides; it does not.</p>
+<p>Caught because <code>graph.json</code> was backed up before the merge and the counts were<br />
+compared. Unioning by id restored 18 -- <strong>but 9 of those 18 had dangling<br />
+members</strong>, because the old hyperedges point at nodes from files that were<br />
+re-extracted this run under different ids. A hyperedge asserting a relationship<br />
+among nodes that are not in the graph is worse than no hyperedge, so the 9 were<br />
+dropped rather than restored:</p>
+<p><strong>Superseded by a new equivalent, so the concept survives:</strong><br />
+<code>guard_that_cannot_fire_defect_family</code> -&gt; <code>guard_that_cannot_fire_family</code>;<br />
+<code>three_sleeve_forward_paper_loop</code> -&gt; <code>m3_forward_evidence_loop</code>;<br />
+<code>three_live_paper_sleeves</code> -&gt; <code>live_paper_sleeve_pipeline</code>;<br />
+<code>research_cache_freshness_guard</code> (1 of 8 members missing) and<br />
+<code>frozen_tripwire_done_check</code> (6 of 7).</p>
+<p><strong>GENUINELY LOST, with no replacement in this run's extraction:</strong><br />
+<code>v1_validation_harness_stack</code>, <code>d1_verdict_machinery</code>,<br />
+<code>stale_cache_refusal_chain</code>, <code>v3_pbo_scoping_gate</code>. Those four encoded<br />
+relationships nothing else in the graph now states. They are recoverable from<br />
+<code>git show 30a5bfa:graphify-out/graph.json</code> if a later session wants them back<br />
+under re-mapped ids.</p>
+<p><strong>Standing hazard:</strong> any future <code>--update</code> on this project will do this again.<br />
+Back up <code>graphify-out/graph.json</code> before the merge and compare hyperedge counts<br />
+after -- the merge reports node and edge counts, which both went UP, so nothing<br />
+in its output signals the loss.</p>
+<h2 id="4-a-token-count-that-was-recorded-as-a-measurement-and-was-not">4. A token count that was recorded as a measurement and was not</h2>
+<p>The cost tracker wrote <code>input_tokens: 0, output_tokens: 0</code> for this run, because<br />
+the chunk files carry placeholder zeros and I did not write the agents' real<br />
+usage back into them before merging. Zero is not a measurement of an extraction<br />
+that plainly cost something.</p>
+<p>Corrected in <code>graphify-out/cost.json</code>: the two extraction agents reported<br />
+<strong>120,256 and 155,017 tokens, combined 275,273</strong>, and the harness gave no<br />
+input/output split -- so the combined figure is recorded under its own field with<br />
+a note saying the 0/0 are NOT a measurement. <strong>The split was not invented</strong>,<br />
+which is the specific error made on 2026-08-13 with a fabricated<br />
+<code>output_tokens: 47000</code> and corrected then. AST extraction used no LLM at all.</p>
+<h2 id="done-check_3">Done-check</h2>
+<p><code>swing_bot.test_frozen</code> -&gt; <code>FROZEN TESTS: GREEN (all d=0)</code>.<br />
+<code>scripts/prove_liquidity_floor.py</code> -&gt; GREEN (11/11).<br />
+Graph health check -&gt; OK. Nothing run against <code>swing.db</code> except <code>mode=ro</code> reads.</p>
+<h2 id="open-after-this-entry_3">Open after this entry</h2>
+<ul>
+<li><strong>Four hyperedges genuinely lost</strong>, listed above, recoverable from <code>30a5bfa</code>.</li>
+<li><strong><code>build_merge</code> hyperedge replacement</strong> -- upstream defect in a shared skill,<br />
+  affecting every project that runs <code>/graphify --update</code>, not just this one.</li>
+<li><strong>E14 under the F3 floor</strong> -- still the one in-scope item not measured.</li>
+<li><strong><code>.e8e9_cache</code> whole-cache refresh</strong> still outstanding; it must be<br />
+  all-or-nothing.</li>
+</ul>
 </main>
 </body>
 </html>

@@ -24,6 +24,14 @@
       "output_tokens": 0,
       "files": 38,
       "note": "incremental --update; harness reports combined subagent tokens, no in/out split"
+    },
+    {
+      "date": "2026-09-05T23:24:25.712924+00:00",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 39,
+      "measured_combined_subagent_tokens": 275273,
+      "note": "two semantic extraction agents, 120256 + 155017 combined tokens each; harness reported no input/output split, so the 0/0 above are NOT a measurement and must not be read as one. AST extraction used no LLM."
     }
   ],
   "total_input_tokens": 808484,

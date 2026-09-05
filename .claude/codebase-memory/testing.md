@@ -60,3 +60,16 @@ FAIL.
   and the commit went through only with a disclosed `--no-verify` on Evan's
   explicit call (record FM). The "no CI, no coverage tool, run by hand" half of
   that sentence still holds.
+
+## Updated 2026-09-05 (F3, record FN)
+
+- `scripts/prove_liquidity_floor.py` is now **11/11**, adding `liquidity_mask`
+  cases: fail-closed over the first 9 indices of any series, PAST-ONLY masking
+  (recomputing on a truncated prefix must give the identical answer), and a
+  mid-series feed death returning False rather than coasting on an old median.
+- **Its pass counts are DERIVED, not written.** The first version printed
+  "GREEN (12/12)" while 11 cases ran, because the total was a literal. A checker
+  that miscounts itself is not a checker.
+- **Determinism is part of the F3 protocol:** every experiment arm is run twice
+  and the two outputs must be byte-identical before any comparison is believed.
+  All 16 runs (8 experiments x 2 arms) passed.

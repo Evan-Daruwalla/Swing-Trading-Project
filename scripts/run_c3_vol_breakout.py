@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_e8_squeeze import cache_fetch, COST, CAP0
+from run_e8_squeeze import cache_fetch, COST, CAP0, f3_masks_for
 from swing_bot.universe import UNIVERSE
 
 K = 5
@@ -46,6 +46,14 @@ def stats(nav):
     for v in nav:
         peak = max(peak, v); mdd = max(mdd, (peak - v) / peak)
     return dict(cagr=cagr, mdd=mdd, sharpe=sh)
+
+
+# F3 (2026-09-05): load() below keeps only (dates, opens, closes) -- volume is
+# discarded, which is the "runners must stop dropping volume" item in the
+# prereg. Widening that tuple would break every (ds, op, cl) unpack in this
+# file, so the liquidity masks are built here from the SAME cache_fetch bars
+# and threaded into run() instead. Same data, same chokepoint, no reshape.
+LIQ = None
 
 
 def load():
@@ -77,7 +85,7 @@ def signals(dates, cl):
     return entry
 
 
-def run(data, channel_exit, cost, c2c):
+def run(data, channel_exit, cost, c2c, liq=None):
     idx = {t: {d: i for i, d in enumerate(ds)} for t, (ds, _, _) in data.items()}
     entry_sig = {t: signals(ds, cl) for t, (ds, op, cl) in data.items()}
     master = sorted({d for (ds, _, _) in data.values() for d in ds})
@@ -129,7 +137,11 @@ def run(data, channel_exit, cost, c2c):
                 j = max(i for i, dd in enumerate(ds) if dd < d)
                 nav += p["sh"] * cl[j]
         for t, (ds, op, cl) in data.items():
-            if t not in pos and d in idx[t] and entry_sig[t][idx[t][d]]:
+            # F3 (2026-09-05): screen before the entry queue is built, not
+            # after -- pend_entry is consumed in sorted order up to K, so a
+            # name dropped later would still have taken a slot.
+            if (t not in pos and d in idx[t] and entry_sig[t][idx[t][d]]
+                    and (liq is None or liq[t][idx[t][d]])):
                 pend_entry.append(t)
         pend_entry.sort()
         navd[d] = nav
@@ -139,10 +151,12 @@ def run(data, channel_exit, cost, c2c):
 
 def main():
     data = load()
+    global LIQ
+    LIQ = f3_masks_for({e.ticker: cache_fetch(e.ticker) for e in UNIVERSE})
     spy = {b[1]: b[5] for b in cache_fetch("SPY")}
 
     def report(tag, channel_exit, cost, c2c):
-        navd, master, entries = run(data, channel_exit, cost, c2c)
+        navd, master, entries = run(data, channel_exit, cost, c2c, LIQ)
         rows = {}
         for wn, (lo, hi) in [("gate", GATE), ("sec", SEC)]:
             nav = [navd[d] for d in master if lo <= d <= hi]

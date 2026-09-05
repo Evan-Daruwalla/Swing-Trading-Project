@@ -21,7 +21,7 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_e8_squeeze import cache_fetch, CACHE, COST, CAP0
+from run_e8_squeeze import cache_fetch, CACHE, COST, CAP0, f3_masks_by_date
 from swing_bot.universe import UNIVERSE
 import yfinance as yf
 
@@ -65,6 +65,12 @@ def stats(nav):
 def main():
     by_entry = {}          # entry_date -> list of (ticker, net_ret)
     n_trades = 0
+    # F3 (2026-09-05): E20 has no ranking -- every ex-date capture is taken
+    # and same-day captures are equal-weighted -- so the floor drops
+    # individual captures rather than reordering a queue.
+    LIQ = f3_masks_by_date({e.ticker: cache_fetch(e.ticker)
+                            for e in UNIVERSE})
+    n_skipped = 0
     for e in UNIVERSE:
         bars = cache_fetch(e.ticker)
         oc = {b[1]: (b[2], b[5]) for b in bars}
@@ -80,6 +86,11 @@ def main():
             p0 = oc[prior][1]              # close before ex
             p1 = oc[exd][0]               # open on ex-date
             if p0 <= 0:
+                continue
+            # screened on the SIGNAL date (the close before ex), not the
+            # ex-date itself: that is the bar the decision is made on.
+            if LIQ is not None and not LIQ[e.ticker].get(prior, False):
+                n_skipped += 1
                 continue
             net = (p1 - p0) / p0 + amt / p0 - 2 * COST
             by_entry.setdefault(prior, []).append((e.ticker, net))

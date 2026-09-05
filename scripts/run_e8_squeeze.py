@@ -218,6 +218,65 @@ def cache_fetch(ticker, through=None):
     raise RuntimeError(f"could not fetch {ticker}")
 
 
+
+# ---- F3 liquidity floor (2026-09-05, prereg_f3_liquidity_floor_etf_scope.md) ----
+# CLAUDE.md:51 calls the liquidity floor "mandatory in any universe filter". Until
+# F3 it was enforced in exactly one place -- the live M10-1 stress screen -- while
+# 26 of the 29 ETFs in swing_bot.universe.UNIVERSE breach it on 16.07% of
+# ticker-sessions (record FG). Default ON, because that is the rule this project
+# already committed to. SWING_F3_FLOOR=0 selects the pre-F3 path byte-for-byte,
+# which is the A/B baseline the amendment pins.
+F3_FLOOR = os.environ.get("SWING_F3_FLOOR", "1") != "0"
+
+
+def f3_masks_for(bars_by_ticker):
+    """{ticker: liquidity mask} for a loaded `data` dict, or None when the arm is
+    OFF. Prints which arm ran -- an unlabelled number from this engine would be
+    ambiguous against every pinned result recorded before 2026-09-05."""
+    from swing_bot import universe as _u
+    if not F3_FLOOR:
+        print("  [F3 liquidity floor: OFF -- pre-F3 path, SWING_F3_FLOOR=0]",
+              flush=True)
+        return None
+    masks = {t: _u.liquidity_mask(b) for t, b in bars_by_ticker.items()}
+    # Report the two REASONS separately. A single "blocked" count conflates the
+    # unmeasurable warm-up prefix -- the first 9 bars of every series, where the
+    # mask fails closed because there is nothing to measure yet -- with bars whose
+    # median really is under the floor. That reads as 29 of 29 names blocked when
+    # the substantive number is 27, and would have gone into a results doc as one
+    # figure (2026-09-05).
+    warm = {t: sum(1 for i in range(min(9, len(m))) if not m[i])
+            for t, m in masks.items()}
+    sub = {t: sum(1 for i in range(9, len(m)) if not m[i]) for t, m in masks.items()}
+    sub = {t: n for t, n in sub.items() if n}
+    print("  [F3 liquidity floor: ON at $%.0fM/day -- %d of %d names have a "
+          "MEASURABLE sub-floor bar (%d bars); a further %d bars are unmeasurable "
+          "warm-up and fail closed]"
+          % (_u.MIN_MEDIAN_DOLLAR_VOL / 1e6, len(sub), len(masks), sum(sub.values()),
+             sum(warm.values())), flush=True)
+    if sub:
+        top = sorted(sub.items(), key=lambda kv: -kv[1])[:8]
+        print("   sub-floor bars: " + ", ".join("%s %d" % kv for kv in top),
+              flush=True)
+    return masks
+
+
+def f3_masks(data):
+    """f3_masks_for for the common shape, where data[t][0] is the raw bar list."""
+    return f3_masks_for({t: data[t][0] for t in data})
+
+
+def f3_masks_by_date(bars_by_ticker):
+    """{ticker: {date: eligible}} -- for runners that key prices by DATE rather
+    than by bar index (E20, X9). Same masks, different lookup; returns None when
+    the arm is OFF so the caller's `is None` check reads the same everywhere."""
+    masks = f3_masks_for(bars_by_ticker)
+    if masks is None:
+        return None
+    return {t: {b[1]: m for b, m in zip(bars_by_ticker[t], masks[t])}
+            for t in masks}
+
+
 def indicators(bars):
     """Per prereg: SMA20, population sigma20, EMA20 (alpha=2/21, SMA-seeded),
     ATR20 (simple mean of TR), squeeze flag, entry/exit signal arrays."""
@@ -261,8 +320,17 @@ def indicators(bars):
     return dict(close=close, sma=sma, ema=ema, entry=entry)
 
 
-def simulate(data):
-    """Global event-driven sim. data[t] = (bars, ind, date->idx)."""
+def simulate(data, liq=None):
+    """Global event-driven sim. data[t] = (bars, ind, date->idx).
+
+    liq (F3, 2026-09-05): optional {ticker: [bool]} from
+    swing_bot.universe.liquidity_mask, aligned to that ticker's bars.
+    When given, a candidate that is not liquid AS OF THE SIGNAL BAR is
+    dropped BEFORE the ranking below, which is where the liquidity floor
+    belongs -- screening after the sort would let an illiquid name displace
+    a liquid one and then vanish. liq=None reproduces the pre-F3 path
+    exactly, and is what SWING_F3_FLOOR=0 selects.
+    """
     all_dates = sorted({b[1] for t in data for b in data[t][0]
                         if b[1] >= SIM_START})
     cash, nav_prev = CAP0, CAP0
@@ -322,7 +390,7 @@ def simulate(data):
             bars, ind, idx = data[t]
             if d in idx and t not in pos and t not in pend_in:
                 i = idx[d]
-                if ind["entry"][i]:
+                if ind["entry"][i] and (liq is None or liq[t][i]):
                     cands.append((ind["close"][i] / ind["sma"][i] - 1, t))
         cands.sort(reverse=True)
         free = K - len(pos) - len(pend_in)
@@ -361,7 +429,7 @@ def main():
         data[e.ticker] = (bars, indicators(bars), idx)
         print(f"loaded {e.ticker}: {bars[0][1]}..{bars[-1][1]} "
               f"({len(bars)} bars)", flush=True)
-    nav_path, trades, open_pos, last_close = simulate(data)
+    nav_path, trades, open_pos, last_close = simulate(data, f3_masks(data))
     print(f"\ntotal closed trades: {len(trades)}; "
           f"open at end: {list(open_pos)} (marked to last close)")
     gate = window_stats(nav_path, trades, SIM_START, GATE_END)

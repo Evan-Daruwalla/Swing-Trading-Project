@@ -46,14 +46,24 @@ def _load(conn, entries):
 
 def run_backtest(conn, entries=None, fill="next_open", cost_bps=5.0,
                  capital=500.0, k=K, ibs_entry=IBS_ENTRY, ibs_exit=IBS_EXIT,
-                 max_hold=MAX_HOLD, size_on_nav=False):
+                 max_hold=MAX_HOLD, size_on_nav=False, liq=None):
     """size_on_nav=False (v1, default): positions sized at FIXED
     initial-capital/k dollars — can drive cash negative after losses
     (implicit leverage; see gotchas bin, E2 K=1). All E1/E1b/E2 pinned refs
     use this path — do not change its behavior.
     size_on_nav=True (v2, C1 2026-07-09): target = min(prev-close-NAV/k,
     available cash), floored at 0 — sizes shrink with losses, cash can never
-    go negative."""
+    go negative.
+
+    liq (F3, 2026-09-05): optional {ticker: {date: bool}} liquidity eligibility.
+    A candidate that is not liquid on the SIGNAL date is dropped BEFORE the
+    ranking sort below. Defaults to None, which is the pre-F3 path byte-for-byte
+    — swing_bot/test_frozen.py calls this function without the argument, so the
+    12 pinned references are untouched by design, not by luck. Only
+    scripts/run_e1_backtest.py passes masks, and only when SWING_F3_FLOOR is on.
+    _load()'s SELECT deliberately still drops volume: widening its (o,h,l,c)
+    tuple would break every bar[1]/bar[2]/bar[3] index on the pinned paths, so
+    the caller builds the mask from swing.db instead."""
     entries = entries or universe.UNIVERSE
     dates, bars = _load(conn, entries)
     cost = cost_bps / 10000.0
@@ -123,6 +133,8 @@ def run_backtest(conn, entries=None, fill="next_open", cost_bps=5.0,
             bar = bars[tk].get(d)
             if bar is None:
                 continue
+            if liq is not None and not liq.get(tk, {}).get(d, False):
+                continue          # F3: screened before the ranking sort below
             v = signals.ibs(bar[1], bar[2], bar[3])
             if v is not None and v < ibs_entry:
                 cands.append((v, tk))
