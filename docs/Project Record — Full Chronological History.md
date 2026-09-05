@@ -72,6 +72,139 @@ the dated entry, not the digest.
 - [AG — Write-up updated to E7 + M6 packaging; at the deploy wall](#appendix-ag---write-up-updated-to-e7--m6-packaging-readme-tag-at-the-deploy-wall-2026-07-10-0110-local) (07-10)
 - [AH — Evan opens E3 (stock momentum); survivorship-bias design problem](#appendix-ah---evan-opens-e3-stock-momentum-survivorship-bias-design-problem-2026-07-10-0130-local) (07-10)
 - [AI — E3 stock momentum FAIL (clean); all three families now falsified](#appendix-ai---e3-stock-momentum-fail-clean-all-three-families-now-falsified-2026-07-10-0155-local) (07-10)
+- [AJ — Program conclusion written; findings-doc consolidation flagged](#appendix-aj---program-conclusion-written-findings-doc-consolidation-flagged-2026-07-10-0445-local) (07-10)
+- [AK — Project published public on GitHub](#appendix-ak---project-published-public-on-github-2026-07-10-0452-local) (07-10)
+- [AL — Reddit thread analysis; Evan opens E8+E9 (new families)](#appendix-al---reddit-thread-analysis-evan-opens-e8e9-new-families-2026-07-10-0457-local) (07-10)
+- [AM — E8 FAIL + E9 FAIL (both predictions confirmed); 0/10 across five families](#appendix-am---e8-fail--e9-fail-both-predictions-confirmed-010-across-five-families-2026-07-10-0515-local) (07-10)
+- [AN — Evan authorizes push of E8/E9 arc to public repo](#appendix-an---evan-authorizes-push-of-e8e9-arc-to-public-repo-2026-07-10-1943-local) (07-10)
+- [AO — E10/E11/E12 PRE-REGISTRATION (from swing-trading articles) before runners](#appendix-ao---e10e11e12-pre-registration-from-swing-trading-articles-before-runners-2026-07-10-2010-local) (07-10)
+- [AP — E10/E11/E12 all FAIL; article-set arc closed; 0/13 across six families](#appendix-ap---e10e11e12-all-fail-article-set-arc-closed-013-across-six-families-2026-07-10-2010-local) (07-10)
+- [AQ — graphify knowledge graph built](#appendix-aq---graphify-knowledge-graph-built-2026-07-10-2025-local) (07-10)
+- [AR — Research brief: exhaustive swing-strategy catalog](#appendix-ar---research-brief-exhaustive-swing-strategy-catalog-2026-07-10-2040-local) (07-10)
+- [AS — Push of E10-E12 arc + catalog + graph; next-steps planning](#appendix-as---push-of-e10-e12-arc--catalog--graph-next-steps-planning-2026-07-10-2113-local) (07-10)
+- [AT — M7 plan: catalog arc E13-E17 written into PRD](#appendix-at---m7-plan-catalog-arc-e13-e17-written-into-prd-2026-07-10-2120-local) (07-10)
+- [AU — Data-type exploration started](#appendix-au---data-type-exploration-started-2026-07-12-0045-local) (07-12)
+- [AV — Data-type brief done: 6 available, 3 blocked, E18-E20 proposed](#appendix-av---data-type-brief-done-6-available-3-blocked-e18-e20-proposed-2026-07-12-0105-local) (07-12)
+- [AW — D1 APPROVED (risk-adjusted verdict tier); M7b added](#appendix-aw---d1-approved-risk-adjusted-verdict-tier-m7b-added-2026-07-12-0115-local) (07-12)
+- [AX — E13 turn-of-month FAIL (both D1 tiers)](#appendix-ax---e13-turn-of-month-fail-both-d1-tiers-2026-07-12-0125-local) (07-12)
+- [AY — E14 sector momentum FAIL (survivorship-CLEAN; lost to passive)](#appendix-ay---e14-sector-momentum-fail-survivorship-clean-lost-to-passive-2026-07-12-0135-local) (07-12)
+- [AZ — TIMEZONE CORRECTION: record stamps were UTC, adopt CST (UTC-5)](#appendix-az---timezone-correction-record-stamps-were-utc-adopt-cst-utc-5-2026-07-11-2055-cst) (07-11)
+- [BA — E15 earnings-announcement premium FAIL (clean); the decayed-anomaly twin of E10](#appendix-ba---e15-earnings-announcement-premium-fail-clean-the-decayed-anomaly-twin-of-e10-2026-07-11-2115-cst) (07-11)
+- [BB — E16 weekly reversal FAIL (clean); cleared 15% return but blew DD ceiling on survivor flattery](#appendix-bb---e16-weekly-reversal-fail-clean-cleared-15-return-but-blew-dd-ceiling-on-survivor-flattery-2026-07-11-2135-cst) (07-11)
+- [BC — E17 days-to-cover BLOCKED-ON-DATA; M7 catalog arc complete](#appendix-bc---e17-days-to-cover-blocked-on-data-m7-catalog-arc-complete-2026-07-11-2145-cst) (07-11)
+- [BD — E18 regime-gate bake-off: nothing beats 200DMA; VIX-TS is a weak first PASS-RA](#appendix-bd---e18-regime-gate-bake-off-nothing-beats-200dma-vix-ts-is-a-weak-first-pass-ra-2026-07-11-2205-cst) (07-11)
+- [BE — E20 dividend capture FAIL (real but sub-scale + tax-eaten)](#appendix-be---e20-dividend-capture-fail-real-but-sub-scale--tax-eaten-2026-07-11-2225-cst) (07-11)
+- [BF — E19 EDGAR probe: FEASIBLE-BUT-DEFERRED; M7/M7b arcs complete; autonomous wall](#appendix-bf---e19-edgar-probe-feasible-but-deferred-m7m7b-arcs-complete-autonomous-wall-2026-07-11-2235-cst) (07-11)
+- [BG — Pushed M7/M7b arc to public repo](#appendix-bg---pushed-m7m7b-arc-to-public-repo-2026-07-11-2026-cst) (07-11)
+- [BH — E19 authorized + launched: EDGAR Form-4 ingestion running](#appendix-bh---e19-authorized--launched-edgar-form-4-ingestion-running-2026-07-11-2045-cst) (07-11)
+- [BI — E19 ingestion restarted](#appendix-bi---e19-ingestion-restarted-2026-07-12-1527-cst) (07-12)
+- [BJ — E19 ingestion ~17% + research-brief on swing methods kicked off](#appendix-bj---e19-ingestion-17--research-brief-on-swing-methods-kicked-off-2026-07-12-2304-cst) (07-12)
+- [BK — Full swing-method survey delivered (research-brief, 2026-07-12, ~23:25 CST)](#appendix-bk---full-swing-method-survey-delivered-research-brief-2026-07-12-2325-cst) (??-??)
+- [BL — PRD_ROADMAP synced to actual outcomes; M8 added](#appendix-bl---prd_roadmap-synced-to-actual-outcomes-m8-added-2026-07-12-2335-cst) (07-12)
+- [BM — E19 ingestion ~27/39; armed to run E19 on completion](#appendix-bm---e19-ingestion-2739-armed-to-run-e19-on-completion-2026-07-13-1141-cst) (07-13)
+- [BN — LLM-driven strategy survey delivered (research-brief, 2026-07-13, ~12:15 CST)](#appendix-bn---llm-driven-strategy-survey-delivered-research-brief-2026-07-13-1215-cst) (??-??)
+- [BO — Four-topic research batch delivered (execution / risk / data / crypto, 2026-07-13, ~13:05 CST)](#appendix-bo---four-topic-research-batch-delivered-execution--risk--data--crypto-2026-07-13-1305-cst) (??-??)
+- [BP — M9 added to PRD: research-batch-2 experiments designed](#appendix-bp---m9-added-to-prd-research-batch-2-experiments-designed-2026-07-13-1325-cst) (07-13)
+- [BQ — E19 ingestion ~31/39; ABT P-buy anomaly flagged](#appendix-bq---e19-ingestion-3139-abt-p-buy-anomaly-flagged-2026-07-13-1340-cst) (07-13)
+- [BR — E19 RUN: FAIL (clean, robust to de-junk); M7b CLOSED](#appendix-br---e19-run-fail-clean-robust-to-de-junk-m7b-closed-2026-07-13-1345-cst) (07-13)
+- [BS — EX-DECOMP (M9 #44): closed FAILs decomposed; only E14 signal-dead](#appendix-bs---ex-decomp-m9-44-closed-fails-decomposed-only-e14-signal-dead-2026-07-13-2150-cst) (07-13)
+- [BT — M9 #43 prereg-template adopted + X2/X3 data probe launched](#appendix-bt---m9-43-prereg-template-adopted--x2x3-data-probe-launched-2026-07-13-2220-cst) (07-13)
+- [BU — FINRA access VERIFIED; X2 days-to-cover = FAIL (short-side anomaly REAL but non-deployable); X3 feasible-deferred](#appendix-bu---finra-access-verified-x2-days-to-cover--fail-short-side-anomaly-real-but-non-deployable-x3-feasible-deferred-2026-07-13-2315-cst) (07-13)
+- [BV — "do 1" = pursue short-side; INTERPRETATION + X2b design](#appendix-bv---do-1--pursue-short-side-interpretation--x2b-design-2026-07-13-2345-cst) (07-13)
+- [BW — X2b short-side = FAIL; X2's "strongest anomaly" was a frictionless mirage](#appendix-bw---x2b-short-side--fail-x2s-strongest-anomaly-was-a-frictionless-mirage-2026-07-13-0040-cst) (07-13)
+- [BX — CAPSTONE written (option 2); X3 ingest launched; X1 next](#appendix-bx---capstone-written-option-2-x3-ingest-launched-x1-next-2026-07-13-0115-cst) (07-13)
+- [BY — X1 conditional vol-targeting = FAIL; plain 200-DMA still wins](#appendix-by---x1-conditional-vol-targeting--fail-plain-200-dma-still-wins-2026-07-13-0140-cst) (07-13)
+- [BZ — Session wrap: X3 ingest interrupted; docs finalized to 24; pushed](#appendix-bz---session-wrap-x3-ingest-interrupted-docs-finalized-to-24-pushed-2026-07-13-2358-cst) (07-13)
+- [CA — Post-crash health check ALL GREEN; X3 ingest resumed](#appendix-ca---post-crash-health-check-all-green-x3-ingest-resumed-2026-07-14-0010-cst) (07-14)
+- [CB — FREE SWEEP part 1: C3/C4/C6/C1 all FAIL](#appendix-cb---free-sweep-part-1-c3c4c6c1-all-fail-2026-07-14-0120-cst) (07-14)
+- [CC — FREE SWEEP part 2: C2 closed on probe; C7 = FAIL despite 26% CAGR; M8 effectively closed](#appendix-cc---free-sweep-part-2-c2-closed-on-probe-c7--fail-despite-26-cagr-m8-effectively-closed-2026-07-14-0200-cst) (07-14)
+- [CD — X3 = FAIL (SVR is noise); FREE SWEEP + program COMPLETE at 30](#appendix-cd---x3--fail-svr-is-noise-free-sweep--program-complete-at-30-2026-07-14-0240-cst) (07-14)
+- [CE — "do 2" = X6 crypto pilot (X5 blocked-on-purchase); scope opened](#appendix-ce---do-2--x6-crypto-pilot-x5-blocked-on-purchase-scope-opened-2026-07-14-1240-cst) (07-14)
+- [CF — X6 crypto trend = FAIL; E6's trend-overlay lesson generalizes to crypto](#appendix-cf---x6-crypto-trend--fail-e6s-trend-overlay-lesson-generalizes-to-crypto-2026-07-14-1320-cst) (07-14)
+- [CG — M10 SYNTHESIS ARC opened: evidence-informed combos vs BOTH tiers](#appendix-cg---m10-synthesis-arc-opened-evidence-informed-combos-vs-both-tiers-2026-07-14-1305-cst) (07-14)
+- [CH — M10 design panel: Nagel Switch is the one non-empty path](#appendix-ch---m10-design-panel-nagel-switch-is-the-one-non-empty-path-2026-07-14-1335-cst) (07-14)
+- [CI — M10-1 Nagel Switch = program's FIRST PASS-HR (but IN-SAMPLE, forward-only)](#appendix-ci---m10-1-nagel-switch--programs-first-pass-hr-but-in-sample-forward-only-2026-07-14-1405-cst) (07-14)
+- [CJ — M10-2 gap-amortized stress IBS: building the panel's 2nd survivor](#appendix-cj---m10-2-gap-amortized-stress-ibs-building-the-panels-2nd-survivor-2026-07-14-1830-cst) (07-14)
+- [CK — M10-2 = FAIL; closes the E2 "c2c mirage" permanently](#appendix-ck---m10-2--fail-closes-the-e2-c2c-mirage-permanently-2026-07-14-1855-cst) (07-14)
+- [CL — Finalize THROUGH M10 (not "done"); full what-worked/what-might report; new M11 chart-pattern direction](#appendix-cl---finalize-through-m10-not-done-full-what-workedwhat-might-report-new-m11-chart-pattern-direction-2026-07-14-2156-cst) (07-14)
+- [CM — M11.1 chart-pattern research brief DONE; evidence MIXED; design sharpened](#appendix-cm---m111-chart-pattern-research-brief-done-evidence-mixed-design-sharpened-2026-07-14-2210-cst) (07-14)
+- [CN — M11.2 prereg committed doc-only (chart-pattern detector, params pinned)](#appendix-cn---m112-prereg-committed-doc-only-chart-pattern-detector-params-pinned-2026-07-14-2240-cst) (07-14)
+- [CO — M11 = FAIL (signal-dead); chart-pattern family closed; survivor bias DESTROYS the pattern edge](#appendix-co---m11--fail-signal-dead-chart-pattern-family-closed-survivor-bias-destroys-the-pattern-edge-2026-07-14-2255-cst) (07-14)
+- [CP — M3 forward-paper infrastructure BUILT; BLOCKED-ON-EVAN for keys](#appendix-cp---m3-forward-paper-infrastructure-built-blocked-on-evan-for-keys-2026-07-15-0129-cst) (07-15)
+- [CQ — M3 rewired to 3-account model; all 3 Alpaca paper accounts VERIFIED CONNECTED](#appendix-cq---m3-rewired-to-3-account-model-all-3-alpaca-paper-accounts-verified-connected-2026-07-15-0215-cst) (07-15)
+- [CR — M3 committed+pushed; daily scheduled task registered (all 3 sleeves, live at 7pm)](#appendix-cr---m3-committedpushed-daily-scheduled-task-registered-all-3-sleeves-live-at-7pm-2026-07-15-0240-cst) (07-15)
+- [CS — FIRST LIVE PAPER ORDER placed + verified; the order-mirror path + after-hours queuing WORK](#appendix-cs---first-live-paper-order-placed--verified-the-order-mirror-path--after-hours-queuing-work-2026-07-15-0245-cst) (07-15)
+- [CT — e18 under-trading bug found (Evan's question) + fixed; clean synchronized restart](#appendix-ct---e18-under-trading-bug-found-evans-question--fixed-clean-synchronized-restart-2026-07-15-0250-cst) (07-15)
+- [CU — Reset approved + re-verified; BlackRock systematic-HY report read + graded: corroborates the program, no new experiment opened](#appendix-cu---reset-approved--re-verified-blackrock-systematic-hy-report-read--graded-corroborates-the-program-no-new-experiment-opened-2026-07-15-0256-cst) (07-15)
+- [CV — X7 HYG:IEF credit gate = FAIL, but the FIRST gate to beat the 200-DMA in a window](#appendix-cv---x7-hygief-credit-gate--fail-but-the-first-gate-to-beat-the-200-dma-in-a-window-2026-07-15-0310-cst) (07-15)
+- [CW — Morgan Stanley US Middle-Market HY brochure read + graded: 3rd-domain corroboration, NO free test](#appendix-cw---morgan-stanley-us-middle-market-hy-brochure-read--graded-3rd-domain-corroboration-no-free-test-2026-07-15-0313-cst) (07-15)
+- [CX — 5 Newfleet/Virtus HY reports read (3 parallel agents): corroboration, no new free signal, 1 broken file](#appendix-cx---5-newfleetvirtus-hy-reports-read-3-parallel-agents-corroboration-no-new-free-signal-1-broken-file-2026-07-15-1510-cst) (07-15)
+- [CY — Cross-project sleeve comparison (Swing 3 vs Trading momentum 27) written](#appendix-cy---cross-project-sleeve-comparison-swing-3-vs-trading-momentum-27-written-2026-07-15-1522-cst) (07-15)
+- [CZ — Graphify graph rebuilt (was 0-edge) + NAV finding-things maps across the codebase](#appendix-cz---graphify-graph-rebuilt-was-0-edge--nav-finding-things-maps-across-the-codebase-2026-07-15-2115-cst) (07-15)
+- [DA — m10-1 "hasn't bought" diagnosed (weekly cadence, not a bug) + dry-run/Alpaca desync footgun fixed](#appendix-da---m10-1-hasnt-bought-diagnosed-weekly-cadence-not-a-bug--dry-runalpaca-desync-footgun-fixed-2026-07-17-cst) (07-17)
+- [DB — m10-1 inaugural buy CONFIRMED live + reconcile fix verified end-to-end (double-run, harmless)](#appendix-db---m10-1-inaugural-buy-confirmed-live--reconcile-fix-verified-end-to-end-double-run-harmless-2026-07-18-0025-cst) (07-18)
+- [DC — VIX3M staleness diagnosed: Yahoo source lag INVERTED e18's live signal](#appendix-dc---vix3m-staleness-diagnosed-yahoo-source-lag-inverted-e18s-live-signal-2026-07-18-1645-cst) (07-18)
+- [DD — Fix applied: live VIX3M -> CBOE source + clear-stale-pending (option 1)](#appendix-dd---fix-applied-live-vix3m---cboe-source--clear-stale-pending-option-1-2026-07-18-1650-cst) (07-18)
+- [DE — Monday re-fire: window MISSED (stale SELL filled) + intraday-execution footgun found](#appendix-de---monday-re-fire-window-missed-stale-sell-filled--intraday-execution-footgun-found-2026-07-20-1255-cdt) (07-20)
+- [DF — Intraday-execution guard added + verified (option 1 from DE)](#appendix-df---intraday-execution-guard-added--verified-option-1-from-de-2026-07-20-1300-cdt) (07-20)
+- [DG — Top-of-file GOAL block added to PRD_ROADMAP.md (matches 2026-07-22 skeleton)](#appendix-dg---top-of-file-goal-block-added-to-prd_roadmapmd-matches-2026-07-22-skeleton-2026-07-22-1814-cdt) (07-22)
+- [DH — Full project audit (/audit) + fixes 1/3/5 applied and verified](#appendix-dh---full-project-audit-audit--fixes-135-applied-and-verified-2026-07-28-1431-cdt) (07-28)
+- [DI — Audit finding #2 FIXED: fill_divergence made live; first real sim-vs-broker numbers](#appendix-di---audit-finding-2-fixed-fill_divergence-made-live-first-real-sim-vs-broker-numbers-2026-07-28-1503-cdt) (07-28)
+- [DJ — Audit findings #4 (measured, not traded), #6 (safe retry), #7 (HANDOFF refresh)](#appendix-dj---audit-findings-4-measured-not-traded-6-safe-retry-7-handoff-refresh-2026-07-28-1519-cdt) (07-28)
+- [DK — Audit findings #8, #10, #9 closed -- all 10 findings now resolved or explicitly open](#appendix-dk---audit-findings-8-10-9-closed----all-10-findings-now-resolved-or-explicitly-open-2026-07-28-1534-cdt) (07-28)
+- [DL — #4b qty-aware reconcile implemented (closes the e18 share fork on the next run)](#appendix-dl---4b-qty-aware-reconcile-implemented-closes-the-e18-share-fork-on-the-next-run-2026-07-28-1619-cdt) (07-28)
+- [DM — #4b VERIFIED IN PRODUCTION: e18 share fork closed at the 07-29 open](#appendix-dm---4b-verified-in-production-e18-share-fork-closed-at-the-07-29-open-2026-08-02-1713-cdt) (08-02)
+- [DN — Sleeve-correlation MEASURED: the 3 live sleeves are ~1 strategy](#appendix-dn---sleeve-correlation-measured-the-3-live-sleeves-are-1-strategy-2026-08-02-2216-cdt) (08-02)
+- [DO — X8 non-equity trend sleeve = FAIL both arms; decorrelation attempt deploys NOTHING](#appendix-do---x8-non-equity-trend-sleeve--fail-both-arms-decorrelation-attempt-deploys-nothing-2026-08-02-2300-cdt) (08-02)
+- [DP — X9 pairs/relative-value = FAIL; decorrelation is not the scarce resource, EDGE is](#appendix-dp---x9-pairsrelative-value--fail-decorrelation-is-not-the-scarce-resource-edge-is-2026-08-03-0104-cdt) (08-03)
+- [DQ — SEARCH PHASE CLOSED at 37 attempts; forward-evidence phase is the only open lever](#appendix-dq---search-phase-closed-at-37-attempts-forward-evidence-phase-is-the-only-open-lever-2026-08-03-0114-cdt) (08-03)
+- [DR — M12 constraint-relaxation factorial PLANNED + revert point tagged; PRD amended](#appendix-dr---m12-constraint-relaxation-factorial-planned--revert-point-tagged-prd-amended-2026-08-03-0125-cdt) (08-03)
+- [DS — M12 universe option (b) chosen; ~100-name expansion PROBED, 143 verified](#appendix-ds---m12-universe-option-b-chosen-100-name-expansion-probed-143-verified-2026-08-03-0822-cdt) (08-03)
+- [DT — M12 universe FROZEN at 142 names; GS excluded by the pre-declared cutoff](#appendix-dt---m12-universe-frozen-at-142-names-gs-excluded-by-the-pre-declared-cutoff-2026-08-03-0824-cdt) (08-03)
+- [DU — M12 factorial RUN: HORIZON binds, breadth does NOT -- and it overturns the program's own explanation](#appendix-du---m12-factorial-run-horizon-binds-breadth-does-not----and-it-overturns-the-programs-own-explanation-2026-08-03-0827-cdt) (08-03)
+- [DV — CORRECTION to DU: the published M12 SEC numbers were WRONG (stale-cache contamination)](#appendix-dv---correction-to-du-the-published-m12-sec-numbers-were-wrong-stale-cache-contamination-2026-08-04-2356-cdt) (08-04)
+- [DW — Cold audit: 12 findings + 8 edge cases, ALL FIXED and verified](#appendix-dw---cold-audit-12-findings--8-edge-cases-all-fixed-and-verified-2026-08-04-2356-cdt) (08-04)
+- [DX — M12 re-run: corrected numbers reproduce BIT-FOR-BIT](#appendix-dx---m12-re-run-corrected-numbers-reproduce-bit-for-bit-2026-08-05-0001-cdt) (08-05)
+- [DY — M12 EXTENDED to a uniform 2026-08-04 cutoff; conclusion stable](#appendix-dy---m12-extended-to-a-uniform-2026-08-04-cutoff-conclusion-stable-2026-08-05-0007-cdt) (08-05)
+- [DZ — COLD literature sweep: what the evidence actually says about chart-TA swing trading run by an AI agent](#appendix-dz---cold-literature-sweep-what-the-evidence-actually-says-about-chart-ta-swing-trading-run-by-an-ai-agent-2026-08-06-1233-cdt) (08-06)
+- [EA — Brief reconciled against the record; machine-readable trial log built; V1 harness pre-registered](#appendix-ea---brief-reconciled-against-the-record-machine-readable-trial-log-built-v1-harness-pre-registered-2026-08-06-1250-cdt) (08-06)
+- [EB — V1 harness BUILT and run: DSR axis discriminates perfectly; my pre-registered acceptance criterion was MIS-SPECIFIED](#appendix-eb---v1-harness-built-and-run-dsr-axis-discriminates-perfectly-my-pre-registered-acceptance-criterion-was-mis-specified-2026-08-06-1258-cdt) (08-06)
+- [EC — V2 amendment applied: harness ACCEPTED, and the pre-registered false positive materialised exactly as predicted](#appendix-ec---v2-amendment-applied-harness-accepted-and-the-pre-registered-false-positive-materialised-exactly-as-predicted-2026-08-06-1304-cdt) (08-06)
+- [ED — Amended harness COMMITTED; V3 deferred to "after fills accrue" -- and that gate is measured to be UNREACHABLE on the current trajectory](#appendix-ed---amended-harness-committed-v3-deferred-to-after-fills-accrue----and-that-gate-is-measured-to-be-unreachable-on-the-current-trajectory-2026-08-06-1331-cdt) (08-06)
+- [EE — Third cold audit: 14 findings + 14 edge cases, 25 fixed. The theme is fixes applied at ONE site and claimed at ALL sites](#appendix-ee---third-cold-audit-14-findings--14-edge-cases-25-fixed-the-theme-is-fixes-applied-at-one-site-and-claimed-at-all-sites-2026-08-06-1413-cdt) (08-06)
+- [EF — Knowledge graph rebuilt: AST is complete and good, semantic extraction is PARTIAL because the session limit killed 4 of 5 agents](#appendix-ef---knowledge-graph-rebuilt-ast-is-complete-and-good-semantic-extraction-is-partial-because-the-session-limit-killed-4-of-5-agents-2026-08-06-1829-cdt) (08-06)
+- [EG — Audit fixes COMMITTED `d46c1d7`; graph semantic coverage 43 -> 82 of 117 files. CORRECTION: EF misattributed the dangling-edge warning](#appendix-eg---audit-fixes-committed-d46c1d7-graph-semantic-coverage-43---82-of-117-files-correction-ef-misattributed-the-dangling-edge-warning-2026-08-07-0533-cdt) (08-07)
+- [EH — Pushed to origin/main: three commits, not the two I reported](#appendix-eh---pushed-to-originmain-three-commits-not-the-two-i-reported-2026-08-08-2115-cdt) (08-08)
+- [EI — E1 CLOSED: scheduled task converted to S4U, no password stored; the missed-session detector fired for real on its first run](#appendix-ei---e1-closed-scheduled-task-converted-to-s4u-no-password-stored-the-missed-session-detector-fired-for-real-on-its-first-run-2026-08-08-2137-cdt) (08-08)
+- [EJ — S4U CONFIRMED unattended; fourth cold audit finds the previous audit's fixes were DETECTIVE, not CORRECTIVE](#appendix-ej---s4u-confirmed-unattended-fourth-cold-audit-finds-the-previous-audits-fixes-were-detective-not-corrective-2026-08-11-0016-cdt) (08-11)
+- [EK — Audit #4 fixes applied: 21 of 28 items, every one fed its own trigger; 3 stay prereg-gated, 1 stays blocked](#appendix-ek---audit-4-fixes-applied-21-of-28-items-every-one-fed-its-own-trigger-3-stay-prereg-gated-1-stays-blocked-2026-08-11-1756-cdt) (08-11)
+- [EL — Audit #4 fix pass COMMITTED](#appendix-el---audit-4-fix-pass-committed-2026-08-11-2222-cdt) (08-11)
+- [EM — Audit #4 findings 1/2 closed at the chokepoint: the freshness guard could not arithmetically fire](#appendix-em---audit-4-findings-12-closed-at-the-chokepoint-the-freshness-guard-could-not-arithmetically-fire-2026-08-12-1725-cdt) (08-12)
+- [EN — Pushed `e290b34..67ce5e4`; the F1 chokepoint fix is now on the remote, and audit #4's top defect is CLOSED](#appendix-en---pushed-e290b3467ce5e4-the-f1-chokepoint-fix-is-now-on-the-remote-and-audit-4s-top-defect-is-closed-2026-08-12-2146-cdt) (08-12)
+- [EO — `/landing-check` on the 08-12 push: the new freshness guard is SWALLOWED at three sites; 16 doc defects confirmed and 8 asserted defects REFUTED](#appendix-eo---landing-check-on-the-08-12-push-the-new-freshness-guard-is-swallowed-at-three-sites-16-doc-defects-confirmed-and-8-asserted-defects-refuted-2026-08-13-0117-cdt) (08-13)
+- [EP — EO's findings applied: the swallowed guard is closed at the chokepoint and now has a standing proof; 16 doc defects corrected across 12 files](#appendix-ep---eos-findings-applied-the-swallowed-guard-is-closed-at-the-chokepoint-and-now-has-a-standing-proof-16-doc-defects-corrected-across-12-files-2026-08-13-0126-cdt) (08-13)
+- [EQ — Second `/landing-check`, on the fix itself: the change broke the very count it corrected, and four other pre-commit defects](#appendix-eq---second-landing-check-on-the-fix-itself-the-change-broke-the-very-count-it-corrected-and-four-other-pre-commit-defects-2026-08-13-0138-cdt) (08-13)
+- [ER — Cache refreshed to one settled vintage (a same-day forming bar caught before it landed); knowledge graph re-indexed 1199 -> 1351 nodes; push BLOCKED by tooling](#appendix-er---cache-refreshed-to-one-settled-vintage-a-same-day-forming-bar-caught-before-it-landed-knowledge-graph-re-indexed-1199---1351-nodes-push-blocked-by-tooling-2026-08-13-1544-cdt) (08-13)
+- [ES — Push landed; the guard exercised in anger on M12 (142/142, silent); and a correction to ER I made by trusting an agent instead of `git ls-files`](#appendix-es---push-landed-the-guard-exercised-in-anger-on-m12-142142-silent-and-a-correction-to-er-i-made-by-trusting-an-agent-instead-of-git-ls-files-2026-08-13-2151-cdt) (08-13)
+- [ET — V3 prereg WRITTEN (doc-only, not run); graph wave 2 done, research docs 80 -> 384 nodes; both extraction agents killed mid-task and the chunks validated rather than trusted](#appendix-et---v3-prereg-written-doc-only-not-run-graph-wave-2-done-research-docs-80---384-nodes-both-extraction-agents-killed-mid-task-and-the-chunks-validated-rather-than-trusted-2026-08-13-2324-cdt) (08-13)
+- [EU — Third `/landing-check`: the wave-2 merge DESTROYED 9 hyperedges while ET claimed it could not, and the V3 prereg overstated its own independence](#appendix-eu---third-landing-check-the-wave-2-merge-destroyed-9-hyperedges-while-et-claimed-it-could-not-and-the-v3-prereg-overstated-its-own-independence-2026-08-13-2336-cdt) (08-13)
+- [EV — Scheduled daily-audit: secret gate wired, pandas/numpy pinned, and ES's "one lost session" claim was itself wrong](#appendix-ev---scheduled-daily-audit-secret-gate-wired-pandasnumpy-pinned-and-ess-one-lost-session-claim-was-itself-wrong-2026-08-16-1326-cdt) (08-16)
+- [EW — Correction to EV.3: the "one lost session" claim was never in ES, and HANDOFF still hadn't been fixed](#appendix-ew---correction-to-ev3-the-one-lost-session-claim-was-never-in-es-and-handoff-still-hadnt-been-fixed-2026-08-16-1335-cdt) (08-16)
+- [EX — Outstanding-work survey, derived from artifacts after a five-day gap; two claims flagged for verification, not asserted](#appendix-ex---outstanding-work-survey-derived-from-artifacts-after-a-five-day-gap-two-claims-flagged-for-verification-not-asserted-2026-08-18-1824-cdt) (08-18)
+- [EY — Landing-check via /opus-workers on EV/EW: ST-1 and ST-2 landed, but EV.3's "two lost sessions" is FALSE and EW baked it into HANDOFF, overturning a correction EI had already made](#appendix-ey---landing-check-via-opus-workers-on-evew-st-1-and-st-2-landed-but-ev3s-two-lost-sessions-is-false-and-ew-baked-it-into-handoff-overturning-a-correction-ei-had-already-made-2026-08-18-1831-cdt) (08-18)
+- [EZ — EY's findings APPLIED: HANDOFF's "two holes" reverted to one, F14 restated as three rows, security bin caught up, cache refreshed to one vintage](#appendix-ez---eys-findings-applied-handoffs-two-holes-reverted-to-one-f14-restated-as-three-rows-security-bin-caught-up-cache-refreshed-to-one-vintage-2026-08-18-2351-cdt) (08-18)
+- [FA — Correction to EZ: three line-number citations were stale by the shift EZ's own edits caused](#appendix-fa---correction-to-ez-three-line-number-citations-were-stale-by-the-shift-ezs-own-edits-caused-2026-08-19-0001-cdt) (08-19)
+- [FB — PRD success-criteria drift cleared: two boxes were done for five weeks, one was superseded and sitting open, and the >=20-consecutive gate is further from met than the session count suggests](#appendix-fb---prd-success-criteria-drift-cleared-two-boxes-were-done-for-five-weeks-one-was-superseded-and-sitting-open-and-the-20-consecutive-gate-is-further-from-met-than-the-session-count-suggests-2026-08-19-0006-cdt) (08-19)
+- [FC — F14 ledger write EXECUTED; V3 implemented and ACCEPTED - but the false positive it was written to remove did not reproduce, so the repair is UNDEMONSTRATED](#appendix-fc---f14-ledger-write-executed-v3-implemented-and-accepted---but-the-false-positive-it-was-written-to-remove-did-not-reproduce-so-the-repair-is-undemonstrated-2026-08-19-1628-cdt) (08-19)
+- [FD — F2 CLOSED: E5 and E7 now implement the rule they test; every pre-registered prediction held and no verdict moved](#appendix-fd---f2-closed-e5-and-e7-now-implement-the-rule-they-test-every-pre-registered-prediction-held-and-no-verdict-moved-2026-08-19-1648-cdt) (08-19)
+- [FE — M6's HTML twin BUILT, closing a scope gap open since 2026-07-10 - and building it proved the record's own Table of Contents had 32 dead links](#appendix-fe---m6s-html-twin-built-closing-a-scope-gap-open-since-2026-07-10---and-building-it-proved-the-records-own-table-of-contents-had-32-dead-links-2026-08-19-1656-cdt) (08-19)
+- [FF — Pushed `01c9ab3..ece0671`; and a correction to FC.6, which is no longer true](#appendix-ff---pushed-01c9ab3ece0671-and-a-correction-to-fc6-which-is-no-longer-true-2026-08-19-1659-cdt) (08-19)
+- [FG — F3 SCOPING INVERTS THE PREMISE: the floor can NEVER fire on the stock universe, and the real exposure is the ETF experiments nobody looked at](#appendix-fg---f3-scoping-inverts-the-premise-the-floor-can-never-fire-on-the-stock-universe-and-the-real-exposure-is-the-etf-experiments-nobody-looked-at-2026-08-19-1702-cdt) (08-19)
+- [FH — Scheduled daily-audit: the run exits GREEN when credentials die during market hours, and a missing price silently marks NAV at cost basis](#appendix-fh---scheduled-daily-audit-the-run-exits-green-when-credentials-die-during-market-hours-and-a-missing-price-silently-marks-nav-at-cost-basis-2026-08-20-1939-cdt) (08-20)
+- [FI — Scheduled daily-audit: FH itself never landed in git, so its two HIGHs are still live five days on](#appendix-fi---scheduled-daily-audit-fh-itself-never-landed-in-git-so-its-two-highs-are-still-live-five-days-on-2026-08-25-0721-cdt) (08-25)
+- [FJ — The LIVE LEDGER has been contaminated since 2026-08-25 and e6_1x has recorded NOTHING for five sessions. Every guard fired correctly; nobody was listening](#appendix-fj---the-live-ledger-has-been-contaminated-since-2026-08-25-and-e6_1x-has-recorded-nothing-for-five-sessions-every-guard-fired-correctly-nobody-was-listening-2026-09-01-2215-cdt) (09-01)
+- [FK — The record itself had been WEDGED for 54 days - one malformed heading refused every append, which is why the 2026-09-05 audit left no trace; plus a missed-session detector blind per sleeve](#appendix-fk---the-record-itself-had-been-wedged-for-54-days---one-malformed-heading-refused-every-append-which-is-why-the-2026-09-05-audit-left-no-trace-plus-a-missed-session-detector-blind-per-sleeve-2026-09-05-1622-cdt) (09-05)
+- [FL — Evan's three calls: the five e6_1x NAV holes are permanent, the post-09-01 ledger write stays unattributed - but reading the cleanup script bounded it to two synthetic rows and the arithmetic reconciles to the row](#appendix-fl---evans-three-calls-the-five-e6_1x-nav-holes-are-permanent-the-post-09-01-ledger-write-stays-unattributed---but-reading-the-cleanup-script-bounded-it-to-two-synthetic-rows-and-the-arithmetic-reconciles-to-the-row-2026-09-05-1748-cdt) (09-05)
 
 ---
 
@@ -2501,7 +2634,7 @@ deliverable).
 
 ---
 
-# Appendix BR-note - CORRECTION to BR's "autonomous wall" claim (2026-07-13, ~13:55 CST)
+## BR-note - CORRECTION to BR's "autonomous wall" claim (2026-07-13, ~13:55 CST)
 
 **Correcting my own error in BR above (append-only: not editing BR).** BR states
 "Autonomous wall stands ... M8/M9 ... BLOCKED-ON-EVAN (paid data budgets X2/X3/X5 ...);
@@ -8054,3 +8187,647 @@ Also corrected: `HANDOFF.md` listed "F2/F3 preregs" as jointly open. F2 closed
 
 **Doc cadence:** entry written same prompt as the work. No miss.
 
+
+
+---
+
+# Appendix FH - Scheduled daily-audit: the run exits GREEN when credentials die during market hours, and a missing price silently marks NAV at cost basis (2026-08-20, ~19:39 CDT)
+
+**TRIGGER:** scheduled daily-audit sweep. Swing Trading classified ACTIVE under a
+rule changed this run: the sweep's SKIP-AUDITED window (7 days) was suppressing
+projects with heavy post-audit churn, so it now also requires fewer than 10
+non-audit commits since the last audit. Swing Trading had exactly 10 since EV
+(2026-08-16), making it the only ACTIVE project of seven. Cold audit run inline
+(the session had done no work here), then a landing check on FG.
+
+## FH.1 Findings - 7 audit + 4 edge cases, nothing fixed
+
+Top two are both silent-wrong-answer paths in the live paper loop:
+
+1. **HIGH - the run exits 0 when credentials die during market hours.**
+   `scripts/daily_swing_paper.py:256-258` prints `SKIPPED (creds)` and appends
+   NOTHING to `RUN_FAILURES`, while its sibling at :812-816 appends for the same
+   root cause. The two are coupled, which is what makes it reachable: broken
+   creds make `market_is_open()` (:213-224) exhaust every sleeve, fall through to
+   the local-ET fallback, and return True on a weekday 09:30-16:00 ET - which
+   makes the sleeve loop `break` at :793, so the sibling that WOULD have flagged
+   it never executes. Net: green Last Result in Task Scheduler, unresolved fills
+   never resolved. The 7pm scheduled run is NOT exposed (fallback returns False
+   at 19:00); a manual daytime `--execute` is.
+2. **HIGH - a missing price marks NAV at cost basis, silently.** `:514`
+   `close_px.get(t) or p["entry_price"]`: when `prices.fetch` returns `[]` after
+   its retries, the held ticker's close is None and the sleeve's NAV is written
+   as qty x ENTRY price. The missed-session guard (:579-592) checks a `paper_nav`
+   row EXISTS, so it cannot see this - a fabricated-flat point enters the
+   forward-evidence series and the run exits 0. yfinance flakiness is documented
+   in this repo as real (`swing_bot/prices.py:98-105`, audit #8).
+
+Then: the convention-header guard globs `scripts/*.py` only and detects
+price-touching by three literal patterns, so `run_x6_crypto_trend.py` (direct
+yfinance) is invisible to it - compliant by hand today, unguarded tomorrow
+(MED); `costs.py:55-57` holds a second copy of `prices.connect_ro`'s connection
+string, the exact defect audit #3 fixed in test_frozen (LOW-MED); `DB_PATH` is
+defined independently in `prices.py:33` and `paper_sleeves.py:40`, equal today,
+proven at runtime (LOW); `universe.py:47-48`'s "every current member clears it
+by a wide margin" is a present-tense snapshot reading as a property of the
+series, the same confusion FG.2 flagged for "28x" (LOW); two unused imports in
+`run_m10_1_nagel_switch.py:28-29` that its own docstring lists as used (LOW).
+
+Edge case worth its own line: **5 of the 10 `fill_divergence` rows carry a NULL
+`alpaca_order_id`** and are structurally excluded from the backfill by
+`open_divergence_rows`' `WHERE alpaca_order_id IS NOT NULL`. They are the
+residue of skipped mirrors, they can never be resolved, and nothing reports that
+half of M3's only fidelity instrument is permanently unmeasurable. OBSERVED in
+the live table.
+
+## FH.2 What was verified HEALTHY, by running it rather than reading it
+
+- **The secret gate fires.** ST-1's chain (repo hook -> `core.hooksPath` ->
+  commit-gate -> `pm-secretscan.js`) was tested end-to-end in a throwaway repo:
+  a realistic Alpaca key pair in a file named `config_notes.py` was caught by
+  BOTH the `alpaca-key-id` rule and the high-entropy heuristic, exit 1. A first
+  attempt reported a false hole - the fixture key contained `123456` and was
+  correctly rejected as a placeholder. The gate was fine; the test was wrong.
+- `estimate_friction()` refuses at n=4 < 20 rather than substituting a default.
+- `swing.db` `integrity_check` ok, `foreign_key_check` clean.
+- Frozen suite GREEN; 12 pinned refs + 17 invariants, exactly as CLAUDE.md says.
+- No bare `except`, no `except: pass`, no mutable defaults anywhere in the tree.
+- Every direct third-party import is pinned in `requirements.txt` - ST-2 holds.
+- `resolve_divergence` repairs `sim_price` from `paper_transactions`, not from
+  `alpaca_price`, so the two 0.00 bps rows are real measurements and not a
+  number compared against itself. Checked because 0.00 twice looked wrong.
+
+Two leads were dropped after measurement rather than reported: `bars` is stale
+since 2026-07-08 but `prices.fetch` goes live to yfinance and never reads that
+table (it is the backtest store), and the empty `.git/hooks/` is irrelevant
+because `core.hooksPath` redirects.
+
+## FH.3 Landing check on FG - SAFE, one imprecision
+
+All five line citations TRUE (`universe.py:49`, `daily_swing_paper.py:64-65`
+vs `:143`, `test_frozen.py:43`, `backtest.py:129`, and 0 null volumes across
+105,396 `bars` rows). All three state claims TRUE: no F3 prereg file exists, the
+tree is clean at FG's own commit `080a756`, and HANDOFF:778 carries the F2-closed
+correction. FG.1's headline re-derived independently: **0 breaches / 0.00% / 0 of
+39 names**, reproduced exactly. FG.3 re-derived: **26 of 29 ETFs breach**, 16.16%
+vs FG's 16.07%, same top-8 breachers in the same rank order.
+
+The one imprecision: FG names the least-liquid point as **COP 2000-02-01,
+$26.1M, 1.3x floor**; under the scoping agent's windowing (which this check
+reproduced, 261,104 ticker-sessions vs FG's 260,363) it is **COP 2000-01-03,
+$24.49M, 1.2x**. FG disclosed that the two windowings differ and the ticker and
+the conclusion agree, so this is a stated-tolerance gap, not a false claim.
+
+Separately: the record's Table of Contents still stops at **Appendix AI
+(2026-07-10)** - roughly fifty entries, A-AI aside, are unlisted. FE built the
+HTML twin and reported 32 dead links in this TOC; the in-document TOC itself was
+not extended.
+
+## FH.4 Status
+
+**READ-ONLY sweep. Nothing fixed, nothing committed, HANDOFF untouched.** The
+liquidity floor being UNENFORCED almost everywhere is NOT counted as a finding
+here - `universe.py:23-34` already states it plainly and it is open item F3,
+whose scope FG put to Evan and which is still his call.
+
+
+---
+
+# Appendix FI - Scheduled daily-audit: FH itself never landed in git, so its two HIGHs are still live five days on (2026-08-25, ~07:21 CDT)
+
+Audit run - 16 findings (3 high, 4 med, 6 low, 1 info, 2 landing) and 7 edge
+cases across three shards. READ-ONLY: nothing fixed, nothing committed, HANDOFF
+untouched.
+
+**Top finding, and it is about this record.** Appendix FH does not exist in git.
+`git show HEAD:"docs/Project Record - Full Chronological History.md" | grep -c
+"Appendix FH"` -> **0**; the working tree has it (165 appendix headings vs 164 at
+HEAD) and the HTML twin has 164 `<h1 id="appendix-...">` and no FH. The same
+2026-08-20 session's other output is also uncommitted: `scripts/git-hooks/pre-commit`
+carries 20 unstaged lines delegating the record-invariant check to
+`${HOME}/.claude/skills/project-memory/hooks/pre-commit-record`. That block is
+COMMITTED in Autonomous Car Project, ServeLocal, Skills and World Models Research;
+here and in Trading it sits on disk only. A clone of this repo gets neither FH nor
+the record guard.
+
+**Consequence: both of FH's HIGHs reproduce today, unchanged.**
+
+1. `scripts/daily_swing_paper.py:257` and `:324` still print `SKIPPED (creds)`
+   and append nothing to `RUN_FAILURES`, while `:812/:816` prints AND appends.
+   `market_is_open()` still `continue`s past every `AlpacaError` (:207-213) into
+   the local-ET fallback, which returns True on a weekday 09:30-16:00 ET - so the
+   sleeve loop breaks before reaching the one site that would have flagged it.
+   A daytime `--execute` with all credentials dead exits 0 and green.
+2. `:514` is still `close_px.get(t) or p["entry_price"]` - a missing close writes
+   NAV at cost basis, and the missed-session guard only checks that a `paper_nav`
+   row exists.
+   FH's edge case also holds exactly: `fill_divergence` has **10 rows, 5 with a
+   NULL `alpaca_order_id`** (read-only query against `swing.db`), permanently
+   excluded from backfill.
+
+**New this run.** No lock, pidfile or mutex anywhere in the 64-file Python tree
+guards two overlapping `daily_swing_paper.py --execute` runs;
+`is_decision_day` is read at `:649`, a 39-ticker fetch loop runs at `:658-683`,
+and the write-back lands at `:693-717` - a check-then-slow-work-then-write race
+with no transaction spanning it, and the project's own record documents manual
+re-fires. `run_e6_deleveraged.py:63-88`'s cross-file convention census still
+lists E5 and E7 under the EXCLUSIVE 200-DMA group and calls that "the opposite
+convention"; F2 moved both to INCLUSIVE on 2026-08-19, so the census is now
+false. `paper_sleeves.py:43` `STRESS_K = 4` exceeds the K=1-3 ceiling CLAUDE.md
+and HANDOFF both state, with no dated decision reconciling them.
+`costs.py:55-57` still holds a second copy of `prices.connect_ro`'s URI string.
+`GRAPH_REPORT.md:225-228` lists 3 of the graph's 12 hyperedges with no
+"N omitted" disclosure, unlike its own Communities section.
+
+**Third HIGH, and `.gitattributes` is the irony.** The live hook is the
+extensionless `scripts/git-hooks/pre-commit`, so it matches NO rule in
+`.gitattributes` - `git check-attr -a scripts/git-hooks/pre-commit` returns
+empty - while that same file pins `*.sh text eol=lf` with the comment "CRLF
+breaks the shebang". With `core.autocrlf=true`, git warns on every diff of it:
+"LF will be replaced by CRLF the next time Git touches it". The policy written
+for exactly this hazard misses the one file it most needs to cover. Census
+across the eight repos here: Autonomous Car Project, ServeLocal, Skills and
+World Models Research pin it; **Swing Trading, Trading, servelocal-v2 and
+servelocal-portfolio do not.**
+
+**Also.** `data/fomc_announcement_dates.json` ends at **2026-07-29**, 27 days
+stale, and `scripts/run_c6_fomc_cycle.py:27-59` anchors each bar to the latest
+announcement at-or-before it - so every bar after 2026-07-29 is scored against a
+stale anchor rather than erroring. The OHLCV cache has a `StaleCacheError` guard
+(`SWING_MAX_CACHE_STALE_DAYS`); this calendar has none.
+`.claude/codebase-memory/dependencies.md` (last touched 2026-07-15) never lists
+`markdown==3.10.3`, which `scripts/render_record_html.py:30` really imports.
+
+**Verified healthy, by running it.** `.venv\Scripts\python.exe -m swing_bot.test_frozen`
+-> `FROZEN TESTS: GREEN (all d=0)`, 12 pinned refs + 17 invariants, exactly as
+CLAUDE.md says. `scripts/daily_swing_paper.bat` is 1567 bytes, 0 non-ASCII.
+`core.hooksPath=scripts/git-hooks`, no dead `.git/hooks/pre-commit` copy. No
+tracked file name matches `.env|.pem|key|credential|secret`; `alpaca_keys.env`
+has never been tracked on any branch. `pip-audit 2.10.1` against
+`requirements.lock --strict` -> no known vulnerabilities across 32 runtime
+packages, zero copyleft, zero `git+`/`--index-url` entries. The lock's 18-package
+delta from `pip freeze` is exactly the dev set its own header says it excludes.
+`trial_log.json`, `fomc_announcement_dates.json` and the three `graphify-out`
+JSONs are all internally consistent. The record's 164 committed appendices are
+unique, ordered and contiguous A->FH, and the HTML twin has zero broken TOC
+links.
+
+Full report in the scheduled daily-audit session output for 2026-08-25.
+
+---
+
+# Appendix FJ - The LIVE LEDGER has been contaminated since 2026-08-25 and e6_1x has recorded NOTHING for five sessions. Every guard fired correctly; nobody was listening (2026-09-01, ~22:15 CDT)
+
+**TRIGGER:** first session in this context since 2026-08-19. Evan's message was
+about the `claude` CLI; this was found while orienting and it outranks it.
+
+**NOT RECORDED ANYWHERE UNTIL NOW.** The last appendix is FI (2026-08-25,
+~07:21 CDT). The contamination happened that EVENING — `clean_ledger_2026-08-25.py`
+has mtime 2026-08-25 21:21 — so it falls after FI and no entry describes it.
+
+## FJ.1 What is in the live ledger right now (read-only, `mode=ro`)
+
+**A landing-check agent wrote synthetic test rows into `swing.db` on 2026-08-25
+while exercising the new `mark_nav` refusal.** Per the cleanup script left on
+disk, both are fixtures, not market data:
+
+- `paper_nav`: `e6_1x / 2026-08-25 / 1140.4494382022472`. That implies a QQQ
+  close of exactly 812.00, while the same day's REAL rows (e18_vixts 991.96,
+  m10_1_nagel 1012.05) imply about 710.7. **A fabricated number is sitting in
+  the forward-evidence series.**
+- `paper_positions`: `e6_1x / ZZZZ / 10 @ 50 / entry 2026-08-20`, a ticker that
+  does not exist, with no matching row in `paper_transactions`.
+
+**THE CLEANUP WAS NEVER RUN.** `clean_ledger_2026-08-25.py` sits untracked in
+the repo ROOT (2,498 B). Its own printed expectation is `paper_nav 87 -> 86`;
+the table now holds **97 rows**, so eight days of the other two sleeves have
+accrued on top of the contamination.
+
+## FJ.2 The consequence: one sleeve of three has produced no evidence for a week
+
+Per-sleeve `paper_nav` counts: **e18_vixts 34, m10_1_nagel 34, e6_1x 29.**
+e6_1x's last row is the FABRICATED 2026-08-25 one; its last HONEST mark is
+**2026-08-24 at $992.02**.
+
+| session | sleeves recorded |
+|---|---|
+| 2026-08-26 | e18_vixts, m10_1_nagel — **e6_1x missing** |
+| 2026-08-27 | e18_vixts, m10_1_nagel — **e6_1x missing** |
+| 2026-08-28 | e18_vixts, m10_1_nagel — **e6_1x missing** |
+| 2026-08-31 | e18_vixts, m10_1_nagel — **e6_1x missing** |
+| 2026-09-01 | e18_vixts, m10_1_nagel — **e6_1x missing** |
+
+**And e6_1x is still TRADING while unable to mark.** `paper_positions` holds
+both the phantom `ZZZZ` and a real `QQQ` 1.404494382022472 @ 707.43 entered
+2026-09-01. So the sleeve takes positions it cannot value.
+
+## FJ.3 EVERY GUARD WORKED. That is the uncomfortable part
+
+This is not a code failure. The machinery built through August did exactly what
+it was built to do, and said so loudly:
+
+- `var/daily_swing_paper.log`: **"!! [e6_1x] no close price for held ['ZZZZ'] --
+  REFUSING to write today's paper_nav row rather than fabricate it at cost
+  basis."** That refusal is the FH finding's fix working on its first real
+  trigger.
+- The mirror-drift check: **"[e6_1x] ZZZZ: DB 10.0000000 vs Alpaca 0.0000000
+  d=-10.0000000 (-100.000%) <-- MATERIAL FORK"**.
+- `RUN_FAILURES` routed it to the exit gate: **`Last Result: 1`** on the
+  scheduled task, every night since 2026-08-26.
+
+**The alarm has been red for five days and nobody looked.** The original design
+note said "a `1` is the system working; the log names the cause" — it did, and
+the failure mode moved from the code to the operator. **A guard that fires into
+a channel no one reads is, in outcome, a guard that cannot fire — the sixth
+variant of this project's one recurring defect, and the first that no code
+change can close.**
+
+## FJ.4 Wider state found while orienting, none of it committed
+
+`git status` shows **11 modified files and 1 untracked**, none authored in this
+context: `scripts/daily_swing_paper.py` (+171), `swing_bot/test_frozen.py`,
+`swing_bot/costs.py`, `scripts/run_c6_fomc_cycle.py`, `scripts/run_e6_deleveraged.py`,
+`scripts/git-hooks/pre-commit`, `.gitattributes`,
+`.claude/codebase-memory/dependencies.md`, `graphify-out/GRAPH_REPORT.md`, and
+the record itself (+192 lines carrying Appendices FH and FI).
+
+**FI's own top finding was that FH never reached git.** It still has not, and FI
+has now joined it — `origin/main` is level with `HEAD` at `080a756`, so a clone
+of this repo gets neither entry, neither fix, and no record guard. The pattern
+FI named has repeated once more, with FI as the second victim.
+
+`HANDOFF.md` is stamped **2026-08-18 ~23:52** and knows none of this.
+
+## FJ.5 NOTHING WAS CHANGED
+
+No ledger write, no commit, no file staged. **Cleaning `swing.db` is a write to
+the live paper ledger and is BLOCKED-ON-EVAN by project rule.** Evan's
+2026-08-19 "i approve all things" was scoped to that turn's enumerated list and
+is not treated as standing authorisation for a ledger write discovered two weeks
+later.
+
+**Doc cadence:** prompt #191, cadence hit (the hook reported project files newer
+than the docs describing them, and it was right). Entry written before
+proceeding. No miss.
+
+
+# Appendix FK - The record itself had been WEDGED for 54 days - one malformed heading refused every append, which is why the 2026-09-05 audit left no trace; plus a missed-session detector blind per sleeve (2026-09-05, ~16:22 CDT)
+**Session:** 2026-09-05, ~16:09-16:22 CDT. Source: the 2026-09-05 daily-audit fix
+prompt (8 findings). Cadence: first record entry since FJ (2026-09-01) - and the
+gap was not neglect, see section 1.
+
+## 1. The record had been WEDGED for 54 days, and that is why 2026-09-05 left no trace
+
+`~/.claude/skills/project-memory/append-record-entry.js` refused EVERY append to
+this project:
+
+```
+REFUSED: unparseable appendix heading at line 2504:
+"# Appendix BR-note - CORRECTION to BR's "autonomous wall" claim (2026-07-13, ~13:55 CST)"
+- it is invisible to the letter scan, so a duplicate could be written.
+```
+
+Exactly 1 malformed heading out of 167. The `-note` suffix does not match
+`^# Appendix ([A-Z]+)<dash>`, so `nextFreeLetter` cannot see it, so the checker
+refuses rather than risk writing a duplicate letter under a green verdict. That
+refusal is correct behaviour; the cost is that no session - scheduled or
+interactive - could record anything here since 2026-07-13.
+
+**Why the heading was not "normalised to `# Appendix <LETTERS> - <title>`" as the
+fix prompt asked.** There is no legal letter available. A census of the record's
+letters shows **A..FJ with ZERO gaps** (166 pure-letter headings). So:
+
+- `# Appendix BR - ...` would be a duplicate of BR at record line 2446.
+- `# Appendix BRA - ...` parses, but its letter index far exceeds FJ, so
+  `nextFreeLetter` would jump to `BRB` and the whole sequence would break.
+- `# Appendix FK - ...` parses and is free, but it would place a 2026-07-13 entry
+  at physical line 2504, after entries dated 2026-09-01. Letters increase with
+  position throughout this record; that is the invariant readers navigate by.
+
+**What was done instead:** demoted it to `## BR-note - CORRECTION to BR's
+"autonomous wall" claim (2026-07-13, ~13:55 CST)`. It IS a correction to BR, not
+a separate appendix, and the record already writes corrections exactly this way -
+`## 2. CORRECTION to Appendix EF` at record line 5896. No letter invented, no
+duplicate, title text byte-for-byte unchanged, only the `# Appendix ` prefix
+replaced by `## ` (-8 bytes). The heading is no longer appendix-shaped, so the
+checker's SUSPECT_RE no longer matches it.
+
+**This deviates from the fix prompt's literal instruction and from the option
+chosen in the prior session** (teach the shared checker that `<LETTERS>-note` is
+legal). That earlier option is still the better long-term fix - it would help all
+six repos that share this checker - but writing to `~/.claude/skills/` was denied
+by the permission classifier in that session, and it was not retried here.
+
+### 1b. Fixing it exposed a SECOND wedge the audit had not seen
+
+With the heading legal, the checker refused again:
+
+```
+REFUSED: invariant failed, file NOT modified: TOC lines (36) != appendix headings (167)
+```
+
+The record's own Table of Contents stops at **Appendix AI** - a defect recorded
+in FE (2026-08-19) and again in FI (record line 8148), never fixed. So finding 1
+was incomplete: unblocking the record required backfilling the TOC too.
+
+**131 TOC lines generated and appended** after record line 74, restoring
+166 = 166. The generator's trustworthiness was established before its output was
+used: it reproduced **32 of the 35 existing hand-written TOC lines
+byte-identically**, and all 3 differences are display text only (a hand-written
+arrow where the heading has `->`; one shortened title) with **matching anchors**.
+The 35 existing lines were left untouched rather than regenerated - additive, not
+rewriting a prior hand.
+
+Verified: the checker's `--dry-run` now proposes `Appendix FK`, exit 0.
+
+## 2. (crit, FIXED) The missed-session detector was blind per sleeve
+
+`daily_swing_paper.py` read `SELECT DISTINCT date FROM paper_nav`. `paper_nav`'s
+primary key is `(sleeve, date)`. Collapsing to a bare date set means a date counts
+as covered when **any one** sleeve recorded it.
+
+Confirmed against the ledger (read-only): `e6_1x` recorded no NAV on 2026-08-25,
+08-26, 08-27, 08-28 and 08-31 while `e18_vixts` and `m10_1_nagel` recorded
+normally. The guard reported clean every night for 11 days. **The one real vanish
+this detector has ever had to catch is the one kind it structurally could not
+see** - another instance of this project's signature defect, a guard that cannot
+fire.
+
+Now a per-sleeve set difference reporting `(sleeve, date)` pairs, with each
+sleeve's own first mark as its start, so a sleeve added later never inherits its
+peers' history as holes.
+
+**`ACKNOWLEDGED_NAV_HOLES` decision, stated as the fix prompt asked:** converted
+from a bare date set to `(sleeve, date)` **PAIRS**. Keeping it date-scoped would
+forgive an acknowledged date for *every* sleeve - re-introducing the exact
+cross-sleeve blindness just removed, in the acknowledgement path. 2026-07-30 is
+written out three times, once per sleeve, because it really did hit all three.
+It is a literal, NOT derived from `ps.SLEEVES`, so a fourth sleeve never inherits
+a pre-acknowledged hole. The reasoning is in the code comment.
+
+**Verification** (scratch probe, `swing.db` opened `mode=ro`, the predicate
+re-run outside the forbidden script):
+
+```
+ACKNOWLEDGED_NAV_HOLES = [('e18_vixts','2026-07-30'), ('e6_1x','2026-07-30'), ('m10_1_nagel','2026-07-30')]
+e6_1x        missed: ['2026-08-25', '2026-08-26', '2026-08-27', '2026-08-28', '2026-08-31']
+e18_vixts    missed: clean
+m10_1_nagel  missed: clean
+unacknowledged (would fail the run): ['e6_1x/2026-08-25', ... , 'e6_1x/2026-08-31']
+OK: new predicate finds 5 e6_1x holes; old DISTINCT-date predicate found []
+```
+
+**Stated limitation of that probe:** it uses the distinct dates in `paper_nav` as
+the trading-session universe, because the real run derives `qdates` from a QQQ
+fetch and this project forbids running `daily_swing_paper.py`. That proxy is
+sound for 2026-07-15..2026-09-03 (two sleeves marked every session) but it cannot
+contain 2026-07-30, which no sleeve has - so the probe does not exercise the
+acknowledgement path for 07-30. In the real run `qdates` contains 07-30 and the
+three acknowledged pairs suppress it.
+
+## 3. (BLOCKED-ON-EVAN) The five NAV rows are neither backfilled nor acknowledged
+
+`e6_1x` has 31 marks; both peers have 36. Any cross-sleeve return or NAV
+comparison is running on unequal series. Last honest pre-gap mark:
+`2026-08-24 $992.02`; it resumes `2026-09-01 $993.88`.
+
+**Not decided here.** Backfilling is a WRITE to the live forward-evidence series;
+acknowledging declares five sessions permanently lost. Both are Evan's call, and
+the acknowledgement path is additionally record-gated by the code's own rule
+("add a pair here only after it is recorded in the project record as permanently
+lost"). Consequence of leaving it: the newly-fixed detector will push
+`RUN_FAILURES` every night until he picks. That is deliberate and correct - the
+holes are real - but it means the nightly task goes red starting now.
+
+## 4. (high, FIXED) The "mandatory" liquidity floor passed any name with missing volume
+
+The call site read `if adv is not None and adv < universe.MIN_MEDIAN_DOLLAR_VOL:`.
+`median_dollar_volume()` returns `None` when fewer than `max(5, n//2)` = 10
+sessions carry usable close AND volume. So a data-starved name - feed gap, halt,
+thin history - **skipped the floor entirely** and could be ranked into the live
+K=4 stress basket at ~$250 of a $1,000 sleeve. The floor `CLAUDE.md` calls
+"mandatory in any universe filter" was absent exactly where it matters most.
+
+Worse, the function's own docstring **instructed** that behaviour ("the caller
+must NOT treat the name as illiquid on missing data alone"), so the call site was
+obeying its contract. Both were changed together: fail closed on `None`
+(excluded, and printed separately from the genuinely-illiquid list), and the
+docstring rewritten to say callers must fail closed and why.
+
+Latent, never fired: reaching that code needs VIX>20, which has not occurred
+live, plus a same-week data gap.
+
+**New check `scripts/prove_liquidity_floor.py` - GREEN (6/6):**
+
+```
+PASS liquid, 30 bars                     got=RANKED
+PASS illiquid, 30 bars                   got=EXCLUDED-illiquid
+PASS 9 bars -> unknown, fail closed      got=EXCLUDED-unknown
+PASS   ...and the OLD branch ranked it   got=RANKED
+PASS volume gap -> unknown, fail closed  got=EXCLUDED-unknown
+PASS   ...and the OLD branch ranked it   got=RANKED
+FLOOR = $20M/day (universe.MIN_MEDIAN_DOLLAR_VOL)
+```
+
+The two `OLD branch` cases are the load-bearing ones: they prove the change is
+not cosmetic. Pure in-memory - no DB, no network, no orders.
+
+## 5. (FIXED) Two stale BLOCKED-ON-EVAN rows for work finished 2026-08-19
+
+`HANDOFF.md` still listed the V3 run and the Audit #4 F14 cash-residue write as
+awaiting Evan. Record FC (record line 7614, 2026-08-19 ~16:28 CDT) says both were
+done, and the DB agrees: `paper_sleeves.cash` is `0.0` for all three sleeves,
+no e-13 residue (verified read-only today). Both struck with "EXECUTED
+2026-08-19, record FC".
+
+FC.5's nuance is preserved on the V3 bullet rather than flattened to "ACCEPTED":
+the false positive V3 was written to remove **did not reproduce** - planted-edge
+PBO 0.486 under V3 against 0.514 under V2, and V2's rule would not have rejected
+it either. V3 is accepted on its reasoning, not on a demonstrated repair.
+Thresholds did not move.
+
+**This is the third stale BLOCKED row this project has carried** (record EO was
+the first, a row that said BLOCKED for 4 weeks while the thing was running). It
+cost 17 days this time.
+
+## 6. (FIXED) HANDOFF was 18 days stale
+
+A grep for FH, FI and FJ in `HANDOFF.md` returned **0** matches; it now returns
+32. The stamp read 2026-08-18 ~23:52 CDT while the doc's own body cited records
+FD and FG dated 2026-08-19. Restamped 2026-09-05 ~16:09 CDT. Added: FH
+(7-finding audit, nothing fixed), FI (that audit never reached git for 5 days),
+FJ (live-ledger contamination), and today's pass.
+
+Also corrected: the M3 roadmap row said "20 sessions" while the M3 block six
+lines earlier said 24 and the DB agreed with 24
+(`select count(*), count(distinct date) from paper_nav where date<='2026-08-18'`
+gives `(72, 24)`). Now 36 sessions / 103 NAV rows through 2026-09-03. The "ONE
+permanent hole" claim is now the full hole list: 2026-07-30 across all three
+sleeves, plus the five e6_1x-only holes. Latest marks refreshed to 2026-09-03:
+e6_1x $1,007.96, e18_vixts $1,001.66, m10_1_nagel $1,021.94.
+
+## 7. (FIXED as a documented exception) STRESS_K = 4 vs the K=1-3 ceiling
+
+`swing_bot/paper_sleeves.py:43` sets `STRESS_K = 4`; `CLAUDE.md` states the goal
+as concentrated K=1-3. Flagged in FH (2026-08-20), unchanged 16 days.
+
+**Resolved as a dated exception in `CLAUDE.md`, not a code change**, because K=4
+is the parameter the evidence actually covers: `run_c1_residual_reversal.py:6`
+("Bottom K=4") and `run_m10_1_nagel_switch.py:4` ("bottom-K=4"). Dropping the
+live basket to K=3 would make the live sleeve implement a rule no backtest has
+ever run - which is precisely the F2 defect class this project closed on
+2026-08-19. Trading a documented rule violation for an undocumented evidence
+violation is the worse trade.
+
+Scope is stated as the M10-1 stress branch only; e6_1x and e18_vixts stay K=1.
+Reversal path is stated: re-run C1 and M10-1 at K=3 under a fresh prereg. A
+pointer comment at `paper_sleeves.py:43` names the exception so the next reader
+does not re-open it.
+
+## 8. (BLOCKED-ON-EVAN, NOT guessed) Something wrote to the live ledger after 2026-09-01
+
+Record FJ (2026-09-01) says "NOTHING WAS CHANGED" and lists the ledger cleanup as
+BLOCKED-ON-EVAN. Disk disagrees: the fabricated 2026-08-25 NAV row is gone, the
+phantom `ZZZZ` position is gone from both `paper_positions` and
+`paper_transactions`, e6_1x resumed marking 2026-09-01, and the scheduled task
+now exits 0. **A manual write and a reconcile self-heal are very different
+answers** for whether the forward-paper evidence is trustworthy, and the
+difference is not inferable from the current state. Asked, not inferred.
+
+Related: `clean_ledger_2026-08-25.py` (2,498 B) still sits untracked in the repo
+root. FJ references it, so it was not deleted.
+
+## Done-check
+
+`swing_bot.test_frozen` printed **`FROZEN TESTS: GREEN (all d=0)`**, run after the
+`daily_swing_paper.py` edits and again after the `swing_bot/paper_sleeves.py`
+comment. `scripts/prove_liquidity_floor.py` GREEN (6/6). Nothing was run against
+`swing.db` except `mode=ro` reads; `daily_swing_paper.py` and every `.bat` were
+never executed.
+
+## Open after this entry
+
+- **Evan's call:** the five e6_1x NAV holes (backfill vs acknowledge); who wrote
+  to the live ledger after 2026-09-01; whether to delete
+  `clean_ledger_2026-08-25.py`.
+- **Still open from FH:** the run exits GREEN when credentials die during market
+  hours; a missing price silently marks NAV at cost basis.
+- **F3 redirect** still unanswered (record FG): the floor can never fire on the
+  stock universe; the real exposure is the ETF experiments.
+- **The shared checker still refuses `<LETTERS>-note` headings** in all six repos
+  that use it. This project no longer has one; the next repo to write one will
+  wedge the same way.
+- The record's HTML twin and the graph index both need re-generating against the
+  new TOC and this entry.
+
+# Appendix FL - Evan's three calls: the five e6_1x NAV holes are permanent, the post-09-01 ledger write stays unattributed - but reading the cleanup script bounded it to two synthetic rows and the arithmetic reconciles to the row (2026-09-05, ~17:48 CDT)
+**Session:** 2026-09-05, ~17:48 CDT. Continues FK. Three questions were put to
+Evan rather than guessed; all three came back, and one of them changed what the
+project can claim about its own evidence.
+
+## 1. The five e6_1x NAV holes: ACKNOWLEDGED AS PERMANENT, not backfilled
+
+**Evan's call.** The five `(e6_1x, date)` pairs for 2026-08-25, 08-26, 08-27,
+08-28 and 08-31 are now in `ACKNOWLEDGED_NAV_HOLES` in
+`scripts/daily_swing_paper.py`. They are still **PRINTED every run** - the series
+genuinely lacks them - but no longer push `RUN_FAILURES`, so the nightly task
+goes green again instead of failing forever on an unfixable past hole.
+
+The alternative was a WRITE to the live forward-evidence series, reconstructing
+five marks from stored closes after the fact. That was rejected: forward paper
+evidence that is reconstructed is not forward evidence.
+
+**Standing consequence, written into the code comment and into HANDOFF:** e6_1x
+has **31 NAV marks against its peers' 36**. Any cross-sleeve return or NAV
+comparison MUST align on dates and must never assume equal series. This is the
+kind of thing that silently corrupts a comparison months later, so it is stated
+in three places (code, HANDOFF, here) rather than one.
+
+Why the holes exist at all, restated so the acknowledgement is not mistaken for
+carelessness: a landing-check agent wrote a synthetic `ZZZZ` position into the
+live ledger on 2026-08-25 while testing the `mark_nav` refusal. `mark_nav` then
+correctly REFUSED to price a position it had no price for, and e6_1x exited 1 -
+every night, for five sessions. **The guard worked. Nobody read the exit code.**
+That is record FJ's finding, and it is why FK's per-sleeve detector matters: the
+detector that should have caught the silence was structurally blind to it.
+
+Verified after the change (read-only, `swing.db` opened `mode=ro`):
+
+```
+e6_1x        missed: ['2026-08-25', '2026-08-26', '2026-08-27', '2026-08-28', '2026-08-31']
+e18_vixts    missed: clean
+m10_1_nagel  missed: clean
+unacknowledged (would fail the run): []
+```
+
+Still reported, no longer fatal - which is exactly the designed behaviour the
+`ACKNOWLEDGED_NAV_HOLES` comment describes.
+
+## 2. The post-2026-09-01 ledger write: WHAT is now known, WHO is not
+
+**Evan does not know what wrote to the ledger.** That is recorded as-is, not
+guessed. But committing `clean_ledger_2026-08-25.py` (question 3) meant reading
+it, and reading it answers most of the question:
+
+- Its docstring names the origin of the contamination: **a landing-check agent
+  wrote two synthetic rows on 2026-08-25 while testing the new `mark_nav`
+  refusal.** Both were provably fixtures, not market data - the fake
+  `paper_nav` row implied a QQQ close of **812.0000 exactly** against the same
+  day's real rows implying **~710.7**, and the `ZZZZ` position had no matching
+  transactions.
+- It deletes exactly the two rows that are now missing from disk.
+- **The row arithmetic reconciles to the row.** The script expects
+  `paper_nav 87 -> 86`. Sessions 2026-08-26..09-03 are 7 trading days x 3 sleeves
+  = 21 sleeve-sessions, minus e6_1x's 4 misses in that window = 17 marks.
+  86 + 17 = **103**, which is exactly the `paper_nav` row count on disk today.
+
+So the change to the live ledger was **surgical and bounded**: two synthetic rows
+removed, nothing else touched. It was not an arbitrary rewrite, and the forward
+evidence either side of it is intact.
+
+**What remains unknown is who ran it and when** - and that is a real gap, not a
+formality. Record FJ (2026-09-01) states "NOTHING WAS CHANGED", so either FJ was
+written before the run or the run was never recorded.
+
+**Provenance caveat now standing on the forward-paper evidence: one unattributed
+write to the live ledger, scope bounded to the two synthetic 2026-08-25 rows.**
+It is in HANDOFF alongside the M3 block, so it travels with any future claim made
+from that series.
+
+This is the second time this project has found that its own record disagreed with
+disk about a live-ledger state (record FC.6 was the first). Both times the record
+was corrected forward rather than edited.
+
+## 3. `clean_ledger_2026-08-25.py` COMMITTED, not deleted
+
+**Evan's call.** FJ references it, so tracking it makes that reference resolvable
+and preserves what was actually run against the live ledger. Deleting it would
+have left FJ pointing at a file nobody could read - and, as section 2 shows, the
+file turned out to carry the only surviving account of how the contamination
+began.
+
+It is a one-shot script that opens `swing.db` read-write. It is committed as
+**history, not as a tool to re-run**; it is already idempotent (reports 0 deleted
+if clean) and its guard asserts the expected 87 -> 86 / 4 -> 3 counts, which no
+longer hold, so a re-run today would print `UNEXPECTED STATE`.
+
+## Done-check
+
+`swing_bot.test_frozen` -> **`FROZEN TESTS: GREEN (all d=0)`** after the
+`ACKNOWLEDGED_NAV_HOLES` change. The per-sleeve detector probe re-run read-only
+against `swing.db`: five e6_1x holes still reported, zero unacknowledged, both
+peers clean. No writes to `swing.db` this session; `daily_swing_paper.py` and
+every `.bat` never executed.
+
+## Open after this entry
+
+- **Still open from FH (2026-08-20):** the run exits GREEN when credentials die
+  during market hours; a missing price silently marks NAV at cost basis. The
+  second of those is the mechanism behind the e6_1x stall's sibling failure mode
+  and is now the oldest unfixed HIGH in the project.
+- **F3 redirect** still unanswered (record FG): the floor can never fire on the
+  stock universe; the real exposure is the ETF experiments nobody looked at.
+- **The shared `append-record-entry.js` still refuses `<LETTERS>-note` headings**
+  in all six repos that use it. This project no longer has one; the next repo to
+  write one wedges the same way, for the same 54-day-shaped reason.
+- **Graph re-index** against the new TOC, FK and FL.

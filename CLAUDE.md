@@ -13,6 +13,19 @@ corrected 2026-08-13, record EO.)
   positions), losses explicitly accepted. Gates are return-centric with
   loosened-but-present drawdown ceilings. Risk appetite changes gate
   NUMBERS, never rigor DISCIPLINE (prereg before results; no tuning a FAIL).
+- **DATED EXCEPTION to the K=1–3 ceiling (2026-09-05, finding 7):**
+  `swing_bot/paper_sleeves.py:43` sets `STRESS_K = 4` for the M10-1 stress
+  basket ONLY. K=4 is not a drift — it is the parameter C1 and M10-1 were
+  actually backtested at (`run_c1_residual_reversal.py:6` "Bottom K=4",
+  `run_m10_1_nagel_switch.py:4` "bottom-K=4"), and it is the only rule the
+  live sleeve has evidence for. Dropping the live basket to K=3 would make it
+  implement a rule no backtest has ever run — this project's F2 defect class,
+  where the live code and the tested code diverge. So the ceiling is
+  documented as breached rather than silently enforced against the evidence.
+  **Scope: the M10-1 stress branch only**; e6_1x and e18_vixts stay K=1.
+  **To reverse:** re-run C1 and M10-1 at K=3 under a fresh prereg, and move
+  `STRESS_K` only if that prereg's gates pass. Flagged unfixed in record FH
+  (2026-08-20) and left unreconciled for 16 days before this line was written.
 - SEPARATE from `D:\ClaudeCode\Trading`. Never modify that repo from this
   project without Evan's explicit instruction. Never run backtests
   concurrently against Trading's DB.

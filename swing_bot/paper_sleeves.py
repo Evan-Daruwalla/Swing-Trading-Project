@@ -41,6 +41,11 @@ DB_PATH = Path(__file__).resolve().parent.parent / "swing.db"
 CAP0 = 1000.0     # starting notional per sleeve; matches E6/M10-1 backtest CAP0
 SLEEVES = ("e6_1x", "e18_vixts", "m10_1_nagel")
 STRESS_K = 4       # M10-1 stress-mode basket size (matches C1's K)
+# K=4 EXCEEDS the K=1-3 ceiling in CLAUDE.md. That is a DATED EXCEPTION, not
+# drift -- see CLAUDE.md "DATED EXCEPTION to the K=1-3 ceiling (2026-09-05,
+# finding 7)". K=4 is the parameter C1 and M10-1 were backtested at, so K=3
+# here would run a rule no backtest has ever tested. Reversing it means
+# re-running both at K=3 under a fresh prereg, not editing this line.
 # M10-1 regime threshold. SINGLE SOURCE OF TRUTH (audit #6): the daily loop
 # gates its residual-rank fetch on this same number. When it was duplicated as
 # a literal in both files, raising one copy (e.g. to 22) meant that at VIX=21 on

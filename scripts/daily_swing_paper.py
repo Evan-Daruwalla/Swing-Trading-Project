@@ -89,7 +89,31 @@ ROUTINE_SKIP = "ROUTINE: "
 # Last Result that fires forever on an unfixable past hole trains the operator
 # to ignore red, which un-fixes F4. Add a date here only after it is recorded
 # in the project record as permanently lost.
-ACKNOWLEDGED_NAV_HOLES = {"2026-07-30"}   # lost to the Interactive-only task; record EI
+# (2026-09-05, finding 2) Was a bare date set; now (sleeve, date) PAIRS. The
+# detector below is per-sleeve, so a date-scoped acknowledgement would forgive
+# that date for EVERY sleeve -- re-introducing the exact cross-sleeve blindness
+# the detector was just fixed to remove. 2026-07-30 is written out three times
+# because it really did hit all three sleeves; it is NOT derived from ps.SLEEVES,
+# so a sleeve added later never inherits a pre-acknowledged hole.
+ACKNOWLEDGED_NAV_HOLES = {                # lost to the Interactive-only task; record EI
+    ("e6_1x", "2026-07-30"),
+    ("e18_vixts", "2026-07-30"),
+    ("m10_1_nagel", "2026-07-30"),
+    # (2026-09-05) Evan's call, given on the finding-3 question: the five
+    # e6_1x-only holes are ACKNOWLEDGED AS PERMANENT, not backfilled. e6_1x
+    # stopped marking because a landing-check agent left a synthetic ZZZZ
+    # position in the ledger and mark_nav correctly REFUSED to price it --
+    # the guard worked, nobody read the exit code for five sessions (record
+    # FJ). Backfilling would mean reconstructing forward evidence after the
+    # fact, so the series keeps an honest hole instead. CONSEQUENCE: e6_1x
+    # has 31 marks against its peers' 36, so any cross-sleeve return or NAV
+    # comparison MUST align on dates rather than assume equal series.
+    ("e6_1x", "2026-08-25"),
+    ("e6_1x", "2026-08-26"),
+    ("e6_1x", "2026-08-27"),
+    ("e6_1x", "2026-08-28"),
+    ("e6_1x", "2026-08-31"),
+}
 # Max sessions the VIX3M reading may lag `today` before e18 refuses to decide
 # (audit #3). 2 = tolerate the normal 1-session publish lag + a holiday edge;
 # the 5-session Yahoo lag that inverted the signal (record DC) trips it.
@@ -144,9 +168,17 @@ def series_with_volume(ticker, start="1999-01-01"):
 
 def median_dollar_volume(dates, close, vol, n=20, asof=None):
     """Median close*volume over the last `n` sessions up to and including `asof`.
-    Past-only -- never looks beyond `asof`. Returns None if there is not enough
-    data or the feed carries no volume (in which case the caller must NOT treat
-    the name as illiquid on missing data alone)."""
+    Past-only -- never looks beyond `asof`. Returns None when fewer than
+    max(5, n//2) sessions carry usable close AND volume -- i.e. LIQUIDITY IS
+    UNKNOWN, not "known adequate".
+
+    (2026-09-05, finding 4) This docstring used to instruct callers NOT to treat
+    the name as illiquid on missing data alone, and the one caller obeyed it by
+    testing `adv is not None and adv < FLOOR` -- which waved every data-starved
+    name straight past the floor CLAUDE.md calls mandatory. Callers must now
+    FAIL CLOSED on None: exclude the name, because a feed gap, a halt, or thin
+    history is exactly the condition under which the floor matters most.
+    """
     ds = [d for d in dates if asof is None or d <= asof][-n:]
     vals = [close[d] * vol[d] for d in ds
             if close.get(d) is not None and vol.get(d)]
@@ -704,20 +736,37 @@ def _run(args):
     # advanced max(date) to 07-31, and the gap became invisible forever. A set
     # difference over the whole series sees interior holes too, and keeps seeing
     # them, so a skipped session stays reported until it is acknowledged.
-    have = {r[0] for r in conn.execute("SELECT DISTINCT date FROM paper_nav")}
-    if have:
-        first = min(have)
+    # (2026-09-05, finding 2) This read `SELECT DISTINCT date`, but paper_nav's
+    # primary key is (sleeve, date). Collapsing to a bare date set made a date
+    # count as covered when ANY ONE sleeve had written it, so the guard printed
+    # clean every night while e6_1x recorded nothing for 2026-08-25, 08-26,
+    # 08-27, 08-28 and 08-31 while its two peers recorded normally -- 11 days of
+    # a green light over the one real vanish this detector has ever had to
+    # catch. The set difference is now taken PER SLEEVE and reports pairs.
+    have = {(r[0], r[1]) for r in conn.execute("SELECT sleeve, date FROM paper_nav")}
+    missed_pairs = []
+    for sleeve in ps.SLEEVES:
+        sdates = {d for s, d in have if s == sleeve}
+        # A sleeve that has never marked has no series yet, so it has no holes;
+        # its first mark is its own start date, not the ledger-wide first date.
+        if not sdates:
+            continue
+        first = min(sdates)
         # `d < today` deliberately: this run has not marked today's NAV yet
         # (that happens ~100 lines below), so today is never "missed".
-        missed = [d for d in qdates if first < d < today and d not in have]
-        if missed:
-            print("\n!! MISSED SESSION(S): %d trading session(s) have no paper_nav "
-                  "row -- %s. Those NAV rows are PERMANENTLY absent from the "
-                  "forward-evidence series. Check the scheduled task."
-                  % (len(missed), ", ".join(missed)), flush=True)
-            new_holes = [d for d in missed if d not in ACKNOWLEDGED_NAV_HOLES]
-            if new_holes:
-                RUN_FAILURES.append("missed session(s): " + ", ".join(new_holes))
+        missed_pairs += [(sleeve, d) for d in qdates
+                         if first < d < today and d not in sdates]
+    if missed_pairs:
+        print("\n!! MISSED SESSION(S): %d (sleeve, date) pair(s) have no paper_nav "
+              "row -- %s. Those NAV rows are PERMANENTLY absent from the "
+              "forward-evidence series, and any cross-sleeve comparison is "
+              "running on unequal series. Check the scheduled task."
+              % (len(missed_pairs),
+                 ", ".join("%s/%s" % p for p in missed_pairs)), flush=True)
+        new_holes = [p for p in missed_pairs if p not in ACKNOWLEDGED_NAV_HOLES]
+        if new_holes:
+            RUN_FAILURES.append("missed session(s): "
+                                + ", ".join("%s/%s" % p for p in new_holes))
 
     # ---- realize any pending from the previous run (needs today's opens for
     # whatever tickers are currently held / newly targeted) ----
@@ -786,6 +835,7 @@ def _run(args):
             ff = fresh_ff3()
             ranks = []
             illiquid = []
+            unknown_liq = []
             for t in UNIV:
                 ds, cl, vol = series_with_volume(t, start="2010-01-01")
                 cls = [cl[d] for d in ds]
@@ -796,13 +846,26 @@ def _run(args):
                 # picks individual stocks, so it is the correct chokepoint:
                 # screen on 20-session median dollar volume before ranking.
                 adv = median_dollar_volume(ds, cl, vol, n=20, asof=today)
-                if adv is not None and adv < universe.MIN_MEDIAN_DOLLAR_VOL:
+                # (2026-09-05, finding 4) FAIL CLOSED on None. This read
+                # `adv is not None and adv < FLOOR`, so a name whose feed
+                # gave fewer than 10 usable volume bars -- gap, halt, thin
+                # history -- skipped the floor entirely and could be ranked
+                # into the live K=4 stress basket at ~$250 of a $1,000
+                # sleeve. Unknown liquidity is excluded, not waved through.
+                if adv is None:
+                    unknown_liq.append(t)
+                    continue
+                if adv < universe.MIN_MEDIAN_DOLLAR_VOL:
                     illiquid.append((t, adv))
                     continue
                 form = residual_series(ds, cls, ff)
                 v = dict(zip(ds, form)).get(today)
                 if v is not None:
                     ranks.append((v, t))
+            if unknown_liq:
+                print("  liquidity floor excluded %d name(s) with too few "
+                      "usable volume bars to measure: %s"
+                      % (len(unknown_liq), ", ".join(unknown_liq)), flush=True)
             if illiquid:
                 print("  liquidity floor ($%.0fM/day) excluded %d name(s): %s"
                       % (universe.MIN_MEDIAN_DOLLAR_VOL / 1e6, len(illiquid),

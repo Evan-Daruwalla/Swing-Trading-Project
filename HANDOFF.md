@@ -90,13 +90,95 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
 > instruments cannot be tested fairly.
 
-**Last updated: 2026-08-18 ~23:52 CDT** — this file is the only live snapshot;
+**Last updated: 2026-09-05 ~16:09 CDT** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
 reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
 2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
 self-contradictory and was corrected 2026-07-28 by audit #7).**
+
+> **2026-09-05 - DAILY-AUDIT FIX PASS (record FK). The record itself had been
+> WEDGED for 54 days, which is why the 2026-09-05 audit left no trace.**
+> `append-record-entry.js` refused EVERY append to this project: the heading
+> `# Appendix BR-note - ...` (record line 2504, written 2026-07-13) is invisible
+> to the letter scan, so the checker refused rather than risk a duplicate letter.
+> Fixed by demoting it to a `## BR-note - ...` sub-head of BR - it IS a
+> correction to BR, not a separate appendix, and the record already writes
+> corrections that way (`## 2. CORRECTION to Appendix EF`). No letter invented,
+> no duplicate, title text unchanged. **Fixing it exposed a SECOND wedge the
+> audit had not seen:** the checker's TOC invariant then refused with `TOC lines
+> (36) != appendix headings (167)`. The record's Table of Contents stopped at
+> Appendix AI (known since records FE/FI, never fixed). **131 TOC lines were
+> generated and appended**; the generator reproduced 32 of the 35 existing
+> human-written lines BYTE-IDENTICALLY, and the 3 differences are display text
+> only (`->` written as an arrow, one shortened title) with matching anchors -
+> which is what makes the generated 131 trustworthy. The record now accepts
+> appends; next letter is **FK**.
+> - **(crit, FIXED) The missed-session detector was blind per sleeve.**
+>   `daily_swing_paper.py` compared `SELECT DISTINCT date`, but `paper_nav`'s
+>   primary key is `(sleeve, date)`, so a date counted as covered when ANY ONE
+>   sleeve wrote it. e6_1x recorded no NAV on 2026-08-25 / 08-26 / 08-27 / 08-28
+>   / 08-31 while both peers did, and the guard printed clean every night for 11
+>   days. The one real vanish it has ever had to catch is the one kind it
+>   structurally could not see. Now a per-sleeve set difference reporting
+>   `(sleeve, date)` pairs. **`ACKNOWLEDGED_NAV_HOLES` converted from a bare
+>   date set to (sleeve, date) PAIRS** - a date-scoped acknowledgement would
+>   forgive that date for every sleeve, re-introducing the exact blindness just
+>   removed; 2026-07-30 is written out three times because it really did hit all
+>   three. Proven read-only against `swing.db`: new predicate reports exactly the
+>   five e6_1x dates and clean for both peers; the old predicate reported `[]`.
+> - **(high, FIXED) The "mandatory" liquidity floor passed any name with missing
+>   volume.** The call site read `adv is not None and adv < MIN_MEDIAN_DOLLAR_VOL`,
+>   and `median_dollar_volume()` returns None on fewer than 10 usable bars - so a
+>   data-starved name (feed gap, halt, thin history) skipped the floor entirely
+>   and could enter the live K=4 stress basket at ~$250 of a $1,000 sleeve. The
+>   function's own docstring INSTRUCTED that behaviour. Now fails closed on None,
+>   docstring rewritten to match, and `scripts/prove_liquidity_floor.py` pins it
+>   6/6 (including two cases proving the OLD branch ranked those names). Latent,
+>   never fired: needs VIX>20, which has not occurred live.
+> - **(FIXED) `STRESS_K = 4` vs the K=1-3 ceiling** - resolved as a **dated
+>   exception in `CLAUDE.md`, not a code change.** K=4 is the parameter C1 and
+>   M10-1 were actually backtested at; dropping the live basket to K=3 would make
+>   it implement a rule no backtest has run - this project's F2 defect class.
+>   Reversing it requires re-running both at K=3 under a fresh prereg.
+> - **(FIXED) Two stale BLOCKED-ON-EVAN rows** for the V3 run and the F14 ledger
+>   write, both finished 2026-08-19 (record FC) and left blocking-looking for 17
+>   days. Struck below. **Third time this project has carried a stale BLOCKED
+>   row** (record EO was the first).
+> - **RESOLVED by Evan, 2026-09-05 (record FL):** **(a)** the five e6_1x NAV
+>   holes are **ACKNOWLEDGED AS PERMANENT, not backfilled** - forward evidence is
+>   not reconstructed after the fact. They are now `(e6_1x, date)` pairs in
+>   `ACKNOWLEDGED_NAV_HOLES`, still PRINTED every run but no longer failing it.
+>   **Standing consequence: e6_1x has 31 NAV marks against its peers' 36, so any
+>   cross-sleeve return or NAV comparison MUST align on dates and must never
+>   assume equal series.** **(b)** Evan does **not** know what wrote to the
+>   ledger after 2026-09-01, and it is recorded as unattributed rather than
+>   guessed. But `clean_ledger_2026-08-25.py` (now COMMITTED, so FJ's reference
+>   resolves) produces exactly the observed deletions, and the row arithmetic
+>   reconciles to the row: it expects `paper_nav 87 -> 86`, and 86 + 17 marks
+>   over 2026-08-26..09-03 (21 sleeve-sessions minus e6_1x's 4 misses) = the 103
+>   rows on disk. Its docstring also names the origin of the contamination - a
+>   landing-check agent wrote two synthetic rows on 2026-08-25 while testing the
+>   `mark_nav` refusal. So WHAT happened is known and surgical (2 provably
+>   synthetic rows: the fake NAV implied QQQ 812.00 against the real ~710.7);
+>   WHO ran it, and when, is not. **Provenance caveat on the forward-paper
+>   evidence: one unattributed write to the live ledger, scope bounded as above.**
+
+> **2026-09-01 - record FJ: THE LIVE LEDGER WAS CONTAMINATED and e6_1x recorded
+> NOTHING for five sessions. Every guard fired correctly; nobody was listening.**
+> See record FJ (record line 8246). `clean_ledger_2026-08-25.py` still sits
+> UNTRACKED in the repo root (2,498 B); FJ references it, so it is not deleted
+> without Evan's say-so.
+
+> **2026-08-25 - record FI: the 2026-08-20 audit (FH) never reached git**, so its
+> two HIGHs stayed live five days. Landed later at `509852e`.
+
+> **2026-08-20 - record FH: 7-finding scheduled daily-audit, NOTHING FIXED at the
+> time.** The run exits GREEN when credentials die during market hours, and a
+> missing price silently marks NAV at cost basis. Of FH's list, `STRESS_K` is
+> resolved above (2026-09-05); the credential-death and missing-price findings
+> are **still open**.
 
 > **2026-07-28 — FULL AUDIT (`/audit`) + 5 fixes landed (records DH, DI; commits
 > `1078693`, `6c9b161`, + this session).** System structurally sound; risk was concentrated
@@ -137,9 +219,18 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 >   "No known vulnerabilities found". This block had claimed them Open for 8 days
 >   after the code said otherwise.
 
-> **M3 forward paper — RUNNING, 24 sessions (2026-07-15 → 2026-08-18), 72 NAV rows, ONE
-> permanent hole (2026-07-30, record EI).** (This line has now been wrong three separate
-> ways, so its history stays visible. It once said "13 sessions, 27 NAV rows, no gaps" —
+> **M3 forward paper — RUNNING, 36 sessions (2026-07-15 → 2026-09-03), 103 NAV rows,
+> and the hole count is NOT one.** (Through 2026-08-18 it was 24 sessions / 72 rows,
+> which is what the sentence below was written against.) **Holes as of 2026-09-05:
+> 2026-07-30 (all three sleeves, record EI) PLUS five e6_1x-only holes — 2026-08-25,
+> 08-26, 08-27, 08-28 and 08-31 (record FJ).** e6_1x therefore has 31 NAV marks where
+> its peers have 36, so any cross-sleeve return or NAV comparison is running on
+> UNEQUAL series until that is resolved. The five are **neither backfilled nor
+> acknowledged** — BLOCKED-ON-EVAN, see below. The missed-session detector could not
+> see them: it compared `SELECT DISTINCT date`, so a date counted as covered when any
+> ONE sleeve wrote it. Fixed per-sleeve 2026-09-05 (finding 2).
+>
+> (This line has now been wrong FOUR separate ways, so its history stays visible. It once said "13 sessions, 27 NAV rows, no gaps" —
 > 13×3 is 39, not 27, and the 07-30 gap was real; corrected by audit #4 F10. Counts
 > re-derived from `paper_nav` 2026-08-13, record EO. Then on 2026-08-16 records EV/EW
 > changed it to "TWO holes (07-14 AND 07-30)" — **that correction was itself wrong and is
@@ -151,10 +242,11 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 > this correction under the heading "the forward-evidence series lost ONE session, not
 > two".) Root cause of the 07-30 miss could not be determined — Windows Task Scheduler
 > history logging is disabled (record EV.3; still `enabled: false` as of 2026-08-18). All
-> three sleeves currently long QQQ. Latest marks (2026-08-18, written after that
-> evening's 19:00 run): **e6_1x $1,007.74 · e18_vixts $1,001.44 · m10_1_nagel
-> $1,021.72** — all three down ~1.7% on the 08-18 session (08-17 was $1,025.10 /
-> $1,018.69 / $1,039.32)
+> three sleeves currently long QQQ (e6_1x re-entered 2026-09-01 after the five-session
+> stall). Latest marks (**2026-09-03**, read-only 2026-09-05): **e6_1x $1,007.96 ·
+> e18_vixts $1,001.66 · m10_1_nagel $1,021.94** (09-02 was $996.12 / $989.89 /
+> $1,009.94). The 2026-08-18 marks this line used to carry were $1,007.74 / $1,001.44 /
+> $1,021.72.
 > (each started at $1,000). Task now runs S4U — fires with nobody logged on. Scheduled task
 > `SwingTradingDailyPaper` fires 7pm weekdays via `scripts/daily_swing_paper.bat --execute`;
 > logs to `var/daily_swing_paper.log`. **Do NOT fire it manually intraday** — that is what
@@ -647,7 +739,7 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 | E4 leverage rotation (3×) | M2d | **PASS backtest, FAILED regime test** | `313d88a` PASS 2014-26; E5 `09a3a31` FAIL 2000-13 (92.7% DD). De-authorized |
 | E6 de-leveraged rotation (1×) | M2d | **PASS, later downgraded** | `0526ea2`; robust in US, but E7 showed market-dependent (3/5). Risk-mgmt overlay, not high-return |
 | E7 international validation | M2e | **Both arms FAIL** | `70ed2a1`; closed the high-return-robust question on 5 unseen non-US regimes |
-| Live paper | M3 | **RUNNING since 2026-07-15** | 3 sleeves (e6_1x / e18_vixts / m10_1_nagel), one $1,000 Alpaca paper account each; 20 sessions, task S4U green. Row said BLOCKED for 4 weeks after deploy — corrected 2026-08-13, record EO |
+| Live paper | M3 | **RUNNING since 2026-07-15** | 3 sleeves (e6_1x / e18_vixts / m10_1_nagel), one $1,000 Alpaca paper account each; 36 sessions (2026-07-15 → 2026-09-03), task S4U green. Said "20 sessions" while :140 six lines earlier said 24 and the DB agreed with 24 — corrected 2026-09-05, finding 6. Row said BLOCKED for 4 weeks after deploy — corrected 2026-08-13, record EO |
 | Program write-up + packaging | M6 | **Done** | Findings doc updated to E1→E7; `README.md` added; git tag |
 | Live paper: LLM-veto overlay sleeve | M3/M4 | **NOT BUILT — spec superseded** | the `e1_control`/`e1_llm_veto` pair died with E1 (M2b); M3 deployed 3 mechanical sleeves instead. Evan's go and the Alpaca accounts are no longer blockers — an overlay arm needs its own prereg (corrected 2026-08-13, record EO) |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
@@ -760,21 +852,30 @@ Full descriptions as Evan gave them: record Phase 0.
   under BLOCKED-ON-EVAN for 4 weeks; corrected 2026-08-13, record EO.)
 - **M2.12 survivorship bound**: deferred as moot for failed ETF-only E1; run
   only if a stock strategy enters scope.
-- **RUN V3?** `docs/prereg_v3_pbo_scoping.md` is WRITTEN and committed doc-only
-  (`6194847`, 2026-08-13, record ET) and **not run**. It scopes PBO to config
+- ~~**RUN V3?**~~ **RUN 2026-08-19, record FC (record line 7614) - V3 IMPLEMENTED and ACCEPTED, but its repair is UNDEMONSTRATED.** `docs/prereg_v3_pbo_scoping.md` was committed doc-only
+  (`6194847`, 2026-08-13, record ET) BEFORE any code moved. It scopes PBO to config
   sets where selection is real: sets are declared `SELECTION` or `EXCHANGEABLE`
   at the call site, PBO gates only the former. No threshold moves. Running it
   means editing `swing_bot/validation.py` + `scripts/run_v1_harness_check.py`
-  and re-running the harness. **Deliberately left for Evan** — a prereg run in
-  the same session it was written is what pre-registration exists to prevent.
-  Pre-committed failure condition: if pure noise is ACCEPTED under V3, V3 FAILS
-  and reverts in full.
-- **Audit #4 F14** — `UPDATE paper_sleeves SET cash=round(cash,9)` to clear a
+  and re-running the harness. Both edits landed 2026-08-19; thresholds did NOT
+  move (`DSR_ALPHA = 0.05`, `PBO_FAIL_AT = 0.5` in
+  `scripts/run_v1_harness_check.py`). The pre-committed failure condition -- if
+  pure noise is ACCEPTED under V3, V3 FAILS and reverts in full -- did NOT fire.
+  **FC.5's nuance, preserved:** the false positive V3 was written to remove did
+  not reproduce. Planted-edge PBO came out 0.486 under V3 against 0.514 under
+  V2, and V2's rule would not have rejected it either, so V3 is accepted on its
+  reasoning and NOT on a demonstrated repair. (This bullet sat under
+  BLOCKED-ON-EVAN for 17 days after the work was finished -- the third stale
+  BLOCKED row this project has carried; see record EO for the first. Struck
+  2026-09-05, finding 5.)
+- ~~**Audit #4 F14**~~ **EXECUTED 2026-08-19, record FC.** `UPDATE paper_sleeves SET cash=round(cash,9)` to clear a
   floating-point residue. **THREE rows, not one** — re-derived 2026-08-18 (record
   EY): `e6_1x −1.1368683772161603e-13`, `e18_vixts` and `m10_1_nagel` both
   **+1.1368683772161603e-13**. Every prior statement of this item said "one-row";
   the statement was wrong, the un-`WHERE`d UPDATE was always the right scope. A
-  write to the live paper ledger, so Evan's call.
+  write to the live paper ledger, so it was Evan's call and he made it. Verified
+  read-only 2026-09-05: `paper_sleeves.cash` is `0.0` for all three sleeves,
+  no e-13 residue. (Struck 2026-09-05, finding 5.)
 - ~~**F2/F3 preregs**~~ **F2 CLOSED 2026-08-19 (record FD)** — E5/E7 now
   implement E6's convention; no verdict moved. **F3 STILL OPEN, and its scope is
   INVERTED (record FG):** the floor provably NEVER fires on the 39-name stock
