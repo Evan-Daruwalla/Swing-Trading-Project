@@ -18,27 +18,33 @@ independent checks:
 Prices are split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
 
 NAV (finding-things map): the M0.4 data-quality gate. Imports swing_bot.
-{prices, universe}. CAVEAT (2026-07-15): NO module currently imports it — it
-was built for M0.4 but is NOT yet wired into the live loop (daily_swing_paper
-does its own fetch without this gate). If you add a pre-signal data check to
-the daily loop, call it from here.
+{prices, universe}.
 
-CONSEQUENCES OF BEING UNWIRED, spelled out 2026-08-06 (audit E14) so this reads
-as a live gap rather than a filing note:
-  * MAX_ABS_DAILY_RET can never fire. Nothing in production screens for the
-    mis-applied-split tell it was written to catch.
-  * latest_common_date() reads the `bars` TABLE, whose max date is frozen at
-    2026-07-08. The live loop fetches through yfinance and never writes `bars`,
-    so if this were called today it would report 2026-07-08 as the latest
-    common session — a month stale, and stale in the silent direction.
-Wiring it means calling sanity_scan from backfill_universe.py; that is a real
-change to the ingest path, not a comment fix, so it is left undone here.
+WIRED 2026-09-06 (audit FX HIGH #3), after 53 days with ZERO importers — the
+gap was flagged on 2026-07-15, again on 2026-08-06 (audit E14), and again by
+FX before it was closed. `scripts/daily_swing_paper.py` now calls
+scan_fetched_bars() on the QQQ series it actually decides on, BEFORE any
+decide_* call, and REFUSES the run on any anomaly. So MAX_ABS_DAILY_RET — the
+mis-applied-split tell — can finally fire in production.
+
+WHAT IS STILL NOT COVERED, stated so this does not read as blanket protection:
+  * Only QQQ. It is the only ticker the live sleeves have ever held
+    (`SELECT DISTINCT ticker FROM paper_transactions` → ['QQQ']) and the only
+    one fetched unconditionally. The 39-name UNIV pulled for an M10-1 weekly
+    STRESS decision is NOT scanned; that path is conditional and has never
+    fired live (it needs VIX>20).
+  * latest_common_date() and coverage() still read the `bars` TABLE, frozen at
+    2026-07-08. They remain UNCALLED by the live loop and would report a stale
+    date if they ever were — do not wire those two without fixing that first.
+    Only the scan_* functions are on the live path.
 """
 from swing_bot import prices, universe
 
-MAX_ABS_DAILY_RET = 0.35  # 35% close-to-close; investigate above this
-                          # NOTE: unreachable in production -- see the caveat
-                          # above; no caller exists.
+MAX_ABS_DAILY_RET = 0.35  # 35% close-to-close; investigate above this.
+                          # REACHABLE in production since 2026-09-06: the live
+                          # loop scans QQQ through scan_fetched_bars(). A real
+                          # QQQ move of this size does not happen; a mis-applied
+                          # split does.
 
 
 def coverage(conn, as_of, entries=None):
@@ -69,28 +75,46 @@ def latest_common_date(conn, entries=None):
     return dates[0] if dates else None
 
 
+def scan_ohlc(ticker, rows, max_abs_ret=MAX_ABS_DAILY_RET):
+    """The anomaly rules themselves, over `rows` of (date, o, h, l, c).
+
+    Split out of sanity_scan on 2026-09-06 (audit FX HIGH #3) so ONE rule set
+    has TWO callers: the DB scan below, and the LIVE loop, which decides on an
+    in-memory yfinance series and never writes the `bars` table. Duplicating
+    the rules for the live path would have been the F2 defect this project
+    keeps naming -- the live code and the checked code diverging."""
+    anomalies = []
+    prev_close = None
+    for d, o, h, l, c in rows:
+        if not (l <= o <= h and l <= c <= h and l <= h):
+            anomalies.append((ticker, d, "ohlc_order", f"O{o} H{h} L{l} C{c}"))
+        if h == l:
+            anomalies.append((ticker, d, "zero_range", f"H==L=={h}"))
+        if prev_close:
+            ret = c / prev_close - 1
+            if abs(ret) > max_abs_ret:
+                anomalies.append((ticker, d, "extreme_ret",
+                                  f"{ret:+.1%} vs prev {prev_close}"))
+        prev_close = c
+    return anomalies
+
+
+def scan_fetched_bars(ticker, bars, max_abs_ret=MAX_ABS_DAILY_RET):
+    """scan_ohlc for a prices.fetch() bar list, whose layout is
+    (ticker, date, o, h, l, c, adj, vol). This is the LIVE loop's entry point."""
+    return scan_ohlc(ticker, [(b[1], b[2], b[3], b[4], b[5]) for b in bars],
+                     max_abs_ret=max_abs_ret)
+
+
 def sanity_scan(conn, entries=None, max_abs_ret=MAX_ABS_DAILY_RET):
-    """Return a list of (ticker, date, kind, detail) anomalies."""
+    """Return a list of (ticker, date, kind, detail) anomalies from the DB."""
     entries = entries or universe.UNIVERSE
     anomalies = []
     for e in entries:
         rows = conn.execute(
             "SELECT date, open, high, low, close FROM bars "
             "WHERE ticker=? ORDER BY date", (e.ticker,)).fetchall()
-        prev_close = None
-        for d, o, h, l, c in rows:
-            if not (l <= o <= h and l <= c <= h and l <= h):
-                anomalies.append((e.ticker, d, "ohlc_order",
-                                  f"O{o} H{h} L{l} C{c}"))
-            if h == l:
-                anomalies.append((e.ticker, d, "zero_range",
-                                  f"H==L=={h}"))
-            if prev_close:
-                ret = c / prev_close - 1
-                if abs(ret) > max_abs_ret:
-                    anomalies.append((e.ticker, d, "extreme_ret",
-                                      f"{ret:+.1%} vs prev {prev_close}"))
-            prev_close = c
+        anomalies += scan_ohlc(e.ticker, rows, max_abs_ret=max_abs_ret)
     return anomalies
 
 

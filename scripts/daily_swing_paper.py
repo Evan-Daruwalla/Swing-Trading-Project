@@ -62,7 +62,8 @@ import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from swing_bot import prices, paper_sleeves as ps, trading_calendar, universe
+from swing_bot import (coverage_gate, prices, paper_sleeves as ps,
+                       trading_calendar, universe)
 from run_e10_earnings_drift import UNIV
 from run_c1_residual_reversal import residual_series, BETA_N
 
@@ -823,6 +824,35 @@ def _run(args):
     # Ungated on purpose: see print_divergence_census's docstring.
     print_divergence_census(conn)
 
+    # ---- DATA-SANITY GATE (audit FX HIGH #3, wired 2026-09-06) ----
+    # swing_bot/coverage_gate.py sat with ZERO importers for 53 days, so
+    # MAX_ABS_DAILY_RET -- written to catch a mis-applied split -- could never
+    # fire. It is wired HERE rather than against the `bars` table because the
+    # live loop decides on the in-memory yfinance series and never writes
+    # `bars` (frozen at 2026-07-08); checking the table would have verified data
+    # the loop does not use.
+    # WINDOW: the last 200 sessions, which is exactly what the decisions read
+    # (decide_e6_1x and the m10_1 calm branch use a 200-DMA). Scanning all 6,916
+    # bars would re-report an ancient anomaly on every run forever, which is how
+    # an operator is trained to ignore a red light -- the ACKNOWLEDGED_NAV_HOLES
+    # lesson. Measured 2026-09-06: 0 anomalies over the full QQQ history, so
+    # this gate starts silent and any future firing is genuinely new.
+    qbars = [b for b in prices.fetch("QQQ", start="1999-01-01")]
+    sane_window = qbars[-200:]
+    anomalies = coverage_gate.scan_fetched_bars("QQQ", sane_window)
+    if anomalies:
+        print("\n!! DATA SANITY FAILED on QQQ over the last %d sessions -- "
+              "%d anomaly(ies). Nothing was decided or marked; a corrupt bar "
+              "here feeds the 200-DMA and the NAV mark alike."
+              % (len(sane_window), len(anomalies)), flush=True)
+        for a in anomalies[:10]:
+            print("     %s %s %s: %s" % a, flush=True)
+        RUN_FAILURES.append("data sanity: %d QQQ anomaly(ies), first=%s"
+                            % (len(anomalies), anomalies[0]))
+        return 1
+    print("data sanity: QQQ clean over the last %d sessions" % len(sane_window),
+          flush=True)
+
     # ---- realize any pending from the previous run (needs today's opens for
     # whatever tickers are currently held / newly targeted) ----
     # TICKER-keyed, so it starts EMPTY (audit #3). It used to start as
@@ -1088,7 +1118,21 @@ def _run(args):
                 src = "pending" if pending is not None else "positions"
                 print(f"\n--execute [{s}]: Alpaca PAPER {client.base_url}  NAV=${nav:,.2f}  "
                       f"held={sorted(held)}  target={sorted(target_syms)} (from DB {src})")
-                client.cancel_all_orders()
+                # cancel_all_orders RAISES as of 2026-09-06 (audit FX HIGH #2).
+                # Same shape as the failed_closes block below: report it, then
+                # SKIP this sleeve's buys. Proceeding would re-place an order on
+                # top of a stale one we could not cancel -- two live orders for
+                # one target, which is the duplicate the reconcile exists to
+                # prevent. The next run re-attempts the whole cancel-then-place.
+                try:
+                    client.cancel_all_orders()
+                except AlpacaError as e:
+                    print(f"    !! cancel_all_orders FAILED ({e}) -- SKIPPING "
+                          f"this sleeve's buys to avoid stacking a new order on "
+                          f"an uncancelled stale one.", flush=True)
+                    RUN_FAILURES.append(f"[{s}] cancel_all_orders failed: {e}; "
+                                        f"buys skipped")
+                    continue
                 failed_closes = []
                 for sym in held:                       # flatten what's not wanted
                     if sym not in target_syms:

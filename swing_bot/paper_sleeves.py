@@ -306,8 +306,15 @@ def decide_e6_1x(qqq_close_series):
 def decide_e18_vixts(vix_today, vix3m_today):
     """Target = 100% QQQ iff VIX/VIX3M < 1.0, else cash. (E18 arm (a), prereg
     f32b008 — identical condition to run_e18_regime_gates gates['(a)'].)"""
-    if vix_today is None or vix3m_today is None or vix3m_today <= 0:
-        return None, "VIX or VIX3M unavailable today"
+    # `vix_today <= 0` added 2026-09-06 (audit FX HIGH #1). vix3m_today was
+    # guarded and vix_today was NOT, so a zero or negative VIX -- the shape a
+    # feed glitch produces, not a market state -- made the ratio < 1.0 and the
+    # gate returned {"QQQ": 1.0}, i.e. GO LONG. A regime gate whose whole job is
+    # to refuse risk in a bad tape failed TOWARD risk-on on corrupt input. Both
+    # legs must be positive for the ratio to mean anything, so both are checked.
+    if (vix_today is None or vix3m_today is None
+            or vix_today <= 0 or vix3m_today <= 0):
+        return None, "VIX or VIX3M unavailable or non-positive today"
     return ({"QQQ": 1.0} if (vix_today / vix3m_today) < 1.0 else {}), None
 
 

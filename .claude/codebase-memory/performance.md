@@ -9,6 +9,6 @@
   in under 5 minutes.** `liquidity_mask` over 29 series × ~6,500 bars adds no
   measurable time. The cost that dominates is a COLD cache: `cache_fetch`
   retries on a 20/40/60/80 s ladder per ticker on a miss.
-- 2026-09-05: `test_frozen` (12 pinned refs + 17 invariants against the real
+- 2026-09-05: `test_frozen` (12 pinned refs + 17 invariants — **19 since 2026-09-06**, audit FX — against the real
   `bars` table) runs in well under a minute; it was run eight times this
   session without being the bottleneck once.

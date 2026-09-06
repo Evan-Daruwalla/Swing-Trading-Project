@@ -1143,9 +1143,13 @@ Full descriptions as Evan gave them: record Phase 0.
   on any broken internal anchor — which is how the record's own TOC was found to
   have 32 dead links, now repointed.
 - `PRD_ROADMAP.md` — the standing plan (written 2026-07-08). Source of truth
-  for what to build and in what order; no unstarted task remains — M3 forward
-  paper is the only open lever and it needs elapsed time, not a task (this line
-  still read "next open task = M0.1" until 2026-08-13; M0.1 shipped 2026-07-08).
+  for what to build and in what order. **M13.2 is OPEN** (root-cause the feed
+  lag; blocked on a trading day, earliest Tue 2026-09-08) — see the M13 block at
+  the top of this file and PRD M13 task 2. Apart from it, no unstarted task
+  remains and M3 forward paper needs elapsed time, not a task. (This line read
+  "next open task = M0.1" until 2026-08-13; M0.1 shipped 2026-07-08. It then
+  read "no unstarted task remains" while the top of this same file said M13.2
+  was open — corrected 2026-09-06, audit FX.)
 - `docs/research/` — evidence brief, experiment-ideas list (+ council
   outcome pointer), future power calc / ablation docs.
 - `.claude/codebase-memory/` — binned technical memory (INDEX + 11 bins).

@@ -188,6 +188,16 @@ INVARIANTS = [
      ps.decide_e18_vixts(25.0, 20.0)[0] == {}),
     ("e18_missing_vix3m_refuses",
      ps.decide_e18_vixts(15.0, None)[0] is None),
+    # (2026-09-06, audit FX HIGH #1) A non-positive VIX is a feed glitch, not a
+    # market state, and it used to make the ratio < 1.0 -> {"QQQ": 1.0}: the
+    # gate went LONG on corrupt input. Both the refusal AND its reason are
+    # asserted, because returning None with no reason is a different bug.
+    ("e18_zero_vix_refuses",
+     ps.decide_e18_vixts(0.0, 20.0)[0] is None
+     and bool(ps.decide_e18_vixts(0.0, 20.0)[1])),
+    ("e18_negative_vix_refuses",
+     ps.decide_e18_vixts(-1.0, 20.0)[0] is None
+     and bool(ps.decide_e18_vixts(-1.0, 20.0)[1])),
     # m10_1: VIX>THR -> residual-reversal basket, else the e6 trend rule.
     ("m10_calm_uses_trend_rule",
      ps.decide_m10_1(15.0, [100.0] * 199 + [150.0], None)[0] == {"QQQ": 1.0}),

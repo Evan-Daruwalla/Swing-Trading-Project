@@ -48,7 +48,7 @@ corrected 2026-08-13, record EO.)
 ## Definition of done (additive to global standards)
 - REQUIRED done-check: `.venv\Scripts\python.exe -m swing_bot.test_frozen`
   must print `FROZEN TESTS: GREEN (all d=0)` — 12 pinned refs at d=±0.0000pp
-  + 17 invariants. Run after ANY change to `swing_bot/` or to
+  + 19 invariants (17 until 2026-09-06, when audit FX added the two non-positive-VIX refusals). Run after ANY change to `swing_bot/` or to
   `scripts/daily_swing_paper.py`. (This line said "no test suite exists yet"
   until 2026-08-06; the tripwire has been green since 2026-07-09. Corrected by
   audit #3. Detail in `.claude/codebase-memory/testing.md`.)

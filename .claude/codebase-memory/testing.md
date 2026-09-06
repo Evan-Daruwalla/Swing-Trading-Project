@@ -19,7 +19,7 @@ Two kinds of case, one file (`swing_bot/test_frozen.py`, no framework, own
 - **12 pinned references** — E1/E1b/E2 total-PnL and closed-trade counts on
   fixed swing.db windows, plus E4 rotation. Declared precision is ±0.0000pp.
   These run the real engine against the real `bars` table, opened READ-ONLY.
-- **17 invariants** — pure-function assertions needing no fixtures: `signals.ibs`
+- **19 invariants** (17 until 2026-09-06; audit FX added `e18_zero_vix_refuses` and `e18_negative_vix_refuses`) — pure-function assertions needing no fixtures: `signals.ibs`
   edge cases; the three live sleeve decisions (`ps.decide_e6_1x`,
   `decide_e18_vixts`, `decide_m10_1`); since 2026-08-06, the pure helpers of
   the live orchestrator (`qty_reconcile_orders` drift band + pending suppression,

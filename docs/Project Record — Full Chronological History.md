@@ -218,6 +218,7 @@ the dated entry, not the digest.
 - [FW — Evan closes M13.5 with no refresh (its done-check already passes and cannot detect staleness); plus the correction for FV's first append, which carried a fabricated future timestamp](#appendix-fw---evan-closes-m135-with-no-refresh-its-done-check-already-passes-and-cannot-detect-staleness-plus-the-correction-for-fvs-first-append-which-carried-a-fabricated-future-timestamp-2026-09-06-0021-cdt) (09-06)
 - [FX — Scheduled daily-audit: a regime gate that fails toward risk-on, the OHLC sanity check nothing imports, and a cancel failure the run list cannot see](#appendix-fx---scheduled-daily-audit-a-regime-gate-that-fails-toward-risk-on-the-ohlc-sanity-check-nothing-imports-and-a-cancel-failure-the-run-list-cannot-see-2026-09-06-0722-cdt) (09-06)
 - [FY — landing-check over all of M13: FIX FIRST. My commit introduced 3 real order ids to the PUBLIC repo and the de-identification was uncommitted; FU's own path:line rule was applied to one citation pair and not the three it also broke; the record's published HTML twin stops at FP](#appendix-fy---landing-check-over-all-of-m13-fix-first-my-commit-introduced-3-real-order-ids-to-the-public-repo-and-the-de-identification-was-uncommitted-fus-own-pathline-rule-was-applied-to-one-citation-pair-and-not-the-three-it-also-broke-the-records-published-html-twin-stops-at-fp-2026-09-06-1308-cdt) (09-06)
+- [FZ — FX's three HIGHs fixed: a regime gate that went LONG on a non-positive VIX, a cancel failure that only printed, and coverage_gate WIRED after 53 days dead (decided with evidence, not deleted)](#appendix-fz---fxs-three-highs-fixed-a-regime-gate-that-went-long-on-a-non-positive-vix-a-cancel-failure-that-only-printed-and-coverage_gate-wired-after-53-days-dead-decided-with-evidence-not-deleted-2026-09-06-1316-cdt) (09-06)
 
 ---
 
@@ -10255,3 +10256,152 @@ Nothing deleted, no `.bat` run, `daily_swing_paper.py` never executed,
 **NOT SWEPT, stated so it does not read as clean:** M13.2's own done-check is
 unreachable until a trading day; the other ~170 appendices, the 44 preregs and
 the 37-attempt history were not re-derived; `graphify-out/` was not inspected.
+
+# Appendix FZ - FX's three HIGHs fixed: a regime gate that went LONG on a non-positive VIX, a cancel failure that only printed, and coverage_gate WIRED after 53 days dead (decided with evidence, not deleted) (2026-09-06, ~13:16 CDT)
+**Session:** 2026-09-06, ~13:16 CDT. Evan handed the three HIGHs from the
+scheduled daily-audit (record FX) with a fixed order and a done-check after
+each. All three fixed; #3 was a decide-with-evidence and the evidence said
+WIRE, not delete.
+
+## 1. HIGH #1 — a regime gate that failed toward RISK-ON
+
+`decide_e18_vixts` guarded `vix3m_today <= 0` and **not** `vix_today`. A zero or
+negative VIX — the shape a feed glitch produces, never a market state — makes
+`vix_today / vix3m_today < 1.0`, so the gate returned `{"QQQ": 1.0}`: **go
+long.** The one sleeve whose entire job is to refuse risk when the term
+structure inverts would have gone long on corrupt input.
+
+Fixed at `swing_bot/paper_sleeves.py:309` by checking both legs, since the ratio
+is meaningless unless both are positive. Reason string widened to "VIX or VIX3M
+unavailable **or non-positive** today".
+
+**Proven by planting the pre-fix condition**, not by assertion. Running the
+verbatim old guard:
+
+    VIX=0.0   -> {'QQQ': 1.0}  err=None
+    VIX=-1.0  -> {'QQQ': 1.0}  err=None
+
+Both went long. Under the fix both return `(None, 'VIX or VIX3M unavailable or
+non-positive today')`, and the two live conditions are unchanged: 15/20 ->
+`{'QQQ': 1.0}`, 25/20 -> `{}`.
+
+**Two invariants added, not one** — `e18_zero_vix_refuses` and
+`e18_negative_vix_refuses`, split so a failure names which input broke. Each
+asserts the refusal **AND** a non-empty reason, because returning `None` with no
+reason is a different bug that would otherwise pass. **17 invariants -> 19.**
+
+## 2. HIGH #2 — a guard that only printed
+
+`cancel_all_orders` caught `AlpacaError`, printed "(continuing)", and returned
+`None`. Printing is not reporting: the caller could not distinguish success from
+failure, `RUN_FAILURES` stayed empty, the `.bat` exited 0, and the reconcile went
+on to place a new order **on top of the stale one it had failed to cancel** —
+two live orders for one target, which is the exact duplicate the reconcile
+exists to prevent. Its own comment said it was worried about that outcome and
+then swallowed the error anyway.
+
+It RAISES now (`swing_bot/alpaca_client.py:285-296`); the call site decides
+(`scripts/daily_swing_paper.py:1091-1105`), in the same shape as the
+`failed_closes` block twelve lines below it: report, append to `RUN_FAILURES`,
+`continue` — skipping this sleeve's buys so nothing stacks on an uncancelled
+order. The next run re-attempts the whole cancel-then-place.
+
+**Proven both halves.** A fake `_request` raising `AlpacaError(500)` now
+propagates out of `cancel_all_orders` instead of returning. An `ast` walk of the
+call site confirms the handler catches `AlpacaError`, appends to `RUN_FAILURES`,
+and contains a `continue` — at line 1099.
+
+Ninth variant of the guard-that-cannot-fire family, and the second this week
+(the feed-clock detector was the eighth).
+
+## 3. HIGH #3 — `coverage_gate` had zero importers for 53 days. DECIDED: WIRE IT.
+
+Both greps confirmed the audit: `grep -rn sanity_scan` and `grep -rn
+coverage_gate` across `*.py` return **no code importer** — every hit is prose in
+docs, the record, or NAV comments. The module has been dead since 2026-07-15,
+flagged on 2026-08-06 (audit E14) and again by FX before anyone closed it.
+
+**Evidence gathered before choosing:**
+- The live loop has only ever held **QQQ** (`SELECT DISTINCT ticker FROM
+  paper_transactions` -> `['QQQ']`, read-only).
+- `sanity_scan` reads the `bars` TABLE, max date **2026-07-08** — the live loop
+  fetches through yfinance and never writes `bars`. Wiring it unchanged would
+  have verified data the loop does not use.
+- Scanning the real fetched QQQ series: **0 anomalies over all 6,916 bars**
+  (1999-03-10..2026-09-04). So the gate starts silent, cannot halt Tuesday's
+  run on existing data, and any future firing is genuinely new.
+
+**Decision: WIRE.** Deleting would remove a written guard for a live risk in the
+very session where a DIFFERENT unguarded feed value (VIX <= 0, §1 above) was
+found flipping a live sleeve to risk-on. That is evidence the failure class is
+real, not hypothetical — and `MAX_ABS_DAILY_RET = 0.35` on QQQ is unreachable by
+a real market move and reachable by a mis-applied split, which is exactly the
+tell it was written for.
+
+**Shape:** the per-bar rules were extracted into `scan_ohlc()` with
+`scan_fetched_bars()` adapting a `prices.fetch` bar tuple, so **ONE rule set has
+TWO callers** — the DB scan and the live loop. Duplicating the rules for the
+live path would have been this project's F2 defect class, live code diverging
+from checked code. `sanity_scan(conn, ...)` now delegates and still returns the
+same 19 `zero_range` anomalies over the DB universe (the known XLRE bars from
+record H), so the DB path is behaviour-preserved.
+
+The loop calls it at `scripts/daily_swing_paper.py:830-853`, **before any
+`decide_*` call**, and refuses the run (`RUN_FAILURES` + exit 1) on any anomaly.
+**Window: the last 200 sessions** — exactly what the decisions read, since
+`decide_e6_1x` and the m10_1 calm branch use a 200-DMA. Scanning all 6,916 bars
+would re-report an ancient anomaly on every run forever, which is how an
+operator gets trained to ignore a red light (the `ACKNOWLEDGED_NAV_HOLES`
+lesson).
+
+**Proven by planting three corruptions** into the real series:
+
+| planted | caught as |
+|---|---|
+| mis-applied split (last bar halved, ~-50%) | `extreme_ret` |
+| low above high | `ohlc_order` |
+| zero-range bar (H==L) | `ohlc_order` + `zero_range` |
+
+and the negative: the untouched real series -> **0 anomalies, gate stays quiet.**
+
+**Scope gaps stated in the module docstring rather than left implied:** only QQQ
+is scanned (the 39-name UNIV pulled for an M10-1 weekly STRESS decision is not —
+that path is conditional and has never fired live, needing VIX>20), and
+`latest_common_date()` / `coverage()` still read the frozen `bars` table and
+remain UNCALLED. Only the `scan_*` functions are on the live path. The old
+docstring's central claim — "NO module currently imports it" — was now false and
+was rewritten rather than left to rot.
+
+## 4. HANDOFF's self-contradiction, and the count that had to propagate
+
+`HANDOFF.md:1146` said the PRD has "no unstarted task remains" while `:102-103`
+of the same file and PRD M13 task 2 both say M13.2 is open until 2026-09-08.
+Corrected to name M13.2 explicitly, keeping the dated history of what the line
+used to say.
+
+**The invariant count propagated to all four places that assert it** — the
+landing-check's most repeated finding is a number changed in code and left stale
+in prose, so this was swept immediately rather than after: `CLAUDE.md:51`,
+`.claude/codebase-memory/INDEX.md:15`, `performance.md:12`, `testing.md:22`, all
+17 -> 19 with the date and reason. Re-derived after editing: no unqualified "17
+invariants" remains anywhere.
+
+## Done-check — real output
+
+    FROZEN TESTS: GREEN (all d=0)
+
+run after EACH of the three fixes, as instructed, and again at the end (12
+pinned refs at d=+-0.0000pp, now 19 invariants). All five proofs re-run
+unchanged: `prove_feed_clock` 18/18 · `prove_divergence_census` 16/16 ·
+`prove_liquidity_floor` 11/11 · `prove_refusal_gate` 10/10 · `prove_cache_guard`
+8/8 · `probe_feed_publication --selftest` 4/4.
+
+`swing.db` opened READ-ONLY only. `scripts/daily_swing_paper.py` never executed,
+no `.bat` run, nothing deleted, nothing pushed.
+
+## 5. Not done here
+
+FX's remaining findings (1 code, 6 docs) were not touched — Evan scoped this to
+the three HIGHs. The `divergence_census` sum-to-total docstring bug handed to
+`/code-review` in record FY is still open, as is the published record HTML twin
+stopping at Appendix FP.

@@ -287,11 +287,16 @@ class AlpacaClient:
         try:
             self._request("DELETE", "/v2/orders")
         except AlpacaError as e:
-            # Usually "nothing open / already flat" and non-fatal -- but this is
-            # the call the reconcile relies on to clear stale orders before
-            # re-placing, so a silent failure here can leave a duplicate live.
-            # Say it out loud rather than swallowing (audit #12).
-            print(f"    cancel_all_orders failed (continuing): {e}", flush=True)
+            # (2026-09-06, audit FX HIGH #2) This used to print "continuing" and
+            # return None. Printing is not reporting: the caller could not tell
+            # success from failure, RUN_FAILURES stayed empty, the .bat exited 0,
+            # and the reconcile went on to re-place an order ON TOP of the stale
+            # one it had failed to cancel -- a duplicate live order, which is the
+            # exact outcome the previous comment said it was worried about. It
+            # RAISES now; the call site decides. A guard that only prints is not
+            # a guard (the FJ lesson: every guard fired, nobody was listening).
+            print(f"    cancel_all_orders FAILED: {e}", flush=True)
+            raise
 
     def cancel_order(self, order_id: str) -> None:
         self._require_paper(f"cancel order {order_id}")
