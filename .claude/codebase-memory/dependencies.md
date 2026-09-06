@@ -20,3 +20,5 @@ transitive, `pip freeze`).
 - pytest OPTIONAL — frozen-regression tests run via their own `__main__`
   (`swing_bot/test_frozen.py`), matching Trading's pattern (see testing.md).
 - After any dependency change, re-pin `requirements.txt` and refresh the lock.
+
+- Reviewed 2026-09-05 against `requirements.txt`: no change; no dependency added by F3 (stdlib only).

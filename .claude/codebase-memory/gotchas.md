@@ -130,3 +130,14 @@ they apply to any yfinance-based pipeline built here:
   CRLF file creates mixed endings silently -- and a multi-line search pattern
   written with LF simply does NOT MATCH a CRLF file, which reads like the code
   having changed. Detect the file's EOL and convert patterns to it.
+- 2026-09-05 (record FP, measured): **a detector whose clock comes from the
+  feed it is checking cannot see that feed lag.** `daily_swing_paper.py` sets
+  `today = qdates[-1]` from `series("QQQ")`. From 2026-09-02 the 19:00 run
+  found no same-day bar and silently processed the previous session — three
+  runs in a row, after a 17-run same-day streak (34 of 40 logged runs same-day) — so `paper_nav` has no 2026-09-04 row
+  and the 09-02/09-03 rows were written a day late. The per-sleeve missed-session
+  detector (fixed that very morning) excludes `today` by design and its `today`
+  is the same lagged value, so it reported clean. **Rule: the expected session
+  date must come from an INDEPENDENT source (broker clock, exchange calendar),
+  and a feed that is behind it is a refusal, not a substitution.** Fix is PRD
+  M13.1. Eighth variant of the guard-that-cannot-fire family.

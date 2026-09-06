@@ -1278,3 +1278,57 @@ record front-matter (`docs/Project Record — Full Chronological History.md`).
   do not tune past a pre-registered kill.
 - `.bat` pure ASCII; JSON via Python/Node only; venv python is
   `.venv\Scripts\python.exe`.
+
+### M13 — Integrity backlog (added 2026-09-05, records FN/FO/FP; the search
+### phase stays CLOSED — none of these is an experiment)
+
+Every task names its files and its done-check and is sized for a cheaper model.
+Order is by consequence, not effort. Nothing here reopens a verdict.
+
+1. **CRIT — the live loop lets the price feed define its own clock.**
+   `scripts/daily_swing_paper.py:685-695` sets `today = qdates[-1]`; since
+   2026-09-02 every 19:00 run has processed the PREVIOUS session (record FP §1),
+   and the per-sleeve missed-session detector cannot see it because its `today`
+   is the same value. Fix: derive the expected trading date independently (the
+   Alpaca clock the loop already fetches in `market_is_open()`, or a local ET
+   calendar) and when `qdates[-1]` is behind it, append to `RUN_FAILURES` and
+   REFUSE to mark or decide — the same shape as `mark_nav`'s refusal. Then decide
+   what to do about the unmarked 2026-09-04 session (acknowledge as a
+   `(sleeve, date)` pair ×3, or backfill — Evan's call, BLOCKED-ON-EVAN).
+   Done-check: a standalone `scripts/prove_feed_clock.py` that feeds the guard a
+   series ending yesterday and asserts it refuses; `test_frozen` GREEN.
+   **Wanted before the Tue 2026-09-08 19:00 run.**
+2. **Root-cause the lag.** Was it yfinance publishing late (FH records yfinance
+   flakiness as real) or `prices.fetch` serving a cached series? Done-check: a
+   timed fetch of QQQ at ~19:00 CT on a trading day, logged with the bar's date
+   and the wall clock, recorded in the record.
+3. **Report the permanently-unmeasurable fidelity rows.** 5 of 10
+   `fill_divergence` rows carry a NULL `alpaca_order_id` and are structurally
+   excluded from `open_divergence_rows`, so half of M3's only fidelity
+   instrument is dark and nothing says so (record FH). Fix: `backfill_divergence`
+   prints the count of unresolvable rows every run. Done-check: the line appears
+   in a `--dry-run`-equivalent path; `test_frozen` GREEN.
+4. **E14 under the liquidity floor** — the one F3 in-scope item not measured
+   (prereg §1 scoped it as a count, not a verdict). Files:
+   `scripts/run_e14_sector_momentum.py` + the shared `f3_masks_by_date`.
+   Done-check: both arms run twice, byte-identical, count reported in a record
+   entry; verdict stays FAIL either way.
+5. **Whole-cache refresh of `.e8e9_cache`** — 19 days stale at 2026-08-17. Must
+   be ALL-OR-NOTHING: delete every price-series `*.json`, re-run every consumer
+   in one sitting (data.md); a partial refresh manufactures a mixed vintage.
+   Done-check: vintage census shows one end date across all 181 files.
+6. **FH's LOWs**: `DB_PATH` defined twice (`prices.py:33`, `paper_sleeves.py:40`);
+   possibly-unused imports `run_m10_1_nagel_switch.py:28-29`. Done-check:
+   `test_frozen` GREEN.
+7. **Bootstrap the two bins the memory system prescribes and this project never
+   created** (record FL): `.claude/codebase-memory/disclosure.md` (what may leave
+   the project — the public GitHub repo exists since 2026-07-10, record AK) and
+   `DIRECTORY.md` (the tree map; the repo is well past the >15-file threshold).
+   Done-check: INDEX.md lists both; DIRECTORY's counts are grepped, with the
+   commands recorded in the file.
+
+**External, not this repo's to fix, recorded so nobody re-discovers them:**
+`~/.claude/skills/project-memory/append-record-entry.js` refuses
+`<LETTERS>-note` headings in all six repos that use it (record FK);
+`/graphify --update`'s `build_merge` replaces hyperedges instead of unioning
+(records FO and the wave-2 merge).

@@ -208,6 +208,7 @@ the dated entry, not the digest.
 - [FM — Committed 87db1c2 (not pushed); the append-only guard fired on exactly one line and was bypassed on Evan's call, with the blast radius measured first](#appendix-fm---committed-87db1c2-not-pushed-the-append-only-guard-fired-on-exactly-one-line-and-was-bypassed-on-evans-call-with-the-blast-radius-measured-first-2026-09-05-1755-cdt) (09-05)
 - [FN — F3 redirect EXECUTED across all 8 ETF experiments: no verdict flipped to PASS, E11 lost its verdict to sample starvation, and 3 of 5 pre-registered predictions were falsified. Also: FH's two HIGHs were already fixed and I had reported them open](#appendix-fn---f3-redirect-executed-across-all-8-etf-experiments-no-verdict-flipped-to-pass-e11-lost-its-verdict-to-sample-starvation-and-3-of-5-pre-registered-predictions-were-falsified-also-fhs-two-highs-were-already-fixed-and-i-had-reported-them-open-2026-09-05-1822-cdt) (09-05)
 - [FO — Graph re-indexed (1,728 nodes, health OK) - but build_merge deleted 9 hyperedges again and 4 are unrecoverable in this run; plus corrections to FN's timestamp and to a token count recorded as zero](#appendix-fo---graph-re-indexed-1728-nodes-health-ok---but-build_merge-deleted-9-hyperedges-again-and-4-are-unrecoverable-in-this-run-plus-corrections-to-fns-timestamp-and-to-a-token-count-recorded-as-zero-2026-09-05-1825-cdt) (09-05)
+- [FP — DRIFT CHECK + handoff sync: CRIT - the live loop has processed YESTERDAY's session on every run since 2026-09-02 and the FK detector cannot see it; 4 HANDOFF rows drifted and are fixed; PRD gains M13](#appendix-fp---drift-check--handoff-sync-crit---the-live-loop-has-processed-yesterdays-session-on-every-run-since-2026-09-02-and-the-fk-detector-cannot-see-it-4-handoff-rows-drifted-and-are-fixed-prd-gains-m13-2026-09-05-1930-cdt) (09-05)
 
 ---
 
@@ -9170,3 +9171,133 @@ Graph health check -> OK. Nothing run against `swing.db` except `mode=ro` reads.
 - **E14 under the F3 floor** -- still the one in-scope item not measured.
 - **`.e8e9_cache` whole-cache refresh** still outstanding; it must be
   all-or-nothing.
+
+# Appendix FP - DRIFT CHECK + handoff sync: CRIT - the live loop has processed YESTERDAY's session on every run since 2026-09-02 and the FK detector cannot see it; 4 HANDOFF rows drifted and are fixed; PRD gains M13 (2026-09-05 ~19:30 CDT)
+**Session:** 2026-09-05, ~19:25-19:30 CDT. Evan: "analyze the project and
+update all /project-memory docs then tell me what the next set of work is."
+This is the §6 DRIFT-CHECK plus §3 HANDOFF sync. Lead finding first, because it
+changes what Tuesday's scheduled run means.
+
+## 1. CRIT, NEW: the live loop has been processing YESTERDAY's session since 2026-09-02
+
+Found by pairing the `.bat`'s wall-clock stamp for each run against the session
+date the Python loop printed (`=== <date> - M3 forward-paper daily loop`):
+
+| run (wall clock, CDT) | session processed | lag |
+|---|---|---|
+| the 17 scheduled runs Fri 08/07 19:00 … Tue 09/01 19:00 | same day | none |
+| **Wed 09/02 19:00** | **2026-09-01** | 1 session |
+| **Thu 09/03 19:00** | **2026-09-02** | 1 session |
+| **Fri 09/04 19:00** | **2026-09-03** | 1 session |
+
+Over the whole log: 40 runs with a session header, **34 same-day, 6 off-date**.
+Three of the six are Saturday manual fires (08-02 ×2, 08-08) that correctly
+processed the prior Friday — which proves the mechanism ("no bar today →
+yesterday") has been latent all along and is only wrong on a trading day. The
+other three are the 09-02/09-03/09-04 scheduled runs, after a **17-run same-day
+streak**. (A first draft of this entry said "22" before the full log was
+paired; 17 is the measured figure.) `today` is `qdates[-1]` from `series("QQQ")`
+(`scripts/daily_swing_paper.py:685-695`), so when the feed has not published
+today's bar by 19:00 the loop silently takes yesterday as today. Log mtime
+`2026-09-04 19:00`, task `Last Run Time 9/4/2026 7:00 PM`, `Last Result 0`,
+`paper_sleeves.last_run_at = 2026-09-05T00:00:04Z` — the 09-04 run happened,
+exited green, and processed 09-03.
+
+**Consequences, measured:**
+- `paper_nav` has no row for **2026-09-04** in any sleeve (max date 2026-09-03,
+  36 distinct dates, which exactly equals sessions 07-15..09-03 minus the
+  acknowledged 07-30). The 09-02 and 09-03 rows exist but were written a day
+  late from a feed that had not yet published the same day's bar.
+- For the 09-03 and 09-04 decisions the live discipline was "signal at
+  YESTERDAY's close, execute next open". No order was affected — all three
+  sleeves held QQQ with unchanged targets — so the ledger is not wrong, but the
+  fidelity claim for those sessions is weakened and must be caveated.
+- **The per-sleeve detector fixed in FK cannot see this.** Its `today` is the
+  same lagged `qdates[-1]`, and it deliberately excludes `today` from the
+  missed set. On Tue 09-08 (Mon 09-07 is Labor Day) two things can happen: if
+  the lag persists, `today` = 09-04, the run writes the 09-04 row a day late,
+  and NOTHING fires; if the feed is caught up, `today` = 09-08, 09-04 is
+  interior, and the detector flags it for all three sleeves. Either way the
+  detector's clock came from the feed it was checking. **This is the eighth
+  variant of "a guard that cannot fire."**
+- Root cause NOT determined here: candidates are a yfinance publication delay
+  that began ~09-02 (FH already records yfinance flakiness as real), or
+  `prices.fetch` returning a cached series. Determining it requires a
+  deliberately timed fetch, which this session did not do.
+
+**Recommended fix (next work #1, not done here):** compare `qdates[-1]` to the
+actual current trading date -- the Alpaca clock the loop already fetches, or a
+local ET calendar -- and REFUSE to process (append to `RUN_FAILURES`, exit 1)
+when the feed is behind, exactly as `mark_nav` refuses on a missing price. The
+loop must never let the feed define its own clock.
+
+## 2. Drift table — HANDOFF.md claims tested against reality
+
+Cheap checks run for real. `swing.db` opened `mode=ro`; nothing that trades was
+executed.
+
+| HANDOFF claim | observed | verdict |
+|---|---|---|
+| `Last updated: 2026-09-05 ~16:09 CDT` | FN, FO and this session all postdate it | **DRIFT** — restamped |
+| "6 commits ahead, not pushed" (my last chat message) | `git ls-remote origin main` = `9bf8890` = HEAD | **DRIFT** — Evan pushed; nothing ahead |
+| M3 "36 sessions (2026-07-15 → 2026-09-03), task S4U green" | 36 distinct dates, Last Result 0, Enabled, Next Run 9/7 19:00 | MATCH — but see §1: 09-04 unmarked |
+| Latest marks e6 $1,007.96 · e18 $1,001.66 · m10 $1,021.94 | identical, dated 2026-09-03 | MATCH |
+| All three long QQQ | positions QQQ 1.4045 / 1.3957 / 1.4240 | MATCH |
+| `paper_sleeves.cash = 0.0` ×3 | 0.0 / 0.0 / 0.0 | MATCH |
+| e6_1x 31 marks vs peers 36 | 31 / 36 / 36 | MATCH |
+| Frozen suite GREEN | `FROZEN TESTS: GREEN (all d=0)` | MATCH |
+| `prove_cache_guard.py` 8/8; `prove_liquidity_floor.py` 11/11 | 8/8 PASS; GREEN (11/11) | MATCH |
+| Record invariants OK | `--dry-run` proposes FP, exit 0 | MATCH |
+| HTML twin current | 172 links, 278 ids, **broken: 0** | MATCH |
+| Open decisions: "F3 STILL OPEN … awaiting Evan's redirect" | F3 EXECUTED, record FN | **DRIFT** — struck |
+| Documentation: graph "1665 nodes / 2886 edges / 184 communities / 12 hyperedges"; "record itself NOT indexed" | 1,728 / 2,876 / 186 / **9**; record indexed (FO) | **DRIFT** — rewritten |
+| Documentation: "INDEX + 11 bins" | 12 files = INDEX + 11 bins | MATCH |
+| 5 of 10 `fill_divergence` rows NULL order id (FH) | 5 of 10 | MATCH — still unreported by the loop |
+| `.e8e9_cache` vintage | all 181 files end 2026-08-17 (19 days stale) | MATCH with FN's amendment |
+| `pip-audit` "No known vulnerabilities" (2026-08-11) | not re-run | UNVERIFIED-TODAY — `.venv\Scripts\pip-audit` |
+| Alpaca mirror drift ≤0.25% | log 09-04 run: −0.001% / +0.000% / −0.014% | MATCH |
+
+**4 DRIFT rows, all fixed in HANDOFF this entry; 1 UNVERIFIED-TODAY; the rest
+MATCH.** The §1 lag is not a HANDOFF claim that drifted — HANDOFF never made a
+claim about feed timing — it is a new finding.
+
+## 3. Corrections to FN (append-only, so they live here)
+
+FN cites `daily_swing_paper.py:275`, `:314`, `:387`, `:586-593`. Those line
+numbers came from a `grep -n` run BEFORE this session's own edits shifted the
+file by 8 lines. Correct as of commit `9bf8890`: `market_is_open()` at
+**`:219`**, its outage flag at **`:267`**, divergence-backfill creds at
+**`:306`**, mirror creds at **`:379`**, `mark_nav()` refusal at **`:578-585`**
+(`def mark_nav` at `:563`). Verified with `grep -Hn`. The findings are
+unchanged; only the coordinates were stale.
+
+## 4. Doc updates made this entry
+
+- **HANDOFF.md**: new top block for FN/FO/§1; restamped; F3 open-decision bullet
+  struck with the FN outcome; Documentation section rewritten for the graph
+  (1,728 / 2,876 / 186 / 9, record indexed, 4 hyperedges lost and named) and
+  the F3 results doc; push state corrected (nothing ahead of `origin/main`).
+- **PRD_ROADMAP.md**: appended **M13 — Integrity backlog (added 2026-09-05)**,
+  seven tasks each with files and a done-check, so "next work" has a home in
+  the plan and not only in chat. Nothing struck, nothing retyped.
+- **Bins**: `gotchas.md` gains the feed-clock variant; `performance.md` loses
+  its "no code yet" stub for real runtime facts (E8 2.2 s/run; C3 ~60 s/arm;
+  E20 and X9 under 10 s; one full 8-experiment × 2-arm F3 sweep under 5
+  minutes); `ui.md`, `dependencies.md`, `security.md`, `tooling.md`,
+  `features.md` reviewed against code and touched as still accurate.
+- **Auto-memory file** (`~/.claude/projects/.../memory/swing-trading-project.md`):
+  was ~30 KB of session narrative duplicating the record — against the memory
+  rule that the repo's own history is not saved there. Rewritten to ~1.5 KB of
+  durable facts only (goal, constraints, doc layout, done-check, the
+  guard-that-cannot-fire rule). Everything removed is in the record.
+
+## 5. Push state
+
+`origin/main` is at `9bf8890` — Evan pushed all six of this session's commits
+between FO and this entry. This entry's commit will be the only one ahead.
+
+## Done-check
+
+`FROZEN TESTS: GREEN (all d=0)`; `prove_liquidity_floor.py` GREEN (11/11);
+`prove_cache_guard.py` 8/8; record checker dry-run exit 0; twin broken: 0.
+No writes to `swing.db`; `daily_swing_paper.py` and every `.bat` never executed.

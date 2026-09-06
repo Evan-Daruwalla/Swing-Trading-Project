@@ -27,3 +27,5 @@ Last updated 2026-07-15. Canonical home for run/tooling.
   loud and before any order, which is the intended direction. `E8E9_CACHE`
   redirects the cache directory (used by `scripts/prove_cache_guard.py` to test
   without touching the real one).
+
+- Reviewed 2026-09-05: add `SWING_F3_FLOOR` (default ON; `=0` selects the pre-F3 research path) to the env-knob list — read at import of `scripts/run_e8_squeeze.py` like the cache knobs; and `SWING_ALLOW_STALE_CACHE=1` was the documented hatch F3 used to pin the vintage (record FN).

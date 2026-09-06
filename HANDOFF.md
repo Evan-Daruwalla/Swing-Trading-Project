@@ -90,7 +90,7 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
 > instruments cannot be tested fairly.
 
-**Last updated: 2026-09-05 ~16:09 CDT** — this file is the only live snapshot;
+**Last updated: 2026-09-05 ~19:30 CDT** — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
@@ -98,7 +98,62 @@ reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
 2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
 self-contradictory and was corrected 2026-07-28 by audit #7).**
 
-> **2026-09-05 - DAILY-AUDIT FIX PASS, committed `87db1c2`, NOT pushed (records
+> **2026-09-05 ~19:30 CDT - DRIFT CHECK (record FP). CRIT, NEW: the live loop has
+> been processing YESTERDAY's session since 2026-09-02.** Pairing each run's
+> `.bat` wall-clock stamp with the session date the loop printed: a 17-run
+> same-day streak through Tue 09-01 (34 of 40 logged runs same-day; the other
+> three off-date runs were Saturday manual fires correctly processing Friday), then **09-02 -> 09-01, 09-03 -> 09-02, 09-04 -> 09-03**.
+> `today = qdates[-1]` from `series("QQQ")` (`daily_swing_paper.py:685-695`), so
+> when the feed has not published today's bar by 19:00 the loop silently takes
+> yesterday as today. **`paper_nav` has NO 2026-09-04 row in any sleeve**; the
+> 09-02/09-03 rows were written a day late. No order was affected (all three
+> held QQQ, targets unchanged), but the fidelity claim for 09-03/09-04 is
+> weakened. **The FK detector cannot see this** - its clock is the same lagged
+> `qdates[-1]` and it excludes `today` by design; on Tue 09-08 it either writes
+> 09-04 a day late and fires NOTHING, or (feed caught up) flags 09-04 for all
+> three sleeves. Eighth variant of "a guard that cannot fire": a detector whose
+> clock comes from the feed it checks. Root cause NOT determined (yfinance
+> publication delay vs a cached series). **Fix = PRD M13.1, before Tuesday if
+> possible:** refuse (exit 1) when `qdates[-1]` is behind the real trading date.
+> **Drift table:** 4 rows DRIFTED (all fixed here), 1 UNVERIFIED-TODAY
+> (`pip-audit`), every other claim MATCHED. **`origin/main` = `9bf8890`: Evan
+> pushed; nothing is ahead.** F3 is EXECUTED (record FN), the graph re-indexed
+> with 4 hyperedges lost and named (record FO). Next work is PRD **M13**.
+
+> **2026-09-05 ~18:20 CDT - F3 REDIRECT EXECUTED across all 8 ETF experiments
+> (record FN; results `docs/research/2026-09-05_F3_liquidity_floor_etf_results.md`;
+> prereg `6a23a9a` + amendment `2f0a8a4`, both doc-only and both before any
+> runner code).** No verdict flipped FAIL -> PASS. **E11 moved FAIL ->
+> INCONCLUSIVE** - the floor cut its gate sample 46 -> 24, under its own n>=30,
+> so it lost the right to a verdict. **C3's gate maxDD fell 31.7% -> 17.1%** at
+> near-constant Sharpe: the illiquid names carried half its drawdown. **3 of 5
+> pre-registered predictions FALSIFIED** (E9 moved least, not most; E20 moved
+> -14%, not least; X9 traded MORE, 2,196 -> 2,502) - all three reasoned from
+> mechanics, all three turned on candidate supply. `median_dollar_volume` moved
+> to `swing_bot/universe.py` beside the constant; `is_liquid` and
+> `liquidity_mask` added; `SWING_F3_FLOOR` (default ON, `=0` = pre-F3 path)
+> shared from `run_e8_squeeze.py`. `backtest.py` took `liq=None` with None the
+> pinned path, so **`FROZEN TESTS: GREEN (all d=0)` held through a change to the
+> pinned engine**. `.e8e9_cache` vintage PINNED at 2026-08-17 (stale 19 days, NOT
+> mixed) via `SWING_ALLOW_STALE_CACHE=1` so both arms read one snapshot. E1 reads
+> `swing.db bars` (2014-01-02..2026-07-08) and is NOT comparable to the other
+> seven. **E14 under the floor is the one in-scope item not measured.** Also in
+> FN: **FH's two HIGHs were ALREADY FIXED** (2026-08-25 session, `509852e`) and
+> had been reported open for 16 days - `market_is_open()` at `:219` flags a
+> total credential outage at `:267`; `mark_nav()` refuses at `:578-585`.
+
+> **2026-09-05 ~18:25 CDT - GRAPH RE-INDEXED (record FO): 1,728 nodes / 2,876
+> edges / 186 communities / 9 hyperedges, health check clean.** The record is
+> now indexed (its TOC is the highest-degree node, 169 edges). **`build_merge`
+> deleted 9 hyperedges AGAIN** (12 -> 6, same bug as the wave-2 merge); union
+> restored 18 but 9 pointed at nodes re-extracted under new ids and were dropped.
+> **Genuinely lost: `v1_validation_harness_stack`, `d1_verdict_machinery`,
+> `stale_cache_refusal_chain`, `v3_pbo_scoping_gate`** - recoverable from
+> `git show 30a5bfa:graphify-out/graph.json`. Back up `graph.json` before any
+> future `--update`; node and edge counts both went UP, so nothing in the
+> merge output signals the loss.
+
+> **2026-09-05 - DAILY-AUDIT FIX PASS, committed `87db1c2`, since PUSHED (records
 > FK, FL, FM). The commit needed `--no-verify` on Evan's explicit call:** the
 > append-only pre-commit guard fired on exactly ONE removed line - the
 > `# Appendix BR-note` heading demoted below - with every other record change
@@ -891,7 +946,10 @@ Full descriptions as Evan gave them: record Phase 0.
   universe (0 of 260,363 ticker-sessions), while the 29-ETF universe breaches it
   on 16.07% (26 of 29 names). Re-running the stock experiments would install a
   guard that cannot fire — this project's signature defect, a fifth time.
-  Awaiting Evan's redirect. Original wording follows: the 200-DMA convention split (7 inclusive / 6 exclusive;
+  ~~Awaiting Evan's redirect.~~ **F3 REDIRECTED and EXECUTED 2026-09-05 (record
+  FN): the floor now runs in E1/E8/E9/E11/E12/C3/E20/X9; no verdict flipped to
+  PASS, E11 went INCONCLUSIVE on sample size, C3's drawdown halved. Struck
+  2026-09-05.** Original wording follows: the 200-DMA convention split (7 inclusive / 6 exclusive;
   E5 and E7 use the opposite convention from the E6 strategy they test) and the
   unenforced liquidity floor. Each moves already-recorded numbers, so each needs
   its own pre-registration; not drafted, because unlike V3 neither has a
@@ -914,14 +972,20 @@ Full descriptions as Evan gave them: record Phase 0.
 - `docs/research/` — evidence brief, experiment-ideas list (+ council
   outcome pointer), future power calc / ablation docs.
 - `.claude/codebase-memory/` — binned technical memory (INDEX + 11 bins).
-- `graphify-out/` — the knowledge graph (`/graphify` queries it). **1665 nodes /
-  2886 edges / 184 communities / 12 hyperedges as of 2026-08-13** (record ET).
-  Wave 2 indexed the last 35 research docs; research-doc nodes went 80 → 384.
-  **Still NOT indexed: the project record itself** — it re-reads as uncached
-  every time an appendix is appended, and `build_merge` replaces ALL nodes for a
-  re-extracted file, so a delta pass would trade its 126 existing nodes for a
-  handful. All-or-nothing; open. **Treat the graph as navigation, never as a
+- `graphify-out/` — the knowledge graph (`/graphify` queries it). **1,728 nodes /
+  2,876 edges / 186 communities / 9 hyperedges as of 2026-09-05** (record FO;
+  was 1665 / 2886 / 184 / 12 at record ET). **The project record IS now
+  indexed** — its TOC is the highest-degree node at 169 edges. **`build_merge`
+  REPLACES hyperedges instead of unioning them** (bit twice: wave 2, and FO);
+  back up `graph.json` before any `--update` and compare hyperedge counts after.
+  Four hyperedges lost in FO, recoverable from `git show
+  30a5bfa:graphify-out/graph.json`. **Treat the graph as navigation, never as a
   citation** — it is LLM-built and has shipped at least one false fact (record
   EQ). The record and the code are ground truth.
+- `docs/research/2026-09-05_F3_liquidity_floor_etf_results.md` — the F3 A/B
+  across eight ETF experiments, with the falsified predictions recorded as
+  written.
+- `docs/prereg_f3_liquidity_floor_etf_scope.md` + `docs/prereg_f3_amendment_cache_vintage.md`
+  — F3's prereg and its vintage amendment, both doc-only commits.
 - `.claude/pm-cadence.json` — record entry every 3 prompts;
   handoff/PRD/bins event-driven.

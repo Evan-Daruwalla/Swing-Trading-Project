@@ -10,3 +10,5 @@
   these are forward EVIDENCE, not validated edges.
 - 2026-07-08: empty — no code yet. Candidate strategies under evaluation are
   listed in HANDOFF.md; none implemented.
+
+- Reviewed 2026-09-05: the three sleeves are unchanged; e6_1x has 31 NAV marks against its peers' 36 (holes acknowledged permanent, record FL); the research runners now enforce the liquidity floor (F3, record FN); the live loop has a feed-clock defect open as PRD M13.1 (record FP).

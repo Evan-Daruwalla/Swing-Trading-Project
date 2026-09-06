@@ -23,3 +23,5 @@
   alpaca_keys.env` is empty). Supersedes the conditional "If this project gets
   its own keys file" phrasing in the 2026-07-08 bullet above.
 
+
+- Reviewed 2026-09-05: hook chain unchanged; `alpaca_keys.env` still untracked (`git log --all -- alpaca_keys.env` empty); the pre-commit gate fired for real on 2026-09-05 (record FM).
