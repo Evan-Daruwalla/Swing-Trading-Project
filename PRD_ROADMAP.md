@@ -1340,6 +1340,21 @@ Order is by consequence, not effort. Nothing here reopens a verdict.
    instrument is dark and nothing says so (record FH). Fix: `backfill_divergence`
    prints the count of unresolvable rows every run. Done-check: the line appears
    in a `--dry-run`-equivalent path; `test_frozen` GREEN.
+   *(Outcome 2026-09-05, record Appendix FT: **DONE, with one deviation stated
+   in-code.** This task's two requirements CONTRADICT: `backfill_divergence` has
+   one call site, `daily_swing_paper.py:1026`, inside `if args.execute:` (`:1001`) — a
+   print placed there can never appear on a dry run. Moving the backfill call
+   out is worse (read-only against Alpaca, but still needs credentials; a dry
+   run makes no network calls). So the REPORT was split from the RESOLVING:
+   `paper_sleeves.divergence_census()` beside `open_divergence_rows`, printed by
+   `print_divergence_census()` called UNGATED at `daily_swing_paper.py:824`
+   beside the missed-session detector. **The census is one row harsher than FH:
+   5 rows are dark, but a 6th is `canceled` with no fill price, so only 4 of 10
+   can EVER yield a fidelity number** — and HANDOFF's "+0.0/+0.0/+1.3 bps" is
+   exactly 3 of those 4. Printed, never added to `RUN_FAILURES` (permanent state;
+   red-forever trains ignoring red). `scripts/prove_divergence_census.py`
+   **PROVEN: 16 checks**, including an `ast` walk asserting the call is NOT under
+   `if args.execute:`; `FROZEN TESTS: GREEN (all d=0)`.)*
 4. **E14 under the liquidity floor** — the one F3 in-scope item not measured
    (prereg §1 scoped it as a count, not a verdict). Files:
    `scripts/run_e14_sector_momentum.py` + the shared `f3_masks_by_date`.

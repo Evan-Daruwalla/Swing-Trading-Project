@@ -98,6 +98,40 @@ reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
 2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
 self-contradictory and was corrected 2026-07-28 by audit #7).**
 
+> **2026-09-05 ~23:25 CDT - M13.3 DONE (record FT): the fidelity instrument now
+> reports its own dark half every run, and the honest denominator is 4, not 5.**
+> Read-only census of `fill_divergence` (10 rows): **4 MEASURED** (a real broker
+> fill to compare), **1 resolved with no fill price** (id 7, `canceled` - outcome
+> known, measures nothing), **5 PERMANENTLY DARK** (`alpaca_order_id IS NULL`:
+> never mirrored, so no broker outcome EXISTS to fetch), **0 pending**. FH's "5
+> of 10 are structurally excluded" is exactly right, but **only 4 of 10 can EVER
+> yield a fidelity number.** This file's "+0.0/+0.0/+1.3 bps when the EOD
+> discipline holds" is exactly 3 of those 4; the fourth is e18_vixts 2026-07-20,
+> sim 706.680 vs Alpaca 700.622 = **-85.7 bps**, already recorded at record line
+> 4517 as the record DE midday manual fire. Nothing changed about that row - the
+> run now prints the DENOMINATOR, so 3-of-4 can no longer read as the whole
+> population.
+> **The task contradicted itself and the deviation is written in-code.** PRD
+> M13.3 named `backfill_divergence` as the printer AND required the line on a dry
+> run; that function's only call site (`daily_swing_paper.py:1026`) is inside
+> `if args.execute:`, so both cannot hold. Moving the backfill call out is worse
+> - read-only against Alpaca but still credential-dependent, and a dry run makes
+> no network calls. So the REPORT was split from the RESOLVING:
+> `paper_sleeves.divergence_census()` beside `open_divergence_rows` (the filter
+> that creates the darkness), printed by `print_divergence_census()` called
+> UNGATED at `daily_swing_paper.py:824`, next to the missed-session detector.
+> **Printed, never appended to `RUN_FAILURES`** - permanent state, and a red exit
+> that fires forever trains the operator to ignore red (the FJ lesson).
+> **Done-check: `scripts/prove_divergence_census.py` -> `PROVEN: 16 checks`**
+> (no network, throwaway DB, `swing.db` never opened), including an `ast` walk of
+> `_run` asserting `print_divergence_census` is called once and NOT under
+> `if args.execute:` while `backfill_divergence` still is. `FROZEN TESTS: GREEN
+> (all d=0)`.
+> **NOT done by this:** the 5 dark rows stay dark forever - never mirrored, so
+> there is nothing to fetch, and manufacturing it would be fabrication. Whether
+> the mirror should log a row at all when it submits no order is a separate
+> design question, untouched.
+
 > **2026-09-05 ~22:55 CDT - M13.2 INSTRUMENTED but NOT ANSWERED (record FS);
 > commit `2d1cfa1` holds M13.1 and is NOT PUSHED.** M13.2's done-check is a
 > timed QQQ fetch at ~19:00 CT **on a trading day**; today is Saturday and Mon

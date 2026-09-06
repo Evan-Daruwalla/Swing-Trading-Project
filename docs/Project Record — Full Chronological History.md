@@ -212,6 +212,8 @@ the dated entry, not the digest.
 - [FQ — M13.1 EXECUTED: the live loop now has a second clock and REFUSES when the feed lags it; the 09-04 hole turns out to be self-healing on Monday's holiday run, and the lag's cause is narrowed to yfinance publication](#appendix-fq---m131-executed-the-live-loop-now-has-a-second-clock-and-refuses-when-the-feed-lags-it-the-09-04-hole-turns-out-to-be-self-healing-on-mondays-holiday-run-and-the-lags-cause-is-narrowed-to-yfinance-publication-2026-09-05-2040-cdt) (09-05)
 - [FR — Evan's two calls on the M13.1 questions: let Monday's Labor Day run mark 2026-09-04 (a late run, not a backfill), and leave the 19:00 CT trigger alone until M13.2 measures the publication hour](#appendix-fr---evans-two-calls-on-the-m131-questions-let-mondays-labor-day-run-mark-2026-09-04-a-late-run-not-a-backfill-and-leave-the-1900-ct-trigger-alone-until-m132-measures-the-publication-hour-2026-09-05-2050-cdt) (09-05)
 - [FS — M13.2 INSTRUMENTED, NOT ANSWERED: the local-change hypothesis is dead (yfinance untouched since 2026-07-08), a third hypothesis is added (our own NaN filter), and the probe is built and self-tested - but the done-check needs a trading day, earliest Tue 2026-09-08](#appendix-fs---m132-instrumented-not-answered-the-local-change-hypothesis-is-dead-yfinance-untouched-since-2026-07-08-a-third-hypothesis-is-added-our-own-nan-filter-and-the-probe-is-built-and-self-tested---but-the-done-check-needs-a-trading-day-earliest-tue-2026-09-08-2026-09-05-2255-cdt) (09-05)
+- [FT — M13.3 DONE: the fidelity instrument now reports its own dark half every run - and only 4 of 10 rows, not 5, can ever yield a number. The task's two requirements contradicted each other, so the report was split from the resolving](#appendix-ft---m133-done-the-fidelity-instrument-now-reports-its-own-dark-half-every-run---and-only-4-of-10-rows-not-5-can-ever-yield-a-number-the-tasks-two-requirements-contradicted-each-other-so-the-report-was-split-from-the-resolving-2026-09-05-2325-cdt) (09-05)
+- [FU — CORRECTION to FT: two line numbers were read before this session's own patch shifted them by 39; HANDOFF and the PRD fixed in place, FT corrected here](#appendix-fu---correction-to-ft-two-line-numbers-were-read-before-this-sessions-own-patch-shifted-them-by-39-handoff-and-the-prd-fixed-in-place-ft-corrected-here-2026-09-05-2335-cdt) (09-05)
 
 ---
 
@@ -9615,3 +9617,165 @@ that disagreement is the finding.
 changed, `daily_swing_paper.py` not executed. **M13.2's own done-check is NOT
 met and is not claimed** - it is blocked on a trading day, earliest Tue
 2026-09-08.
+
+# Appendix FT - M13.3 DONE: the fidelity instrument now reports its own dark half every run - and only 4 of 10 rows, not 5, can ever yield a number. The task's two requirements contradicted each other, so the report was split from the resolving (2026-09-05, ~23:25 CDT)
+**Session:** 2026-09-05, ~23:10-23:25 CDT, same sitting as FQ/FR/FS. Evan: "do
+M13.3 next." No prereg, for the reason given in FQ: M13 is not an experiment and
+no verdict moves.
+
+## 1. FH's count confirmed, and it was one row too generous
+
+Read-only census of `fill_divergence` in `swing.db` (`mode=ro`, 10 rows):
+
+| bucket | n | what it can tell us |
+|---|---|---|
+| measured (`alpaca_price` NOT NULL) | **4** | a real broker fill to compare against sim |
+| resolved with no fill price | **1** | id 7, `canceled` -- outcome known, measures nothing |
+| **dark** (`alpaca_order_id` IS NULL) | **5** | never mirrored, so no broker outcome EXISTS to fetch |
+| pending (has id, unpolled) | **0** | the backfill work list |
+
+FH said 5 of 10 are structurally excluded from `open_divergence_rows`. That is
+exactly right. **But the number that matters is 4, not 5:** a canceled order
+never filled, so id 7 is resolved and still yields no fidelity number. **Only 4
+of 10 rows can EVER produce a sim-vs-broker measurement**, and the census line
+now says so in those words.
+
+**What those 4 are, and why the headline reads as three.** HANDOFF quotes
+fidelity as "+0.0/+0.0/+1.3 bps when the EOD discipline holds". Those are
+exactly ids 3, 4 and 8 (712.0 vs 712.0; 712.0 vs 712.0; 702.260 vs 702.35 =
++1.3 bps). The fourth measured row is id 11, e18_vixts 2026-07-20, sim 706.680
+vs Alpaca 700.622 = **-85.7 bps** -- already recorded at record line 4517 as the
+record DE midday manual fire, where Alpaca filled intraday Monday while the DB
+simulated Tuesday's open. The qualifier "when the EOD discipline holds" is what
+excludes it. Nothing here is new about that row; what is new is that the run now
+PRINTS the denominator, so the 3-of-4 selection can no longer look like the
+whole population.
+
+## 2. The task as written could not satisfy its own done-check
+
+PRD M13.3 says: "`backfill_divergence` prints the count of unresolvable rows
+every run" AND "Done-check: the line appears in a `--dry-run`-equivalent path".
+**Those two cannot both hold.** `backfill_divergence` has exactly ONE call site,
+`daily_swing_paper.py:987`, and it sits inside `if args.execute:` (`:962`). A
+dry run never reaches it, so a print placed there would never appear on a dry
+run.
+
+Moving the backfill call out of the gate is the worse fix: it is read-only
+against Alpaca, but it still needs credentials, and a dry run is documented as
+making no network order calls. So **the REPORT was split from the RESOLVING**:
+
+- `swing_bot/paper_sleeves.py` gains `divergence_census(conn)`, beside
+  `open_divergence_rows` -- the function whose filter creates the darkness. Four
+  mutually exclusive buckets that sum to `total`.
+- `scripts/daily_swing_paper.py:275` gains `print_divergence_census(conn)`,
+  called UNCONDITIONALLY at `:824`, next to the missed-session detector -- the
+  two together report the health of the forward evidence, and both now run in
+  both paths.
+- The deviation and its reason are written into the function's own docstring, so
+  the next reader does not "fix" it back.
+
+**Printed, never appended to `RUN_FAILURES`.** `dark` is a permanent recorded
+fact; a red exit firing forever on an unfixable past state trains the operator
+to ignore red, which is the reasoning already written into
+`ACKNOWLEDGED_NAV_HOLES` and the lesson of record FJ (every guard fired, nobody
+was listening).
+
+## 3. Done-check -- real output
+
+`scripts/prove_divergence_census.py` (NEW) -> **`PROVEN: 16 checks`**, exit 0.
+No network, no Alpaca, and `swing.db` is never opened -- it seeds a throwaway
+DB with the live table's exact shape. Three parts, because proving the function
+is not proving the call site:
+
+- **A/A2 (8 checks)** the four buckets on the real shape, that they sum to
+  total, an empty table, and an all-measured table.
+- **B (3 checks)** parses `daily_swing_paper.py` with `ast`, walks `_run`, and
+  asserts `print_divergence_census` is called exactly once and **NOT** nested
+  under any `if args.execute:` -- while asserting `backfill_divergence` still
+  IS, which is the evidence for the split in §2. This is the M13.3 done-check
+  stated mechanically rather than by inspection.
+- **C (5 checks)** captures the real printed line and pins the fragments an
+  operator reads:
+
+      fill_divergence census: 10 row(s) -- 4 MEASURED (sim vs real broker fill),
+      1 resolved with no fill price, 5 PERMANENTLY DARK (no alpaca_order_id:
+      never mirrored, so no broker outcome exists to fetch), 0 awaiting backfill.
+         => 4 of 10 rows can EVER yield a fidelity number. Every sim-vs-broker
+         claim rests on those 4.
+
+`.venv\Scripts\python.exe -m swing_bot.test_frozen` -> **`FROZEN TESTS: GREEN
+(all d=0)`**. The three other prove scripts re-run unchanged: feed clock 18/18,
+liquidity floor 11/11, refusal gate 10/10, cache guard 8/8.
+
+## 4. What this does NOT do
+
+It reports the darkness; it does not reduce it. The 5 dark rows stay dark
+forever -- they were never mirrored, so there is no broker outcome to fetch, and
+manufacturing one would be exactly the fabrication this project refuses. Whether
+the mirror should log a row at all when it does not submit an order is a
+separate design question and was NOT touched here.
+
+## 5. Files
+
+- `swing_bot/paper_sleeves.py` -- `divergence_census()` added beside
+  `open_divergence_rows`
+- `scripts/daily_swing_paper.py` -- `print_divergence_census()` at `:275`,
+  called ungated at `:824`
+- `scripts/prove_divergence_census.py` -- NEW, 16 checks
+
+## Done-check
+
+`PROVEN: 16 checks`; `FROZEN TESTS: GREEN (all d=0)`; `prove_feed_clock.py`
+18/18; `prove_liquidity_floor.py` 11/11; `prove_refusal_gate.py` 10/10;
+`prove_cache_guard.py` 8/8. `swing.db` opened READ-ONLY for the census only and
+never written; `daily_swing_paper.py` not executed; no `.bat` run.
+
+# Appendix FU - CORRECTION to FT: two line numbers were read before this session's own patch shifted them by 39; HANDOFF and the PRD fixed in place, FT corrected here (2026-09-05, ~23:35 CDT)
+**Session:** 2026-09-05, ~23:35 CDT, same sitting as FT. Caught by the
+claim-check hook on the summary written immediately after FT.
+
+## 1. CORRECTION to Appendix FT: two line numbers are off by 39
+
+FT §2 cites `backfill_divergence`'s call site as `daily_swing_paper.py:987` and
+its enclosing gate as `:962`. **Both were read BEFORE the same session's own
+patch inserted 39 lines above them** (`print_divergence_census` at `:275`, ~35
+lines, plus the 4-line ungated call at `:824`). Correct values on disk now:
+
+| cited in FT | actually |
+|---|---|
+| `backfill_divergence(conn)` at `:987` | **`:1026`** |
+| `if args.execute:` at `:962` | **`:1001`** |
+
+962 + 39 = 1001 and 987 + 39 = 1026, so the shift is fully explained by this
+session's insertion and nothing else moved. **Every other reference in FT is
+correct** and was re-derived: `print_divergence_census` defined at `:275`,
+called ungated at `:824`, `backfill_divergence` defined at `:310`.
+
+**The reasoning in FT is unaffected** -- the call site is still inside
+`if args.execute:`, which is the entire basis for splitting the report from the
+resolving. Only the two integers were stale.
+
+`HANDOFF.md` and `PRD_ROADMAP.md` carried the same two stale numbers and were
+**fixed in place** (they are live snapshots, not append-only). FT itself is a
+prior appendix and is NOT edited; this entry is its correction, which is how
+this record already writes them (`## 2. CORRECTION to Appendix EF`, and FO's
+corrections to FN).
+
+## 2. The mechanism, so it stops recurring
+
+A line number read from `grep -n` is only true for the file as it stood at that
+moment. This session read `:987`/`:962` during investigation, then patched the
+same file, then quoted the pre-patch numbers in the write-up. **Rule: re-derive
+every `path:line` AFTER the last edit to that file, not during investigation.**
+This is the second provenance class the claim-check hook has caught in one
+session; the earlier three flags were false positives (values that WERE in tool
+output), and this one was real -- which is the argument for not dismissing the
+hook by pattern.
+
+## Done-check
+
+Corrected values re-derived from disk with `grep -n` after the final edit:
+`275:def print_divergence_census`, `310:def backfill_divergence`,
+`824:    print_divergence_census(conn)`, `1001:    if args.execute:`,
+`1026:        backfill_divergence(conn)`. No code changed in this entry:
+`FROZEN TESTS: GREEN (all d=0)`, `prove_divergence_census.py` PROVEN 16/16.

@@ -272,6 +272,41 @@ def market_is_open():
     return (dt.time(9, 30) <= now.time() < dt.time(16, 0)), all_creds_dead
 
 
+def print_divergence_census(conn):
+    """Say out loud, every run, how much of the fidelity instrument is dark.
+
+    PRD M13.3 asked `backfill_divergence` to print this. It cannot: that
+    function is called at ONE site, inside `if args.execute:`, so the line
+    would never appear on a dry run -- and the same task's done-check requires
+    it in a dry-run path. Moving the backfill call out is worse: it is
+    read-only against Alpaca but still needs credentials, and a dry run is
+    documented as making no network order calls. So the REPORT is split from
+    the RESOLVING and called unconditionally here, beside the missed-session
+    detector, which reports the other half of the forward evidence's health.
+
+    Printed, never appended to RUN_FAILURES: `dark` is a permanent recorded
+    fact, and a red exit that fires forever on an unfixable past state trains
+    the operator to ignore red -- the reasoning already written into
+    ACKNOWLEDGED_NAV_HOLES."""
+    c = ps.divergence_census(conn)
+    if not c["total"]:
+        print("\nfill_divergence: EMPTY -- no mirrored order has ever been logged.",
+              flush=True)
+        return c
+    print("\nfill_divergence census: %d row(s) -- %d MEASURED (sim vs real broker "
+          "fill), %d resolved with no fill price, %d PERMANENTLY DARK (no "
+          "alpaca_order_id: never mirrored, so no broker outcome exists to "
+          "fetch), %d awaiting backfill."
+          % (c["total"], c["measured"], c["resolved_no_price"], c["dark"],
+             c["pending"]), flush=True)
+    if c["dark"] or c["resolved_no_price"]:
+        usable = c["measured"]
+        print("   => %d of %d rows can EVER yield a fidelity number. Every "
+              "sim-vs-broker claim rests on those %d."
+              % (usable, c["total"], usable), flush=True)
+    return c
+
+
 def backfill_divergence(conn):
     """Learn the REAL Alpaca outcome of every mirrored order still unresolved,
     and repair its sim-side so the row is an actual measurement.
@@ -783,6 +818,10 @@ def _run(args):
         if new_holes:
             RUN_FAILURES.append("missed session(s): "
                                 + ", ".join("%s/%s" % p for p in new_holes))
+
+    # ---- FIDELITY-INSTRUMENT CENSUS (PRD M13.3, record FH) ----
+    # Ungated on purpose: see print_divergence_census's docstring.
+    print_divergence_census(conn)
 
     # ---- realize any pending from the previous run (needs today's opens for
     # whatever tickers are currently held / newly targeted) ----

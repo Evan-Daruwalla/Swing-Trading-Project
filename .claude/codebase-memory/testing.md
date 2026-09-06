@@ -105,3 +105,16 @@ FAIL.
   disagreement between them is a real finding, not noise.
 - It refuses to mislead: run on a non-trading day it prints that it is measuring
   nothing about publication timing before sampling anyway.
+
+## Added 2026-09-05 (M13.3, record FT)
+
+- `scripts/prove_divergence_census.py` -> **`PROVEN: 16 checks`**. Seeds a
+  throwaway DB with the live `fill_divergence` table's exact shape; `swing.db`
+  is never opened and no network is touched.
+- **Part B is the pattern worth reusing:** it parses `daily_swing_paper.py` with
+  `ast`, walks `_run`, and asserts `print_divergence_census` is NOT nested under
+  any `if args.execute:` -- while asserting `backfill_divergence` still IS. A
+  "this line must appear on a dry run" requirement is otherwise checkable only
+  by running the live loop, which this project forbids in a dev session.
+- Part C captures the real printed line and pins the fragments an operator
+  reads, so a reword that drops the denominator fails the check.

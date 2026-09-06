@@ -217,6 +217,39 @@ def open_divergence_rows(conn):
         "ORDER BY date, id").fetchall()
 
 
+def divergence_census(conn):
+    """Every fill_divergence row sorted into what it can and cannot tell us.
+
+    Why (PRD M13.3, record FH): fill_divergence is M3's ONLY
+    implementation-fidelity instrument, and `open_divergence_rows` -- the only
+    thing that ever looks at the table -- filters to rows WITH an order id.
+    Rows that were never mirrored have `alpaca_order_id IS NULL`, so they are
+    structurally invisible to it and no run has ever said so. At 2026-09-05
+    that is 5 of 10 rows. A dark half that nothing reports is the same defect
+    class as a guard that cannot fire.
+
+    Buckets are mutually exclusive and sum to `total`:
+      measured          -- a real broker fill price to compare against sim
+      resolved_no_price -- terminal status but no fill (a canceled order
+                           yields no measurement, though we know its outcome)
+      dark              -- no order id: never mirrored, so no broker outcome
+                           exists to fetch. PERMANENTLY unmeasurable.
+      pending           -- has an order id, not yet polled: the backfill work
+                           list, the only bucket that can still change on its
+                           own.
+    """
+    row = conn.execute(
+        "SELECT COUNT(*) AS total,"
+        " COALESCE(SUM(alpaca_price IS NOT NULL), 0) AS measured,"
+        " COALESCE(SUM(alpaca_status IS NOT NULL AND alpaca_price IS NULL), 0)"
+        "   AS resolved_no_price,"
+        " COALESCE(SUM(alpaca_order_id IS NULL), 0) AS dark,"
+        " COALESCE(SUM(alpaca_order_id IS NOT NULL AND alpaca_status IS NULL), 0)"
+        "   AS pending"
+        " FROM fill_divergence").fetchone()
+    return dict(row)
+
+
 def resolve_divergence(conn, row_id, *, status, alpaca_price=None, alpaca_qty=None):
     """Record an order's real outcome AND repair sim_price to the DB-simulated
     fill for the same cycle.

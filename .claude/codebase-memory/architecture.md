@@ -58,3 +58,13 @@
   docstring step 3) and a total credential outage is a logged real event
   (record FH). An Alpaca-sourced clock would turn that outage into a refusal to
   mark NAV, manufacturing the holes the guard exists to prevent.
+- 2026-09-05 (M13.3, record FT): **the fidelity REPORT is split from the
+  fidelity RESOLVING, on purpose.** `paper_sleeves.divergence_census(conn)`
+  buckets every `fill_divergence` row (measured / resolved_no_price / dark /
+  pending, mutually exclusive, summing to total) and lives beside
+  `open_divergence_rows` -- the filter whose `alpaca_order_id IS NOT NULL`
+  clause creates the darkness. `daily_swing_paper.print_divergence_census()`
+  prints it and is called UNGATED at `:824`, beside the missed-session detector.
+  **Do not "tidy" that call into `backfill_divergence`:** that function's only
+  call site is inside `if args.execute:`, so the line would vanish from every
+  dry run, which is precisely what M13.3 required it to survive.
