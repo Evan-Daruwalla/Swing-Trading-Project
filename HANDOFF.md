@@ -98,6 +98,72 @@ reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
 2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
 self-contradictory and was corrected 2026-07-28 by audit #7).**
 
+> **2026-09-06 ~13:40 CDT - FX's SIX REMAINING findings CLOSED (record GA), but
+> its own prescribed fix was a NO-OP and three of its corrections were wrong.**
+> **The headline: FX told us to wrap `record_fill`+`upsert_position` in one
+> BEGIN/COMMIT. That does NOTHING.** Both self-committed, and an inner
+> `conn.commit()` ENDS the transaction a `with conn:` opened - measured here on
+> Python 3.14.4 / SQLite 3.50.4: a rolled-back wrap left BOTH rows durable and
+> `in_transaction == False`. Applying FX literally would have left the kill
+> window open while making the source read as fixed. The commits had to be
+> DEFERRED. This is pinned as arm G of the new proof so it stays a runnable
+> check, not prose. **Standing lesson: an audit finding is evidence; its
+> PRESCRIPTION is a hypothesis.**
+> **MED 4 fixed, phase-wide (Evan's call).** `clear_pending`, `record_fill` and
+> `upsert_position` take `commit=True`, which preserves the OLD behaviour for
+> any call site that does not opt out. **Careful, corrected 2026-09-06 (GC): the
+> five `realize_pending` sites were all switched to `commit=False` in the same
+> change, so they are NOT unchanged -- and `commit=True` is the TEARING
+> behaviour, not the safe one. A future caller that forgets `commit=False` gets
+> the bug back, and the AST arm only guards `realize_pending`.** Handed to
+> `/code-review`: the default may be the wrong way round. `realize_pending` is now EXACTLY TWO transactions -
+> T1 = every sell leg + the phase-1 cash write, T2 = every buy leg + the
+> phase-2 cash write + `clear_pending`. Phase-wide closed a window FX never
+> found: a kill between the phase-2 cash commit and `clear_pending` left the
+> buys DURABLE with `pending_json` still set, so the next run liquidated the
+> basket it had just bought and rebought it - a wash in this ledger, **a full
+> real round trip of churn orders through the `--execute` mirror.** E6's cash
+> write is NOT removed: same line, same order, now inside T1, so its invariant
+> holds by construction instead of by being early enough.
+> **`scripts/prove_torn_write.py` -> `PROVEN: 32 checks`.** It KILLS A REAL
+> CHILD PROCESS (`os._exit(137)`, no finalizers) rather than raising, and
+> asserts by LEDGER REPLAY, not row counts. Arm A reproduces the pre-fix shape
+> and requires the harness to DETECT the tear - without it a harness that
+> detects nothing would pass. Arm F is an `ast` walk pinning all 5 deferred
+> calls inside `with conn:` and exactly two transactions, so a later edit cannot
+> silently un-fix this.
+> **CORRECTION (2026-09-06, record GC): FX's three record-line figures were
+> RIGHT when it measured them.** An earlier version of this block, and record
+> GA's own title, called them "wrong". They are not: FX audited a tree with FV
+> and FW already appended (its own "Uncommitted at audit time" section says so),
+> and `2646` at `75b8ad7` + FV + FW = **2648**, exactly what FX reported. The
+> chain then continues +FX +FY = 2650 (`a56bba1`), +FZ = 2651 (`1d3473d`), +GA =
+> 2652, +GB = 2653. **They drifted; they were never wrong.** Its import fix
+> `:66`/`:67` genuinely was off by one (`:67`/`:68`), so ONE of five, not three.
+> Do not cite a record LINE at all — cite the heading. Also fixed: the
+> `clean_ledger` "still sits UNTRACKED" claim that sat 13 lines BELOW its own
+> correction, "INDEX + 11 bins" -> 13, and `mark_nav()` cited at `:578-585`
+> (defined `daily_swing_paper.py:621`, refuses `:638-644`) - a citation that
+> moved AGAIN during this session's own code edit.
+> **The HTML twin is CAUGHT UP: Appendix FP -> FZ**, all ten missing appendices
+> rendered, `broken: 0`, and **appendix ids in the HTML == `# Appendix`
+> headings in the markdown** -- the invariant, which holds at every size. (An
+> earlier version quoted "821,115 B ... at 182"; both were stale within the
+> hour because the twin is re-rendered after every append. Do not quote a byte
+> count for a derived artifact.)
+> **Root cause fixed:** `scripts/git-hooks/pre-commit:8-9` asserted "this repo
+> has no HTML-twin record ... don't add that job here", which was FALSE and is
+> why it drifted - a comment in the gate telling readers not to build the
+> control. It now names `scripts/render_record_html.py` and records that
+> regeneration is a HUMAN step, deliberately NOT gated (Evan), so no commit can
+> be newly blocked. **REGENERATE AFTER EVERY APPEND still depends on someone
+> remembering.**
+> **`divergence_census`'s docstring** no longer promises its buckets "sum to
+> total" - that is data-dependent (a row with a NULL order id AND a price counts
+> twice). Query unchanged; it was a false claim, not a bug.
+> **Nothing from FX or FY is left open.** M13.2 is the only outstanding task:
+> the timed feed probe, earliest Tue 2026-09-08.
+
 > **2026-09-06 ~00:21 CDT - M13 IS CLOSED: 4/6/7 DONE, 5 closed with no action
 > (records FV, FW). **M13.2 remains OPEN-BUT-BLOCKED** on a trading day (earliest
 > Tue 2026-09-08) - an earlier version of this line said "no open task left" in the
@@ -315,7 +381,10 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 > seven. **E14 under the floor is the one in-scope item not measured.** Also in
 > FN: **FH's two HIGHs were ALREADY FIXED** (2026-08-25 session, `509852e`) and
 > had been reported open for 16 days - `market_is_open()` at `:219` flags a
-> total credential outage at `:267`; `mark_nav()` refuses at `:578-585`.
+> total credential outage at `:268`; `mark_nav()` is defined at
+> `daily_swing_paper.py:621` and refuses at `:638-644`. (This said `:578-585`
+> until 2026-09-06; the range had also moved again by the time it was fixed,
+> which is why the fix cites both the definition and the refusal.)
 
 > **2026-09-05 ~18:25 CDT - GRAPH RE-INDEXED (record FO): 1,728 nodes / 2,876
 > edges / 186 communities / 9 hyperedges, health check clean.** The record is
@@ -340,7 +409,11 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 > **The original finding (record FK). The record itself had been
 > WEDGED for 54 days, which is why the 2026-09-05 audit left no trace.**
 > `append-record-entry.js` refused EVERY append to this project: the heading
-> `# Appendix BR-note - ...` (record line 2504, written 2026-07-13) is invisible
+> `## BR-note - ...` (search the record for `## BR-note`; ~line 2652 at 2026-09-06 and it moves +1
+> on EVERY append, so the heading text is the stable reference. Written
+> 2026-07-13; it was cited as line
+> 2504 when the record's TOC was 35 lines long -- the demotion described below
+> changed the HEADING LEVEL, not any line count) is invisible
 > to the letter scan, so the checker refused rather than risk a duplicate letter.
 > Fixed by demoting it to a `## BR-note - ...` sub-head of BR - it IS a
 > correction to BR, not a separate appendix, and the record already writes
@@ -408,9 +481,11 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 
 > **2026-09-01 - record FJ: THE LIVE LEDGER WAS CONTAMINATED and e6_1x recorded
 > NOTHING for five sessions. Every guard fired correctly; nobody was listening.**
-> See record FJ (record line 8246). `clean_ledger_2026-08-25.py` still sits
-> UNTRACKED in the repo root (2,498 B); FJ references it, so it is not deleted
-> without Evan's say-so.
+> See record **Appendix FJ** (~line 8394 at 2026-09-06; search the heading, the
+> number moves +1 per append). `clean_ledger_2026-08-25.py` is **TRACKED**,
+> committed at `87db1c2` — see the correction 13 lines above. (This line claimed
+> "still sits UNTRACKED in the repo root" until 2026-09-06, contradicting that
+> correction inside the same file.)
 
 > **2026-08-25 - record FI: the 2026-08-20 audit (FH) never reached git**, so its
 > two HIGHs stayed live five days. Landed later at `509852e`.
@@ -1061,7 +1136,7 @@ Full descriptions as Evan gave them: record Phase 0.
   `SWING_MAX_CACHE_STALE_DAYS` (default 5).
   **The live M3 paper loop is unaffected**, but not for the reason this file
   used to give. It DOES import the module, transitively, on every run
-  (`daily_swing_paper.py:64` → `run_e10_earnings_drift:27`; `:65` →
+  (`daily_swing_paper.py:67` → `run_e10_earnings_drift:27`; `:68` →
   `run_c1_residual_reversal:29`) — it pulls only `UNIV`, `residual_series` and
   `BETA_N`, none of which call `cache_fetch`, the guard's only caller. The
   earlier wording, "`daily_swing_paper.py` does not import that module", was
@@ -1093,7 +1168,8 @@ Full descriptions as Evan gave them: record Phase 0.
   under BLOCKED-ON-EVAN for 4 weeks; corrected 2026-08-13, record EO.)
 - **M2.12 survivorship bound**: deferred as moot for failed ETF-only E1; run
   only if a stock strategy enters scope.
-- ~~**RUN V3?**~~ **RUN 2026-08-19, record FC (record line 7614) - V3 IMPLEMENTED and ACCEPTED, but its repair is UNDEMONSTRATED.** `docs/prereg_v3_pbo_scoping.md` was committed doc-only
+- ~~**RUN V3?**~~ **RUN 2026-08-19, record Appendix FC** (~line 7763 at 2026-09-06; search the
+heading, the number moves +1 per append) - V3 IMPLEMENTED and ACCEPTED, but its repair is UNDEMONSTRATED.** `docs/prereg_v3_pbo_scoping.md` was committed doc-only
   (`6194847`, 2026-08-13, record ET) BEFORE any code moved. It scopes PBO to config
   sets where selection is real: sets are declared `SELECTION` or `EXCHANGEABLE`
   at the call site, PBO gates only the former. No threshold moves. Running it
@@ -1152,7 +1228,8 @@ Full descriptions as Evan gave them: record Phase 0.
   was open — corrected 2026-09-06, audit FX.)
 - `docs/research/` — evidence brief, experiment-ideas list (+ council
   outcome pointer), future power calc / ablation docs.
-- `.claude/codebase-memory/` — binned technical memory (INDEX + 11 bins).
+- `.claude/codebase-memory/` — binned technical memory (INDEX + 13 bins; was
+  11 before M13.7 added `DIRECTORY.md` and `disclosure.md`).
 - `graphify-out/` — the knowledge graph (`/graphify` queries it). **1,728 nodes /
   2,876 edges / 186 communities / 9 hyperedges as of 2026-09-05** (record FO;
   was 1665 / 2886 / 184 / 12 at record ET). **The project record IS now

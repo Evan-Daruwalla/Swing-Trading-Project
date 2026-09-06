@@ -72,7 +72,34 @@ FAIL.
   that miscounts itself is not a checker.
 - **Determinism is part of the F3 protocol:** every experiment arm is run twice
   and the two outputs must be byte-identical before any comparison is believed.
-  All 16 runs (8 experiments x 2 arms) passed.
+  All 16 runs (8 experiments x 2 arms) passed. (This bullet belongs to the F3
+  section above; a 2026-09-06 edit inserted a heading directly on top of it and
+  filed it under the torn-write section. Restored here.)
+
+## Added 2026-09-06 (audit FX MED 4, record GA)
+
+- `scripts/prove_torn_write.py` -> **`PROVEN: 32 checks`**. Proves
+  `realize_pending`'s ledger writes are atomic PER PHASE.
+- **It kills a real child process, it does not raise.** An in-process `raise`
+  only shows `with conn:` unwinds cleanly; it does not model
+  ExecutionTimeLimit or a reboot. Each kill arm re-execs the file as a child
+  that monkeypatches one `paper_sleeves` function to `os._exit(137)` -- no
+  `__exit__`, no `atexit`, no `close()` -- then the parent reopens the DB and
+  lets SQLite's rollback journal decide. The child's return code is asserted
+  to be exactly 137 so a child that merely errored cannot pass as a kill.
+- **Arms A and F are what make it a proof.** A reproduces the PRE-FIX shape and
+  requires the harness to DETECT the tear (without it, a harness that can
+  detect nothing would pass). F is an `ast` walk asserting all 5 ledger calls
+  carry `commit=False` inside a `with conn:` and that there are exactly TWO
+  transactions -- so a later edit cannot silently un-defer a write.
+- **Arm G pins a fact about the toolchain, not the code:** an inner
+  `conn.commit()` ENDS a transaction opened by `with conn:`, so wrapping
+  self-committing writes is a no-op. That is why FX's own prescribed fix would
+  not have worked, and it is now a runnable check rather than prose.
+- The assertion is a LEDGER REPLAY, not row counts: replay every
+  `paper_transactions` row from the opening state and require the result to
+  equal stored cash and positions to 1e-9.
+
 
 ## Added 2026-09-05 (M13.1, record FQ)
 

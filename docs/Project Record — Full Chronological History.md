@@ -219,6 +219,9 @@ the dated entry, not the digest.
 - [FX — Scheduled daily-audit: a regime gate that fails toward risk-on, the OHLC sanity check nothing imports, and a cancel failure the run list cannot see](#appendix-fx---scheduled-daily-audit-a-regime-gate-that-fails-toward-risk-on-the-ohlc-sanity-check-nothing-imports-and-a-cancel-failure-the-run-list-cannot-see-2026-09-06-0722-cdt) (09-06)
 - [FY — landing-check over all of M13: FIX FIRST. My commit introduced 3 real order ids to the PUBLIC repo and the de-identification was uncommitted; FU's own path:line rule was applied to one citation pair and not the three it also broke; the record's published HTML twin stops at FP](#appendix-fy---landing-check-over-all-of-m13-fix-first-my-commit-introduced-3-real-order-ids-to-the-public-repo-and-the-de-identification-was-uncommitted-fus-own-pathline-rule-was-applied-to-one-citation-pair-and-not-the-three-it-also-broke-the-records-published-html-twin-stops-at-fp-2026-09-06-1308-cdt) (09-06)
 - [FZ — FX's three HIGHs fixed: a regime gate that went LONG on a non-positive VIX, a cancel failure that only printed, and coverage_gate WIRED after 53 days dead (decided with evidence, not deleted)](#appendix-fz---fxs-three-highs-fixed-a-regime-gate-that-went-long-on-a-non-positive-vix-a-cancel-failure-that-only-printed-and-coverage_gate-wired-after-53-days-dead-decided-with-evidence-not-deleted-2026-09-06-1316-cdt) (09-06)
+- [GA — FX's six remaining findings closed - but its prescribed fix for the torn write was a NO-OP and three of its own doc corrections were wrong; realize_pending is now two transactions, proven with a real process kill](#appendix-ga---fxs-six-remaining-findings-closed---but-its-prescribed-fix-for-the-torn-write-was-a-no-op-and-three-of-its-own-doc-corrections-were-wrong-realize_pending-is-now-two-transactions-proven-with-a-real-process-kill-2026-09-06-1340-cdt) (09-06)
+- [GB — CORRECTION to GA: its corrected record line numbers went stale during the append that published them - every append shifts every record line by +1 via the TOC, so the three citations are now anchored to headings instead](#appendix-gb---correction-to-ga-its-corrected-record-line-numbers-went-stale-during-the-append-that-published-them---every-append-shifts-every-record-line-by-1-via-the-toc-so-the-three-citations-are-now-anchored-to-headings-instead-2026-09-06-1343-cdt) (09-06)
+- [GC — landing-check on GA/GB: the code and its proof held under four planted mutations, but GA accused FX of being WRONG when FX was RIGHT - its figures drifted, they were never mistaken. Plus a false 'safe default' claim and six propagation misses](#appendix-gc---landing-check-on-gagb-the-code-and-its-proof-held-under-four-planted-mutations-but-ga-accused-fx-of-being-wrong-when-fx-was-right---its-figures-drifted-they-were-never-mistaken-plus-a-false-safe-default-claim-and-six-propagation-misses-2026-09-06-1406-cdt) (09-06)
 
 ---
 
@@ -10405,3 +10408,361 @@ FX's remaining findings (1 code, 6 docs) were not touched — Evan scoped this t
 the three HIGHs. The `divergence_census` sum-to-total docstring bug handed to
 `/code-review` in record FY is still open, as is the published record HTML twin
 stopping at Appendix FP.
+
+# Appendix GA - FX's six remaining findings closed - but its prescribed fix for the torn write was a NO-OP and three of its own doc corrections were wrong; realize_pending is now two transactions, proven with a real process kill (2026-09-06, ~13:40 CDT)
+**Session:** 2026-09-06, ~13:16-13:40 CDT. Evan: "continue with the next set of
+tasks", then approved a plan. Closes FX's six remaining findings (1 code, 5
+docs) and the two items record FY left explicitly unfixed. No prereg: none of
+this is an experiment and no verdict moves.
+
+## 1. FX's OWN PRESCRIBED FIX FOR MED 4 WAS A NO-OP. Measured, not argued.
+
+FX said to wrap `record_fill` + `upsert_position` "in one `BEGIN`/`COMMIT`".
+**That does nothing.** Both functions ended with a bare `conn.commit()`, and an
+inner commit ENDS the transaction a `with conn:` block opened — the block's
+exit-commit then finds nothing to roll back. Measured on this machine (Python
+3.14.4 / SQLite 3.50.4): a `with conn:` block containing two self-committing
+writes and then an exception left **both rows durable** and
+`in_transaction == False`.
+
+So applying FX literally would have left the kill window fully open **while
+making the source read as fixed** — the guard-that-cannot-fire class this
+project keeps naming, except self-inflicted by the remedy. The commits had to be
+DEFERRED, not wrapped. This is pinned as arm G of the new proof, so the fact
+survives as a runnable check rather than a claim in prose.
+
+**Second-order lesson: an audit's proposed FIX can be as wrong as the defect it
+reports.** FX also mis-stated three of its five doc corrections (§4). An audit
+finding is evidence; its prescription is a hypothesis.
+
+## 2. MED 4 fixed — deferred commits, phase-wide boundary
+
+**Caller census first, because a chokepoint fix is only safe if every caller is
+known.** Six call sites, all in `scripts/daily_swing_paper.py`, all on the one
+connection: `record_fill` (`:511`, `:549`), `upsert_position` (`:512`, `:550`),
+`clear_pending` (`:595`, `:994`). No dynamic dispatch anywhere in project code,
+so the name grep is exhaustive. `test_frozen` calls none of them.
+**`clean_ledger_2026-08-25.py` writes these tables by raw SQL, so it is neither
+broken by the change nor protected by it** — stated rather than implied.
+
+`clear_pending`, `record_fill` and `upsert_position` now take `commit=True`.
+The default keeps all six sites behaviourally identical, so a future caller
+written in ignorance gets today's safe behaviour. `realize_pending` became
+**exactly two transactions**:
+
+- **T1, the liquidation** — every sell leg AND the phase-1 cash write.
+- **T2, the rebuild** — every buy leg, the phase-2 cash write, AND
+  `clear_pending`.
+
+**Evan chose phase-wide over per-leg, and it closed a window FX never found.**
+Per-leg satisfies FX literally but leaves two siblings of the same class:
+1. A kill after leg 1's pair but before the cash write still leaves a position
+   deleted against pre-sale cash — **the audit #4 E6 bug, alive in miniature.**
+2. A kill between the phase-2 cash commit and `clear_pending` left the buys
+   DURABLE with `pending_json` still set, so the next run re-fired
+   `realize_pending`, liquidated the basket it had just bought and rebought it.
+   A wash in this ledger, but **a full real round trip of churn orders through
+   the `--execute` Alpaca mirror.** Not in FX; found while designing the fix and
+   closed by T2.
+
+**E6's cash write was NOT removed.** It stays at its line, in its order, now
+inside T1 — so E6's invariant holds by construction instead of by being early
+enough. Its comment said "record_fill and upsert_position each commit
+immediately", which the fix made false; it now records the original bug, the
+ordering fix, and why the write must not be moved or deleted.
+
+## 3. The proof: `scripts/prove_torn_write.py` — **PROVEN: 32 checks**
+
+A raise proves only that `with conn:` unwinds cleanly; it does not model
+`ExecutionTimeLimit` or a reboot. Each kill arm **re-execs this file as a child
+process** that monkeypatches one `paper_sleeves` function to call
+`os._exit(137)` — no `__exit__`, no `atexit`, no `close()` — then the parent
+reopens the file and lets SQLite's rollback journal decide what survived. The
+child's return code is asserted to be exactly 137, so a child that merely
+errored cannot pass as a kill. No source edit was needed for injection:
+`realize_pending` calls through the module attribute `ps.upsert_position`.
+
+The assertion is **ledger replay**, not row counts: replay every
+`paper_transactions` row from the seeded opening state and require the result to
+equal stored cash and positions to 1e-9 — the mechanised form of the hand check
+`clean_ledger_2026-08-25.py` had to make after the real contamination.
+
+| arm | result |
+|---|---|
+| **A. CONTROL** (pre-fix shape, kill between the pair) | 1 orphan transaction row, position unchanged, **replay MISMATCH detected** |
+| **B. FIXED** (same kill, real `realize_pending`) | 0 rows, position/cash untouched, pending still set, replay consistent |
+| **C. RETRY** (re-run on B's recovered DB) | exactly **1** sell row, not 2 — FX's stated failure, directly answered |
+| **D. PHASE BOUNDARY** (kill at `clear_pending`) | 0 buy rows, pending still set → one clean rebuild next run, not churn |
+| **E. HAPPY PATH** | sell and buy cycles identical to before — boundaries changed, outcomes did not |
+| **F. AST TRIPWIRE** | all 5 ledger calls carry `commit=False` and sit inside a `with conn:`; both cash writes present; exactly TWO transactions |
+| **G. FX's fix, measured** | 2 rows survive a rolled-back wrap → **the prescription is a no-op** |
+
+**A and F are what make it a proof rather than a demonstration.** Without A the
+harness could pass by being unable to detect anything; F stops a later edit from
+silently dropping a `commit=False` and un-fixing this without any test going red.
+
+## 4. FX's five doc findings — and three of its own corrections were wrong
+
+FX ran at 07:22, before `a56bba1` and `1d3473d` shifted the files it cited.
+Re-derived against disk:
+
+| finding | FX said | FX's proposed fix | actual |
+|---|---|---|---|
+| MED 7a | record line 2504 | 2648 | **2651** (and the heading is now `## BR-note`, not `# Appendix` — the quoted form was stale too) |
+| MED 7b | 7614 for FC | 7758 | **7761** |
+| MED 7c | 8246 for FJ | 8390 | **8393** |
+| LOW 9b | imports `:64`/`:65` | `:66`/`:67` | **`:67`/`:68`** |
+
+**FX's three proposed record targets are all blank lines** — its +144 shift was
+already +147 by the time anyone could act on it. Fixed to the re-derived values.
+
+Also fixed: **MED 6** — `HANDOFF.md:411` claimed `clean_ledger_2026-08-25.py`
+"still sits UNTRACKED" while `HANDOFF.md:398`, thirteen lines above it in the
+same file, already recorded it as committed at `87db1c2`. **MED 8** — "INDEX +
+11 bins" → 13, the two added by M13.7. **LOW 9a** — `mark_nav()` cited at
+`:578-585`; it is defined at `daily_swing_paper.py:621` and refuses at
+`:638-644`, and it lives in `daily_swing_paper.py`, not `paper_sleeves.py` as
+the surrounding text implied. That citation moved AGAIN during this session's
+own code edit, which is why the correction now names both the definition and the
+refusal rather than one range.
+
+## 5. LOW 10 — the HTML twin, and the comment that caused the drift
+
+`scripts/render_record_html.py` exists and its own docstring says "REGENERATE
+AFTER EVERY APPEND"; `HANDOFF.md` states the same policy. But
+`scripts/git-hooks/pre-commit:8-9` asserted *"this repo has no HTML-twin record
+to keep in sync — don't add that job here"*. **That was false, and it is the
+root cause**: a comment in the gate actively instructing future readers not to
+build the control.
+
+Regenerated: the twin ran **Appendix FP → FZ**, picking up all ten missing
+appendices (FQ, FR, FS, FT, FU, FV, FW, FX, FY, FZ), 821,115 bytes, `internal
+links: 183, heading ids: 346, broken: 0`. Appendix ids in the HTML now equal
+`# Appendix` headings in the markdown at **182 = 182**, re-derived by regex —
+a first `grep -c` said 183 because one line carries two ids, which is a counting
+artifact, not a rendering fault.
+
+The hook comment now states that the twin DOES exist, names the renderer, and
+records that regeneration is a HUMAN step, deliberately not gated (Evan's call),
+so no commit can be newly blocked. **The twin still depends on someone
+remembering — but the instruction has stopped being actively wrong.** My added
+lines are pure ASCII; the file's non-ASCII byte count went DOWN 192 → 189
+because the false comment carried an em dash.
+
+## 6. FY leftover — a docstring that promised more than the query delivers
+
+`divergence_census` said its four buckets are "mutually exclusive and sum to
+`total`". That is data-dependent, not structural: a row with
+`alpaca_order_id IS NULL` **and** a price counts in both `measured` and `dark`,
+and a planted row made them sum to 4 against a total of 3. Now stated as a
+precondition, with the reason it is unreachable today spelled out (the price
+only ever arrives via `resolve_divergence`, which is keyed by the order id).
+**The query is unchanged** — this was a false claim, not a bug.
+
+## Done-check — real output
+
+`FROZEN TESTS: GREEN (all d=0)` after each of tasks 1, 3, 4 and 5 (12 pinned
+refs at d=+-0.0000pp, 19 invariants). No pinned number could move: all 12 come
+from the `bars` table via `prices.connect_ro()` and none of the 19 invariants
+touch the three changed functions.
+
+`prove_torn_write.py` -> **PROVEN: 32 checks**, exit 0. The other five proofs
+re-run unchanged, all exit 0: `prove_divergence_census` 16, `prove_feed_clock`
+18, `prove_liquidity_floor` 11/11, `prove_refusal_gate` 10/10,
+`prove_cache_guard` 8/8. `probe_feed_publication --selftest` 4/4.
+
+`swing.db` was never opened — every proof arm uses a throwaway DB under
+`tempfile.mkdtemp()`. `scripts/daily_swing_paper.py` was never executed, no
+`.bat` ran, nothing was deleted, nothing pushed.
+
+## 7. Still open
+
+M13.2 (root-cause the feed lag) needs its timed probe on a trading day —
+earliest **Tue 2026-09-08**, `scripts\probe_feed_publication.py --watch` from
+~15:15 CT. FX's remaining findings were all closed by this entry; nothing from
+FX or FY is left outstanding.
+
+# Appendix GB - CORRECTION to GA: its corrected record line numbers went stale during the append that published them - every append shifts every record line by +1 via the TOC, so the three citations are now anchored to headings instead (2026-09-06, ~13:43 CDT)
+**Session:** 2026-09-06, ~13:43 CDT, minutes after GA. Caught by the claim-check
+hook asking where two numbers came from.
+
+## 1. CORRECTION to GA §4: the "correct" record line numbers were stale before the ink dried
+
+GA reported FX's three record-line citations as wrong (FX said +144; true shift
++147) and gave the corrected targets as **2651 / 7761 / 8393**. Those were
+correct when derived. **They were wrong by the time GA was appended**, because
+appending GA itself shifted them:
+
+| target | GA said | actually, after GA |
+|---|---|---|
+| `## BR-note` | 2651 | **2652** |
+| Appendix FC | 7761 | **7762** |
+| Appendix FJ | 8393 | **8394** |
+
+**The mechanism, which nobody had named before:**
+`append-record-entry.js` writes TWO things per append — the entry at the end of
+the file AND one line in the front-matter Table of Contents. The TOC line sits
+near the top, so **every record line number below it shifts by exactly +1 on
+every single append.** Three appends in one sitting move every citation by 3.
+That is the whole of FX's "+144", and of my "+147", and of this +1.
+
+## 2. So the fix was not better numbers
+
+A record line number in `HANDOFF.md` is a citation to a moving target that is
+*guaranteed* to be wrong after the next append. Chasing it produces the exact
+loop this project has now run three times: FX corrected the numbers and was
+wrong by 3; GA corrected FX and was wrong by 1; a fourth pass would be wrong by
+however many appends happened in between.
+
+All three citations are now anchored to the thing that does NOT move — the
+heading text (`## BR-note`, `Appendix FC`, `Appendix FJ`) — with the line kept
+only as a dated "~line N at 2026-09-06" hint and an explicit note that it moves
++1 per append. `grep` on the heading always finds it; the number is a
+convenience, no longer the reference.
+
+## 3. Where this sits in the pattern
+
+This is the FOURTH stale-citation finding in two days, and the third variant:
+- FU (2026-09-05): line numbers read before the same session's own patch shifted
+  them by 39.
+- FY (2026-09-06): FU's rule was applied to the one pair FU was looking at, and
+  not to the three other citations the same insert had broken.
+- GA (2026-09-06): FX's *proposed corrections* were themselves stale.
+- GB (here): GA's corrections went stale during the append that published them.
+
+Each was fixed by re-deriving a number. **None of them fixed the reason a number
+was being cited at all.** That is what this entry changes for these three, and it
+is the standing recommendation for any future record citation: cite the heading,
+not the line.
+
+## Done-check
+
+`FROZEN TESTS: GREEN (all d=0)`. Three citations re-anchored in `HANDOFF.md`
+(the live snapshot, edited in place); GA is a prior appendix and is corrected
+HERE, not edited. Targets re-derived from disk after the GA append:
+`2652:## BR-note`, `7762:# Appendix FC`, `8394:# Appendix FJ`. No code changed,
+`swing.db` untouched, nothing pushed.
+
+# Appendix GC - landing-check on GA/GB: the code and its proof held under four planted mutations, but GA accused FX of being WRONG when FX was RIGHT - its figures drifted, they were never mistaken. Plus a false 'safe default' claim and six propagation misses (2026-09-06, ~14:06 CDT)
+**Session:** 2026-09-06, ~14:06 CDT. `/landing-check` over the uncommitted
+GA/GB change set, run COLD on artifacts only. Verdict **FIX FIRST**. Every
+finding re-verified by hand before acting. The code and its proof held; the
+prose around them did not.
+
+## 1. THE ONE THAT MATTERS: GA accused FX of being wrong, and FX was RIGHT
+
+GA's title and HANDOFF both asserted "**three of FX's five doc corrections were
+themselves wrong**". **That is false, and it is an accusation against another
+agent's work published in an append-only record on a public repo.**
+
+FX audited a working tree with FV and FW already appended — its own
+"Uncommitted at audit time" section says "13 modified + 2 untracked, including
+... this record". The arithmetic closes exactly:
+
+| state | `## BR-note` at |
+|---|---|
+| `75b8ad7` (committed) | **2646** |
+| + FV + FW (FX's tree) | **2648** ← exactly what FX reported as "actual" |
+| + FX + FY | 2650 = `a56bba1` |
+| + FZ | 2651 = `1d3473d` |
+| + GA | 2652 |
+| + GB | 2653 |
+
+**FX's figures DRIFTED; they were never wrong.** Only its import fix
+(`:66`/`:67` where the truth is `:67`/`:68`) was genuinely off, and that one was
+off by a single line — **one of five, not three.**
+
+GA's own §4 conceded the mechanism in prose ("FX ran at 07:22, before `a56bba1`
+and `1d3473d` shifted the files it cited") while its TITLE and the HANDOFF block
+asserted wrongness anyway. A hedge in the body does not undo a claim in the
+headline: the title is what a reader sees in the TOC and what the HTML twin
+renders. Corrected in HANDOFF; GA is sealed and is corrected here.
+
+**Standing rule from this: a stale citation and a wrong citation are different
+findings, and only one of them is anybody's fault.** Before writing that an
+audit was wrong, check whether the file moved under it.
+
+## 2. A claim in GA that is false as written
+
+GA §2 and HANDOFF said the `commit=True` default "keeps all six sites
+behaviourally identical, so a future caller written in ignorance gets today's
+safe behaviour". **Both halves are wrong.** Five of the six sites were switched
+to `commit=False` in the same change, so they are not identical — and
+`commit=True` is the TEARING behaviour, not the safe one. A future caller who
+forgets `commit=False` gets the bug back, and arm F only guards
+`realize_pending`. The default may be the wrong way round; handed to
+`/code-review` rather than flipped here, because flipping it would change every
+one of the seven other self-committing writers' neighbours in the same module.
+
+## 3. The proof survived four planted mutations, including an AST-invisible one
+
+The sweep did what the skill asks and tried to make the fix LOOK correct while
+being broken, in a throwaway copy of the tree:
+
+| mutation | result |
+|---|---|
+| T1 `upsert_position` back to `commit=True` | arm F FAILS |
+| T1 `record_fill` back to `commit=True` | arms B and C FAIL — reproduces FX's stated failure exactly (1 orphan row, 2 rows on retry) |
+| **keep every `commit=False` and both `with conn:`, plant a bare `conn.commit()` between the pair** | **arm F PASSES (as designed — it is AST-blind to this), and arms B and C still FAIL.** The behavioural arms catch what the structural arm cannot |
+| delete the phase-1 cash write | arm F FAILS ("both cash writes still present 1") |
+| T2 `with conn:` → `if True:` | arm F FAILS on two checks plus four behavioural fails |
+
+That third row is the one worth keeping: it is the exact shape of FX's own
+no-op prescription, and it proves the proof is not merely reading the source.
+
+## 4. Corrections propagated, all re-derived
+
+- **`HANDOFF.md` had NO GB block at all** (`grep -c GB HANDOFF.md` → 0) while
+  still carrying GA's "correct values 2651 / 7761 / 8393" 1,020 lines above
+  three other lines citing ~2652 / ~7762 / ~8394. **The MED-6 class GA had just
+  fixed, reintroduced inside the same file.** Now one corrected block.
+- **The twin's byte count and appendix count in HANDOFF were stale within the
+  hour** (821,115 B / 182 → the file is larger and matches at a higher number,
+  because the twin is re-rendered after every append). Replaced with the
+  INVARIANT — appendix ids in the HTML == `# Appendix` headings in the markdown
+  — which holds at every size. **Do not quote a byte count for a derived
+  artifact.**
+- **Broken Markdown this change set introduced:** `HANDOFF.md` had
+  `**RUN ..., record **Appendix FC**`, whose inner `**` closed the outer bold
+  and silently un-bolded the rest of the sentence. Now balanced (4 markers).
+- **`.claude/codebase-memory/testing.md`:** the new section heading was inserted
+  directly on top of a pre-existing F3 bullet with no blank line, filing "*
+  Determinism is part of the F3 protocol*" under the torn-write section.
+  Restored to the F3 section.
+- **`INDEX.md`** was edited today and still said "(updated 2026-09-05)".
+- **`DIRECTORY.md`** counts drifted again with this change set: 208 → **210**
+  tracked, `.claude/` 13 → **15**, `scripts/` 58 → **59**.
+- **`HANDOFF.md` attributed the 2504 figure to the BR-note demotion.** The
+  demotion changed the HEADING LEVEL, not any line count; 2504 was a function of
+  the TOC being 35 lines long at the time. Corrected.
+
+## 5. Left standing, deliberately
+
+**FX's load-bearing negative "no front-matter TOC in this project's format" is
+FALSE** — the record has `# Table of Contents` at line 33 with 184 TOC lines,
+and GB's entire +1-per-append mechanism depends on it existing. FX is sealed;
+this entry is the correction. It matters because that negative is what let FX
+treat the record-line drift as somebody's mistake rather than as a structural
+property.
+
+**Publication, judged not just listed:** the regenerated HTML twin newly
+publishes the three order-id prefixes FY classified as INTRODUCED (`68152fbc`,
+`625aa9a8`, `d4e05de3`, each 0 → 1 in the tracked `.html`) plus more copies of
+the two INHERITED ones. This is a second published copy of text already public
+in the `.md` at HEAD, under Evan's standing 2026-09-06 ruling that paper order
+ids are not credentials and history stays. **Not a new disclosure, and flagged
+rather than assumed.**
+
+## Done-check
+
+`FROZEN TESTS: GREEN (all d=0)`. `prove_torn_write.py` **PROVEN: 32 checks**
+after every correction. The mutation copy was restored and verified identical.
+`swing.db` never opened (mtime unchanged through the whole sweep),
+`daily_swing_paper.py` never executed, no `.bat` run, nothing deleted, nothing
+pushed.
+
+**NOT SWEPT, stated so this does not read as clean:** the renderer was not
+re-run by the sweep (it writes), so GA's intermediate render figures are
+unverifiable in principle rather than merely unverified; the 1,365-line HTML
+diff was checked structurally, not line-by-line; `PRD_ROADMAP.md`, the ~170
+older appendices, the 44 preregs and `graphify-out/` were not swept.

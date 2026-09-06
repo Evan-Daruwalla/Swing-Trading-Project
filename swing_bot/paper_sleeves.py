@@ -156,11 +156,21 @@ def set_pending(conn, sleeve, target, signal_date):
     conn.commit()
 
 
-def clear_pending(conn, sleeve):
+def clear_pending(conn, sleeve, commit=True):
+    """Drop the sleeve's pending target.
+
+    `commit=False` lets a caller put this write in ITS transaction (audit FX
+    MED 4, 2026-09-06). Wrapping the call site in `with conn:` is NOT enough on
+    its own: a commit here ENDS that transaction, so the block's exit-commit
+    finds nothing to roll back and a kill between two such calls still tears the
+    ledger. Measured, Python 3.14.4 / SQLite 3.50.4. The default is True, so
+    every existing caller is unchanged.
+    """
     conn.execute(
         "UPDATE paper_sleeves SET pending_json=NULL, pending_signal_date=NULL WHERE sleeve=?",
         (sleeve,))
-    conn.commit()
+    if commit:
+        conn.commit()
 
 
 def touch_run(conn, sleeve):
@@ -169,14 +179,35 @@ def touch_run(conn, sleeve):
     conn.commit()
 
 
-def record_fill(conn, sleeve, date, ticker, side, qty, price, reason):
+def record_fill(conn, sleeve, date, ticker, side, qty, price, reason,
+                commit=True):
+    """Append one transaction row.
+
+    `commit=False` lets a caller put this write in ITS transaction (audit FX
+    MED 4, 2026-09-06). Wrapping the call site in `with conn:` is NOT enough on
+    its own: a commit here ENDS that transaction, so the block's exit-commit
+    finds nothing to roll back and a kill between two such calls still tears the
+    ledger. Measured, Python 3.14.4 / SQLite 3.50.4. The default is True, so
+    every existing caller is unchanged.
+    """
     conn.execute(
         "INSERT INTO paper_transactions (sleeve, date, ticker, side, qty, price, reason) "
         "VALUES (?, ?, ?, ?, ?, ?, ?)", (sleeve, date, ticker, side, qty, price, reason))
-    conn.commit()
+    if commit:
+        conn.commit()
 
 
-def upsert_position(conn, sleeve, ticker, qty, entry_price, entry_date):
+def upsert_position(conn, sleeve, ticker, qty, entry_price, entry_date,
+                    commit=True):
+    """Set a position, or DELETE it when qty <= 0.
+
+    `commit=False` lets a caller put this write in ITS transaction (audit FX
+    MED 4, 2026-09-06). Wrapping the call site in `with conn:` is NOT enough on
+    its own: a commit here ENDS that transaction, so the block's exit-commit
+    finds nothing to roll back and a kill between two such calls still tears the
+    ledger. Measured, Python 3.14.4 / SQLite 3.50.4. The default is True, so
+    every existing caller is unchanged.
+    """
     if qty <= 0:
         conn.execute("DELETE FROM paper_positions WHERE sleeve=? AND ticker=?",
                      (sleeve, ticker))
@@ -186,7 +217,8 @@ def upsert_position(conn, sleeve, ticker, qty, entry_price, entry_date):
             "VALUES (?, ?, ?, ?, ?) ON CONFLICT(sleeve, ticker) DO UPDATE SET "
             "qty=excluded.qty, entry_price=excluded.entry_price, entry_date=excluded.entry_date",
             (sleeve, ticker, qty, entry_price, entry_date))
-    conn.commit()
+    if commit:
+        conn.commit()
 
 
 def record_nav(conn, sleeve, date, nav):
@@ -228,7 +260,14 @@ def divergence_census(conn):
     that is 5 of 10 rows. A dark half that nothing reports is the same defect
     class as a guard that cannot fire.
 
-    Buckets are mutually exclusive and sum to `total`:
+    Buckets sum to `total` FOR THE DATA THIS TABLE ACTUALLY HOLDS, not by
+    construction (found by the 2026-09-06 landing-check, record FY). A row with
+    `alpaca_order_id IS NULL` AND a price would count in both `measured` and
+    `dark`: a planted row made them sum to 4 against a total of 3. Unreachable
+    today -- nothing writes a price without an order id, because the price only
+    ever arrives via resolve_divergence, which is keyed by that id -- and
+    prove_divergence_census.py's sum-to-total check never exercises it. Stated
+    as a precondition rather than a promise; the query is unchanged:
       measured          -- a real broker fill price to compare against sim
       resolved_no_price -- terminal status but no fill (a canceled order
                            yields no measurement, though we know its outcome)

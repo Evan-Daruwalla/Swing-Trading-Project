@@ -5,8 +5,15 @@
 # core.hooksPath, no .git/hooks/pre-commit. Activate with:
 #   git config core.hooksPath scripts/git-hooks
 #
-# Secret gate ONLY (unlike Trading's copy, this repo has no HTML-twin record
-# to keep in sync — don't add that job here just because Trading has it).
+# Secret gate + record invariants. NOTE (corrected 2026-09-06, audit FX LOW 10):
+# this comment used to say "this repo has no HTML-twin record to keep in sync --
+# don't add that job here". That was FALSE. The twin exists at
+# docs/'Project Record - Full Chronological History.html', built by
+# scripts/render_record_html.py, and HANDOFF states the policy: REGENERATE AFTER
+# EVERY APPEND. The false instruction is why the twin drifted ten appendices
+# behind. Regeneration is a HUMAN step and is deliberately NOT gated here (Evan,
+# 2026-09-06) -- so nothing below blocks a commit for a stale twin. If you skip
+# it, the public record's reading view silently lags the ground truth.
 #
 # ONE executing copy, at a fixed path, shared by every repo — do NOT inline a
 # second copy here. That file resolves the scanner and owns the block/fail-open

@@ -502,97 +502,119 @@ def realize_pending(conn, sleeve, today, fill_open):
     # this function regardless, so an unfilled BUY leg is dropped for good and
     # the sleeve just sits on that cash. Collect both kinds and report below.
     skipped_sell, skipped_buy = [], []
-    for t, pos in positions.items():
-        px = fill_open.get(t)
-        if px is None or px <= 0:
-            skipped_sell.append(t)
-            continue  # no bar today for this ticker -- leave held, retry next run
-        cash += pos["qty"] * px
-        ps.record_fill(conn, sleeve, today, t, "sell", pos["qty"], px, "pending-liquidate")
-        ps.upsert_position(conn, sleeve, t, 0.0, px, today)
-        # NO log_divergence here (audit #4 F6): this call carried no order id,
-        # so open_divergence_rows could never resolve it -- one permanent
-        # orphan per leg per cycle, 5 of the live table's 10 rows. The sim-side
-        # fill this recorded is already in paper_transactions via record_fill
-        # above, which is exactly where resolve_divergence's repair join reads
-        # it from. Divergence rows are created at SUBMIT time only, with the
-        # Alpaca order id attached.
-    # Persist cash NOW, before the buy loop (audit #4 E6). record_fill and
-    # upsert_position each commit immediately, but cash was only written once,
-    # after the buys -- so a kill between the loops (ExecutionTimeLimit,
-    # reboot) left the position deletions COMMITTED while cash still held its
-    # pre-sale value: the sale proceeds simply vanished from the ledger that
-    # IS the forward evidence. Two writes make every kill window consistent.
-    conn.execute("UPDATE paper_sleeves SET cash=? WHERE sleeve=?",
-                 (round(cash, 9), sleeve))
-    conn.commit()
-    if target:
-        # cash * w, not cash / len(target) (audit #4 F7): the equal-split
-        # ignored the weight the decide_* contract says callers must honour
-        # ("Callers translate weights -> $ notional using the sleeve's NAV",
-        # paper_sleeves.py) -- while the Alpaca mirror DOES honour it
-        # (desired = nav * w). A {.50/.30/.20} target would book $333/$333/$333
-        # in this ledger vs $500/$300/$200 at the broker: a $167 fork on a
-        # $1,000 sleeve. Latent only because every decide_* today returns
-        # equal weights, for which cash*w == cash/len exactly (w = 1/K and the
-        # tripwire pins that identity).
-        cash_at_entry = cash          # snapshot AFTER the sell loop: weights
-                                      # size against the post-liquidation pool,
-                                      # not a balance that shrinks per leg
-        for t, w in target.items():
+    # ---- T1: THE LIQUIDATION, one transaction (audit FX MED 4, 2026-09-06) ----
+    # Every sell leg AND the phase-1 cash write commit together. FX asked only
+    # for the record_fill/upsert_position pair, but per-leg atomicity leaves the
+    # audit #4 E6 bug alive in miniature: a kill after leg 1's pair but before
+    # the cash write still leaves a position deleted against pre-sale cash.
+    # E6's write below is KEPT, at its line and in its order -- widening the
+    # boundary makes its invariant hold by construction instead of by ordering.
+    with conn:
+        for t, pos in positions.items():
             px = fill_open.get(t)
             if px is None or px <= 0:
-                skipped_buy.append(t)
-                continue
-            qty = (cash_at_entry * w) / px
-            cash -= qty * px
-            ps.record_fill(conn, sleeve, today, t, "buy", qty, px, "pending-enter")
-            ps.upsert_position(conn, sleeve, t, qty, px, today)
-            # no log_divergence here either -- same reason as the sell leg above
-    if skipped_sell or skipped_buy:
-        # Report BOTH sides (audit E6). The old message divided only skipped_buy
-        # by len(target), so a pure sell-side skip printed "buy=- ~0%
-        # under-invested" while the sleeve was in fact simultaneously long a
-        # stale position AND buying under-sized legs -- because a position that
-        # could not be sold never added its proceeds to `cash`, and
-        # per_ticker_cash is that reduced cash divided by the full target size.
-        # The sizing arithmetic is right (you cannot spend cash you do not have);
-        # it is the operator-visible damage that was under-stated.
-        buy_pct = 100.0 * len(skipped_buy) / len(target) if target else 0.0
-        note = ""
-        if skipped_sell:
-            note = (f" ALSO still long {len(skipped_sell)} unsold position(s), so "
-                    f"the remaining legs are under-sized by the value of those "
-                    f"holdings -- this sleeve's weights no longer match the "
-                    f"strategy.")
-        print(f"  !! [{sleeve}] PARTIAL REALIZE on {today} -- no open price for: "
-              f"sell={skipped_sell or '-'} buy={skipped_buy or '-'}. "
-              f"Unfilled BUY legs leave ~{buy_pct:.0f}% of the target unbought."
-              f"{note} Check the yfinance feed for those tickers.", flush=True)
-        RUN_FAILURES.append(f"[{sleeve}] partial realize: sell={skipped_sell} "
-                            f"buy={skipped_buy}")
-    # Round away float residue (audit E8): full liquidation left cash at
-    # -1.14e-13 instead of 0.0. Harmless to arithmetic, but it makes any future
-    # `if cash < 0` guard fire on a sleeve that is exactly flat.
-    conn.execute("UPDATE paper_sleeves SET cash=? WHERE sleeve=?",
-                 (round(cash, 9), sleeve))
-    conn.commit()
-    # Only clear the pending target if every BUY leg actually filled (audit E6).
-    # Clearing unconditionally dropped an unfillable leg for good -- the sleeve
-    # then sat ~1/K in cash against its target until the next weekly decision,
-    # with no way to recover it. Keeping the pending lets the next run retry the
-    # leg; the realize guard (today > pending_signal_date) still prevents a
-    # same-session double fill.
-    # DISCLOSED TRADEOFF (audit #4 E10): the retried cycle liquidates and
-    # re-buys EVERY leg at the retry day's open, not the signal's next open --
-    # a deviation from the EOD rule plus one extra round trip of cost on the
-    # already-filled legs. Accepted deliberately: a late fill at a known price
-    # beats a permanently under-invested sleeve. This is a tradeoff, not a bug.
-    if skipped_buy:
-        print("  [%s] pending KEPT for retry next run (unfilled buy legs: %s)"
-              % (sleeve, skipped_buy), flush=True)
-    else:
-        ps.clear_pending(conn, sleeve)
+                skipped_sell.append(t)
+                continue  # no bar today for this ticker -- leave held, retry next run
+            cash += pos["qty"] * px
+            ps.record_fill(conn, sleeve, today, t, "sell", pos["qty"], px,
+                           "pending-liquidate", commit=False)
+            ps.upsert_position(conn, sleeve, t, 0.0, px, today, commit=False)
+            # NO log_divergence here (audit #4 F6): this call carried no order id,
+            # so open_divergence_rows could never resolve it -- one permanent
+            # orphan per leg per cycle, 5 of the live table's 10 rows. The sim-side
+            # fill this recorded is already in paper_transactions via record_fill
+            # above, which is exactly where resolve_divergence's repair join reads
+            # it from. Divergence rows are created at SUBMIT time only, with the
+            # Alpaca order id attached.
+        # Persist cash NOW, before the buy loop (audit #4 E6). ORIGINAL BUG:
+        # record_fill and upsert_position each committed immediately while cash
+        # was written once, after the buys -- so a kill between the loops
+        # (ExecutionTimeLimit, reboot) left the position deletions COMMITTED
+        # while cash still held its pre-sale value, and the sale proceeds simply
+        # vanished from the ledger that IS the forward evidence. E6 fixed that by
+        # ORDERING: write cash here, immediately after the sells.
+        # 2026-09-06 (FX MED 4): the ordering is unchanged and this write stays
+        # exactly here -- but it is now inside T1 with the sell legs, so E6's
+        # invariant holds BY CONSTRUCTION rather than by being early enough.
+        # Do not move or delete this write: without it, one transaction spanning
+        # sells and buys would put us back where E6 started.
+        conn.execute("UPDATE paper_sleeves SET cash=? WHERE sleeve=?",
+                     (round(cash, 9), sleeve))
+    # ---- T2: THE REBUILD, one transaction (audit FX MED 4, 2026-09-06) ----
+    # The buy legs, the phase-2 cash write and clear_pending land together or
+    # not at all. Wider than FX asked, deliberately: a kill between the cash
+    # commit and clear_pending used to leave the buys DURABLE with pending_json
+    # still set, so the next run re-fired realize_pending, liquidated the basket
+    # it had just bought and rebought it -- a wash in this ledger, but a full
+    # real round trip of churn orders through the --execute mirror.
+    with conn:
+        if target:
+            # cash * w, not cash / len(target) (audit #4 F7): the equal-split
+            # ignored the weight the decide_* contract says callers must honour
+            # ("Callers translate weights -> $ notional using the sleeve's NAV",
+            # paper_sleeves.py) -- while the Alpaca mirror DOES honour it
+            # (desired = nav * w). A {.50/.30/.20} target would book $333/$333/$333
+            # in this ledger vs $500/$300/$200 at the broker: a $167 fork on a
+            # $1,000 sleeve. Latent only because every decide_* today returns
+            # equal weights, for which cash*w == cash/len exactly (w = 1/K and the
+            # tripwire pins that identity).
+            cash_at_entry = cash          # snapshot AFTER the sell loop: weights
+                                          # size against the post-liquidation pool,
+                                          # not a balance that shrinks per leg
+            for t, w in target.items():
+                px = fill_open.get(t)
+                if px is None or px <= 0:
+                    skipped_buy.append(t)
+                    continue
+                qty = (cash_at_entry * w) / px
+                cash -= qty * px
+                ps.record_fill(conn, sleeve, today, t, "buy", qty, px,
+                               "pending-enter", commit=False)
+                ps.upsert_position(conn, sleeve, t, qty, px, today, commit=False)
+                # no log_divergence here either -- same reason as the sell leg above
+        if skipped_sell or skipped_buy:
+            # Report BOTH sides (audit E6). The old message divided only skipped_buy
+            # by len(target), so a pure sell-side skip printed "buy=- ~0%
+            # under-invested" while the sleeve was in fact simultaneously long a
+            # stale position AND buying under-sized legs -- because a position that
+            # could not be sold never added its proceeds to `cash`, and
+            # per_ticker_cash is that reduced cash divided by the full target size.
+            # The sizing arithmetic is right (you cannot spend cash you do not have);
+            # it is the operator-visible damage that was under-stated.
+            buy_pct = 100.0 * len(skipped_buy) / len(target) if target else 0.0
+            note = ""
+            if skipped_sell:
+                note = (f" ALSO still long {len(skipped_sell)} unsold position(s), so "
+                        f"the remaining legs are under-sized by the value of those "
+                        f"holdings -- this sleeve's weights no longer match the "
+                        f"strategy.")
+            print(f"  !! [{sleeve}] PARTIAL REALIZE on {today} -- no open price for: "
+                  f"sell={skipped_sell or '-'} buy={skipped_buy or '-'}. "
+                  f"Unfilled BUY legs leave ~{buy_pct:.0f}% of the target unbought."
+                  f"{note} Check the yfinance feed for those tickers.", flush=True)
+            RUN_FAILURES.append(f"[{sleeve}] partial realize: sell={skipped_sell} "
+                                f"buy={skipped_buy}")
+        # Round away float residue (audit E8): full liquidation left cash at
+        # -1.14e-13 instead of 0.0. Harmless to arithmetic, but it makes any future
+        # `if cash < 0` guard fire on a sleeve that is exactly flat.
+        conn.execute("UPDATE paper_sleeves SET cash=? WHERE sleeve=?",
+                     (round(cash, 9), sleeve))
+        # Only clear the pending target if every BUY leg actually filled (audit E6).
+        # Clearing unconditionally dropped an unfillable leg for good -- the sleeve
+        # then sat ~1/K in cash against its target until the next weekly decision,
+        # with no way to recover it. Keeping the pending lets the next run retry the
+        # leg; the realize guard (today > pending_signal_date) still prevents a
+        # same-session double fill.
+        # DISCLOSED TRADEOFF (audit #4 E10): the retried cycle liquidates and
+        # re-buys EVERY leg at the retry day's open, not the signal's next open --
+        # a deviation from the EOD rule plus one extra round trip of cost on the
+        # already-filled legs. Accepted deliberately: a late fill at a known price
+        # beats a permanently under-invested sleeve. This is a tradeoff, not a bug.
+        if skipped_buy:
+            print("  [%s] pending KEPT for retry next run (unfilled buy legs: %s)"
+                  % (sleeve, skipped_buy), flush=True)
+        else:
+            ps.clear_pending(conn, sleeve, commit=False)
     return True
 
 

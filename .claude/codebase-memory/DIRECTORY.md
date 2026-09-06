@@ -19,16 +19,16 @@ git ls-files 'docs/prereg*' | wc -l                                           # 
 without it git quotes the path and `awk -F/` counts it as its own directory (a
 first pass here reported 105 docs + a phantom `"docs` bucket instead of 107).
 
-## Counts at 2026-09-05 (208 tracked at HEAD)
+## Counts at 2026-09-05 (208 tracked at HEAD; **210 by 2026-09-06**)
 
 **Tense warning, found by the 2026-09-06 landing-check:** these were counted from `git ls-files`, which sees only what is TRACKED. This file and `disclosure.md` were untracked when it ran, so an earlier version of this heading said "0 untracked" while being one of the two untracked files. A count taken from inside its own change set is stale the moment it lands - re-derive after committing, not before.
 
 | path | files | what lives there |
 |---|---|---|
 | `docs/` | **107** | 51 at root + 56 in `research/` |
-| `scripts/` | **58** | 55 `.py` + `daily_swing_paper.bat` + `git-hooks/pre-commit` + `.gitkeep` |
+| `scripts/` | **59** at 2026-09-06 (58 at 2026-09-05; `prove_torn_write.py` added) | 55 `.py` + `daily_swing_paper.bat` + `git-hooks/pre-commit` + `.gitkeep` |
 | `swing_bot/` | **14** | the importable package: engines, ledger, guards, tripwire |
-| `.claude/` | **13** at HEAD, **15** on disk | codebase-memory bins + `pm-cadence.json`; DIRECTORY.md and disclosure.md are the two not yet tracked |
+| `.claude/` | **15** (13 at the 2026-09-05 HEAD) | codebase-memory bins + `pm-cadence.json`; DIRECTORY.md and disclosure.md are the two not yet tracked |
 | (root) | **9** | see below |
 | `graphify-out/` | **6** | the knowledge-graph build outputs (cache is gitignored) |
 | `data/` | **1** | `fomc_announcement_dates.json` |
