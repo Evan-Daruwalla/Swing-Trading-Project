@@ -43,3 +43,18 @@
   default away. `_load`'s SELECT still drops volume on purpose: widening its
   `(o,h,l,c)` tuple breaks every `bar[1]/bar[2]/bar[3]` index on the pinned
   paths, so E1's runner builds its mask from `swing.db` directly instead.
+- 2026-09-05 (M13.1, record FQ): **`swing_bot/trading_calendar.py` is the M3
+  loop's SECOND CLOCK** and the only module in the repo that deliberately reads
+  no price data. `last_completed_session(now)` = the latest already-closed US
+  session from the wall clock plus rule-derived NYSE closures (n-th weekday,
+  Gregorian Easter for Good Friday, Sat->Fri / Sun->Mon observance, and the
+  exception that Jan 1 on a Saturday does NOT close the prior Friday).
+  `check_feed_clock(qdates[-1])` returns the refusal reason or None and is
+  called at `daily_swing_paper.py:698-719`, BEFORE the VIX/VIX3M fetches, so a
+  refusal costs no network. It refuses in BOTH directions (feed behind = the
+  real bug; feed ahead = a partial row or a wrong calendar).
+- **Why not Alpaca's calendar API** (asked and answered, do not "improve" it):
+  the M3 DB ledger is independent of broker connectivity by design (the loop's
+  docstring step 3) and a total credential outage is a logged real event
+  (record FH). An Alpaca-sourced clock would turn that outage into a refusal to
+  mark NAV, manufacturing the holes the guard exists to prevent.

@@ -73,3 +73,20 @@ FAIL.
 - **Determinism is part of the F3 protocol:** every experiment arm is run twice
   and the two outputs must be byte-identical before any comparison is believed.
   All 16 runs (8 experiments x 2 arms) passed.
+
+## Added 2026-09-05 (M13.1, record FQ)
+
+- `scripts/prove_feed_clock.py` -> **`PROVEN: 18 checks`**, exit 0. No DB, no
+  network, no clock dependence: every case pins an explicit `now`. It calls
+  `trading_calendar.check_feed_clock` -- **the same function the live loop
+  calls**, not a copy of the branch, so the proof cannot drift away from the
+  shipped guard (`prove_liquidity_floor.py` had to duplicate its branch).
+- Coverage: the real incident replayed (feed 2026-09-03 at Fri 09-04 19:00 CT
+  -> REFUSE), the Labor Day run, a before-close run, Good Friday, the
+  Jul-4-observed-Friday shift, a 4-session stall, feed-ahead, and three
+  observance shifts including Dec 31 2021 still TRADING. The derived 2026
+  closure list is PRINTED for eyeballing rather than asserted from memory.
+- **Call-site landing check** (scratchpad only, not committed): `_run()` on a
+  throwaway DB with `series()` monkeypatched returned exit 1 and wrote 0
+  `paper_nav` / 0 `paper_transactions` rows. Proving the function is not
+  proving the call site.

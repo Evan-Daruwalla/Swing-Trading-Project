@@ -98,6 +98,52 @@ reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
 2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
 self-contradictory and was corrected 2026-07-28 by audit #7).**
 
+> **2026-09-05 ~20:40 CDT - M13.1 DONE (record FQ): the live loop has a SECOND
+> CLOCK and refuses when the feed lags it.** `swing_bot/trading_calendar.py`
+> (NEW) derives the latest already-CLOSED US session from the wall clock plus
+> rule-derived NYSE closures - n-th-weekday arithmetic, Gregorian Easter for
+> Good Friday, the Sat->Fri / Sun->Mon observance shift including the NYSE
+> exception that Jan 1 on a Saturday does NOT close the prior Friday. Rules, not
+> a pinned table, so it never goes stale and nothing was recalled from memory.
+> **Deliberately NOT Alpaca's calendar API**: the M3 ledger is independent of
+> broker connectivity by design, and a total credential outage (record FH) would
+> otherwise become a refusal to mark NAV - manufacturing the holes this guard
+> prevents. `scripts/daily_swing_paper.py:698-719` calls
+> `check_feed_clock(today)` right after `today = qdates[-1]` and, on any
+> mismatch (feed BEHIND or AHEAD), prints the reason, appends to `RUN_FAILURES`
+> and returns 1 - nothing decided, marked or mirrored.
+> **Done-check: `scripts/prove_feed_clock.py` -> `PROVEN: 18 checks`;
+> `FROZEN TESTS: GREEN (all d=0)`.** A call-site landing check on a throwaway DB
+> (`series()` monkeypatched, no network, `swing.db` never opened) returned exit
+> 1 with 0 `paper_nav` and 0 `paper_transactions` rows.
+> **`test_frozen` caught the new file first:** its convention guard counts any
+> file containing the bare word `yfinance` as price-touching, and the module says
+> it in prose. The invariant was NOT weakened - the header now states the
+> convention truthfully ("reads NO price data ... compares DATES only").
+> **The 2026-09-04 hole is probably self-healing and is NOT backfilled:** the
+> task's Next Run Time is Mon 9/7 19:00 and its Days are MON-FRI, so it fires on
+> Labor Day, when 09-04 IS the latest closed session; yfinance already has that
+> bar (read-only probe Sat 09-05 20:27 CDT: `2026-09-04 close=718.96`). Marking
+> it Monday is the ordinary path, not reconstructed evidence. **DECIDED by Evan
+> 2026-09-05 (record FR): let Monday's run mark it; 09-04 is NOT added to
+> `ACKNOWLEDGED_NAV_HOLES`. CHECK after the 09-07 run - a `2026-09-04` row in
+> all three sleeves, e6_1x 31 -> 32 against its peers' 36 -> 37. If it does not
+> land it stays OPEN and visible; acknowledging it would be a fresh question.**
+> **M13.2 half-answered:** the cached-series hypothesis is DEAD from the code -
+> `swing_bot/prices.py:92-136` is a bare `yf.download` per call with no store and
+> no cache, so the M3 path fetches live every run and the cause is the vendor.
+> The timed fetch on a trading day is still owed.
+> **STANDING CONSEQUENCE, needs Evan:** the guard turns a silent wrong-date mark
+> into a HARD STOP. If the vendor keeps publishing after 20:00 ET, the Tue
+> 2026-09-08 19:00 run REFUSES and marks nothing, and so does every run after it,
+> until the timing changes or the task moves later than 19:00 CT. No override env
+> var was added on purpose. **DECIDED by Evan 2026-09-05 (record FR): the
+> `SwingTradingDailyPaper` trigger STAYS at 19:00 CT until M13.2 measures the
+> publication hour - picking an hour now is a guess (the only bracket available
+> is a useless ~25h window). The refusal is loud and the run is re-runnable by
+> hand the same evening. The scheduled task was not touched.**
+> Nothing committed, nothing pushed.
+
 > **2026-09-05 ~19:30 CDT - DRIFT CHECK (record FP). CRIT, NEW: the live loop has
 > been processing YESTERDAY's session since 2026-09-02.** Pairing each run's
 > `.bat` wall-clock stamp with the session date the loop printed: a 17-run

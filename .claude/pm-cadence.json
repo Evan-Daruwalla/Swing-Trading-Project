@@ -1,11 +1,17 @@
 {
   "record_entry": 3,
-  "handoff": 0,
+  "handoff": 15,
   "prd_next_task": 0,
-  "bins": 0,
-  "_count": 192,
-  "_last_reminder_iso": "2026-09-02T03:12:51Z",
+  "bins": 3,
+  "_count": 204,
+  "_last_reminder_iso": "2026-09-05T23:20:39Z",
   "_last_fired": {
-    "record_entry": 191
-  }
+    "record_entry": 199,
+    "handoff": 194,
+    "bins": 200,
+    "drift_check": 194
+  },
+  "bins_max_age_days": 21,
+  "drift_check": 15,
+  "drift_check_days": 14
 }

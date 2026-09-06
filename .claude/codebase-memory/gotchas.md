@@ -141,3 +141,22 @@ they apply to any yfinance-based pipeline built here:
   date must come from an INDEPENDENT source (broker clock, exchange calendar),
   and a feed that is behind it is a refusal, not a substitution.** Fix is PRD
   M13.1. Eighth variant of the guard-that-cannot-fire family.
+- 2026-09-05 (M13.1, record FQ): **the feed-clock guard converts a silent
+  wrong-date mark into a HARD STOP.** If yfinance keeps publishing the current
+  bar after 20:00 ET, `daily_swing_paper.py` now REFUSES (exit 1, nothing
+  marked or decided) on every 19:00 CT run instead of marking yesterday. That
+  is correct, and it means the forward series stops accumulating rather than
+  accumulating wrong. **No override env var exists on purpose** -- an override
+  would let a human re-create the exact bug. The lever is the scheduled task's
+  start time, not a flag.
+- 2026-09-05 (M13.1, record FQ): **`test_frozen`'s convention guard counts a
+  file as price-touching if the bare word `yfinance` appears ANYWHERE in it**,
+  prose included -- `_price_scripts_missing_convention_header` greps the whole
+  source but requires the convention string in the first 40 lines. A new module
+  that merely *mentions* yfinance goes RED. Fix by stating the convention
+  truthfully in the header, never by editing the invariant.
+- 2026-09-05 (M13.1, record FQ): **`swing_bot/prices.py:92-136` `fetch()` has
+  NO cache** -- a bare `yf.download` per call with a retry ladder. The
+  permanent on-disk cache is `run_e8_squeeze.cache_fetch`, which the M3 loop
+  never uses, and `swing.db bars` is frozen at 2026-07-08. So M3 feed staleness
+  is always the vendor, never a local cache.

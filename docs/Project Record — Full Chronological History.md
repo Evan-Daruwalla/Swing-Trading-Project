@@ -209,6 +209,8 @@ the dated entry, not the digest.
 - [FN — F3 redirect EXECUTED across all 8 ETF experiments: no verdict flipped to PASS, E11 lost its verdict to sample starvation, and 3 of 5 pre-registered predictions were falsified. Also: FH's two HIGHs were already fixed and I had reported them open](#appendix-fn---f3-redirect-executed-across-all-8-etf-experiments-no-verdict-flipped-to-pass-e11-lost-its-verdict-to-sample-starvation-and-3-of-5-pre-registered-predictions-were-falsified-also-fhs-two-highs-were-already-fixed-and-i-had-reported-them-open-2026-09-05-1822-cdt) (09-05)
 - [FO — Graph re-indexed (1,728 nodes, health OK) - but build_merge deleted 9 hyperedges again and 4 are unrecoverable in this run; plus corrections to FN's timestamp and to a token count recorded as zero](#appendix-fo---graph-re-indexed-1728-nodes-health-ok---but-build_merge-deleted-9-hyperedges-again-and-4-are-unrecoverable-in-this-run-plus-corrections-to-fns-timestamp-and-to-a-token-count-recorded-as-zero-2026-09-05-1825-cdt) (09-05)
 - [FP — DRIFT CHECK + handoff sync: CRIT - the live loop has processed YESTERDAY's session on every run since 2026-09-02 and the FK detector cannot see it; 4 HANDOFF rows drifted and are fixed; PRD gains M13](#appendix-fp---drift-check--handoff-sync-crit---the-live-loop-has-processed-yesterdays-session-on-every-run-since-2026-09-02-and-the-fk-detector-cannot-see-it-4-handoff-rows-drifted-and-are-fixed-prd-gains-m13-2026-09-05-1930-cdt) (09-05)
+- [FQ — M13.1 EXECUTED: the live loop now has a second clock and REFUSES when the feed lags it; the 09-04 hole turns out to be self-healing on Monday's holiday run, and the lag's cause is narrowed to yfinance publication](#appendix-fq---m131-executed-the-live-loop-now-has-a-second-clock-and-refuses-when-the-feed-lags-it-the-09-04-hole-turns-out-to-be-self-healing-on-mondays-holiday-run-and-the-lags-cause-is-narrowed-to-yfinance-publication-2026-09-05-2040-cdt) (09-05)
+- [FR — Evan's two calls on the M13.1 questions: let Monday's Labor Day run mark 2026-09-04 (a late run, not a backfill), and leave the 19:00 CT trigger alone until M13.2 measures the publication hour](#appendix-fr---evans-two-calls-on-the-m131-questions-let-mondays-labor-day-run-mark-2026-09-04-a-late-run-not-a-backfill-and-leave-the-1900-ct-trigger-alone-until-m132-measures-the-publication-hour-2026-09-05-2050-cdt) (09-05)
 
 ---
 
@@ -9301,3 +9303,219 @@ between FO and this entry. This entry's commit will be the only one ahead.
 `FROZEN TESTS: GREEN (all d=0)`; `prove_liquidity_floor.py` GREEN (11/11);
 `prove_cache_guard.py` 8/8; record checker dry-run exit 0; twin broken: 0.
 No writes to `swing.db`; `daily_swing_paper.py` and every `.bat` never executed.
+
+# Appendix FQ - M13.1 EXECUTED: the live loop now has a second clock and REFUSES when the feed lags it; the 09-04 hole turns out to be self-healing on Monday's holiday run, and the lag's cause is narrowed to yfinance publication (2026-09-05, ~20:40 CDT)
+**Session:** 2026-09-05, ~20:24-20:40 CDT. Cold start; Evan: do M13.1 first -
+independent trading-date source, refuse when the feed lags, prove it with
+`scripts/prove_feed_clock.py`, then ask about the 09-04 hole. Wanted before the
+Tue 2026-09-08 19:00 run.
+
+**No pre-registration was written.** PRD M13's own heading says "the search
+phase stays CLOSED - none of these is an experiment" and "Nothing here reopens
+a verdict"; this task changes no rule, no parameter and no gate, and produces
+no number a verdict could rest on. The prereg-before-code discipline is not
+being relaxed - it does not apply to a guard.
+
+## 1. What shipped
+
+**New: `swing_bot/trading_calendar.py` (150 lines).** The second clock. Derives
+the most recent US equity session that has already CLOSED from the wall clock
+plus the NYSE's ten scheduled closures, and compares it to the feed's newest
+bar.
+
+- `last_completed_session(now=None) -> date` - if `now` (ET) is a trading day
+  at or after 16:00 ET, that day; else walk back to the previous trading day.
+- `check_feed_clock(feed_last_session, now=None) -> str | None` - `None` when
+  the feed is current, else the refusal reason. **This is the function the loop
+  calls**, so `prove_feed_clock.py` exercises the shipped code path rather than
+  a copy of the branch (which is what `prove_liquidity_floor.py` had to do).
+- `holidays(year)` computes the ten closures from RULES, not a pinned table:
+  n-th-weekday arithmetic, Gregorian Easter for Good Friday, and the
+  Saturday-to-Friday / Sunday-to-Monday observance shift, **including the NYSE
+  exception that Jan 1 on a Saturday does NOT close the preceding Friday**. A
+  recalled table would have been a fabrication risk and would go stale every
+  year; rules are correct for any year with no maintenance.
+
+**Two design calls, both recorded in the module docstring:**
+
+1. **Not Alpaca's calendar API**, even though it is authoritative. The M3
+   ledger is deliberately independent of broker connectivity (the loop's own
+   docstring step 3), and a TOTAL credential outage is a real logged event for
+   this account (record FH). Sourcing the clock from Alpaca would convert a
+   credential outage into a refusal to mark NAV - manufacturing exactly the
+   holes this guard exists to prevent.
+2. **Scheduled closures only.** An ad-hoc closure (day of mourning, weather) is
+   not modelled, so the guard would expect a session that never happened and
+   refuse. That is the SAFE direction - a false red a human clears, never a
+   silent wrong-date mark. Marked in-code as a `# shortcut:` with that upgrade
+   trigger.
+
+**Changed: `scripts/daily_swing_paper.py`** - one import, one guard block
+immediately after `today = qdates[-1]` (now `:698-719`), placed BEFORE the
+VIX/VIX3M fetches so a refusal costs no network. On mismatch it prints the
+reason, appends to `RUN_FAILURES`, and returns 1 - refusing the whole run
+rather than marking or deciding, the shape `mark_nav` already uses on a missing
+close. It refuses in BOTH directions: feed behind (the real bug) and feed ahead
+(a partial/live row, or this calendar being wrong).
+
+**New: `scripts/prove_feed_clock.py`** - 18 checks, no DB, no network, every
+case pinning an explicit `now`.
+
+## 2. Done-check - real output
+
+`.venv\Scripts\python.exe -m swing_bot.test_frozen` gives **`FROZEN TESTS:
+GREEN (all d=0)`** (12 refs at d=+0.0000pp, 17 invariants).
+`prove_feed_clock.py` gives **`PROVEN: 18 checks`**, exit 0. The three
+pre-existing prove scripts re-run unchanged: liquidity floor 11/11, refusal
+gate 10/10, cache guard 8/8.
+
+The 18 checks include the real incident replayed - feed `2026-09-03` at Fri
+2026-09-04 19:00 CT gives REFUSE - plus the Labor Day case, the before-close
+case, Good Friday 2026-04-03, the Jul-4-2026-observed-Friday case, a 4-session
+stall, and the three observance shifts (Jul 4 2020 Sat to Fri, Jul 4 2021 Sun
+to Mon, and Dec 31 2021 still TRADING because Jan 1 2022 fell on a Saturday).
+The derived 2026 closure list is PRINTED for eyeballing rather than asserted
+from memory: 01-01, 01-19, 02-16, 04-03, 05-25, 06-19, 07-03, 09-07, 11-26,
+12-25.
+
+**Call-site landing check** (scratchpad, throwaway DB, `series()` monkeypatched
+so nothing touched the network or `swing.db`): `_run()` with a series ending
+2026-09-03 returned **exit 1**, wrote **0** `paper_nav` rows and **0**
+`paper_transactions` rows, put `feed clock: ...` in `RUN_FAILURES`, and never
+reached the second fetch. The guard fires where it executes, not just where it
+was typed.
+
+## 3. test_frozen caught the new file before I did
+
+The first `test_frozen` run came back **RED** on
+`price_scripts_state_adjustment_convention`, naming `trading_calendar.py`. The
+guard counts a file as price-touching when its regex matches ANYWHERE in the
+file, and one alternative in that regex is the bare word `yfinance` - which the
+module's docstring uses in prose while importing no price code at all. **The
+invariant was not weakened.** The header was rewritten to state the convention
+truthfully in the enforced vocabulary ("reads NO price data, so the
+split-adjusted / dividend-UNADJUSTED convention does not arise - it compares
+DATES only") within the required first 40 lines. The over-trigger is left in
+place and recorded here as a known, harmless property of the guard; it costs
+one honest sentence per file.
+
+## 4. The 2026-09-04 hole is probably self-healing - and that changes the question
+
+The scheduled task's `Next Run Time` is **Mon 9/7/2026 7:00 PM**, and its Days
+are MON, TUE, WED, THU, FRI - so **it fires on Labor Day**. Labor Day is a full
+NYSE closure, so on Monday evening the latest CLOSED session IS 2026-09-04.
+yfinance already has that bar: a read-only probe at Sat 2026-09-05 20:27 CDT
+returned `2026-09-04 close=718.96`.
+
+So Monday's run should see `qdates[-1] = 2026-09-04` and `expected =
+2026-09-04`, pass the new guard, and mark 2026-09-04 NAV through the ordinary
+path. **That is not a backfill.** It computes the mark from 09-04's real close
+and the sleeve's actual position, exactly as a correct Friday-evening run would
+have; only the wall clock of the run differs. It is categorically different
+from the e6_1x holes Evan declared permanent (record FL), which would have
+required inventing marks for sessions whose state was never captured.
+
+This is asked, not assumed - the question to Evan is in section 6.
+
+## 5. Root cause of the lag: narrowed to publication, cache hypothesis KILLED
+
+M13.2 asks whether the lag was yfinance publishing late or `prices.fetch`
+serving a cached series. **The cache hypothesis is dead from the code alone:**
+`swing_bot/prices.py:92-136` `fetch()` is a bare `yf.download(...)` per call
+with a retry ladder and NO store, no memo, no on-disk cache. (The permanent
+on-disk cache in this repo is `run_e8_squeeze.cache_fetch`, which the M3 loop
+does not use; `swing.db bars` is separately frozen at 2026-07-08 and the loop
+never reads it for QQQ.) So the M3 path fetches live every run, and the only
+remaining explanation is the vendor.
+
+Two bracketing facts: at Fri 09-04 19:00 CDT the 09-04 bar was absent
+(`latest session: 2026-09-03` in the log); at Sat 09-05 20:27 CDT it was
+present. That brackets publication inside a ~25-hour window, which is useless
+for choosing a run time. **M13.2 still needs its timed fetch on a trading day**;
+what is settled is which hypothesis it is testing. The behaviour also CHANGED
+around 09-02 after a 17-run same-day streak, so it is a vendor-side change, not
+a constant this project mis-set.
+
+## 6. Standing consequence Evan has to decide on, and one BLOCKED-ON-EVAN
+
+**The guard converts a silent wrong-date mark into a hard stop.** If yfinance is
+now publishing after 20:00 ET on a regular basis, the Tue 2026-09-08 19:00 run
+will REFUSE and mark nothing, and so will every run after it, until either the
+vendor timing changes or the scheduled task moves later. That is the correct
+behaviour and it is the whole point of the guard - but it means the forward
+series stops accumulating instead of accumulating wrong. No override
+environment variable was added (`SWING_ALLOW_FEED_LAG` was considered and
+deliberately skipped): an override would let a human re-create the exact bug
+the guard exists to stop, and the honest response to a real vendor outage is to
+wait, not to force.
+
+**BLOCKED-ON-EVAN (asked at session end):** (a) let Monday's Labor Day run mark
+2026-09-04 through the ordinary path, or acknowledge 09-04 as three permanent
+`(sleeve, date)` holes; (b) whether to move the scheduled task later than 19:00
+CT, which is really an M13.2 decision and should wait for its timed fetch.
+
+## 7. Files
+
+- `swing_bot/trading_calendar.py` - NEW, 150 lines
+- `scripts/daily_swing_paper.py` - import line plus the guard at `:698-719`
+- `scripts/prove_feed_clock.py` - NEW, 18 checks
+
+## Done-check
+
+`FROZEN TESTS: GREEN (all d=0)`; `prove_feed_clock.py` PROVEN 18/18;
+`prove_liquidity_floor.py` 11/11; `prove_refusal_gate.py` 10/10;
+`prove_cache_guard.py` 8/8. No writes to `swing.db` (the landing check used a
+throwaway DB in the scratchpad); `daily_swing_paper.py` was never executed
+against the live ledger and no `.bat` was run. Nothing committed, nothing
+pushed.
+
+# Appendix FR - Evan's two calls on the M13.1 questions: let Monday's Labor Day run mark 2026-09-04 (a late run, not a backfill), and leave the 19:00 CT trigger alone until M13.2 measures the publication hour (2026-09-05, ~20:50 CDT)
+**Session:** 2026-09-05, ~20:50 CDT, same sitting as FQ. Both questions FQ
+left BLOCKED-ON-EVAN were put to him and answered. Recorded separately so the
+decisions are findable without reading FQ's implementation detail.
+
+## 1. The 2026-09-04 NAV hole: let Monday's Labor Day run mark it
+
+**Evan's call:** do nothing; let the Mon 2026-09-07 19:00 scheduled run mark
+2026-09-04 through the ordinary path. **NOT** added to `ACKNOWLEDGED_NAV_HOLES`.
+
+Grounds, as put to him: Labor Day is a full NYSE closure and the task's Days
+are MON-FRI, so it fires on 09-07 with 2026-09-04 as the latest already-CLOSED
+session. The new feed-clock guard therefore PASSES (`qdates[-1]` = expected =
+`2026-09-04`; yfinance already has the bar, read-only probe Sat 09-05 20:27
+CDT: `2026-09-04 close=718.96`), and the loop marks NAV from 09-04's real close
+against the sleeve's actual position. **That is a late run, not a backfill** -
+the same computation a correct Friday-evening run would have made, one calendar
+day later. It is categorically unlike the five e6_1x holes made permanent in
+record FL, which would have required inventing marks for state that was never
+captured.
+
+**If it does not land, it stays open and visible, not silently forgiven.** No
+pre-authorisation was taken to acknowledge the pair set if Monday fails; that
+would be asked again. Whoever reads this next should CHECK: after the 09-07
+run, `paper_nav` should hold a `2026-09-04` row for all three sleeves and
+e6_1x's count should go 31 -> 32 against its peers' 36 -> 37.
+
+## 2. Scheduled task start time: leave at 19:00 CT, wait for M13.2
+
+**Evan's call:** do not move the `SwingTradingDailyPaper` trigger before M13.2
+has measured anything. No schedule change was made; the task is untouched.
+
+Grounds: picking a later hour now is a guess - the only bracket this session
+could establish is a useless ~25-hour window (bar absent Fri 09-04 19:00 CDT,
+present Sat 09-05 20:27 CDT). M13.2's timed fetch on a trading day is what
+sets the hour, and Monday's holiday run supplies a free extra data point.
+
+**Accepted consequence, stated before the decision and unchanged by it:** if
+the vendor keeps publishing after 20:00 ET, the Tue 2026-09-08 19:00 run
+REFUSES and marks nothing, and so does every run after it, until M13.2 lands
+or the trigger moves. The forward series stops accumulating rather than
+accumulating wrong. A refusal is loud (exit 1, red Last Result) and the run is
+re-runnable by hand the same evening.
+
+## Done-check
+
+Decision-only entry; no code changed after FQ's done-check. State re-verified
+unchanged at the end of this entry: `FROZEN TESTS: GREEN (all d=0)`,
+`prove_feed_clock.py` PROVEN 18/18. No writes to `swing.db`, no `.bat` run, no
+scheduled-task change, nothing committed, nothing pushed.

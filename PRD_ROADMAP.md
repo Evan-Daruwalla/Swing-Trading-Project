@@ -1298,6 +1298,24 @@ Order is by consequence, not effort. Nothing here reopens a verdict.
    Done-check: a standalone `scripts/prove_feed_clock.py` that feeds the guard a
    series ending yesterday and asserts it refuses; `test_frozen` GREEN.
    **Wanted before the Tue 2026-09-08 19:00 run.**
+   *(Outcome 2026-09-05, record Appendix FQ: **DONE** — `swing_bot/
+   trading_calendar.py` is the independent clock (wall clock + rule-derived
+   NYSE closures; NOT Alpaca's calendar, so a credential outage cannot stop
+   NAV marking). `daily_swing_paper.py:698-719` refuses in both directions and
+   returns 1 without marking or deciding. `scripts/prove_feed_clock.py`
+   **PROVEN: 18 checks**; `FROZEN TESTS: GREEN (all d=0)`. The 2026-09-04
+   question is asked, not answered — it is likely moot because the task fires
+   on Labor Day 09-07, when 09-04 IS the latest closed session. **New standing
+   consequence: if the vendor keeps publishing after 20:00 ET, the guard stops
+   the series instead of corrupting it — see M13.2.**)*
+   *(Evan 2026-09-05, record Appendix FR: **both questions ANSWERED.**
+   (a) 2026-09-04 is NOT acknowledged as a hole — Monday 09-07's Labor Day run
+   marks it through the ordinary path (a late run, not a backfill). CHECK after
+   09-07: a `2026-09-04` row for all three sleeves, e6_1x 31 -> 32 vs peers
+   36 -> 37. (b) the 19:00 CT trigger is UNCHANGED until M13.2 measures the
+   publication hour; the accepted cost is that a still-lagging feed makes the
+   Tue 09-08 run refuse and mark nothing. No BLOCKED-ON-EVAN row remains for
+   M13.1.)*
 2. **Root-cause the lag.** Was it yfinance publishing late (FH records yfinance
    flakiness as real) or `prices.fetch` serving a cached series? Done-check: a
    timed fetch of QQQ at ~19:00 CT on a trading day, logged with the bar's date

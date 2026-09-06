@@ -62,7 +62,7 @@ import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from swing_bot import prices, paper_sleeves as ps, universe
+from swing_bot import prices, paper_sleeves as ps, trading_calendar, universe
 from run_e10_earnings_drift import UNIV
 from run_c1_residual_reversal import residual_series, BETA_N
 
@@ -694,6 +694,30 @@ def _run(args):
         return 1
     today = qdates[-1]
     print(f"  latest session: {today}")
+
+    # ---- FEED-CLOCK GUARD (PRD M13.1, record FP) ----
+    # `today` above comes from the PRICE FEED, so until now the feed defined
+    # which session this run was processing. From 2026-09-02 yfinance stopped
+    # publishing the current bar before the 19:00 CT scheduled run and three
+    # consecutive runs silently processed the PREVIOUS session (09-02 -> 09-01,
+    # 09-03 -> 09-02, 09-04 -> 09-03 in var/daily_swing_paper.log), leaving
+    # 2026-09-04 with no paper_nav row in any sleeve. The per-sleeve
+    # missed-session detector below could not see it: its `today` is this same
+    # lagged value, so the hole sat inside its own blind spot. swing_bot/
+    # trading_calendar.py is the second, INDEPENDENT clock (wall clock + the
+    # exchange's holiday rules, no feed, no broker) that makes the comparison
+    # possible. On a mismatch, refuse the whole run rather than mark or decide
+    # -- the shape mark_nav already uses when a close price is missing.
+    feed_lag = trading_calendar.check_feed_clock(today)
+    if feed_lag is not None:
+        print("\n!! REFUSING TO RUN -- %s\n   Nothing was decided, marked "
+              "or mirrored, and the exit code is 1 so Task Scheduler shows a "
+              "red Last Result. Re-run once the feed catches up; if it never "
+              "does, that session is genuinely lost and belongs in "
+              "ACKNOWLEDGED_NAV_HOLES." % feed_lag, flush=True)
+        RUN_FAILURES.append("feed clock: %s" % feed_lag)
+        return 1
+
     _, vclose, _ = series("^VIX", start="2015-01-01")
     v3close = vix3m_close(start="2015-01-01")   # CBOE-primary (Yahoo ^VIX3M lags, record DC)
 
