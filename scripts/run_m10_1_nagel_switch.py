@@ -25,8 +25,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_e8_squeeze import cache_fetch, COST, CAP0
 from run_e10_earnings_drift import UNIV
+# BETA_N and FORM_N dropped 2026-09-05 (PRD M13.6, FH low): ast-confirmed
+# unused HERE. They are still imported from run_c1_residual_reversal by
+# daily_swing_paper.py, which is a different consumer -- this only trims this
+# file's import list, and the module itself is still imported, so no
+# module-level side effect changes.
 from run_c1_residual_reversal import (ff3_daily, residual_series, isoweek, stats,
-                                      K, BETA_N, FORM_N, GATE, SEC)
+                                      K, GATE, SEC)
 from run_e18_regime_gates import macro_close, sma
 
 QCOST = 0.0001          # 1 bp/side broad-ETF (QQQ)

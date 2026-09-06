@@ -50,7 +50,7 @@
   Gregorian Easter for Good Friday, Sat->Fri / Sun->Mon observance, and the
   exception that Jan 1 on a Saturday does NOT close the prior Friday).
   `check_feed_clock(qdates[-1])` returns the refusal reason or None and is
-  called at `daily_swing_paper.py:698-719`, BEFORE the VIX/VIX3M fetches, so a
+  called at `daily_swing_paper.py:733-754`, BEFORE the VIX/VIX3M fetches, so a
   refusal costs no network. It refuses in BOTH directions (feed behind = the
   real bug; feed ahead = a partial row or a wrong calendar).
 - **Why not Alpaca's calendar API** (asked and answered, do not "improve" it):

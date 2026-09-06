@@ -29,20 +29,24 @@ sys.path.insert(0, str(ROOT))
 
 from swing_bot import paper_sleeves as ps  # noqa: E402
 
-# The live table at 2026-09-05, read read-only and transcribed as (order_id,
-# status, alpaca_price). 10 rows: 4 measured, 1 canceled with no fill price,
-# 5 never mirrored, 0 pending.
+# The live table's SHAPE at 2026-09-05, read read-only and transcribed as
+# (order_id, status, alpaca_price). 10 rows: 4 measured, 1 canceled with no fill
+# price, 5 never mirrored, 0 pending. The order ids are SYNTHETIC on purpose --
+# the census only ever tests NULL vs NOT NULL, so the real Alpaca ids would add
+# nothing here and this file lives in a public repo. Prices are the real ones,
+# because they are what makes the "+0.0/+0.0/+1.3 bps is 3 of 4" arithmetic
+# checkable.
 LIVE_SHAPE = [
-    ("68152fbc", "filled",   712.0),
-    ("625aa9a8", "filled",   712.0),
-    (None,       None,       None),
-    (None,       None,       None),
-    ("7d348c06", "canceled", None),
-    ("d0b7fc18", "filled",   702.35),
-    (None,       None,       None),
-    (None,       None,       None),
-    ("d4e05de3", "filled",   700.622),
-    (None,       None,       None),
+    ("oid-1", "filled",   712.0),
+    ("oid-2", "filled",   712.0),
+    (None,    None,       None),
+    (None,    None,       None),
+    ("oid-3", "canceled", None),
+    ("oid-4", "filled",   702.35),
+    (None,    None,       None),
+    (None,    None,       None),
+    ("oid-5", "filled",   700.622),
+    (None,    None,       None),
 ]
 
 ok = True

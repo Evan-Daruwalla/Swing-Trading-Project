@@ -1286,7 +1286,7 @@ Every task names its files and its done-check and is sized for a cheaper model.
 Order is by consequence, not effort. Nothing here reopens a verdict.
 
 1. **CRIT — the live loop lets the price feed define its own clock.**
-   `scripts/daily_swing_paper.py:685-695` sets `today = qdates[-1]`; since
+   `scripts/daily_swing_paper.py:730` sets `today = qdates[-1]` (`:685-695` before the M13.3 insert shifted it); since
    2026-09-02 every 19:00 run has processed the PREVIOUS session (record FP §1),
    and the per-sleeve missed-session detector cannot see it because its `today`
    is the same value. Fix: derive the expected trading date independently (the
@@ -1301,7 +1301,7 @@ Order is by consequence, not effort. Nothing here reopens a verdict.
    *(Outcome 2026-09-05, record Appendix FQ: **DONE** — `swing_bot/
    trading_calendar.py` is the independent clock (wall clock + rule-derived
    NYSE closures; NOT Alpaca's calendar, so a credential outage cannot stop
-   NAV marking). `daily_swing_paper.py:698-719` refuses in both directions and
+   NAV marking). `daily_swing_paper.py:733-754` refuses in both directions and
    returns 1 without marking or deciding. `scripts/prove_feed_clock.py`
    **PROVEN: 18 checks**; `FROZEN TESTS: GREEN (all d=0)`. The 2026-09-04
    question is asked, not answered — it is likely moot because the task fires
@@ -1360,19 +1360,65 @@ Order is by consequence, not effort. Nothing here reopens a verdict.
    `scripts/run_e14_sector_momentum.py` + the shared `f3_masks_by_date`.
    Done-check: both arms run twice, byte-identical, count reported in a record
    entry; verdict stays FAIL either way.
+   *(Outcome 2026-09-05, record Appendix FV §1: **DONE — verdict stays FAIL, but
+   the count is far bigger than predicted.** E14 had NO F3 wiring at all; added
+   via the shared `f3_masks_by_date`, applied at RANKING (SPY is the benchmark,
+   not a candidate, so unscreened). **560 of 3,141 ticker-rebalance candidacies
+   dropped = 17.83%**, spread 1999-07-23..2016-08-31 across nearly every sector
+   — my pre-registered prediction of "near-zero, early-2000s only" was FALSIFIED
+   on both halves. **Measured, not inferred: 56 of 325 rebalances could not fire
+   at all** (fewer than K=3 eligible → the strategy sat in CASH), so the floor
+   suppresses rebalances rather than only re-ranking. GATE CAGR 2.42%→4.47%,
+   Sharpe 0.22→0.33, entries 501→351; **SECONDARY 2014- is IDENTICAL in both
+   arms**; maxDD unchanged at 51.4% — the tell that the strategy was not made
+   safer, just ABSENT. Read the gate improvement as an artifact of thin
+   early-2000s ETF volume meeting a today-calibrated floor, NOT as an edge. Both
+   arms byte-identical across 2 runs each, and the OFF arm reproduces the
+   pre-patch baseline with not one number changed.)*
 5. **Whole-cache refresh of `.e8e9_cache`** — 19 days stale at 2026-08-17. Must
    be ALL-OR-NOTHING: delete every price-series `*.json`, re-run every consumer
    in one sitting (data.md); a partial refresh manufactures a mixed vintage.
    Done-check: vintage census shows one end date across all 181 files.
+   *(Outcome 2026-09-06, records FV §4 + FW: **CLOSED, done-check ALREADY
+   SATISFIED — no refresh, nothing deleted (Evan's call).** Census of all 292
+   `.json` in `.e8e9_cache`: **181 bar series, every one ending 2026-08-17,
+   exactly ONE distinct end date**; the other 111 are not bar series. The check
+   passes with no action. The task's real worry is 19-day STALENESS, which this
+   done-check structurally cannot detect. Refreshing would delete 181 files and
+   destroy reproducibility of every F3 result and of E14 above, all pinned to the
+   2026-08-17 snapshot via `SWING_ALLOW_STALE_CACHE=1`. **Known accepted
+   limitation: this done-check still cannot fail when it should** — revisit if
+   the search phase ever reopens, since fresh data would then matter.)*
 6. **FH's LOWs**: `DB_PATH` defined twice (`prices.py:33`, `paper_sleeves.py:40`);
    possibly-unused imports `run_m10_1_nagel_switch.py:28-29`. Done-check:
    `test_frozen` GREEN.
+   *(Outcome 2026-09-05, record Appendix FV §2: **DONE.** `DB_PATH` moved to
+   `swing_bot/__init__.py` (imports no submodule → no cycle) and re-exported by
+   both modules, because `costs.py:28` and `daily_swing_paper.py` read it from
+   `paper_sleeves`. **The obvious fix was rejected:** `paper_sleeves` importing
+   `prices` would drag yfinance into the ledger module that `costs.py`,
+   `test_frozen` and `prove_divergence_census.py` all import. Unused imports:
+   `ast` says exactly `BETA_N` and `FORM_N`; dropped, post-edit re-run reports
+   **UNUSED: none**. `FROZEN TESTS: GREEN (all d=0)`.)*
 7. **Bootstrap the two bins the memory system prescribes and this project never
    created** (record FL): `.claude/codebase-memory/disclosure.md` (what may leave
    the project — the public GitHub repo exists since 2026-07-10, record AK) and
    `DIRECTORY.md` (the tree map; the repo is well past the >15-file threshold).
    Done-check: INDEX.md lists both; DIRECTORY's counts are grepped, with the
    commands recorded in the file.
+   *(Outcome 2026-09-05, record Appendix FV §3: **DONE.** Both bins created and
+   listed in `INDEX.md`, whose "missing bins" line is struck rather than deleted.
+   `DIRECTORY.md`: 208 tracked / 0 untracked — docs 107, scripts 58, swing_bot
+   14, .claude 13, root 9, graphify-out 6, data 1 — every count grepped with the
+   command recorded IN the file, including the `-c core.quotePath=false` trap
+   that made a first pass report 105 docs and a phantom `"docs` directory.
+   `disclosure.md`: the repo is PUBLIC under Evan's real name, so the default is
+   inverted. **Gap recorded, not fixed: `.claude/secrets-inventory.md` has never
+   existed here** — the scanners run on built-in rules, but writing that
+   inventory is a security decision left to Evan. Also fixed while writing it:
+   `prove_divergence_census.py`'s fixture used five REAL Alpaca paper order-id
+   prefixes; replaced with `oid-1`..`oid-5` under the new rule that "already
+   published elsewhere" is not a reason to publish again in a new file.)*
 
 **External, not this repo's to fix, recorded so nobody re-discovers them:**
 `~/.claude/skills/project-memory/append-record-entry.js` refuses

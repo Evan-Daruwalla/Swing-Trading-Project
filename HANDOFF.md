@@ -98,6 +98,67 @@ reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
 2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
 self-contradictory and was corrected 2026-07-28 by audit #7).**
 
+> **2026-09-06 ~00:21 CDT - M13 IS CLOSED: 4/6/7 DONE, 5 closed with no action
+> (records FV, FW). **M13.2 remains OPEN-BUT-BLOCKED** on a trading day (earliest
+> Tue 2026-09-08) - an earlier version of this line said "no open task left" in the
+> same breath as naming M13.2 blocked, which is self-contradictory; M13 tasks
+> 1,3,4,5,6,7 are closed.** Commits `2d1cfa1` / `f71fd8e` / `75b8ad7` are
+> **PUSHED - Evan pushed them, `origin/main` == HEAD** (this line said UNPUSHED
+> until the 2026-09-06 landing-check re-derived it live). This block's own work is
+> not yet committed.
+> **M13.4 - E14 under the liquidity floor: verdict still FAIL, and my
+> pre-registered prediction was FALSIFIED.** E14 had NO F3 wiring at all; added
+> via the shared `f3_masks_by_date`, applied at RANKING (SPY is the benchmark,
+> not a candidate, so unscreened). I predicted near-zero exclusions confined to
+> the early 2000s. Actual: **560 of 3,141 ticker-rebalance candidacies dropped =
+> 17.83%**, spread **1999-07-23..2016-08-31** across nearly every sector
+> (`XLY=77, XLP=74, XLV=74, XLI=71, XLU=63, XLB=55, XLE=55, XLK=55, XLF=31,
+> XLRE=5`, XLC=0). **Measured, not inferred: 56 of 325 rebalances could not fire
+> at all** - fewer than K=3 eligible, so the strategy sat in CASH. The floor
+> SUPPRESSES rebalances here, it does not merely re-rank. GATE CAGR 2.42% ->
+> 4.47%, Sharpe 0.22 -> 0.33, entries 501 -> 351; **SECONDARY 2014- is IDENTICAL
+> in both arms**; maxDD unchanged 51.4%. **Do NOT read the gate improvement as an
+> edge** - forced cash through the dot-com bust flatters it, an artifact of thin
+> early-2000s ETF volume meeting a today-calibrated floor; unchanged maxDD is the
+> tell that the strategy was made ABSENT, not safer. Both arms byte-identical x2,
+> and the OFF arm reproduces the pre-patch baseline with **not one number
+> changed**.
+> **M13.5 - CLOSED, NOTHING DELETED (Evan's call, record FW).** Its done-check
+> ("one end date across all 181 files") **already passes**: 181 of the 292
+> `.e8e9_cache` `.json` are bar series and every one ends **2026-08-17**, exactly
+> ONE distinct end date. The task's real worry is 19-day staleness, which its own
+> done-check structurally cannot detect. Refreshing would delete 181 files and
+> destroy reproducibility of every F3 result AND of the E14 numbers above, all
+> pinned to that snapshot via `SWING_ALLOW_STALE_CACHE=1`. **Known accepted
+> limitation: that done-check still cannot fail when it should** - revisit if the
+> search phase ever reopens.
+> **M13.6 - both FH LOWs fixed.** `DB_PATH` now lives once, in
+> `swing_bot/__init__.py`, re-exported by `prices` and `paper_sleeves` (both
+> `costs.py:28` and `daily_swing_paper.py` read it from `paper_sleeves`). **The
+> obvious fix was REJECTED:** `paper_sleeves` importing `prices` would drag
+> yfinance into the ledger module that `costs.py`, `test_frozen` and
+> `prove_divergence_census.py` all import. Unused imports: `ast` names exactly
+> `BETA_N` and `FORM_N` in `run_m10_1_nagel_switch.py`; dropped, re-run reports
+> **UNUSED: none**.
+> **M13.7 - both missing bins now exist**, listed in `INDEX.md` with its
+> "missing bins" line struck, not deleted. `DIRECTORY.md`: **208 tracked / 0
+> untracked**, every count grepped with the command recorded IN the file
+> (including the `-c core.quotePath=false` trap that made a first pass report 105
+> docs and a phantom `"docs` directory instead of 107). `disclosure.md`: the repo
+> is PUBLIC under Evan's real name, so the default is inverted. **Gap recorded,
+> NOT fixed: `.claude/secrets-inventory.md` has never existed here** - the
+> scanners run on built-in rules, but writing that inventory is a security
+> decision for Evan. Also fixed while writing it: `prove_divergence_census.py`'s
+> fixture carried five REAL Alpaca paper order-id prefixes -> `oid-1`..`oid-5`,
+> under the new rule that "already published elsewhere" is not a reason to
+> publish again in a new file.
+> **Process failure caught and corrected (record FW §2):** FV was first appended
+> stamped `2026-09-06 ~00:20 CDT` while the clock read `2026-09-05 23:22 CDT` - a
+> fabricated future timestamp, because `date` was run in the SAME command as the
+> append instead of before composing it. Reverted with `git checkout` (clean:
+> FQ-FU were committed, 0 removed lines verified first) and re-appended with the
+> real time; two further wrong numbers in that body were fixed in the same pass.
+
 > **2026-09-05 ~23:25 CDT - M13.3 DONE (record FT): the fidelity instrument now
 > reports its own dark half every run, and the honest denominator is 4, not 5.**
 > Read-only census of `fill_divergence` (10 rows): **4 MEASURED** (a real broker
@@ -108,7 +169,7 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 > yield a fidelity number.** This file's "+0.0/+0.0/+1.3 bps when the EOD
 > discipline holds" is exactly 3 of those 4; the fourth is e18_vixts 2026-07-20,
 > sim 706.680 vs Alpaca 700.622 = **-85.7 bps**, already recorded at record line
-> 4517 as the record DE midday manual fire. Nothing changed about that row - the
+> 4521 as the record DE midday manual fire. Nothing changed about that row - the
 > run now prints the DENOMINATOR, so 3-of-4 can no longer read as the whole
 > population.
 > **The task contradicted itself and the deviation is written in-code.** PRD
@@ -176,7 +237,7 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 > **Deliberately NOT Alpaca's calendar API**: the M3 ledger is independent of
 > broker connectivity by design, and a total credential outage (record FH) would
 > otherwise become a refusal to mark NAV - manufacturing the holes this guard
-> prevents. `scripts/daily_swing_paper.py:698-719` calls
+> prevents. `scripts/daily_swing_paper.py:733-754` calls
 > `check_feed_clock(today)` right after `today = qdates[-1]` and, on any
 > mismatch (feed BEHIND or AHEAD), prints the reason, appends to `RUN_FAILURES`
 > and returns 1 - nothing decided, marked or mirrored.
@@ -217,7 +278,7 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 > `.bat` wall-clock stamp with the session date the loop printed: a 17-run
 > same-day streak through Tue 09-01 (34 of 40 logged runs same-day; the other
 > three off-date runs were Saturday manual fires correctly processing Friday), then **09-02 -> 09-01, 09-03 -> 09-02, 09-04 -> 09-03**.
-> `today = qdates[-1]` from `series("QQQ")` (`daily_swing_paper.py:685-695`), so
+> `today = qdates[-1]` from `series("QQQ")` (`daily_swing_paper.py:730`), so
 > when the feed has not published today's bar by 19:00 the loop silently takes
 > yesterday as today. **`paper_nav` has NO 2026-09-04 row in any sleeve**; the
 > 09-02/09-03 rows were written a day late. No order was affected (all three
@@ -313,7 +374,9 @@ self-contradictory and was corrected 2026-07-28 by audit #7).**
 >   and could enter the live K=4 stress basket at ~$250 of a $1,000 sleeve. The
 >   function's own docstring INSTRUCTED that behaviour. Now fails closed on None,
 >   docstring rewritten to match, and `scripts/prove_liquidity_floor.py` pins it
->   6/6 (including two cases proving the OLD branch ranked those names). Latent,
+>   6/6 at the time (**11/11 since F3** - corrected 2026-09-06; this file had no
+>   later note, unlike testing.md which self-corrects in a dated section)
+>   (including two cases proving the OLD branch ranked those names). Latent,
 >   never fired: needs VIX>20, which has not occurred live.
 > - **(FIXED) `STRESS_K = 4` vs the K=1-3 ceiling** - resolved as a **dated
 >   exception in `CLAUDE.md`, not a code change.** K=4 is the parameter C1 and

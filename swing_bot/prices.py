@@ -30,7 +30,7 @@ from pathlib import Path
 
 import yfinance as yf
 
-DB_PATH = Path(__file__).resolve().parent.parent / "swing.db"
+from swing_bot import DB_PATH   # single home (M13.6)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS bars (

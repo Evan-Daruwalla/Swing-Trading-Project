@@ -37,7 +37,7 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parent.parent / "swing.db"
+from swing_bot import DB_PATH   # single home (M13.6)
 CAP0 = 1000.0     # starting notional per sleeve; matches E6/M10-1 backtest CAP0
 SLEEVES = ("e6_1x", "e18_vixts", "m10_1_nagel")
 STRESS_K = 4       # M10-1 stress-mode basket size (matches C1's K)

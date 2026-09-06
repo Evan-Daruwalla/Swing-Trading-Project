@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_e8_squeeze import cache_fetch, COST, CAP0
+from run_e8_squeeze import cache_fetch, COST, CAP0, f3_masks_by_date
 
 SECTORS = ["XLE", "XLF", "XLK", "XLV", "XLI", "XLY", "XLP", "XLU", "XLB",
            "XLRE", "XLC"]
@@ -45,17 +45,28 @@ def stats(nav):
 
 
 def main():
-    data = {}
+    data, raw = {}, {}
     for t in SECTORS:
         bars = cache_fetch(t)
+        raw[t] = bars
         data[t] = {b[1]: (b[2], b[5]) for b in bars}   # date -> (open, close)
         print(f"loaded {t}: {bars[0][1]}..{bars[-1][1]} ({len(bars)} bars)",
               flush=True)
+    # F3 (PRD M13.4, 2026-09-05): E14 was the one in-scope ETF experiment the
+    # F3 redirect never measured -- its prereg scoped it as a count, not a
+    # verdict. `data` keeps only (open, close) and drops volume, so the masks
+    # are built from `raw`, the same cache_fetch bars, exactly as X9 and E20 do.
+    # Applied at RANKING: an illiquid name cannot enter the top-K momentum
+    # queue. SPY is the benchmark, not a candidate, so it is not screened --
+    # same convention as every other F3 runner.
+    LIQ = f3_masks_by_date(raw)
     spy = {b[1]: (b[2], b[5]) for b in cache_fetch("SPY")}
 
     dates = sorted(set().union(*[set(d) for d in data.values()]))
     cash, pos, pend = CAP0, {}, None      # pos: ticker -> shares
     nav_by_date, entries = {}, []
+    n_illiquid = n_rebal = n_candidates = n_no_quorum = 0
+    illiquid_by_ticker, illiquid_dates = {}, []
     for i, d in enumerate(dates):
         if pend is not None and (i - pend[1]) >= 1:
             targets = pend[0]
@@ -80,10 +91,23 @@ def main():
             mom = []
             for t in SECTORS:
                 if prev in data[t] and base in data[t] and data[t][base][1] > 0:
+                    if LIQ is not None and not LIQ[t].get(prev, False):
+                        n_illiquid += 1
+                        illiquid_by_ticker[t] = illiquid_by_ticker.get(t, 0) + 1
+                        illiquid_dates.append(prev)
+                        continue
                     mom.append((data[t][prev][1] / data[t][base][1] - 1, t))
             mom.sort(reverse=True)
+            n_rebal += 1
+            n_candidates += len(mom)
             if len(mom) >= K:
                 pend = ([t for _, t in mom[:K]], i)
+            else:
+                # The floor does not only RE-RANK: when it leaves fewer than K
+                # eligible sectors the rebalance cannot fire at all and the
+                # strategy sits in cash. Counted rather than inferred from the
+                # entry delta (PRD M13.4).
+                n_no_quorum += 1
 
     def win(series_dict, lo, hi, base=None):
         ds = [d for d in dates if lo <= d <= hi and d in series_dict]
@@ -102,6 +126,21 @@ def main():
 
     print(f"\ncommon dates {dates[0]}..{dates[-1]} ({len(dates)}); "
           f"total entries {len(entries)}")
+    if LIQ is None:
+        print("F3 count: floor OFF (SWING_F3_FLOOR=0) -- no candidate screened.")
+    else:
+        print("F3 count: %d of %d ticker-rebalance candidacies dropped by the "
+              "$20M/day floor across %d rebalances (%.2f%%)."
+              % (n_illiquid, n_illiquid + n_candidates, n_rebal,
+                 100.0 * n_illiquid / max(1, n_illiquid + n_candidates)))
+        if n_illiquid:
+            print("  by ticker: %s" % ", ".join(
+                "%s=%d" % kv for kv in sorted(illiquid_by_ticker.items())))
+            print("  date range of drops: %s..%s"
+                  % (min(illiquid_dates), max(illiquid_dates)))
+            print("  rebalances that could not fire (fewer than K=%d eligible, "
+                  "so the strategy sat in CASH): %d of %d"
+                  % (K, n_no_quorum, n_rebal))
     rows = {}
     for name, (lo, hi) in [("GATE 2000-2013", GATE), ("SECONDARY 2014-", SEC),
                            ("FULL 2000-", FULL)]:

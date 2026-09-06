@@ -214,6 +214,10 @@ the dated entry, not the digest.
 - [FS — M13.2 INSTRUMENTED, NOT ANSWERED: the local-change hypothesis is dead (yfinance untouched since 2026-07-08), a third hypothesis is added (our own NaN filter), and the probe is built and self-tested - but the done-check needs a trading day, earliest Tue 2026-09-08](#appendix-fs---m132-instrumented-not-answered-the-local-change-hypothesis-is-dead-yfinance-untouched-since-2026-07-08-a-third-hypothesis-is-added-our-own-nan-filter-and-the-probe-is-built-and-self-tested---but-the-done-check-needs-a-trading-day-earliest-tue-2026-09-08-2026-09-05-2255-cdt) (09-05)
 - [FT — M13.3 DONE: the fidelity instrument now reports its own dark half every run - and only 4 of 10 rows, not 5, can ever yield a number. The task's two requirements contradicted each other, so the report was split from the resolving](#appendix-ft---m133-done-the-fidelity-instrument-now-reports-its-own-dark-half-every-run---and-only-4-of-10-rows-not-5-can-ever-yield-a-number-the-tasks-two-requirements-contradicted-each-other-so-the-report-was-split-from-the-resolving-2026-09-05-2325-cdt) (09-05)
 - [FU — CORRECTION to FT: two line numbers were read before this session's own patch shifted them by 39; HANDOFF and the PRD fixed in place, FT corrected here](#appendix-fu---correction-to-ft-two-line-numbers-were-read-before-this-sessions-own-patch-shifted-them-by-39-handoff-and-the-prd-fixed-in-place-ft-corrected-here-2026-09-05-2335-cdt) (09-05)
+- [FV — M13.4/6/7 DONE: E14 under the floor drops 17.83% of candidacies and cannot fire 56 of 325 rebalances (verdict still FAIL, my prediction falsified); DB_PATH gets one home; the two missing bins exist. M13.5 NOT done - its done-check already passes and the work would destroy F3's pinned vintage](#appendix-fv---m13467-done-e14-under-the-floor-drops-1783-of-candidacies-and-cannot-fire-56-of-325-rebalances-verdict-still-fail-my-prediction-falsified-db_path-gets-one-home-the-two-missing-bins-exist-m135-not-done---its-done-check-already-passes-and-the-work-would-destroy-f3s-pinned-vintage-2026-09-05-2322-cdt) (09-05)
+- [FW — Evan closes M13.5 with no refresh (its done-check already passes and cannot detect staleness); plus the correction for FV's first append, which carried a fabricated future timestamp](#appendix-fw---evan-closes-m135-with-no-refresh-its-done-check-already-passes-and-cannot-detect-staleness-plus-the-correction-for-fvs-first-append-which-carried-a-fabricated-future-timestamp-2026-09-06-0021-cdt) (09-06)
+- [FX — Scheduled daily-audit: a regime gate that fails toward risk-on, the OHLC sanity check nothing imports, and a cancel failure the run list cannot see](#appendix-fx---scheduled-daily-audit-a-regime-gate-that-fails-toward-risk-on-the-ohlc-sanity-check-nothing-imports-and-a-cancel-failure-the-run-list-cannot-see-2026-09-06-0722-cdt) (09-06)
+- [FY — landing-check over all of M13: FIX FIRST. My commit introduced 3 real order ids to the PUBLIC repo and the de-identification was uncommitted; FU's own path:line rule was applied to one citation pair and not the three it also broke; the record's published HTML twin stops at FP](#appendix-fy---landing-check-over-all-of-m13-fix-first-my-commit-introduced-3-real-order-ids-to-the-public-repo-and-the-de-identification-was-uncommitted-fus-own-pathline-rule-was-applied-to-one-citation-pair-and-not-the-three-it-also-broke-the-records-published-html-twin-stops-at-fp-2026-09-06-1308-cdt) (09-06)
 
 ---
 
@@ -9779,3 +9783,475 @@ Corrected values re-derived from disk with `grep -n` after the final edit:
 `824:    print_divergence_census(conn)`, `1001:    if args.execute:`,
 `1026:        backfill_divergence(conn)`. No code changed in this entry:
 `FROZEN TESTS: GREEN (all d=0)`, `prove_divergence_census.py` PROVEN 16/16.
+
+# Appendix FV - M13.4/6/7 DONE: E14 under the floor drops 17.83% of candidacies and cannot fire 56 of 325 rebalances (verdict still FAIL, my prediction falsified); DB_PATH gets one home; the two missing bins exist. M13.5 NOT done - its done-check already passes and the work would destroy F3's pinned vintage (2026-09-05, ~23:22 CDT)
+**Session:** 2026-09-05, ~22:55-23:22 CDT, same sitting as FQ-FU. Evan: "do the rest of M13". Tasks 4, 6 and 7 are DONE; task 5
+is **NOT DONE and should not be done** -- its done-check already passes and the
+work it prescribes is destructive, see §4. No prereg: M13 is not an experiment
+and no verdict moves.
+
+## 1. M13.4 -- E14 under the liquidity floor. Verdict FAIL both arms, but the numbers moved a LOT and my prediction was WRONG
+
+E14 had NO F3 wiring at all (`grep -n "f3_mask|SWING_F3_FLOOR|is_liquid"` on the
+runner returned nothing) -- it really was the one in-scope ETF experiment the F3
+redirect never touched. Wired using the SAME shared helper every other date-keyed
+runner uses, `f3_masks_by_date` from `run_e8_squeeze`, built from the same
+`cache_fetch` bars `main()` already loads (E14's `data` keeps only (open, close)
+and drops volume, exactly the situation X9 and E20 handle the same way). Applied
+at RANKING: an illiquid name cannot enter the top-K momentum queue. SPY is the
+benchmark, not a candidate, so it is not screened -- the convention in every
+other F3 runner.
+
+**PREDICTION, written before the run: near-zero exclusions, clustered in the
+early 2000s, because the 11 SPDR sector ETFs are far above a $20M/day floor.
+FALSIFIED on both halves.**
+
+- **560 of 3,141 ticker-rebalance candidacies dropped = 17.83%**, across 325
+  rebalances. Not near-zero.
+- **Drops run 1999-07-23 .. 2016-08-31**, not just the early 2000s.
+- Spread across nearly every sector, not a thin-name tail:
+  `XLY=77, XLP=74, XLV=74, XLI=71, XLU=63, XLB=55, XLE=55, XLK=55, XLF=31,
+  XLRE=5` (XLC: 0).
+
+**The mechanism, MEASURED not inferred.** A counter was added rather than
+deducing it from the entry delta: **56 of 325 rebalances (17.2%) could not fire
+at all**, because the floor left fewer than K=3 eligible sectors -- so the
+strategy sat in CASH. The floor does not merely re-rank here; it suppresses
+whole rebalances. GATE entries fall 501 -> 351, exactly 150 = 50 x K=3, so 50 of
+those 56 land in the gate window.
+
+| window | arm | CAGR | maxDD | Sharpe | entries |
+|---|---|---|---|---|---|
+| GATE 2000-2013 | OFF | 2.42% | 51.4% | 0.22 | 501 |
+| GATE 2000-2013 | **ON** | **4.47%** | 51.4% | **0.33** | **351** |
+| SECONDARY 2014- | OFF | 7.48% | 31.8% | 0.50 | 456 |
+| SECONDARY 2014- | **ON** | **7.48%** | **31.8%** | **0.50** | **456** |
+| FULL 2000- | OFF | 4.76% | 51.4% | 0.34 | 957 |
+| FULL 2000- | **ON** | **5.86%** | 51.4% | **0.41** | **807** |
+
+**The SECONDARY window is IDENTICAL to four decimal places in both arms.** Every
+effect is in 2000-2013. The gate improvement is not an edge and must not be read
+as one: forced cash during the dot-com bust flatters CAGR and Sharpe, and it is
+an artifact of thin early-2000s sector-ETF volume meeting a floor calibrated for
+today. maxDD is unchanged at 51.4%, which is the tell -- the strategy was not
+made safer, it was made ABSENT for part of the window.
+
+**VERDICT: FAIL under the floor, as pre-stated.** PASS-HR fails (CAGR 4.47% /
+7.48% vs the 15% bar). PASS-RA fails on the secondary Sharpe (0.50 vs SPY 0.75)
+in both arms. Nothing was tuned; the floor was applied and the result reported.
+
+**Determinism, per the F3 protocol:** ON arm byte-identical across 2 runs; OFF
+arm byte-identical across 2 runs. And the strongest form of the
+`SWING_F3_FLOOR=0` contract -- **the OFF arm reproduces the PRE-PATCH baseline
+exactly**, `diff` showing only the two added banner lines and **not one changed
+number**.
+
+## 2. M13.6 -- FH's two LOWs
+
+**(a) `DB_PATH` defined twice.** It was an identical expression in
+`prices.py:33` and `paper_sleeves.py:40`. **The obvious fix was rejected:**
+having `paper_sleeves` import `prices` would drag `yfinance` into the paper
+ledger module that `costs.py`, `test_frozen` and `prove_divergence_census.py`
+all import -- a yfinance import failure would then take out the ledger. Instead
+the constant moved to `swing_bot/__init__.py`, which imports no submodule (so no
+cycle) and is already executed by every consumer. Both modules re-export it,
+because `costs.py:28` does `from swing_bot.paper_sleeves import DB_PATH` and
+`daily_swing_paper.py:652` reads `ps.DB_PATH`. Verified all four resolve to the
+same path.
+
+**(b) unused imports at `run_m10_1_nagel_switch.py:28-29`.** FH said "possibly";
+an `ast` pass says exactly two of the nine names on those lines are unused:
+**`BETA_N` and `FORM_N`**. Dropped. `daily_swing_paper.py` imports both from
+`run_c1_residual_reversal` directly, which is a different consumer and is
+untouched; nothing imports names FROM `run_m10_1_nagel_switch` at all (checked).
+Post-edit `ast` re-run: **16 imports, UNUSED: none.**
+
+## 3. M13.7 -- the two bins that were never created
+
+`.claude/codebase-memory/DIRECTORY.md` and `disclosure.md` created; `INDEX.md`
+lists both and its "missing bins" line is struck rather than deleted.
+
+**DIRECTORY.md**: 208 tracked files, 0 untracked. docs/ 107 (51 root + 56
+research) · scripts/ 58 (39 runners, 5 proofs, 1 orchestrator + .bat + git-hook)
+· swing_bot/ 14 · .claude/ 13 · root 9 · graphify-out/ 6 · data/ 1. **Every
+count is grepped and the commands are recorded IN the file**, per the done-check.
+One trap is recorded there because it bit this session: without
+`-c core.quotePath=false`, git quotes the record's em-dashed filename and
+`awk -F/` counts it as a phantom `"docs` directory -- the first pass reported 105
+docs instead of 107.
+
+**disclosure.md**: the governing fact is that
+`github.com/Evan-Daruwalla/Swing-Trading-Project` is **public, under Evan's real
+name**, so anything committed is world-readable permanently. Hard line (keys,
+`swing.db`, `var/`, anything from a non-paper account) with what enforces each.
+**Gap recorded, not fixed:** `commit-gate` reads `.claude/secrets-inventory.md`
+and this project has never had that file (`ls .claude/` shows only
+`codebase-memory/` and `pm-cadence.json`). The scanners still run on built-in
+rules, so nothing is unguarded, but writing that inventory is a security
+decision and was left for Evan.
+
+**One thing was found and fixed while writing it.** `prove_divergence_census.py`
+(committed earlier this session, `75b8ad7`) seeded its throwaway DB with the five
+REAL 8-char Alpaca paper order-id prefixes. Not a leak by this project's own
+standard -- record lines 4206-4218 have carried `7d348c06` and `d0b7fc18` in the
+narrative since 2026-07-18, and `.gitignore` states these are "regeneratable,
+not secrets" -- but the census only ever tests NULL vs NOT NULL, so the real ids
+bought nothing. Replaced with `oid-1`..`oid-5`; prices KEPT real, because they
+are what makes the "+0.0/+0.0/+1.3 bps is 3 of 4" arithmetic checkable. **Rule
+written into the bin: "already published elsewhere" is not a reason to publish
+again in a new file -- only need is.**
+
+## 4. M13.5 -- NOT DONE, and the task's premise is wrong
+
+M13.5 asks for an all-or-nothing refresh of `.e8e9_cache`, done-check "vintage
+census shows one end date across all 181 files".
+
+**That done-check ALREADY PASSES, with no action taken.** Census of all 292
+`.json` files in `.e8e9_cache`: **181 are bar series and every single one ends
+2026-08-17 -- exactly ONE distinct end date.** The other 111 are not bar series
+(dividends, factor files, metadata). The PRD's own figure of 181 matches the
+count of price-series files exactly.
+
+So the task cannot detect what it is worried about. Its real concern is
+STALENESS (2026-08-17 to today 2026-09-05 = 19 days), not a MIXED vintage -- and
+its done-check measures uniformity, which already holds. Executing it anyway
+would delete 181 files nobody in this session created and **destroy the
+reproducibility of every F3 result**, all of which were deliberately pinned to
+this 2026-08-17 snapshot via `SWING_ALLOW_STALE_CACHE=1` so both arms read one
+vintage -- including the E14 numbers in §1, produced today against that same
+snapshot. **Put to Evan rather than executed; the decision is in the next entry.**
+
+## 5. Done-check -- real output
+
+`FROZEN TESTS: GREEN (all d=0)` after every change (`swing_bot/__init__.py`,
+`prices.py`, `paper_sleeves.py` were all touched). All five proofs re-run:
+`prove_feed_clock` 18/18 · `prove_divergence_census` 16/16 ·
+`prove_liquidity_floor` 11/11 · `prove_refusal_gate` 10/10 ·
+`prove_cache_guard` 8/8. E14: 8 runs total (2 pre-patch baseline, 2 ON, 2 OFF, 2 more ON after the
+quorum counter was added), every pair byte-identical, ~4.8s each.
+`ast` re-check on `run_m10_1_nagel_switch.py`: UNUSED: none.
+
+No writes to `swing.db`. `daily_swing_paper.py` not executed, no `.bat` run, no
+scheduled task touched, nothing deleted.
+
+## 6. Files
+
+- `scripts/run_e14_sector_momentum.py` -- F3 wiring + the count + the no-quorum counter
+- `swing_bot/__init__.py` -- `DB_PATH` single home
+- `swing_bot/prices.py`, `swing_bot/paper_sleeves.py` -- re-export it
+- `scripts/run_m10_1_nagel_switch.py` -- 2 unused names dropped
+- `scripts/prove_divergence_census.py` -- fixture de-identified
+- `.claude/codebase-memory/DIRECTORY.md`, `disclosure.md` -- NEW; `INDEX.md` updated
+
+# Appendix FW - Evan closes M13.5 with no refresh (its done-check already passes and cannot detect staleness); plus the correction for FV's first append, which carried a fabricated future timestamp (2026-09-06, ~00:21 CDT)
+**Session:** 2026-09-06, ~00:21 CDT, continuing the 2026-09-05 sitting past
+midnight. Recorded separately from FV so the decision is findable without
+reading the measurement that prompted it.
+
+## 1. M13.5 CLOSED, no refresh
+
+**Evan's call:** close M13.5 as **done-check ALREADY SATISFIED**; the
+`.e8e9_cache` is **not** refreshed and **no file is deleted**.
+
+Grounds, as put to him and measured in FV §4: the task's own done-check is
+"vintage census shows one end date across all 181 files", and a census of all
+292 `.json` files found **181 bar series, every one ending 2026-08-17 -- exactly
+one distinct end date** (the other 111 are not bar series). The check passes
+with no action taken. The task's real worry is 19-day STALENESS, which its own
+done-check structurally cannot detect.
+
+Executing the refresh anyway would delete 181 files nobody in this session
+created and destroy the reproducibility of **every F3 result**, all deliberately
+pinned to the 2026-08-17 snapshot via `SWING_ALLOW_STALE_CACHE=1` so both arms
+read one vintage -- including the E14 numbers produced hours earlier in FV §1.
+Staleness costs nothing while the search phase is CLOSED and no new backtest is
+being run.
+
+**Explicitly NOT taken:** the two live options were archiving the vintage before
+refreshing, and rewriting the done-check to actually measure staleness. Neither
+was chosen, so **M13.5's done-check still cannot fail when it should.** That
+limitation is now a known, accepted property rather than an unnoticed one -- and
+it is the thing to revisit if the search phase ever reopens, because a reopened
+search would need fresh data and would then be running against a 2026-08-17
+snapshot with nothing to complain.
+
+## 2. Correction carried from FV's first append
+
+FV was first appended with the heading timestamp **"2026-09-06, ~00:20 CDT"**
+while the real clock read **2026-09-05 23:22 CDT** -- a fabricated future
+timestamp, caught immediately because `date` was run in the same command instead
+of BEFORE composing the argument. The append was reverted with
+`git checkout -- <record>` (clean: FQ-FU were already committed, so only the
+uncommitted FV disappeared, 0 removed lines confirmed first) and re-appended with
+the real time. Two further numbers in that body were wrong and were fixed in the
+same pass: the run count said "6 runs total" while enumerating 8, and the cache
+staleness said "19 days at the time of writing, 20 now" when 2026-08-17 to
+2026-09-05 is 19 days flat.
+
+**The mechanism: `date` must be run BEFORE the text is composed, not in the same
+command as the append.** Running it alongside is indistinguishable from not
+running it at all, because the value arrives after the timestamp has already
+been written.
+
+## Done-check
+
+Decision and correction only; no code changed since FV's done-check.
+`FROZEN TESTS: GREEN (all d=0)`. Nothing deleted, no `.e8e9_cache` file touched,
+`swing.db` not written, no `.bat` run.
+
+# Appendix FX - Scheduled daily-audit: a regime gate that fails toward risk-on, the OHLC sanity check nothing imports, and a cancel failure the run list cannot see (2026-09-06, ~07:22 CDT)
+**Session:** scheduled `daily-audit`, 2026-09-06 ~07:22 CDT. Read-only sweep —
+no code, docs, or config were changed. Swing Trading classified ACTIVE: the last
+audit entry is FI (2026-08-25, outside the 7-day window) and 10 non-audit commits
+landed since 2026-08-30. FK notes the 2026-09-05 audit left no trace because the
+record was wedged; the wedge is fixed and this entry is the proof it appends.
+
+## Findings — 4 code, 6 docs
+
+**HIGH 1 — asymmetric VIX guard fails in the risk-ON direction.**
+`swing_bot/paper_sleeves.py:309` guards `vix3m_today <= 0` but never
+`vix_today <= 0`. A VIX read of 0 or negative makes `vix_today / vix3m_today`
+less than 1.0, so `decide_e18_vixts` returns `{"QQQ": 1.0}` — go long — instead
+of refusing. A regime gate that fails toward risk-on is the wrong direction.
+Fix: add `or vix_today <= 0` to the existing condition on that line.
+
+**HIGH 2 — the only OHLC anomaly detector is dead code.**
+`swing_bot/coverage_gate.py` (`sanity_scan`: OHLC-order violations, zero-range
+bars, `MAX_ABS_DAILY_RET`) has zero importers — verified two ways: a name grep
+across all `.py` returns only docstring prose in `prices.py:19` and
+`universe.py:25,39`, and an import-statement grep returns nothing. It also reads
+the `bars` SQLite table, which the live loop never writes. A mis-applied split
+or one corrupt yfinance bar reaches `decide_e6_1x` / `decide_e18_vixts` /
+`decide_m10_1` with no anomaly check anywhere in the live path. Fix: wire
+`sanity_scan` into `scripts/daily_swing_paper.py` against the fetched in-memory
+series, or delete the module and record the gap as accepted.
+
+**HIGH 3 — a failed order-cancel cannot reach the run's failure list.**
+`swing_bot/alpaca_client.py:285-294`, `cancel_all_orders` catches `AlpacaError`,
+prints "continuing", and returns None. Its own comment says a silent failure
+"can leave a duplicate live" — and it still does not propagate, so
+`scripts/daily_swing_paper.py:1091` cannot see it and `RUN_FAILURES` stays
+empty. A stale order that fails to cancel is then re-ordered on top of, giving
+broker exposure larger than the DB ledger, while Task Scheduler reports success.
+Fix: re-raise from `cancel_all_orders` and append to `RUN_FAILURES` at the call
+site, matching every sibling failure in that block.
+
+**MED 4 — two-commit fill write can tear.**
+`swing_bot/paper_sleeves.py:172-189`: `record_fill` and `upsert_position` each
+open and commit their own transaction, and `realize_pending` always calls them
+as a pair. A kill between the two commits leaves a transaction row whose
+position row never updated, so the retry re-sells the same leg and writes a
+second row for one real fill. Fix: wrap the pair in one `BEGIN`/`COMMIT`, the
+same shape as the two-phase cash write already applied nearby.
+
+**HIGH 5 — HANDOFF contradicts itself on whether any task is open.**
+`HANDOFF.md:1146` says "no unstarted task remains"; `HANDOFF.md:102-103` and
+`PRD_ROADMAP.md` M13.2 both say M13.2 is OPEN-BUT-BLOCKED until a trading day
+(earliest Tue 2026-09-08). Line 1146 predates M13. A reader who hits the
+reference section first concludes there is nothing to do. Fix: point 1146 at the
+top-of-file status block.
+
+**MED 6 — a false tracked-status claim.**
+`HANDOFF.md:411` says `clean_ledger_2026-08-25.py` "still sits UNTRACKED";
+`git ls-files` returns it, committed at `87db1c2`. `HANDOFF.md:398` already
+carries the correction, but 411 does not point at it. Fix: strike the clause at
+411.
+
+**MED 7 — three record citations stale by the same +144 lines.**
+`HANDOFF.md:343` cites record line 2504 (actual 2648), `:1096` cites 7614 for
+Appendix FC (actual 7758), `:411` cites 8246 for Appendix FJ (actual 8390). One
+insertion shifted the record and none of the three citations followed. Fix: add
+144 to each.
+
+**MED 8 — bin count off by two.** `HANDOFF.md:1151` says "INDEX + 11 bins";
+disk has 13 non-INDEX files, the two new ones documented at `HANDOFF.md:143-154`
+in the same file. Fix: 11 -> 13.
+
+**LOW 9 — two wrong code citations.** `HANDOFF.md:318` cites `mark_nav()` at
+`daily_swing_paper.py:578-585`; it is defined at 598 and refuses at 611-620.
+`HANDOFF.md:1064` cites import lines `:64`/`:65`; they are at `:66`/`:67`.
+
+**LOW 10 — the record's HTML twin is stale.** It was last rendered at `9bb558c`
+(2026-09-05 19:31) and contains no "FV"; the `.md` has gained FV and FW since.
+HANDOFF's own policy says regenerate after every append. Fix: run
+`scripts/render_record_html.py` before the next commit.
+
+## Verified holding (load-bearing negatives, each cross-checked)
+
+- Feed-clock refusal is real: `trading_calendar.check_feed_clock` returns a
+  refusal string, never a warning, and `daily_swing_paper.py:747-754` turns any
+  non-None into `return 1`. The 2026-09-05 CRIT (processing yesterday's session)
+  does not reproduce.
+- No experiment runner writes the live paper-ledger tables, and nothing in this
+  project opens Trading's `price_cache` at all — two independent greps each.
+- `scripts/daily_swing_paper.bat`: 0 bytes above 127.
+- Record integrity: 179 `# Appendix` headings, no duplicate letters, no
+  front-matter TOC in this project's format. The 54-day BR-note wedge is gone.
+- Live runs, real output: `python -m swing_bot.test_frozen` ->
+  `FROZEN TESTS: GREEN (all d=0)`; `prove_divergence_census.py` -> PROVEN 16
+  checks; `prove_feed_clock.py` -> PROVEN 18 checks; `prove_liquidity_floor.py`
+  -> GREEN 11/11.
+- FW's cache census reproduces exactly: `.e8e9_cache` holds 292 `.json` files.
+- `STRESS_K = 4` matches CLAUDE.md's dated exception and is still scoped to the
+  M10-1 branch only. Not a finding.
+
+## Uncommitted at audit time
+
+13 modified + 2 untracked, including HANDOFF.md, PRD_ROADMAP.md and this record.
+All of it is substantive M13.4-M13.7 work. Nothing was committed by this audit.
+
+# Appendix FY - landing-check over all of M13: FIX FIRST. My commit introduced 3 real order ids to the PUBLIC repo and the de-identification was uncommitted; FU's own path:line rule was applied to one citation pair and not the three it also broke; the record's published HTML twin stops at FP (2026-09-06, ~13:08 CDT)
+**Session:** 2026-09-06, ~13:08 CDT. `/landing-check` over all of M13, run COLD
+by a fresh agent given ARTIFACTS ONLY (the PRD M13 section, appendices FQ-FW,
+the three commit messages, the working-tree diff, HANDOFF's top blocks, the two
+new bins, and a landing-probe census whose canary passed 23/23) and explicitly
+NOT given my account of the work. Verdict: **FIX FIRST**. Every finding below
+was re-verified by hand before acting.
+
+## 1. STATE CHANGED UNDER THE SESSION: the three M13 commits are PUSHED
+
+`git rev-list --left-right --count origin/main...HEAD` -> `0 0`, and
+`git reflog show origin/main` carries three `update by push` entries. **Evan
+pushed `2d1cfa1`, `f71fd8e` and `75b8ad7` between turns.** HANDOFF's live
+snapshot still said "UNPUSHED" and has been corrected. This is exactly the
+skill's own warning that ahead/behind must be re-derived at sweep time rather
+than carried from a capture.
+
+## 2. PUBLICATION: my commit introduced three real order ids to a PUBLIC repo
+
+`75b8ad7` published five Alpaca paper order-id prefixes in
+`scripts/prove_divergence_census.py`'s fixture. Record FV §3 and
+`disclosure.md` justified the whole set with "record lines 4206-4218 have
+carried `7d348c06` and `d0b7fc18` since 2026-07-18". **That is true for TWO of
+the FIVE.** `git log -S <id> --all --reverse` per id:
+
+| id | first commit containing it | status |
+|---|---|---|
+| `7d348c06` | `93d8479` | INHERITED (re-published) |
+| `d0b7fc18` | `93d8479` | INHERITED (re-published) |
+| `68152fbc` | **`75b8ad7`** | **INTRODUCED** |
+| `625aa9a8` | **`75b8ad7`** | **INTRODUCED** |
+| `d4e05de3` | **`75b8ad7`** | **INTRODUCED** |
+
+**The reasoning silently generalised from two identifiers to five.** The
+de-identification to `oid-1`..`oid-5` was real on disk but UNCOMMITTED, so
+`git show origin/main:scripts/prove_divergence_census.py` still returns 5 hits
+-- the write-ups described the fix as accomplished while the published copy was
+untouched. The built-in secret scanners cannot see this: 8-char hex is below
+their entropy threshold, which is precisely the limit `disclosure.md` states in
+its own words (the scan "cannot judge embarrassment, only secrets").
+
+**Evan's call (2026-09-06): commit the de-identification, leave history alone.**
+No rewrite, no force-push. Grounds: an order id is not a credential, cannot act
+on an account, and identifies orders on $1,000 paper accounts; two of the five
+have been public since 2026-07-18 regardless. HEAD is clean going forward and
+the blob stays in history. **Rotation was explicitly rejected as overkill** --
+an order id unlocks nothing, and rotating would break the live M3 sleeves'
+key pairs mid-run against no nameable threat.
+
+## 3. Stale `path:line` citations -- the SAME defect FU was written about
+
+FU (2026-09-05) corrected `:987`/`:962` after the M13.3 insert shifted them by
+39 lines, and wrote the rule "re-derive every `path:line` AFTER the last edit".
+**That rule was applied to the pair FU was looking at and to nothing else.** The
+same insert shifted the feed-clock citations by 35 lines, and three live docs
+kept the pre-insert numbers for a day:
+
+| doc | said | actual |
+|---|---|---|
+| `HANDOFF.md:236` | `daily_swing_paper.py:698-719` | `:733-754` (call at `:746`) |
+| `PRD_ROADMAP.md:1304` | `:698-719` | `:733-754` |
+| `.claude/codebase-memory/architecture.md:53` | `:698-719` | `:733-754` |
+| `HANDOFF.md:277`, `PRD_ROADMAP.md:1289` | `:685-695` for `today = qdates[-1]` | `:730` |
+
+All five corrected. **A rule written into the record is not a control** -- FU
+stated it and the very next document repeated the defect. Nothing mechanical
+checks `path:line` citations.
+
+## 4. Other false claims, all re-verified and all now corrected
+
+- **"record line 4517"** for the -85.7 bps row (FT §1, HANDOFF): 4517 is the
+  `+0.0 bps` row; the -85.7 row is at **4521**. Off by 4. HANDOFF fixed; FT is
+  sealed and is corrected here.
+- **"`daily_swing_paper.py` imports BOTH from `run_c1_residual_reversal`"**
+  (FV §2b): `grep -c FORM_N scripts/daily_swing_paper.py` -> **0**. It imports
+  `BETA_N` only (`:67`). Dropping `FORM_N` from `run_m10_1_nagel_switch.py` was
+  still correct -- it is unused everywhere -- but the stated reason was wrong.
+- **The yfinance rationale for moving `DB_PATH` was WRONG** (FV §2a, PRD M13.6,
+  HANDOFF, DIRECTORY.md). I wrote that importing `prices` from `paper_sleeves`
+  would "drag yfinance into the ledger module that `costs.py`, `test_frozen` and
+  `prove_divergence_census.py` all import". All three **already** pull yfinance:
+  `costs.py:27` is literally `from swing_bot import prices`. **The decision
+  stands on a narrower true fact** -- `import swing_bot.paper_sleeves` alone
+  still yields `'yfinance' in sys.modules` -> **False**, so the ledger module by
+  itself remains stdlib-only. Right call, wrong reason, and the wrong reason was
+  copied into four documents.
+- **"`swing_bot/trading_calendar.py` (150 lines)"** (FQ §1/§7): `wc -l` -> **153**.
+- **HANDOFF said "PRD M13 has no open task left; M13.2 alone is BLOCKED"** --
+  self-contradictory in one sentence. M13.2 is OPEN-BUT-BLOCKED; corrected.
+- **`gotchas.md:91` said `prove_liquidity_floor.py` (6/6)**; it is 11/11 since
+  F3. `testing.md` says 6/6 at `:50` but self-corrects at `:64` in a later dated
+  section -- the append-with-dated-update pattern working -- so it was left.
+  HANDOFF `:377` had no such correction and was annotated.
+- **DIRECTORY.md's counts were stale inside their own change set**: "0
+  untracked" was written by a file that was itself one of the two untracked
+  files, and the record line/appendix counts were HEAD values. Annotated with
+  the tense warning rather than silently re-numbered.
+
+## 5. Collateral the sweep found that nothing else would have
+
+**The HTML twin of the record is tracked, PUBLISHED, and stops at Appendix FP.**
+`docs/Project Record — Full Chronological History.html` (733,059 B, mtime
+2026-09-05 19:31) contains **zero** of FQ-FW -- so the browser-readable copy of
+the public record is missing this entire session. Root cause is a comment in the
+gate that should have caught it: `scripts/git-hooks/pre-commit:8` asserts
+*"unlike Trading's copy, this repo has no HTML-twin record to keep in sync --
+don't add that job here"*, which is false for this repo and instructs future
+readers not to fix it. `git log -S` shows `ece0671 M6 HTML twin built`, so the
+twin was built deliberately and then never regenerated. **NOT fixed here** --
+regenerating a 733 KB published artifact and correcting a hook comment is its
+own change, and the probe reported "0 with twins", so its census is blind to a
+tracked generated twin.
+
+## 6. LATENT bug, handed to /code-review not fixed here
+
+`swing_bot/paper_sleeves.py` `divergence_census`'s docstring says the four
+buckets are "mutually exclusive and sum to `total`". That is **data-dependent,
+not structural**. The agent planted a row with `alpaca_order_id IS NULL` AND a
+price: buckets summed to **4 against total 3**. Unreachable today (nothing
+writes a price without an order id) and `prove_divergence_census.py`'s
+sum-to-total assertion never exercises it. Logged, not patched -- correctness in
+the diff belongs to `/code-review`.
+
+## 7. What reproduced EXACTLY -- the load-bearing negatives
+
+Both new controls FIRE on a planted positive and stay quiet on a negative, which
+is the thing this project keeps failing at: the feed-clock guard refused in both
+directions and produced a genuinely zero-write run (`paper_nav` 0,
+`paper_transactions` 0), and `print_divergence_census` was proven reached at
+RUNTIME with `args.execute=False` via a raised sentinel -- not merely asserted by
+`ast`. `FROZEN TESTS: GREEN` with exactly 12 refs + 17 invariants. All five
+proofs at 18/16/11/10/8. Every DIRECTORY.md per-directory count; the 292/181/111
+cache census with its single 2026-08-17 vintage; the entire E14 table including
+`560 of 3141`, `17.83%`, the by-ticker histogram, `1999-07-23..2016-08-31` and
+`56 of 325`; the 2026 holiday list; the live `fill_divergence` 10/4/1/5/0; the
+`16 imports, UNUSED: none` result; and all 180 record TOC anchors resolving --
+all reproduced digit-for-digit. **The OFF arm vs the pre-patch blob differed by
+exactly two banner lines and not one number.** No emails, keys, tokens, account
+numbers or absolute user paths in the three published commits' added lines.
+
+The self-critical claims all held on disk: M13.5's done-check really cannot
+detect what it worries about, the fidelity denominator really is 4 not 5, and
+the E14 prediction really was falsified.
+
+## Done-check
+
+`FROZEN TESTS: GREEN (all d=0)` after every correction. Corrections applied to
+`HANDOFF.md` (5), `PRD_ROADMAP.md` (2), `architecture.md` (1), `gotchas.md` (1),
+`DIRECTORY.md` (3). Sealed appendices FQ, FT, FV are corrected HERE, not edited.
+Nothing deleted, no `.bat` run, `daily_swing_paper.py` never executed,
+`swing.db` opened read-only only, nothing pushed.
+
+**NOT SWEPT, stated so it does not read as clean:** M13.2's own done-check is
+unreachable until a trading day; the other ~170 appendices, the 44 preregs and
+the 37-attempt history were not re-derived; `graphify-out/` was not inspected.

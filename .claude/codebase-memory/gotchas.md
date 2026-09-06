@@ -88,7 +88,7 @@ they apply to any yfinance-based pipeline built here:
   liquidity floor entirely and could enter the live K=4 stress basket. Both were
   fixed together; fixing only the call site would have left the next caller
   reading instructions to re-introduce it. Standing check:
-  `scripts/prove_liquidity_floor.py` (6/6), which includes two cases asserting
+  `scripts/prove_liquidity_floor.py` (11/11 since F3; this line said 6/6 until 2026-09-06), which includes two cases asserting
   the OLD branch ranked those names. **Rule: when a helper returns "unknown",
   its docstring must say FAIL CLOSED, or the next caller will fail open with a
   clear conscience.**
