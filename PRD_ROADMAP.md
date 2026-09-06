@@ -1320,6 +1320,20 @@ Order is by consequence, not effort. Nothing here reopens a verdict.
    flakiness as real) or `prices.fetch` serving a cached series? Done-check: a
    timed fetch of QQQ at ~19:00 CT on a trading day, logged with the bar's date
    and the wall clock, recorded in the record.
+   *(Progress 2026-09-05, record Appendix FS: **INSTRUMENTED, NOT ANSWERED —
+   still OPEN.** Both "it was us" branches are closed: `prices.fetch` has no
+   cache, and yfinance 1.5.1 / pandas 3.0.3 / numpy 2.5.1 all match the lockfile
+   and site-packages is dated 2026-07-08, untouched — nothing on this box
+   changed in the window the lag started. **A THIRD hypothesis was added that
+   this task's binary does not contain:** `prices.fetch` drops any row with NaN
+   in O/H/L/C, so a NaN-carrying current-day row from Yahoo would be deleted by
+   OUR filter and look identical to "not published" — and the fix would be in
+   this repo, not the schedule. `scripts/probe_feed_publication.py` (NEW)
+   records the RAW frame and the post-filter result on every sample and flags
+   the disagreement; `--selftest` **PASS (4 cases)** pins the never-fired branch
+   offline. **The done-check needs a trading day — Mon 09-07 is Labor Day, so
+   earliest is Tue 2026-09-08:** run `--watch` from ~15:15 CT to bracket the
+   publication hour. Nothing was scheduled; registering a task is Evan's call.)*
 3. **Report the permanently-unmeasurable fidelity rows.** 5 of 10
    `fill_divergence` rows carry a NULL `alpaca_order_id` and are structurally
    excluded from `open_divergence_rows`, so half of M3's only fidelity

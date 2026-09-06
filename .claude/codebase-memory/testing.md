@@ -90,3 +90,18 @@ FAIL.
   throwaway DB with `series()` monkeypatched returned exit 1 and wrote 0
   `paper_nav` / 0 `paper_transactions` rows. Proving the function is not
   proving the call site.
+
+## Added 2026-09-05 (M13.2, record FS)
+
+- `scripts/probe_feed_publication.py --selftest` -> **`SELFTEST: PASS
+  (4 cases)`**, no network, no DB. The verdict logic was lifted into a pure
+  `verdicts(raw_last, filtered_last, expected)` for exactly one reason: the
+  **"our filter dropped it"** state has never occurred live, and a branch that
+  only a future bug can exercise is an untested branch. Pinning it offline is
+  cheaper than waiting for the bug.
+- The probe's `expected_session` comes from `swing_bot/trading_calendar.py` -
+  the SAME clock `daily_swing_paper.py`'s feed guard uses. The probe and the
+  live refusal are therefore independent measurements that must agree; a
+  disagreement between them is a real finding, not noise.
+- It refuses to mislead: run on a non-trading day it prints that it is measuring
+  nothing about publication timing before sampling anyway.

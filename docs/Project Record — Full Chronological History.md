@@ -211,6 +211,7 @@ the dated entry, not the digest.
 - [FP — DRIFT CHECK + handoff sync: CRIT - the live loop has processed YESTERDAY's session on every run since 2026-09-02 and the FK detector cannot see it; 4 HANDOFF rows drifted and are fixed; PRD gains M13](#appendix-fp---drift-check--handoff-sync-crit---the-live-loop-has-processed-yesterdays-session-on-every-run-since-2026-09-02-and-the-fk-detector-cannot-see-it-4-handoff-rows-drifted-and-are-fixed-prd-gains-m13-2026-09-05-1930-cdt) (09-05)
 - [FQ — M13.1 EXECUTED: the live loop now has a second clock and REFUSES when the feed lags it; the 09-04 hole turns out to be self-healing on Monday's holiday run, and the lag's cause is narrowed to yfinance publication](#appendix-fq---m131-executed-the-live-loop-now-has-a-second-clock-and-refuses-when-the-feed-lags-it-the-09-04-hole-turns-out-to-be-self-healing-on-mondays-holiday-run-and-the-lags-cause-is-narrowed-to-yfinance-publication-2026-09-05-2040-cdt) (09-05)
 - [FR — Evan's two calls on the M13.1 questions: let Monday's Labor Day run mark 2026-09-04 (a late run, not a backfill), and leave the 19:00 CT trigger alone until M13.2 measures the publication hour](#appendix-fr---evans-two-calls-on-the-m131-questions-let-mondays-labor-day-run-mark-2026-09-04-a-late-run-not-a-backfill-and-leave-the-1900-ct-trigger-alone-until-m132-measures-the-publication-hour-2026-09-05-2050-cdt) (09-05)
+- [FS — M13.2 INSTRUMENTED, NOT ANSWERED: the local-change hypothesis is dead (yfinance untouched since 2026-07-08), a third hypothesis is added (our own NaN filter), and the probe is built and self-tested - but the done-check needs a trading day, earliest Tue 2026-09-08](#appendix-fs---m132-instrumented-not-answered-the-local-change-hypothesis-is-dead-yfinance-untouched-since-2026-07-08-a-third-hypothesis-is-added-our-own-nan-filter-and-the-probe-is-built-and-self-tested---but-the-done-check-needs-a-trading-day-earliest-tue-2026-09-08-2026-09-05-2255-cdt) (09-05)
 
 ---
 
@@ -9519,3 +9520,98 @@ Decision-only entry; no code changed after FQ's done-check. State re-verified
 unchanged at the end of this entry: `FROZEN TESTS: GREEN (all d=0)`,
 `prove_feed_clock.py` PROVEN 18/18. No writes to `swing.db`, no `.bat` run, no
 scheduled-task change, nothing committed, nothing pushed.
+
+# Appendix FS - M13.2 INSTRUMENTED, NOT ANSWERED: the local-change hypothesis is dead (yfinance untouched since 2026-07-08), a third hypothesis is added (our own NaN filter), and the probe is built and self-tested - but the done-check needs a trading day, earliest Tue 2026-09-08 (2026-09-05, ~22:55 CDT)
+**Session:** 2026-09-05, ~22:45-22:55 CDT, same sitting as FQ/FR. Evan: "do
+M13.2 next."
+
+**M13.2 is NOT DONE and cannot be finished tonight.** Its done-check is "a
+timed fetch of QQQ at ~19:00 CT **on a trading day**". Today is Saturday
+2026-09-05 and Monday 2026-09-07 is Labor Day, a full NYSE closure - so the
+earliest possible done-check is **Tue 2026-09-08**. What this entry delivers is
+everything that does not depend on that: one hypothesis eliminated, one added,
+and the instrument built, self-tested and smoke-run.
+
+## 1. ELIMINATED: nothing changed on this machine
+
+M13.2's premise is a binary - late publication vs `prices.fetch` serving a
+cached series. Both halves of "it was us" are now closed:
+
+- **No cache exists on the M3 path** (already recorded in FQ §5):
+  `swing_bot/prices.py:92-136` `fetch()` is a bare `yf.download` per call with a
+  retry ladder and no store, no memo, no on-disk cache.
+- **No dependency moved.** `yfinance 1.5.1`, `pandas 3.0.3`, `numpy 2.5.1`
+  installed - all three exactly matching `requirements.lock` and
+  `requirements.txt`. `.venv/Lib/site-packages/yfinance/` and its `dist-info`
+  are both dated **2026-07-08 23:18** and untouched since; the newest mtime
+  anywhere in site-packages is 2026-08-19 (`markdown`, unrelated). The lag
+  started 2026-09-02. **Nothing on this box changed in that window.**
+
+So the behaviour change is upstream of this repo. That is as far as code
+reading can go.
+
+## 2. ADDED: a third hypothesis M13.2's binary does not contain
+
+`prices.fetch` **drops any row with NaN in O/H/L/C** (`prices.py:126-128`, a
+deliberate guard against yfinance's trailing partial rows). If Yahoo begins
+emitting the current day's row with a NaN in it, **our own filter deletes the
+bar** and the loop sees yesterday - which is indistinguishable, from
+`var/daily_swing_paper.log` alone, from "the vendor has not published yet".
+
+This matters because it changes where the fix goes: a late vendor means moving
+the 19:00 CT trigger; our filter eating a real row means changing this repo. The
+probe therefore records the RAW yfinance frame **and** the post-filter result
+on every sample, and flags disagreement explicitly.
+
+## 3. The instrument: `scripts/probe_feed_publication.py` (NEW)
+
+Per sample it records wall clock in CT and ET, the independently-computed
+`expected_session` (via `swing_bot/trading_calendar.py` - the same clock the new
+live guard uses, so the probe and the guard cannot disagree about what day it
+is), the raw yfinance last date and its last-3 tail, whether the raw last row
+carries a NaN, the post-filter last date, and both fetch durations. One JSON
+line per sample appended to `var/feed_publication_probe.jsonl` (`var/` is
+gitignored). It touches NO database, submits NO orders, and never imports
+`daily_swing_paper`.
+
+`--watch` samples every 15 minutes (default, `--max-hours 6`) and STOPS on the
+first sample where the bar appears - so one evening pins the publication hour
+instead of yielding a single yes/no at 19:00. It refuses to mislead: run on a
+non-trading day it prints that it is measuring nothing.
+
+**Done-checks that DO pass tonight:**
+- `--selftest` -> **`SELFTEST: PASS (4 cases)`**, no network. The verdict logic
+  is a pure function (`verdicts()`) precisely so the **"our filter dropped it"**
+  branch - which no live run has ever produced - is pinned offline rather than
+  waiting for a bug to prove itself.
+- One live smoke sample at 22:51 CT: `expected=2026-09-04 raw_last=2026-09-04
+  filtered_last=2026-09-04 nan=False -> PUBLISHED`, correctly prefixed by the
+  not-a-trading-day warning.
+- `FROZEN TESTS: GREEN (all d=0)`.
+
+## 4. What is owed, and when
+
+**Tue 2026-09-08.** Start the probe in the afternoon so it brackets the hour:
+
+    .venv\Scripts\python.exe scripts\probe_feed_publication.py --watch
+
+Started ~15:15 CT it covers the 16:00 ET close through ~21:15 CT, which spans
+both the normal ~16:30 ET publication and the 19:00 CT scheduled run. The
+resulting first-appearance timestamp is the input to the deferred M13.1
+question of whether the trigger moves (record FR §2).
+
+**Nothing was scheduled.** Registering another Windows task is a system change
+and is Evan's call; the probe is a hand-run script until he says otherwise.
+
+**Note for whoever runs it:** the 09-08 19:00 `SwingTradingDailyPaper` run will
+REFUSE if the feed is still lagging (record FQ). That refusal and this probe are
+independent measurements of the same fact and should agree; if they disagree,
+that disagreement is the finding.
+
+## Done-check
+
+`SELFTEST: PASS (4 cases)`; one live probe sample recorded; `FROZEN TESTS: GREEN
+(all d=0)`. No writes to `swing.db`, no `.bat` run, no scheduled task created or
+changed, `daily_swing_paper.py` not executed. **M13.2's own done-check is NOT
+met and is not claimed** - it is blocked on a trading day, earliest Tue
+2026-09-08.

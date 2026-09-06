@@ -98,6 +98,40 @@ reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
 2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
 self-contradictory and was corrected 2026-07-28 by audit #7).**
 
+> **2026-09-05 ~22:55 CDT - M13.2 INSTRUMENTED but NOT ANSWERED (record FS);
+> commit `2d1cfa1` holds M13.1 and is NOT PUSHED.** M13.2's done-check is a
+> timed QQQ fetch at ~19:00 CT **on a trading day**; today is Saturday and Mon
+> 09-07 is Labor Day, so the **earliest possible answer is Tue 2026-09-08**. Not
+> claimed as done.
+> **Both "it was us" branches are now CLOSED:** `prices.fetch` has no cache
+> (bare `yf.download` per call), and yfinance 1.5.1 / pandas 3.0.3 / numpy 2.5.1
+> all match `requirements.lock` with site-packages dated **2026-07-08 23:18,
+> untouched** - nothing on this machine changed in the window the lag began
+> (2026-09-02). The change is upstream of this repo.
+> **THIRD HYPOTHESIS, new and not in the PRD's binary:** `prices.fetch`
+> (`prices.py:126-128`) drops any row with NaN in O/H/L/C. A NaN-carrying
+> current-day row from Yahoo would be deleted by OUR filter and look exactly
+> like "not published yet" in the log - and the fix would then be in this repo,
+> not the 19:00 trigger.
+> **`scripts/probe_feed_publication.py` (NEW)** records wall clock (CT+ET), the
+> independently-computed expected session (same `trading_calendar` the live
+> guard uses), the RAW yfinance last date, whether that row has a NaN, and the
+> post-filter last date - one JSON line per sample to
+> `var/feed_publication_probe.jsonl` (gitignored). No DB, no orders, never
+> imports `daily_swing_paper`. `--watch` samples every 15 min and stops on first
+> appearance, so ONE evening pins the publication hour.
+> **Tonight's real output: `SELFTEST: PASS (4 cases)`** (the never-fired
+> "our filter dropped it" branch pinned offline), one live smoke sample at 22:51
+> CT (`raw_last=2026-09-04 filtered_last=2026-09-04 nan=False -> PUBLISHED`,
+> correctly warning that a Saturday measures nothing), and `FROZEN TESTS: GREEN
+> (all d=0)`.
+> **OWED Tue 2026-09-08:** `.venv\Scripts\python.exe
+> scripts\probe_feed_publication.py --watch` started ~15:15 CT. Nothing was
+> scheduled - a new Windows task is Evan's call. That evening's 19:00
+> `SwingTradingDailyPaper` run will REFUSE if the feed still lags; the probe and
+> the refusal are independent measurements of one fact and should agree. If they
+> disagree, THAT is the finding.
+
 > **2026-09-05 ~20:40 CDT - M13.1 DONE (record FQ): the live loop has a SECOND
 > CLOCK and refuses when the feed lags it.** `swing_bot/trading_calendar.py`
 > (NEW) derives the latest already-CLOSED US session from the wall clock plus
