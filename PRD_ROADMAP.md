@@ -1024,7 +1024,16 @@ free-data downloads; 48–51 are gated. All run AFTER E19 closes.
     the 16:00 close for a 15:50 order is look-ahead; measure the 15:50→16:00
     stub as a residual) alongside the next-open control, measuring realized
     overnight capture net of costs. Prior: confirms the kill (NightShares
-    failure + NY-Fed flat-since-2021 drift). M3-adjacent: needs the Alpaca
+    failure + NY-Fed flat-since-2021 drift).
+    *(AMENDED 2026-09-08, record GD: this prior has LOST ONE OF ITS TWO LEGS. The
+    NightShares leg stands. The NY-Fed flat-since-2021 leg **does not reproduce**
+    on our data — an unconditional decomposition puts the post-2021 overnight leg
+    at the 45th–57th percentile of each ticker's own matched-length window
+    history, at or near the median. What the diagnostic DID confirm, and more
+    sharply, is the COST kill: breakeven is **1.4–2.6 bps/side** against the 5 we
+    price, so an overnight-only trade loses 11–17 pp/yr in every era. X4's
+    expected OUTCOME is unchanged; one of its two stated REASONS is not. Still
+    BLOCKED-ON-EVAN + BLOCKED-ON-BROKER-TIER.)* M3-adjacent: needs the Alpaca
     account → BLOCKED-ON-EVAN.
 49. **X5 — Analyst recommendation-change drift (Womack).** Cheapest clean
     event-driven unblock: upgrades/downgrades are EVENT-DATED, so a cheap feed

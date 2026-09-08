@@ -3,11 +3,11 @@
   "handoff": 15,
   "prd_next_task": 0,
   "bins": 3,
-  "_count": 215,
-  "_last_reminder_iso": "2026-09-05T23:20:39Z",
+  "_count": 222,
+  "_last_reminder_iso": "2026-09-08T05:46:54Z",
   "_last_fired": {
-    "record_entry": 199,
-    "handoff": 194,
+    "record_entry": 222,
+    "handoff": 216,
     "bins": 200,
     "drift_check": 194
   },

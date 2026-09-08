@@ -53,6 +53,19 @@ verified from current docs (they correct a stale HANDOFF note — see below).
   ~14 months** — "transaction costs of turning the portfolio over twice a day." The
   NY Fed ("The Disappearing Overnight Drift," 2026) dates the drift **flat since
   2021**. The overnight component is both uncapturable *and* now decayed.
+
+  > **CORRECTION 2026-09-08 (record GD; `docs/research/2026-09-08_overnight_intraday_decomposition.md`):
+  > the second half of that sentence does NOT reproduce on this project's data.**
+  > An unconditional decomposition of SPY/QQQ/DIA/IWM puts the overnight leg
+  > post-2021 at **+8.07 / +10.27 / +5.36 / +12.97 pp/yr** — the **56.0th /
+  > 50.7th / 45.5th / 57.3rd percentile** of all matched-length windows in each
+  > ticker's own history, i.e. at or near the median, every decline well inside
+  > its own 95% CI. **"Uncapturable" is CONFIRMED** and sharpened: breakeven is
+  > **1.4–2.6 bps/side** against the 5 bps this project prices, so the trade
+  > loses 11–17 pp/yr in every era. **"Now decayed" is NOT supported here.**
+  > This does not falsify the NY Fed paper — its index, window, and whether it
+  > measured price-only or total return are all unrecorded — it falsifies the
+  > confidence with which this sentence has been carried since 2026-07-13.
 - **The one honest experiment left — a market-on-close (MOC) entry.** A close entry
   is the *only* fill positioned to hold across the gap, Alpaca supports CLS, and the
   closing auction is the deep-liquidity side of the asymmetry. **Catch:** Alpaca

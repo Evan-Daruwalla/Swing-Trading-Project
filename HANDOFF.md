@@ -90,13 +90,113 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > New gap logged: no total-return (dividend-adjusted) data path, so coupon/dividend-heavy
 > instruments cannot be tested fairly.
 
-**Last updated: 2026-09-05 ~19:30 CDT** — this file is the only live snapshot;
+**Last updated: 2026-09-08 ~00:42 CDT** (record GE) — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
 reports UTC — subtract the current offset (record Appendix AZ; made DST-aware
 2026-07-19; an earlier version of this line hardcoded "CST (UTC-5)", which is
 self-contradictory and was corrected 2026-07-28 by audit #7).**
+
+> **2026-09-08 ~00:42 CDT - HOLD-N EXIT-AT-OPEN, analyzed not built (record GE).
+> ANALYSIS ONLY: no code, no verdict, tally UNCHANGED.** Evan's thought
+> experiment: hold 1-3 days, sell at the open, on SPY or "residual 05/95" from
+> the Trading repo.
+> **The multi-day hold IS the right fix for GD's cost problem, and it still
+> loses.** Holding N days amortizes one round trip over N days: buy close(day 0),
+> sell open(day N) captures N overnight legs and N-1 intraday legs. SPY goes
+> -15.60 (N=1) -> -2.63 (N=2) -> **+1.70 (N=3)** -> +9.11 (N=21) pp/yr. **But
+> buy-and-hold is 10.35, and the structure converges to it FROM BELOW and never
+> crosses.** Exact form: **`net(N) = BH - (ID + 25.2)/N`** (25.2 pp/yr = 252 x a
+> 10 bps round trip). It beats buy-and-hold only if the intraday leg loses more
+> than **25 pp/yr**; the worst measured is IWM at **-4.09**. Strictly dominated
+> at every N.
+> **The exit-at-open detail is worth almost nothing** - versus exiting at the
+> close it only forgoes one intraday leg per cycle, `ID/N` per year: +0.93 pp/yr
+> on QQQ at N=3, and a small LOSS on SPY and DIA.
+> **THE NUMBER THAT GOVERNS ANY VERSION OF THIS: a strategy round-tripping every
+> N days pays 25.2/N pp/yr in cost.** N=1 25.2 · N=2 12.6 · **N=3 8.4** · N=5 5.0
+> · N=21 1.2. A 3-day hold needs **8.4 pp/yr of gross alpha before it earns a
+> cent**. For scale, M1.8 measured the IBS signal at +7.5 bps gross PER SIGNAL.
+> **"residual 05/95" - two corrections.** (a) WRONG HORIZON:
+> `D:\ClaudeCode\Trading\trading_bot\factors\residual_momentum.py` is
+> Blitz-Huij-Martens residual MOMENTUM - 252-day formation ending 21 days back,
+> regressed on SPY, scored `alpha/stdev(residual)`, ~4,000 tickers, **rebalanced
+> MONTHLY**. Half-life in months; driving a 1-3 day trade with it is a slow
+> signal on a fast trade. (b) **"05/95" does not exist in that repo** - the sleeve
+> name `residual_roa_6535` is **65/35** (`zcombo.py:8-9` weights residual
+> momentum 0.65, ROA 0.35). Recorded as NOT FOUND rather than guessed.
+> **The version scoped for THIS project already exists and IS LIVE.**
+> `run_c1_residual_reversal.py:1-7` is FF3 residual REVERSAL, 21-day residual
+> sum, bottom K=4, **5-session hold**, weekly rebalance - the program's
+> closest-ever HR near-miss (gate 19.08% CAGR, dies post-2014) and **already
+> running in paper** as the VIX>20 stress branch of `m10_1_nagel`.
+> **What the idea does NOT fix, and it is what bit C1:** C1 leaked ~5 pp/yr from
+> c2c 22.82% to next-open 17.87%. **That leak is at ENTRY** - signed at the
+> close, bought at the next open, forfeiting the overnight leg GD measured as the
+> entire source of index return. Exiting at the open does not touch entry. The
+> only fill that fixes entry is a market-on-close order = **X4**, blocked on the
+> broker tier and the EOD-only rule. **The real question this lands on is "can we
+> ENTER at the close?", already the one honest execution experiment left.**
+> **Slip logged (GE §7):** I asserted "65/35" as a correction to Evan while
+> having inferred it from the digits in a FILENAME, before reading any weighting
+> code. The `claim-check` hook flagged it; verification came after the sentence
+> and happened to agree. Same class as GA's accusation against FX (GC) and the
+> E14 prediction (FV).
+
+> **2026-09-08 ~00:30 CDT - OVERNIGHT DECOMPOSITION DIAGNOSTIC (record GD):
+> a CITED PRIOR IN THIS PROJECT'S OWN DOCS DOES NOT REPRODUCE.** Evan asked about
+> buying the close and selling the open. DIAGNOSTIC - no D1 verdict, nothing
+> deployed, **attempt tally UNCHANGED**; no prereg. Runner
+> `scripts/ablation_overnight_decomp.py` (NEW), results
+> `docs/research/2026-09-08_overnight_intraday_decomposition.md`.
+> **`execution_microstructure.md:53-55` has carried since July: the overnight
+> component is "both uncapturable AND now decayed" (NY Fed, flat since 2021).
+> Half of that is wrong.** UNCAPTURABLE: confirmed decisively. NOW DECAYED: does
+> NOT reproduce on our data.
+> **The anomaly is real and large** - first UNCONDITIONAL decomposition this repo
+> has run (`ablation_fill_timing.py` only ever measured IBS<0.20 signal days).
+> Annualized pp/yr, log space, total-return arm: **SPY overnight +9.60 vs
+> intraday +0.75; QQQ +13.12 vs -2.78; DIA +7.12 vs +1.67; IWM +12.63 vs -4.09.**
+> SPY's overnight leg compounded **24.9x** over 33.5 years, its intraday leg
+> 1.29x. QQQ's and IWM's intraday legs are outright NEGATIVE over 25 years.
+> **"Flat since 2021" fails the FAIR test.** Comparing a 4.6y window to a 29y
+> window is not a test (the long window's SE is ~5x tighter). Against all
+> overlapping windows of the SAME length in each ticker's own history, the
+> current window sits at the **56.0th (SPY), 50.7th (QQQ), 45.5th (DIA), 57.3rd
+> (IWM)** percentile - **at or near the MEDIAN**, three of four still above +8
+> pp/yr, not one decline approaching its own CI. The post-2022 softness is ONE
+> YEAR: SPY 2021 +16.18, **2022 -14.37**, 2023 +5.75, **2024 +21.38**, 2025
+> +8.06, 2026 +13.31.
+> **The era question was underpowered by ~40x and that is itself the finding.**
+> Overnight vol ~10.6%/yr, so post-2022 (n=1,159) the 95% CI on SPY is **+-9.57
+> pp/yr** against a 1-2 pp/yr effect; 2-sigma resolution needs ~200 years. Every
+> era row prints its CI - a table without one would have manufactured a
+> conclusion its data cannot support.
+> **STILL NOT TRADEABLE, and this needs no era split.** A full round trip every
+> session: breakeven per side `c*=(G-1)/(G+1)` is **SPY 1.90 / QQQ 2.60 / DIA
+> 1.41 / IWM 2.51 bps**. **We price 5.** Net **-14.4 / -11.4 / -16.5 / -11.8
+> pp/yr**. Even at a fantasy 1 bp/side SPY's +4.7 is BELOW its own buy-and-hold
+> of 10.35. Same wall NightShares hit with real money.
+> **The trap that would have INVERTED the answer:** on dividend-unadjusted
+> `close` the ex-dividend drop falls ENTIRELY in the close->open window, so a
+> price-only overnight leg is understated by the whole dividend yield (~183
+> bps/yr on SPY) - the same order as the effect - and DIFFERENTIALLY across
+> tickers (QQQ ~51). A naive price-only run would have made "the premium died"
+> look supported. My first correction (`DIV = TR - PR`, added) was also WRONG,
+> breaking by the cross term up to 154 bps; the shipped form is multiplicative
+> and exact to one ULP, validated by a dividend cross-check against **667
+> independent ex-dates** (worst 1.87e-06 vs 5e-5).
+> **DISCLOSED: a result leaked during PLANNING** - a sub-agent computed SPY's
+> full-history leg products while validating the identity, so the headline
+> existed before the runner did. Recorded, not presented as a virgin run.
+> **Consequence:** X4's stated prior (`PRD_ROADMAP.md:1026`) loses one of its two
+> legs - NightShares stands, NY-Fed does not reproduce. X4 stays BLOCKED-ON-EVAN
+> and BLOCKED-ON-BROKER-TIER; nothing here unblocks it. Does NOT touch the
+> 54%-of-edge figure (different conditioning), E2's c2c mirage (CK closed it on
+> drawdown grounds), the closed search phase, or any live sleeve.
+> **Done-check:** `FROZEN TESTS: GREEN (all d=0)`; all six proofs pass; F3
+> determinism - run twice, 288 lines, byte-identical. `swing.db` NEVER OPENED.
 
 > **2026-09-06 ~13:40 CDT - FX's SIX REMAINING findings CLOSED (record GA), but
 > its own prescribed fix was a NO-OP and three of its corrections were wrong.**

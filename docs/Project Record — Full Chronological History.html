@@ -268,7 +268,9 @@ the dated entry, not the digest.</p>
 - <a href="#appendix-fz---fxs-three-highs-fixed-a-regime-gate-that-went-long-on-a-non-positive-vix-a-cancel-failure-that-only-printed-and-coverage_gate-wired-after-53-days-dead-decided-with-evidence-not-deleted-2026-09-06-1316-cdt">FZ — FX's three HIGHs fixed: a regime gate that went LONG on a non-positive VIX, a cancel failure that only printed, and coverage_gate WIRED after 53 days dead (decided with evidence, not deleted)</a> (09-06)<br />
 - <a href="#appendix-ga---fxs-six-remaining-findings-closed---but-its-prescribed-fix-for-the-torn-write-was-a-no-op-and-three-of-its-own-doc-corrections-were-wrong-realize_pending-is-now-two-transactions-proven-with-a-real-process-kill-2026-09-06-1340-cdt">GA — FX's six remaining findings closed - but its prescribed fix for the torn write was a NO-OP and three of its own doc corrections were wrong; realize_pending is now two transactions, proven with a real process kill</a> (09-06)<br />
 - <a href="#appendix-gb---correction-to-ga-its-corrected-record-line-numbers-went-stale-during-the-append-that-published-them---every-append-shifts-every-record-line-by-1-via-the-toc-so-the-three-citations-are-now-anchored-to-headings-instead-2026-09-06-1343-cdt">GB — CORRECTION to GA: its corrected record line numbers went stale during the append that published them - every append shifts every record line by +1 via the TOC, so the three citations are now anchored to headings instead</a> (09-06)<br />
-- <a href="#appendix-gc---landing-check-on-gagb-the-code-and-its-proof-held-under-four-planted-mutations-but-ga-accused-fx-of-being-wrong-when-fx-was-right---its-figures-drifted-they-were-never-mistaken-plus-a-false-safe-default-claim-and-six-propagation-misses-2026-09-06-1406-cdt">GC — landing-check on GA/GB: the code and its proof held under four planted mutations, but GA accused FX of being WRONG when FX was RIGHT - its figures drifted, they were never mistaken. Plus a false 'safe default' claim and six propagation misses</a> (09-06)</p>
+- <a href="#appendix-gc---landing-check-on-gagb-the-code-and-its-proof-held-under-four-planted-mutations-but-ga-accused-fx-of-being-wrong-when-fx-was-right---its-figures-drifted-they-were-never-mistaken-plus-a-false-safe-default-claim-and-six-propagation-misses-2026-09-06-1406-cdt">GC — landing-check on GA/GB: the code and its proof held under four planted mutations, but GA accused FX of being WRONG when FX was RIGHT - its figures drifted, they were never mistaken. Plus a false 'safe default' claim and six propagation misses</a> (09-06)<br />
+- <a href="#appendix-gd---overnight-decomposition-diagnostic-the-buy-closesell-open-premium-is-real-and-not-decayed-on-our-data---the-flat-since-2021-half-of-the-recorded-kill-does-not-reproduce---but-breakeven-is-14-26-bpsside-against-the-5-we-price-so-it-stays-uncapturable-2026-09-08-0030-cdt">GD — Overnight decomposition DIAGNOSTIC: the buy-close/sell-open premium is REAL and NOT decayed on our data - the 'flat since 2021' half of the recorded kill does not reproduce - but breakeven is 1.4-2.6 bps/side against the 5 we price, so it stays uncapturable</a> (09-08)<br />
+- <a href="#appendix-ge---hold-n-exit-at-open-analyzed-not-built-it-converges-to-buy-and-hold-from-below-and-never-crosses-it-at-5-bps-tradings-residual-is-a-12-1-monthly-momentum-factor-wrong-horizon-and-c1-already-is-this-idea-live-in-paper-2026-09-08-0042-cdt">GE — Hold-N exit-at-open, analyzed not built: it converges to buy-and-hold FROM BELOW and never crosses it at 5 bps; Trading's residual is a 12-1 MONTHLY momentum factor (wrong horizon) and C1 already is this idea, live in paper</a> (09-08)</p>
 <hr />
 <h2 id="phase-0--inception-and-doc-system-bootstrap-2026-07-08">Phase 0 — Inception and doc-system bootstrap (2026-07-08)</h2>
 <p><strong>WHAT:</strong> Project created. Evan's brief: build a bot that swing trades —<br />
@@ -10064,6 +10066,442 @@ re-run by the sweep (it writes), so GA's intermediate render figures are<br />
 unverifiable in principle rather than merely unverified; the 1,365-line HTML<br />
 diff was checked structurally, not line-by-line; <code>PRD_ROADMAP.md</code>, the ~170<br />
 older appendices, the 44 preregs and <code>graphify-out/</code> were not swept.</p>
+<h1 id="appendix-gd---overnight-decomposition-diagnostic-the-buy-closesell-open-premium-is-real-and-not-decayed-on-our-data---the-flat-since-2021-half-of-the-recorded-kill-does-not-reproduce---but-breakeven-is-14-26-bpsside-against-the-5-we-price-so-it-stays-uncapturable-2026-09-08-0030-cdt">Appendix GD - Overnight decomposition DIAGNOSTIC: the buy-close/sell-open premium is REAL and NOT decayed on our data - the 'flat since 2021' half of the recorded kill does not reproduce - but breakeven is 1.4-2.6 bps/side against the 5 we price, so it stays uncapturable (2026-09-08, ~00:30 CDT)</h1>
+<p><strong>Session:</strong> 2026-09-08, ~00:30 CDT. Evan asked about buying at the close and<br />
+selling at the open, then chose the decomposition diagnostic over unblocking X4.<br />
+<strong>DIAGNOSTIC — no D1 verdict, nothing deployed, attempt tally UNCHANGED</strong><br />
+(precedent EX-DECOMP / DU / X9's zero-cost split). No prereg. Full results:<br />
+<code>docs/research/2026-09-08_overnight_intraday_decomposition.md</code>. Runner:<br />
+<code>scripts/ablation_overnight_decomp.py</code> (NEW).</p>
+<h2 id="1-the-headline-the-projects-recorded-prior-is-half-wrong">1. The headline: the project's recorded prior is HALF WRONG</h2>
+<p><code>docs/research/2026-07-13_execution_microstructure.md:53-55</code> has carried this<br />
+since July: <em>"The NY Fed ... dates the drift flat since 2021. The overnight<br />
+component is both uncapturable AND now decayed."</em> It is half of X4's<br />
+pre-registered prior. <strong>It had never been checked against our data, and it<br />
+carries no sample, universe, or magnitude.</strong></p>
+<ul>
+<li><strong>UNCAPTURABLE — confirmed, decisively, and by arithmetic no era can rescue.</strong></li>
+<li><strong>NOW DECAYED — does not reproduce.</strong></li>
+</ul>
+<h2 id="2-the-anomaly-is-real-here-and-it-is-large">2. The anomaly is real here and it is large</h2>
+<p>First UNCONDITIONAL return decomposition this repo has ever run.<br />
+<code>ablation_fill_timing.py</code> only ever measured IBS&lt;0.20 signal days, averaged<br />
+rather than compounded, gross-only, on <code>swing.db</code> (2014+).</p>
+<p>Annualized pp/yr, log space, total-return arm:</p>
+<table>
+<thead>
+<tr>
+<th>ticker</th>
+<th>sessions</th>
+<th>overnight</th>
+<th>intraday</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SPY 1993-02-01..2026-08-17</td>
+<td>8,443</td>
+<td><strong>+9.60</strong></td>
+<td>+0.75</td>
+</tr>
+<tr>
+<td>QQQ 1999-03-11..2026-08-17</td>
+<td>6,901</td>
+<td><strong>+13.12</strong></td>
+<td>-2.78</td>
+</tr>
+<tr>
+<td>DIA 1998-01-21..2026-08-17</td>
+<td>7,187</td>
+<td><strong>+7.12</strong></td>
+<td>+1.67</td>
+</tr>
+<tr>
+<td>IWM 2000-05-30..2026-08-17</td>
+<td>6,593</td>
+<td><strong>+12.63</strong></td>
+<td>-4.09</td>
+</tr>
+</tbody>
+</table>
+<p>SPY's overnight leg compounded <strong>24.9x</strong> over 33.5 years; its intraday leg<br />
+<strong>1.29x</strong>. QQQ's and IWM's intraday legs are outright NEGATIVE across a quarter<br />
+century in which both roughly tripled. Lou-Polk-Skouras (2019) reproduced on our<br />
+own cache. External validation of the construction: SPY total-return CAGR from<br />
+<code>prod(F_TR)=32.043</code> over 33.55y = <strong>10.9%/yr</strong>, matching SPY's published TR.</p>
+<h2 id="3-flat-since-2021-fails-on-the-fair-test">3. "Flat since 2021" fails on the fair test</h2>
+<p>Comparing a 4.6-year window to a 29-year window is not a test — the long<br />
+window's SE is ~5x tighter, so any gap looks large against it while sitting<br />
+inside the short window's own error bar. The fair form: where does the current<br />
+window's drift sit among ALL overlapping windows of the SAME length in that<br />
+ticker's own history?</p>
+<table>
+<thead>
+<tr>
+<th>ticker</th>
+<th>&gt;=2021-01-01 overnight</th>
+<th>95% CI</th>
+<th>pre-2021</th>
+<th><strong>percentile</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SPY</td>
+<td>+8.07</td>
+<td>+-8.28</td>
+<td>9.90</td>
+<td><strong>56.0th</strong></td>
+</tr>
+<tr>
+<td>QQQ</td>
+<td>+10.27</td>
+<td>+-11.03</td>
+<td>13.85</td>
+<td><strong>50.7th</strong></td>
+</tr>
+<tr>
+<td>DIA</td>
+<td>+5.36</td>
+<td>+-7.28</td>
+<td>7.55</td>
+<td>45.5th</td>
+</tr>
+<tr>
+<td>IWM</td>
+<td>+12.97</td>
+<td>+-11.17</td>
+<td>12.54</td>
+<td><strong>57.3rd</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>All four sit at or near the MEDIAN of their own history.</strong> Three of four are<br />
+still above +8 pp/yr. Not one decline approaches its own CI.</p>
+<p>The post-2022 softness is <strong>one year</strong>: SPY's overnight leg ran 2021 +16.18,<br />
+<strong>2022 -14.37</strong>, 2023 +5.75, 2024 <strong>+21.38</strong>, 2025 +8.06, 2026 +13.31. QQQ 2022<br />
+was <strong>-23.51</strong>. One bad year in a series with 10.6% annual sd is not a regime<br />
+change.</p>
+<p><strong>Honest limit, stated in the doc and here:</strong> we do not know whether the source<br />
+measured price-only or total return, which index, or what window. A definitional<br />
+mismatch is an artifact, not a failed reproduction. <strong>This does not falsify the<br />
+NY Fed paper. It falsifies the confidence with which one uncited sentence has<br />
+been carried in this project's docs.</strong> Our price-only arm (SPY +7.81 full,<br />
++6.75 post-2021) does not change the conclusion.</p>
+<h2 id="4-the-era-question-was-underpowered-by-40x-and-that-is-itself-the-finding">4. The era question was underpowered by ~40x, and that is itself the finding</h2>
+<p>The overnight leg's annualized vol is ~10.6%. Post-2022 (n=1,159) the 95% CI on<br />
+SPY's drift is <strong>+-9.57 pp/yr</strong> against an effect of interest of 1-2 pp/yr.<br />
+Resolving that at 2 sigma needs <strong>~200 years</strong>. Every era row prints its CI for<br />
+exactly this reason. <strong>A table that printed a pre number and a post number<br />
+without one would have manufactured a conclusion its data cannot support</strong> —<br />
+and that is the shape the original question invited.</p>
+<h2 id="5-it-is-still-not-tradeable-and-this-part-needs-no-era-split">5. It is still not tradeable, and this part needs NO era split</h2>
+<p>An overnight-only trade is a FULL round trip every session, so<br />
+<code>F_net = F_ON * (1-c)/(1+c)</code> and breakeven per side is <code>c* = (G-1)/(G+1)</code>.</p>
+<table>
+<thead>
+<tr>
+<th>ticker</th>
+<th>gross pp/yr</th>
+<th>breakeven bps/side</th>
+<th>net @5bps</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SPY</td>
+<td>9.60</td>
+<td><strong>1.90</strong></td>
+<td><strong>-14.4</strong></td>
+</tr>
+<tr>
+<td>QQQ</td>
+<td>13.12</td>
+<td><strong>2.60</strong></td>
+<td><strong>-11.4</strong></td>
+</tr>
+<tr>
+<td>DIA</td>
+<td>7.12</td>
+<td><strong>1.41</strong></td>
+<td><strong>-16.5</strong></td>
+</tr>
+<tr>
+<td>IWM</td>
+<td>12.63</td>
+<td><strong>2.51</strong></td>
+<td><strong>-11.8</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>This project prices 5 bps/side.</strong> Short by 2x-3.5x. Even at a fantasy 1<br />
+bp/side, SPY's +4.7 pp/yr is BELOW its own buy-and-hold of 10.35. Same wall the<br />
+NightShares ETFs hit with real money (-6.9%/-10%+ vs +22%/+16%, liquidated in<br />
+~14 months, post-mortem blaming "transaction costs of turning the portfolio over<br />
+twice a day"). Our arithmetic and their outcome agree.</p>
+<h2 id="6-the-methodological-trap-that-would-have-inverted-the-answer">6. The methodological trap that would have INVERTED the answer</h2>
+<p>On dividend-unadjusted <code>close</code>, the ex-dividend drop falls entirely in the<br />
+<code>close[t-1] -&gt; open[t]</code> window, so a price-only overnight leg is understated by<br />
+the <strong>whole dividend yield — ~183 bps/yr on SPY pre-2022</strong>, the same order as<br />
+the effect under test. A naive price-only run prints a materially weaker<br />
+overnight leg and makes "the premium died" look supported. It is also<br />
+DIFFERENTIAL across tickers (QQQ ~51 bps/yr vs SPY ~183), so a price-only<br />
+cross-ticker table measures dividend policy rather than drift.</p>
+<p><strong>My first construction was wrong and was caught before it shipped.</strong> <code>DIV =
+TR - PR</code> added to the overnight leg breaks by the cross term <code>DIV*ID</code> — up to<br />
+154 bps summed over full history. The correct form is multiplicative:<br />
+<code>F_ON = F_TR * (open/close)</code>, <code>F_ID = close/open</code>, so <code>F_ON * F_ID = F_TR</code><br />
+exactly (one ULP). Logs throughout, because <code>log F_ON + log F_ID = log F_TR</code><br />
+survives summing over any date subset.</p>
+<p>Log is primary, pre-committed in the header, because the arithmetic-minus-log<br />
+wedge is <code>sigma^2/2</code> and DIFFERS PER LEG — it hands intraday a spurious ~+0.59<br />
+pp/yr on SPY, larger than the effect being measured.</p>
+<h2 id="7-self-checks--20-assertions-4-tickers">7. Self-checks — 20 assertions, 4 tickers</h2>
+<table>
+<thead>
+<tr>
+<th>check</th>
+<th>worst</th>
+<th>tol</th>
+<th>binds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>decomposition</td>
+<td>6.44e-15</td>
+<td>1e-10</td>
+<td><strong>tautological</strong> — holds even if <code>open</code> is garbage</td>
+</tr>
+<tr>
+<td>telescope-TR</td>
+<td>8.88e-15</td>
+<td>1e-10</td>
+<td>every bar's presence and order</td>
+</tr>
+<tr>
+<td>telescope-price</td>
+<td>1.13e-14</td>
+<td>1e-10</td>
+<td><code>open</code> and both closes</td>
+</tr>
+<tr>
+<td>adj-anchor</td>
+<td>0.00e+00</td>
+<td>1e-10</td>
+<td>back-adjustment anchor</td>
+</tr>
+<tr>
+<td><strong>dividend x-check</strong></td>
+<td><strong>1.87e-06</strong></td>
+<td>5e-5</td>
+<td><strong>667 independent ex-dates</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The decomposition check is deliberately labelled tautological in-code: <code>F_ON</code> is<br />
+DEFINED as <code>F_TR/F_ID</code>, so it cannot detect a bad <code>open</code>. The telescoping checks<br />
+are the ones that bind, and the dividend cross-check validates the whole<br />
+correction against a source the legs never touch.</p>
+<h2 id="8-disclosure--a-result-leaked-before-the-runner-existed">8. DISCLOSURE — a result leaked before the runner existed</h2>
+<p>While validating the reconciliation identity during PLANNING, a sub-agent<br />
+computed and reported full-history leg products: SPY <code>prod(F_TR)=32.043</code>,<br />
+<code>prod(F_ON)=24.91</code>, <code>prod(F_ID)=1.286</code>. The finished run reproduces them (SPY<br />
+cumulative log-NAV overnight 3.215 -&gt; 24.90). No era split, per-year row or<br />
+pre/post comparison existed at that stage — but <strong>the headline was out before<br />
+the script was written</strong>, and that is recorded rather than presented as a virgin<br />
+run, on the same standard applied when the E14 prediction was falsified (FV).</p>
+<h2 id="9-what-changes-what-does-not">9. What changes, what does not</h2>
+<p><strong>Changes:</strong> the "now decayed" half of the overnight kill is unsupported on our<br />
+data and must not be restated without this caveat. X4's stated prior<br />
+(<code>PRD_ROADMAP.md:1026</code>) loses one of its two legs — NightShares stands, NY-Fed<br />
+does not reproduce. X4 stays BLOCKED-ON-EVAN and BLOCKED-ON-BROKER-TIER; nothing<br />
+here unblocks it.</p>
+<p><strong>Does not change:</strong> the 54%-of-edge figure (different conditioning), E2's c2c<br />
+mirage (record CK closed it on drawdown grounds), the closed search phase, or<br />
+any live sleeve.</p>
+<h2 id="done-check--real-output_2">Done-check — real output</h2>
+<p><code>FROZEN TESTS: GREEN (all d=0)</code> (12 pinned refs at d=+-0.0000pp, 19 invariants).<br />
+All six proofs pass: <code>prove_torn_write</code> 32, <code>prove_feed_clock</code> 18,<br />
+<code>prove_divergence_census</code> 16, <code>prove_liquidity_floor</code> 11/11, <code>prove_refusal_gate</code><br />
+10/10, <code>prove_cache_guard</code> 8/8. <strong>F3 determinism: run twice, 288 lines,<br />
+byte-identical</strong> (<code>cmp</code> clean) — pure function of the frozen 2026-08-17 cache.</p>
+<p><code>swing.db</code> was NEVER OPENED (this reads <code>.e8e9_cache</code> only).<br />
+<code>scripts/daily_swing_paper.py</code> never executed, no <code>.bat</code> run, nothing deleted,<br />
+nothing pushed. <code>SWING_ALLOW_STALE_CACHE=1</code> was set EXTERNALLY and<br />
+<code>cache_fetch</code> was not wrapped in <code>except</code> — both are the record-EO defect class.</p>
+<h1 id="appendix-ge---hold-n-exit-at-open-analyzed-not-built-it-converges-to-buy-and-hold-from-below-and-never-crosses-it-at-5-bps-tradings-residual-is-a-12-1-monthly-momentum-factor-wrong-horizon-and-c1-already-is-this-idea-live-in-paper-2026-09-08-0042-cdt">Appendix GE - Hold-N exit-at-open, analyzed not built: it converges to buy-and-hold FROM BELOW and never crosses it at 5 bps; Trading's residual is a 12-1 MONTHLY momentum factor (wrong horizon) and C1 already is this idea, live in paper (2026-09-08, ~00:42 CDT)</h1>
+<p><strong>Session:</strong> 2026-09-08, ~00:35-00:42 CDT, continuing the GD sitting. Evan's<br />
+thought experiment: "buy then hold for a day or 2 or 3 then sell at market open<br />
+using SPY or residual 05/95 from the long term trading project."</p>
+<p><strong>ANALYSIS ONLY — no code written, nothing deployed, no verdict, attempt tally<br />
+UNCHANGED.</strong> The only execution was read-only arithmetic over the legs GD had<br />
+already measured, plus read-only greps of <code>D:\ClaudeCode\Trading</code>. No prereg<br />
+(nothing was tested; an existing measurement was re-used).</p>
+<h2 id="1-the-multi-day-hold-is-the-right-fix-for-the-cost-problem-and-it-still-loses">1. The multi-day hold IS the right fix for the cost problem, and it still loses</h2>
+<p>GD showed the overnight-only trade dies on 252 round trips a year. Holding N<br />
+days amortizes ONE round trip over N days. Buy at close(day 0), sell at<br />
+open(day N): you capture <strong>N overnight legs and N-1 intraday legs</strong>, then sit out<br />
+day N's session before re-entering at its close.</p>
+<p>Annualized pp/yr, log space, TR arm, 5 bps/side, computed from GD's legs:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>ON/yr</th>
+<th>ID/yr</th>
+<th>N=1</th>
+<th>N=2</th>
+<th>N=3</th>
+<th>N=5</th>
+<th>N=21</th>
+<th>buy&amp;hold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SPY</td>
+<td>9.60</td>
+<td>0.75</td>
+<td>-15.60</td>
+<td>-2.63</td>
+<td>+1.70</td>
+<td>+5.16</td>
+<td>+9.11</td>
+<td><strong>10.35</strong></td>
+</tr>
+<tr>
+<td>QQQ</td>
+<td>13.12</td>
+<td>-2.78</td>
+<td>-12.08</td>
+<td>-0.87</td>
+<td>+2.86</td>
+<td>+5.85</td>
+<td>+9.27</td>
+<td><strong>10.34</strong></td>
+</tr>
+<tr>
+<td>DIA</td>
+<td>7.12</td>
+<td>1.67</td>
+<td>-18.08</td>
+<td>-4.64</td>
+<td>-0.16</td>
+<td>+3.42</td>
+<td>+7.52</td>
+<td>8.79</td>
+</tr>
+<tr>
+<td>IWM</td>
+<td>12.63</td>
+<td>-4.09</td>
+<td>-12.57</td>
+<td>-2.02</td>
+<td>+1.50</td>
+<td>+4.31</td>
+<td>+7.53</td>
+<td>8.54</td>
+</tr>
+</tbody>
+</table>
+<p>Evan is right that holding rescues it from -15.6 to positive by N=3. <strong>But the<br />
+structure converges to buy-and-hold FROM BELOW and never crosses it.</strong> The<br />
+general form is exact:</p>
+<blockquote>
+<p><strong><code>net(N) = buy_and_hold - (ID + 25.2) / N</code></strong>, where 25.2 pp/yr = 252 x a<br />
+10 bps round trip.</p>
+</blockquote>
+<p>It beats buy-and-hold only if <code>ID &lt; -25.2 pp/yr</code> -- the intraday leg would have<br />
+to LOSE 25%/yr. The worst measured is IWM at -4.09. <strong>So as a passive structure,<br />
+with no signal, hold-N-exit-at-open is strictly dominated at every N.</strong> This is<br />
+arithmetic on measured legs, not an estimate.</p>
+<h2 id="2-the-exit-at-open-detail-is-worth-almost-nothing">2. The exit-at-open detail is worth almost nothing</h2>
+<p>Versus exiting at the CLOSE, exiting at the open merely forgoes one intraday leg<br />
+per cycle: <strong>ID/N per year</strong>. On QQQ at N=3 that is +0.93 pp/yr (intraday is<br />
+negative, so skipping it helps); on SPY and DIA it is a small LOSS. The part of<br />
+the idea that felt like the edge is the part worth least.</p>
+<h2 id="3-the-number-that-actually-governs-any-version-of-this">3. The number that actually governs any version of this</h2>
+<p><strong>A strategy that round-trips every N days pays 25.2/N pp/yr in cost:</strong></p>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>5</th>
+<th>10</th>
+<th>21</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cost, pp/yr</td>
+<td>25.2</td>
+<td>12.6</td>
+<td><strong>8.4</strong></td>
+<td>5.0</td>
+<td>2.5</td>
+<td>1.2</td>
+</tr>
+</tbody>
+</table>
+<p>A 3-day hold needs the signal to produce <strong>8.4 pp/yr of gross alpha before it<br />
+earns a cent.</strong> For scale: M1.8 measured the IBS signal at +7.5 bps gross PER<br />
+SIGNAL on a 1-day hold.</p>
+<h2 id="4-residual-0595-from-the-long-term-trading-project----two-corrections">4. "residual 05/95 from the long term trading project" -- two corrections</h2>
+<p><strong>(a) Wrong horizon.</strong> <code>D:\ClaudeCode\Trading\trading_bot\factors\residual_momentum.py</code><br />
+is Blitz-Huij-Martens (2011) residual <strong>MOMENTUM</strong>: a 252-day formation window<br />
+ending <code>skip</code>=21 days before as_of, daily stock returns regressed on SPY, scored<br />
+<code>alpha / stdev(residual)</code> -- the appraisal ratio of the idiosyncratic drift, on<br />
+~4,000 tickers, <strong>rebalanced MONTHLY</strong>. Its holding-period half-life is months.<br />
+Driving a 1-3 day trade with it is a slow signal on a fast trade: the ranking<br />
+does not refresh on that timescale, so you re-trade the same names and pay cost<br />
+for nothing.</p>
+<p><strong>(b) "05/95" does not exist in that repo.</strong> The number in the sleeve name<br />
+<code>residual_roa_6535</code> is <strong>65/35</strong> -- <code>trading_bot/factors/zcombo.py:8-9</code> weights<br />
+<code>residual_momentum_score</code> 0.65 and <code>roa_score</code> 0.35;<br />
+<code>trading_bot/factors/ensemble.py:50</code> does the same for the non-residual variant<br />
+via <code>make_rank_fn(0.65, 0.35)</code>. Recorded as NOT FOUND rather than guessed at; if<br />
+Evan meant a different quantity he will say so.</p>
+<h2 id="5-the-version-scoped-for-this-project-already-exists-and-is-live">5. The version scoped for THIS project already exists AND IS LIVE</h2>
+<p><code>scripts/run_c1_residual_reversal.py:1-7</code> is FF3-stripped residual <strong>REVERSAL</strong>:<br />
+21-day residual sum over a trailing 126-session OLS on Mkt-RF+SMB+HML, bottom<br />
+K=4 at next open, <strong>5-session hold</strong>, weekly rebalance, 5 bps/side. That is the<br />
+idea -- residual signal, multi-day hold -- already built, already<br />
+pre-registered, already the program's closest-ever HR near-miss (gate 19.08%<br />
+CAGR / DD 57.7%, then dies post-2014 on survivorship + regime), and <strong>already<br />
+running in paper</strong> as the VIX&gt;20 stress branch of the <code>m10_1_nagel</code> sleeve.</p>
+<h2 id="6-what-the-idea-does-not-fix-and-it-is-the-thing-that-bit-c1">6. What the idea does NOT fix, and it is the thing that bit C1</h2>
+<p>C1 leaked ~5 pp/yr moving from close-to-close (22.82% CAGR) to next-open fills<br />
+(17.87%) -- record Appendix, quoted in CAPSTONE. <strong>That leak is at ENTRY:</strong> the<br />
+signal is signed at the close and bought at the next open, forfeiting exactly the<br />
+overnight leg GD measured as the entire source of index return. <strong>Exiting at the<br />
+open does not touch entry.</strong> The only fill that fixes entry is a market-on-close<br />
+order, which is X4 -- blocked on the Alpaca broker tier and on the EOD-only hard<br />
+rule.</p>
+<p>So the live question this thought experiment actually lands on is not "hold 1-3<br />
+days and exit at the open", it is <strong>"can we ENTER at the close?"</strong> -- already the<br />
+one honest execution experiment the project has left, and already blocked on<br />
+Evan.</p>
+<h2 id="7-slip-caught-by-the-claim-check-hook">7. SLIP, caught by the claim-check hook</h2>
+<p>I told Evan "65/35, the momentum/ROA blend weight" as a CORRECTION to his "05/95"<br />
+-- having inferred it from the digits in the filename <code>residual_roa_6535</code>, before<br />
+reading any weighting code. The <code>claim-check</code> hook flagged 65/35 as appearing in<br />
+no tool output. I then verified it and it was right (<code>zcombo.py:8-9</code>).</p>
+<p><strong>The number survived; the process did not.</strong> Asserting a decomposition of a<br />
+filename as an established fact, inside a sentence framed as correcting the<br />
+user, is the same class as record GA's accusation that FX was "wrong" (GC) and<br />
+the E14 prediction (FV): a confident claim whose verification arrived after the<br />
+sentence. Logged because the hook caught it, not because I did.</p>
+<h2 id="done-check_14">Done-check</h2>
+<p>No code changed, so no tripwire run was required by CLAUDE.md; <code>FROZEN TESTS:
+GREEN (all d=0)</code> was nonetheless still green at the end of the GD work<br />
+immediately preceding. <code>swing.db</code> never opened. <code>D:\ClaudeCode\Trading</code> was READ<br />
+ONLY -- greps and <code>sed</code> only, no writes, no backtest run against its DB.<br />
+<code>scripts/daily_swing_paper.py</code> never executed, no <code>.bat</code> run, nothing deleted,<br />
+nothing pushed.</p>
 </main>
 </body>
 </html>

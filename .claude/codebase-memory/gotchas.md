@@ -160,3 +160,28 @@ they apply to any yfinance-based pipeline built here:
   permanent on-disk cache is `run_e8_squeeze.cache_fetch`, which the M3 loop
   never uses, and `swing.db bars` is frozen at 2026-07-08. So M3 feed staleness
   is always the vendor, never a local cache.
+- 2026-09-08 (record GD): **on dividend-UNADJUSTED prices the ex-dividend drop
+  falls ENTIRELY in the `close[t-1] -> open[t]` window.** Any close-to-open vs
+  open-to-close decomposition run on `close` (idx 5) alone understates the
+  overnight leg by the whole dividend yield -- **~183 bps/yr on SPY, ~51 on QQQ**.
+  It is DIFFERENTIAL across tickers, so a price-only cross-ticker table measures
+  dividend policy, not drift. Correct form uses `adj_close` (idx 6) and is
+  MULTIPLICATIVE: `F_ON = (adj[t]/adj[t-1]) * (open[t]/close[t])`,
+  `F_ID = close[t]/open[t]`, so `F_ON * F_ID = F_TR` exactly. The additive form
+  (`DIV = TR - PR`, added to the overnight leg) is WRONG -- it breaks by the
+  cross term `DIV*ID`, up to 154 bps over SPY's full history.
+- 2026-09-08 (record GD): **`*_div.json` is never vintage-checked.**
+  `run_e8_squeeze._last_bar_date` returns `None` for dict-shaped files, so
+  `_note_vintage` returns early and the staleness guard skips them entirely. The
+  div files are vintage 2026-07-11 against 2026-08-18 bars. Known consequence:
+  DIA's 2026-07-17 ex-date is in `adj_close` and absent from `DIA_div.json`. Use
+  `adj_close` differencing as the primary dividend source; `*_div.json` only as a
+  cross-check, restricted to dates the div file's vintage actually covers.
+- 2026-09-08 (record GD): **an era comparison on a 10.6%-vol series is
+  underpowered by ~40x.** Post-2022 (n=1,159) the 95% CI on SPY's overnight drift
+  is +-9.57 pp/yr against a 1-2 pp/yr effect; 2-sigma resolution needs ~200 years.
+  Comparing a 4.6y window to a 29y window is not a test either -- the long
+  window's SE is ~5x tighter, so any gap looks large against it. The fair form is
+  the percentile of the current window among ALL overlapping windows of the SAME
+  length (descriptive only; overlapping windows are autocorrelated, so it is not
+  a p-value).

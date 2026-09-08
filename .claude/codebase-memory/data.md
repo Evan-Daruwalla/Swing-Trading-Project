@@ -90,3 +90,27 @@ Trading-read-only + EOD-only rules are also always-load INDEX invariants.
   E9, E11, E12, C3, E20, X9), not only the live loop. The INDEX invariant
   "liquidity floor is MANDATORY in any universe filter" was true nowhere in
   research until 2026-09-05.
+
+## Added 2026-09-08 (record GD)
+
+- **`.e8e9_cache` bars carry BOTH price conventions**: `close` (idx 5) is
+  split-adjusted and dividend-UNADJUSTED; `adj_close` (idx 6) is split+dividend
+  adjusted and is 100% populated (SPY 8444/8444, QQQ 6902/6902). Yahoo
+  back-adjusts the WHOLE history, so `adj/close` runs 0.5488 at SPY's 1993 start
+  to exactly 1.0 on the newest bar -- meaning the ratio is not constant and a
+  per-day difference is the right way to extract the dividend. Splits cancel in
+  that ratio (both series are split-adjusted), so it isolates dividends.
+- **Yahoo's dividend adjustment is MULTIPLICATIVE**, `k = 1/(1 - D/close[t-1])`,
+  verified across 135 SPY ex-dates at median relative error 3.5e-5. It is not
+  additive.
+- **`adj_close` differencing is NOT a usable ex-date detector**: float32
+  quantization moves the ratio on 8,307 of 8,443 SPY days. Real dividends are
+  1.7-95 bps; the non-ex-date noise floor is 0.015 bps. Threshold at 0.05 bps.
+- **broad_us history depth** (`.e8e9_cache`, vintage 2026-08-17): SPY 8,444 bars
+  from 1993-01-29 · DIA 7,188 from 1998-01-20 · QQQ 6,902 from 1999-03-10 · IWM
+  6,594 from 2000-05-26. `swing.db bars` only covers 2014-01-02..2026-07-08, so
+  any study needing pre-2014 depth must use the cache.
+- **Early synthetic opens**: sessions with `open == prior close` EXACTLY are
+  concentrated in early history -- SPY 1993 33/233 (14.2%), 1994 9.5%, 1995 4.8%;
+  IWM 2001 7.3%. The overnight leg is mechanically zero on those days and the
+  session dumps into intraday, deflating any pre-2000 overnight baseline.
