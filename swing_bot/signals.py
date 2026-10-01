@@ -7,7 +7,7 @@ committed pre-registration doc.
 IBS (Internal Bar Strength) = (close - low) / (high - low). Guards the
 zero-range case (high == low) discovered in M0.4 (XLRE's illiquid early
 bars): returns None so callers SKIP that ticker-day rather than divide by
-zero. See .claude/codebase-memory/gotchas.md.
+zero. See .claude/project-memory/gotchas.md.
 
 NAV (finding-things map): the only symbol here is `ibs()`. Imported by
 swing_bot.backtest (E1 entry/exit) and swing_bot.test_frozen; scripts
