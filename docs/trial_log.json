@@ -6,17 +6,17 @@
     "docs/research/*results*",
     "docs/Project Record \u2014 Full Chronological History.md"
   ],
-  "prereg_docs_found": 37,
+  "prereg_docs_found": 41,
   "max_attempt_number_in_record": 38,
   "attempt_count_discrepancy": {
     "record_says": 38,
-    "prereg_docs": 37,
+    "prereg_docs": 41,
     "note": "UNRESOLVED -- do not silently pick one. See docs/trial_log_notes.md"
   },
-  "declared_variant_total": 50,
+  "declared_variant_total": 54,
   "variant_count_is_lower_bound": true,
   "lower_bound_reason": "Counts only variants DECLARED in a prereg. Excludes: parameter values explored before pre-registration, the ~90-method survey and the dropped-16 list (record Appendix B), and any abandoned variant never written down. The true search effort is strictly LARGER, so any DSR computed from this number is OPTIMISTIC (too generous to the strategy).",
-  "entries_with_unknown_fields": 1,
+  "entries_with_unknown_fields": 3,
   "excluded_non_attempt": [
     {
       "file": "docs\\prereg_v1_cost_model_and_validation_harness.md",
@@ -386,6 +386,49 @@
       "variant_basis": "no additional arms declared in prereg"
     },
     {
+      "id": "f2_ma_convention_alignment",
+      "prereg_file": "docs\\prereg_f2_ma_convention_alignment.md",
+      "prereg_commit": "9be5719",
+      "prereg_date": "2026-08-19",
+      "results_files": null,
+      "headline_verdict_at_publication": null,
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg",
+      "_unknown": [
+        "headline_verdict_at_publication"
+      ]
+    },
+    {
+      "id": "f3_amendment_cache_vintage",
+      "prereg_file": "docs\\prereg_f3_amendment_cache_vintage.md",
+      "prereg_commit": "2f0a8a4",
+      "prereg_date": "2026-09-05",
+      "results_files": [
+        "docs\\research\\2026-09-05_F3_liquidity_floor_etf_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "f3_liquidity_floor_etf_scope",
+      "prereg_file": "docs\\prereg_f3_liquidity_floor_etf_scope.md",
+      "prereg_commit": "6a23a9a",
+      "prereg_date": "2026-09-05",
+      "results_files": [
+        "docs\\research\\2026-09-05_F3_liquidity_floor_etf_results.md"
+      ],
+      "headline_verdict_at_publication": "FAIL",
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg"
+    },
+    {
       "id": "m10_1_nagel_switch",
       "prereg_file": "docs\\prereg_m10_1_nagel_switch.md",
       "prereg_commit": "63fa9db",
@@ -496,6 +539,23 @@
       "_final_verdict_note": "requires the record; not auto-derivable",
       "declared_variants": 1,
       "variant_basis": "no additional arms declared in prereg"
+    },
+    {
+      "id": "x4_moc_close_entry",
+      "prereg_file": "docs\\prereg_x4_moc_close_entry.md",
+      "prereg_commit": null,
+      "prereg_date": null,
+      "results_files": null,
+      "headline_verdict_at_publication": null,
+      "final_verdict": null,
+      "_final_verdict_note": "requires the record; not auto-derivable",
+      "declared_variants": 1,
+      "variant_basis": "no additional arms declared in prereg",
+      "_unknown": [
+        "prereg_commit",
+        "prereg_date",
+        "headline_verdict_at_publication"
+      ]
     },
     {
       "id": "x6_crypto_trend",

@@ -1,6 +1,7 @@
 # tooling — Swing Trading
 
-Last updated 2026-07-15. Canonical home for run/tooling.
+Last updated 2026-09-05 (header said 2026-07-15 while dated entries ran to
+2026-09-05 -- audit GJ MEDIUM, corrected 2026-09-11). Canonical home for run/tooling.
 
 - Python via `.venv`. Code under `swing_bot/` and `scripts/`.
 - **Accessing Trading's repo/DB**: Grep/Glob tools do NOT reach

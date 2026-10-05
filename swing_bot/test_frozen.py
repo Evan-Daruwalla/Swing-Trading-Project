@@ -42,7 +42,10 @@ import sys
 from collections import namedtuple
 from pathlib import Path
 
+from datetime import date as _date
+
 from swing_bot import prices, signals, backtest, rotation, paper_sleeves as ps
+from swing_bot import trading_calendar as tc
 
 # scripts/ is not a package; the live orchestrator's PURE helpers are pinned
 # below (audit #3), so the suite needs it importable. Import is side-effect-free
@@ -238,6 +241,27 @@ INVARIANTS = [
     # The m10_1 weekly gate is keyed on this string; a wrong week burns or
     # repeats a decision.
     ("isoweek_str_friday_2026_07_31", dsp.isoweek_str("2026-07-31") == "2026-W31"),
+
+    # A DB row with literal qty 0.0 against a live Alpaca position is INFINITE
+    # drift, not zero. Every other reconcile case above uses dbq=1.0, so this
+    # branch had no coverage at all while it silently declined to act (GJ).
+    ("reconcile_zero_db_qty_is_infinite_drift",
+     [(o["side"], o["qty"]) for o in dsp.qty_reconcile_orders(
+         {"QQQ": {"qty": 0.0}}, {"QQQ": {"qty": 0.5}}, {"QQQ": 700.0}, None)]
+     == [("sell", 0.5)]),
+
+    # --- CALENDAR RANGE ENUMERATOR (audit GJ.6, added 2026-09-09) ----------
+    # 2026-09-05/06 are a weekend and 2026-09-07 is Labor Day, so a Fri->Tue
+    # span contains exactly two sessions. Without this, nothing could build the
+    # EXPECTED session set and a mid-series hole was undetectable.
+    ("sessions_between_skips_weekend_and_holiday",
+     [d.isoformat() for d in tc.sessions_between(_date(2026, 9, 4),
+                                                 _date(2026, 9, 8))]
+     == ["2026-09-04", "2026-09-08"]),
+    # Derived from QQQ's full history, not from memory; Hurricane Sandy closed
+    # a Monday that is neither a weekend nor a scheduled holiday.
+    ("ad_hoc_closure_is_not_a_session",
+     not tc.is_trading_day(_date(2012, 10, 29))),
 
     # --- CONVENTION-HEADER GUARD (audit #4 F13, added 2026-08-11) -----------
     ("price_scripts_state_adjustment_convention",

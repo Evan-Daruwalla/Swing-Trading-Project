@@ -1,7 +1,7 @@
 # gotchas — Swing Trading
 
 All inherited 2026-07-08 from Trading's battle scars (source: Evan's
-infrastructure inventory + Trading's `.claude/codebase-memory/gotchas.md`);
+infrastructure inventory + Trading's `.claude/project-memory/gotchas.md`);
 they apply to any yfinance-based pipeline built here:
 
 - yfinance split-misapplication: a >1000% single-day move is the tell for a
@@ -185,3 +185,40 @@ they apply to any yfinance-based pipeline built here:
   the percentile of the current window among ALL overlapping windows of the SAME
   length (descriptive only; overlapping windows are autocorrelated, so it is not
   a p-value).
+
+- 2026-09-10 (records GH, GK, GL): **Yahoo REVISES the current session's QQQ
+  bar into a NaN-carrying row around the 19:00 CT scheduled run, then cleans it
+  again within hours.** Observed: clean at 17:35 CT on 2026-09-08; NaN at the
+  19:00 CT run on 09-08, 09-09 and 09-10; clean by ~23:10 CT on 09-10.
+  `prices.fetch` drops any row with a NaN in O/H/L/C, so the series ends a
+  session short and the feed-clock guard refuses. **A seconds-scale retry cannot
+  recover it:** GK added a 2/5/15 s re-fetch on a NaN-tailed frame, and both
+  following 19:00 runs still refused after 4 attempts. A fix has to move the
+  fetch out of the window or stop depending on the tail row. Same family as the
+  FS hypothesis: once filtered, a revised bar and an unpublished bar leave the
+  identical short series.
+- 2026-09-10 (record GL): **`trading_calendar.holidays()` adds Juneteenth for
+  EVERY year**, although its own comment says NYSE closed for it only from 2022.
+  QQQ has 23 real sessions on June dates 1999-2021 that the calendar calls
+  holidays, so `sessions_between()` omits them and `missing_sessions()` cannot
+  see a hole on one. `check_feed_clock` is unaffected (recent dates only).
+  ~~Inherited, unfixed.~~ **FIXED 2026-09-11:** Juneteenth is added only for
+  `year >= 2022`; `prove_session_gap` case 8 pins it and FAILS against the
+  old rule (2020-06-19 read as a holiday).
+
+- 2026-09-22 (record GO): **the live loop now fires at 23:45 CT, which is
+  00:45 ET the NEXT calendar day.** The loop's clock is ET, so "today" in ET is
+  already the next date; `last_completed_session` walks back to the session that
+  just closed (5 cases checked). Anything new that derives a date from
+  `datetime.now(ET).date()` without that walk-back will be off by one session.
+
+- 2026-10-03 (records GT, GU): **Ken French publishes the daily FF3 factors about a
+  month late** - on 2026-10-03 the file ended 2026-08-31. `residual_series`
+  (`run_c1_residual_reversal.py`) needs a factor row for `today`, so the live
+  M10-1 stress basket (VIX>20 Friday) can NEVER form: `decide_m10_1` gets no
+  ranked names and refuses. The backtest had complete history, so this is the
+  F2 class (live code differs from tested code). Since 2026-10-04 the loop says
+  so in `RUN_FAILURES` ("FF3 lags today ... stress basket unreachable") on a
+  stress decision day. **Any fix that makes the basket form changes the rule and
+  needs a prereg** (Evan, 2026-10-04: warning only for now). It has not fired
+  yet only because VIX stayed under 20.

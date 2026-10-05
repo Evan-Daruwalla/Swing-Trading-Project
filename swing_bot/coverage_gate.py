@@ -18,7 +18,7 @@ independent checks:
 Prices are split-adjusted, dividend-UNADJUSTED (auto_adjust=False).
 
 NAV (finding-things map): the M0.4 data-quality gate. Imports swing_bot.
-{prices, universe}.
+{prices, trading_calendar, universe}.
 
 WIRED 2026-09-06 (audit FX HIGH #3), after 53 days with ZERO importers — the
 gap was flagged on 2026-07-15, again on 2026-08-06 (audit E14), and again by
@@ -38,7 +38,9 @@ WHAT IS STILL NOT COVERED, stated so this does not read as blanket protection:
     date if they ever were — do not wire those two without fixing that first.
     Only the scan_* functions are on the live path.
 """
-from swing_bot import prices, universe
+import datetime as dt
+
+from swing_bot import prices, trading_calendar, universe
 
 MAX_ABS_DAILY_RET = 0.35  # 35% close-to-close; investigate above this.
                           # REACHABLE in production since 2026-09-06: the live
@@ -99,11 +101,44 @@ def scan_ohlc(ticker, rows, max_abs_ret=MAX_ABS_DAILY_RET):
     return anomalies
 
 
+def missing_sessions(ticker, bars):
+    """Sessions the calendar expects inside this series' own span but that the
+    series does not contain, as scan_ohlc-shaped anomaly tuples.
+
+    scan_ohlc walks rows POSITIONALLY -- `prev_close` is just "the previous row
+    in the list" -- so a session missing from the middle produces a two-day
+    return silently compared as if it were one day, and every downstream
+    `[-200:]` slice (paper_sleeves.py:341, the live loop's sane_window) silently
+    spans 201 sessions. Nothing in the repo could detect that before
+    trading_calendar.sessions_between existed (record GJ.6).
+
+    Span-bounded on purpose: it asks only whether this series is internally
+    whole, never whether it reaches today. The tail question is
+    trading_calendar.check_feed_clock's, and duplicating it here would give two
+    guards one job."""
+    dates = [b[1] for b in bars]
+    if len(dates) < 2:
+        return []
+    first = dt.date.fromisoformat(dates[0])
+    last = dt.date.fromisoformat(dates[-1])
+    have = set(dates)
+    return [(ticker, d.isoformat(), "missing_session",
+             f"calendar expects it within {dates[0]}..{dates[-1]}")
+            for d in trading_calendar.sessions_between(first, last)
+            if d.isoformat() not in have]
+
+
 def scan_fetched_bars(ticker, bars, max_abs_ret=MAX_ABS_DAILY_RET):
     """scan_ohlc for a prices.fetch() bar list, whose layout is
-    (ticker, date, o, h, l, c, adj, vol). This is the LIVE loop's entry point."""
-    return scan_ohlc(ticker, [(b[1], b[2], b[3], b[4], b[5]) for b in bars],
-                     max_abs_ret=max_abs_ret)
+    (ticker, date, o, h, l, c, adj, vol). This is the LIVE loop's entry point.
+
+    Also diffs the date sequence against the trading calendar -- see
+    missing_sessions. Both anomaly kinds flow through the caller's one existing
+    failure path (daily_swing_paper.py's DATA-SANITY GATE block prints, appends
+    to RUN_FAILURES and returns 1), so no new plumbing exists to go stale."""
+    return (scan_ohlc(ticker, [(b[1], b[2], b[3], b[4], b[5]) for b in bars],
+                      max_abs_ret=max_abs_ret)
+            + missing_sessions(ticker, bars))
 
 
 def sanity_scan(conn, entries=None, max_abs_ret=MAX_ABS_DAILY_RET):

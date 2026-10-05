@@ -75,3 +75,10 @@ git diff --cached | grep -inE "key|secret|token|password|[A-Z0-9]{20,}"
 ```
 The pre-commit scan already covers this; the point of doing it by eye is that
 the scan cannot judge *embarrassment*, only *secrets*.
+
+- 2026-09-10 (record GL): **the scheduled daily-audit wrote Evan's personal
+  email into its own record entry (Appendix GJ)**, inside a sentence asserting no
+  email was in tracked files. The record ships in this PUBLIC repo. Before any
+  commit that includes the record, grep the staged diff case-insensitively for
+  email addresses and absolute user paths -- the commit-gate scans for secrets,
+  not for personal identifiers.

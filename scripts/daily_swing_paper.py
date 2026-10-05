@@ -115,10 +115,31 @@ ACKNOWLEDGED_NAV_HOLES = {                # lost to the Interactive-only task; r
     ("e6_1x", "2026-08-28"),
     ("e6_1x", "2026-08-31"),
 }
+# BACKFILLED, not acknowledged (Evan's call 2026-09-22, record GP): the 27
+# (sleeve, date) rows for 2026-09-08..09-11, 09-14..09-17 and 09-21, all three
+# sleeves, lost to the 19:00 NaN-revision refusals (M13.2). paper_nav has no
+# provenance column, so they are listed here. Unlike the FJ holes above, these
+# are EXACT reconstructions, not guesses: the ledger was frozen across the
+# window (no transaction after 09-01, no pending, cash 0), every rule said HOLD
+# on every missed session, and the same formula reproduced all 15 live rows in
+# the window to 1e-9. Backup of the pre-write DB and the script: record GP.
 # Max sessions the VIX3M reading may lag `today` before e18 refuses to decide
 # (audit #3). 2 = tolerate the normal 1-session publish lag + a holiday edge;
 # the 5-session Yahoo lag that inverted the signal (record DC) trips it.
 VIX3M_MAX_STALE_SESSIONS = 2
+# Mirrors the VIX3M bound. Yahoo's ^VIX is normally same-session, so lagging
+# more than 2 sessions means the feed is broken; the VIX leg had no staleness
+# guard while its VIX3M sibling did (record GT MED 8, 2026-10-03).
+VIX_MAX_STALE_SESSIONS = 2
+
+
+def stale_sessions(qdates, asof_dt, today):
+    """How many sessions of the QQQ series lie after a carried-forward
+    reading's as-of date, up to and including today; shared by the VIX3M and
+    VIX staleness gates."""
+    return len([d for d in qdates if asof_dt is not None and asof_dt < d <= today])
+
+
 FF3_URL = ("https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
            "F-F_Research_Data_Factors_daily_CSV.zip")
 
@@ -419,6 +440,12 @@ def report_mirror_drift(conn):
             ap = {p["symbol"]: p for p in c.list_positions()}
         except AlpacaError as e:
             print(f"    [{s}] unavailable: {e}")
+            # Same blind spot as the credential handler eleven lines up, and it
+            # was the only one of the two that stayed invisible to the exit
+            # path: a transient API failure here leaves this sleeve's broker
+            # side unobserved and the run still exited 0. Audit GJ; 2026-09-09.
+            RUN_FAILURES.append(f"[{s}] mirror drift check skipped: "
+                                f"positions unavailable ({e})")
             continue
         finally:
             c.close()
@@ -463,7 +490,13 @@ def qty_reconcile_orders(positions, held, close_px, pending):
         dbq = positions[t]["qty"]
         aq = float(held[t]["qty"])
         dq = aq - dbq                       # + => Alpaca holds too many
-        pct = abs(dq / dbq * 100) if dbq else 0.0
+        # dbq == 0 is INFINITE drift, not zero: the DB thinks we hold nothing
+        # while Alpaca holds something. 0.0 sorts below MIRROR_DRIFT_WARN_PCT
+        # and `continue`s, so the function that DECIDES corrective orders was
+        # silent on the one case its reporting twin calls the worst possible
+        # fork (report_mirror_drift uses float("inf") for the identical
+        # test). Audit GJ; aligned 2026-09-09.
+        pct = abs(dq / dbq * 100) if dbq else float("inf")
         if pct < MIRROR_DRIFT_WARN_PCT:
             continue
         notional = abs(dq) * (close_px.get(t) or 0.0)
@@ -473,6 +506,22 @@ def qty_reconcile_orders(positions, held, close_px, pending):
             "action": "skip_small" if notional < MIN_RECONCILE_NOTIONAL else "order",
         })
     return out
+
+
+def fill_session(signal_date, today):
+    """The session whose OPEN a pending signal from `signal_date` fills at is
+    the first trading session after it. When the run for that session refused
+    or never fired (record GT MED 6, 2026-10-03), the next run used to fill the
+    pending against ITS OWN `today`'s open while Alpaca had filled at the
+    earlier session's open -- a silent DB-vs-broker fork. The caller now passes
+    this date to realize_pending instead. ISO strings in and out; `signal_date`
+    is None when nothing is pending."""
+    if not signal_date or signal_date >= today:
+        return today
+    nxt = trading_calendar.sessions_between(
+        dt.date.fromisoformat(signal_date) + dt.timedelta(days=1),
+        dt.date.fromisoformat(today))
+    return nxt[0].isoformat() if nxt else today
 
 
 def realize_pending(conn, sleeve, today, fill_open):
@@ -796,6 +845,14 @@ def _run(args):
     vix_dt, vix_today = _asof(vclose, today)
     v3_dt, vix3m_today = _asof(v3close, today)
     print(f"  VIX={vix_today} (asof {vix_dt})  VIX3M={vix3m_today} (asof {v3_dt})")
+    # (record GT MED 8) Setting vix_today to None routes e18 and the m10 decision
+    # day through their existing "VIX unavailable" refusals; nothing else changes.
+    vix_stale = stale_sessions(qdates, vix_dt, today)
+    if vix_today is not None and vix_stale > VIX_MAX_STALE_SESSIONS:
+        print(f"  !! VIX STALE: asof {vix_dt}, {vix_stale} sessions behind {today} "
+              f"-- treating VIX as unavailable", flush=True)
+        RUN_FAILURES.append(f"VIX stale: asof {vix_dt}, {vix_stale} sessions behind {today}")
+        vix_today = None
 
     conn = ps.connect()
 
@@ -861,6 +918,13 @@ def _run(args):
     # this gate starts silent and any future firing is genuinely new.
     qbars = [b for b in prices.fetch("QQQ", start="1999-01-01")]
     sane_window = qbars[-200:]
+    # (record GT MED 9) An empty or short second fetch used to print "clean over
+    # the last 0 sessions" and pass; the window must actually hold 200 bars.
+    if len(sane_window) < 200:
+        print("\n!! DATA SANITY: second QQQ fetch returned %d bars, need 200 -- "
+              "nothing decided or marked" % len(sane_window), flush=True)
+        RUN_FAILURES.append("data sanity: QQQ window %d < 200 bars" % len(sane_window))
+        return 1
     anomalies = coverage_gate.scan_fetched_bars("QQQ", sane_window)
     if anomalies:
         print("\n!! DATA SANITY FAILED on QQQ over the last %d sessions -- "
@@ -882,19 +946,31 @@ def _run(args):
     # does fill_open.get(<ticker>), so those ~6,700 entries were unreachable
     # junk, and QQQ was never actually "always available" -- it arrives through
     # the refetch loop below like every other held name.
-    fill_open = {}
+    # Since 2026-10-04 (record GT MED 6, Evan's call) the fill uses the open of
+    # fill_session(...), the first session after the signal, which is the open
+    # Alpaca actually filled at; normally that IS today.
+    open_maps = {}            # TICKER -> {date: open}; the fill date is per sleeve
     for s in ps.SLEEVES:
         st = ps.get_sleeve(conn, s)
         positions = ps.get_positions(conn, s)
         import json
         target = json.loads(st["pending_json"]) if st["pending_json"] else {}
         needed = set(positions) | set(target)
-        for t in needed - set(fill_open):
+        for t in needed - set(open_maps):
             _, _, op = series(t, start="2024-01-01")
-            fill_open[t] = op.get(today)
+            open_maps[t] = op
     fills = {}
     for s in ps.SLEEVES:
-        fills[s] = realize_pending(conn, s, today, fill_open)
+        st = ps.get_sleeve(conn, s)
+        fdate = fill_session(st["pending_signal_date"], today) if st["pending_json"] else today
+        if fdate != today:
+            msg = (f"[{s}] LATE FILL: pending from {st['pending_signal_date']} filled at "
+                   f"{fdate}'s open (the session Alpaca filled it), not today's {today}; "
+                   f"no run processed {fdate}")
+            print("  !! " + msg, flush=True)
+            RUN_FAILURES.append(msg)
+        fills[s] = realize_pending(conn, s, fdate,
+                                   {t: m.get(fdate) for t, m in open_maps.items()})
 
     # ---- decide today's new signal per sleeve ----
     decisions = {}
@@ -907,7 +983,7 @@ def _run(args):
     # HOLD). Carry-forward across 1-2 sessions is the intended live
     # accommodation; beyond that the term structure is no longer current and a
     # decision would be fiction dressed as data. Refuse loudly instead.
-    v3_stale = len([d for d in qdates if v3_dt is not None and v3_dt < d <= today])
+    v3_stale = stale_sessions(qdates, v3_dt, today)
     if vix3m_today is None or v3_stale > VIX3M_MAX_STALE_SESSIONS:
         target_e18, err = None, (f"VIX3M STALE ({v3_stale} sessions behind; asof "
                                  f"{v3_dt} vs {today}) -- refusing to decide on "
@@ -940,6 +1016,15 @@ def _run(args):
             print("Stress + weekly decision day: fetching 39-name universe + FF3 "
                   "for the residual ranking ...", flush=True)
             ff = fresh_ff3()
+            # Ken French publishes the daily factors ~a month late (2026-10-03: file ended
+            # 2026-08-31); residual_series needs today's factor row, so the stress basket
+            # cannot form live. Fixing that changes the rule (prereg), so this only says so.
+            ff_max = max(ff) if ff else None
+            if ff_max is None or ff_max < today:
+                print(f"  !! FF3 lags today ({ff_max} < {today}): stress basket "
+                      f"unreachable (record GT)", flush=True)
+                RUN_FAILURES.append(f"FF3 lags today ({ff_max} < {today}): stress basket "
+                                    f"unreachable (record GT)")
             ranks = []
             illiquid = []
             unknown_liq = []

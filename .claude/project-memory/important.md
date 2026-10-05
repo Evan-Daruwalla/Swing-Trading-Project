@@ -37,7 +37,7 @@
 **Source:** CLAUDE.md:29-31, 60-63.
 
 ## 6. NAV holes are permanent - never backfill or "fix" them (2026-09-30)
-**What:** the acknowledged holes (2026-07-30 x3; e6_1x 08-25..08-31) stay holes (Evan, 2026-09-05). The 27 rows backfilled for 09-08..09-21 must be excluded from uptime metrics.
+**What:** the acknowledged holes (2026-07-30 x3; e6_1x 08-25..08-31) stay holes (Evan, 2026-09-05). The 30 rows backfilled for 09-08..09-22 (27 on 2026-09-22, record GP; the 3 for 09-22 on 2026-10-04, record GU) must be excluded from uptime metrics. They were backfilled only because each was proven exact (ledger frozen, every rule said HOLD, formula reproduced every live row); that is the bar for any future backfill.
 **Constrains:** any NAV repair or uptime number.
 **Why:** a silent backfill is a fabricated track record.
 **Source:** data.md:57-63, 125-132.
@@ -54,8 +54,8 @@
 **Why:** the record ships in this PUBLIC repo.
 **Source:** HANDOFF.md:599-603; disclosure.md:79-85.
 
-## 9. Open: the 23:45 CT schedule fix is APPLIED, NOT VERIFIED (2026-09-30)
-**What:** `SwingTradingDailyPaper` moved 19:00 -> 23:45 CT Mon-Fri on 2026-09-22 (record GO).
-**Constrains:** check `var/daily_swing_paper.log` for FEED-CLOCK refusals and that `paper_nav` has rows for all three sleeves before trusting it.
+## 9. The 23:45 CT schedule: 8 of 9 nights clean (2026-09-30; updated 2026-10-04)
+**What:** `SwingTradingDailyPaper` moved 19:00 -> 23:45 CT Mon-Fri on 2026-09-22 (record GO). The first 23:45 run (09-22) still saw the NaN and refused; 09-23..10-02 all passed (records GT, GU).
+**Constrains:** check `var/daily_swing_paper.log` for the line `REFUSING TO RUN -- price feed is BEHIND` (it said "FEED-CLOCK", text the log never prints, until 2026-10-04 - record GT HIGH 3) and that `paper_nav` has rows for all three sleeves. Since the 09-22 backfill a clean night ends `exit code 0`.
 **Why:** the feed-clock guard has no override on purpose; a wrong start time silently skips days.
 **Source:** HANDOFF.md:45-58; gotchas.md (feed clock).

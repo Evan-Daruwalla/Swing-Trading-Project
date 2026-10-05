@@ -43,7 +43,10 @@ ET = ZoneInfo("America/New_York")
 # The guard only has to know "has the session finished". Half-days end 13:00 ET;
 # using the REGULAR 16:00 close means a run between 13:00 and 16:00 on a half-day
 # does not yet expect that day's bar -- conservative in the no-false-refusal
-# direction. The scheduled run is 19:00 CT = 20:00 ET, well past either.
+# direction. The scheduled run is 23:45 CT = 00:45 ET the NEXT day (moved
+# from 19:00 CT by Evan 2026-09-22, record GO), well past either; the ET date
+# has rolled over, so last_completed_session() walks back to the session
+# that just closed.
 REGULAR_CLOSE_ET = dt.time(16, 0)
 
 # How far back last_completed_session() will walk before giving up. The longest
@@ -101,7 +104,10 @@ def holidays(year):
     out.add(_nth_weekday(year, 2, 0, 3))            # Washington's Birthday
     out.add(_easter(year) - dt.timedelta(days=2))   # Good Friday
     out.add(_nth_weekday(year, 5, 0, -1))           # Memorial Day, last Monday
-    out.add(_observed(dt.date(year, 6, 19)))        # Juneteenth (NYSE since 2022)
+    if year >= 2022:                                # Juneteenth, NYSE since 2022 --
+        out.add(_observed(dt.date(year, 6, 19)))    # unconditional until 2026-09-11,
+                                                    # which rejected 23 real June
+                                                    # sessions 1999-2021 (record GL s4)
     out.add(_observed(dt.date(year, 7, 4)))         # Independence Day
     out.add(_nth_weekday(year, 9, 0, 1))            # Labor Day, 1st Monday
     out.add(_nth_weekday(year, 11, 3, 4))           # Thanksgiving, 4th Thursday
@@ -109,9 +115,58 @@ def holidays(year):
     return out
 
 
+# Unscheduled full-day NYSE closures: weekdays that are not holidays and yet had
+# no session. DERIVED FROM DATA, not from memory -- 2026-09-09, by running
+# sessions_between() across QQQ's whole history (1999-03-10..2026-09-09, 6,918
+# bars) and taking every date the enumerator expected that the vendor series did
+# not contain. That returned exactly these ten and nothing else; the parenthetical
+# reasons are the commonly recorded ones, but the DATES are the measurement.
+#
+# This is the upgrade trigger the shortcut note at the top of this file named
+# ("if an ad-hoc closure ever actually fires this, add a dated exception set
+# here"). It fired ten times the first time an enumerator existed to fire it.
+# Bounded by construction: only closures inside QQQ's span are discoverable this
+# way, so a pre-1999 consumer would still see false holes.
+AD_HOC_CLOSURES = frozenset({
+    dt.date(2001, 9, 11), dt.date(2001, 9, 12),      # September 11 attacks
+    dt.date(2001, 9, 13), dt.date(2001, 9, 14),
+    dt.date(2004, 6, 11),                            # Reagan day of mourning
+    dt.date(2007, 1, 2),                             # Ford day of mourning
+    dt.date(2012, 10, 29), dt.date(2012, 10, 30),    # Hurricane Sandy
+    dt.date(2018, 12, 5),                            # G.H.W. Bush day of mourning
+    dt.date(2025, 1, 9),                             # Carter day of mourning
+})
+
+
 def is_trading_day(d):
     """True if `d` (a datetime.date) is a scheduled US equity session."""
-    return d.weekday() < 5 and d not in holidays(d.year)
+    return (d.weekday() < 5 and d not in holidays(d.year)
+            and d not in AD_HOC_CLOSURES)
+
+
+def sessions_between(start, end):
+    """Every scheduled session from `start` to `end`, inclusive, ascending.
+
+    `start` and `end` are datetime.date. Returns [] if end < start.
+
+    The only range enumerator in this module. `is_trading_day` answers one date
+    and `last_completed_session` walks backward to the first hit, so before this
+    nothing could produce the EXPECTED set of sessions to diff a price series
+    against -- which is why a session missing from the MIDDLE of a series was
+    invisible repo-wide (record GJ.6). The tail case was already covered by
+    check_feed_clock; this is the interior one.
+
+    Carries the same shortcut as the rest of the module: SCHEDULED closures
+    only. An ad-hoc closure makes this expect a session that never happened, so
+    a caller diffing against it reports a false hole -- a red a human clears,
+    never a silent wrong answer."""
+    out = []
+    d = start
+    while d <= end:
+        if is_trading_day(d):
+            out.append(d)
+        d += dt.timedelta(days=1)
+    return out
 
 
 def last_completed_session(now=None):

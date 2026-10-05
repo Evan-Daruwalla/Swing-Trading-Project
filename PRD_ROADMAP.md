@@ -61,7 +61,7 @@ immediately; statistical CONCLUSIONS about it wait for the pre-registered N
 ### What exists (verified 2026-07-08)
 
 - This project: docs only. `HANDOFF.md`, append-only record (Phase 0 +
-  Appendices A–B), `.claude/codebase-memory/` bins,
+  Appendices A–B), `.claude/project-memory/` bins,
   `docs/research/2026-07-08_small-account-swing-strategies.md` (evidence
   brief), `docs/research/2026-07-08_experiment_ideas.md` (30 ideas +
   council outcome). No code, no git repo, no venv, no DB.
@@ -1343,6 +1343,32 @@ Order is by consequence, not effort. Nothing here reopens a verdict.
    offline. **The done-check needs a trading day — Mon 09-07 is Labor Day, so
    earliest is Tue 2026-09-08:** run `--watch` from ~15:15 CT to bracket the
    publication hour. Nothing was scheduled; registering a task is Evan's call.)*
+   *(Outcome 2026-09-10, records GH/GK/GL: **ROOT CAUSE ANSWERED - FIX NOT
+   LANDED - still OPEN.** The done-check passed 2026-09-08: a fetch at
+   19:00:01 CT logged `raw_last=2026-09-08`, `nan=True`,
+   `filtered_last=2026-09-04` (GH). It is the THIRD hypothesis above: Yahoo
+   publishes the bar clean (17:35 CT), revises it into a NaN-carrying row by
+   the 19:00 run, and cleans it again within hours (~23:10 CT on 09-10); our
+   O/H/L/C filter drops the NaN row and the feed-clock guard refuses. GK's
+   2/5/15-second retry did NOT unblock the 09-09 or 09-10 runs. `paper_nav`
+   ends at 2026-09-04 for all three sleeves. The real fix - move the run past
+   the revision window, or narrow the filter - is Evan's call.)*
+   *(Update 2026-09-22, record GO: **FIX APPLIED, NOT YET VERIFIED.** Evan
+   moved the `SwingTradingDailyPaper` trigger 19:00 -> 23:45 CT, Mon-Fri
+   (option D; confirmed by `schtasks /query /xml`). Done-check: the first
+   23:45 run prints no `REFUSING TO RUN -- price feed is BEHIND` line (this
+   said "no FEED-CLOCK refusal", text the log never prints, so the check could
+   not fail - record GT HIGH 3, corrected 2026-10-04) and writes a `paper_nav`
+   row for its session in all three sleeves. ~~Its exit code will still be 1 - the
+   27 unacknowledged (sleeve, date) holes go to `RUN_FAILURES` - so read the
+   log, not Last Result.~~ The 27 holes were BACKFILLED the same evening
+   (record GP), so exit 0 is now possible.)*
+   *(Outcome 2026-10-04, records GT/GU: **8 of 9 nights clean, not a clean
+   sweep.** The FIRST 23:45 run (09-22) still saw the NaN and refused; 09-23
+   through 10-02 all passed the feed clock and marked NAV. Every one of those
+   runs still exited 1, only because the lost 09-22 session was unacknowledged
+   - backfilled 2026-10-04 (GU). Proof that the loop is green is the first
+   23:45 log ending `exit code 0`, read the next morning, never a manual run.)*
 3. **Report the permanently-unmeasurable fidelity rows.** 5 of 10
    `fill_divergence` rows carry a NULL `alpaca_order_id` and are structurally
    excluded from `open_divergence_rows`, so half of M3's only fidelity

@@ -25,3 +25,10 @@
 
 
 - Reviewed 2026-09-05: hook chain unchanged; `alpaca_keys.env` still untracked (`git log --all -- alpaca_keys.env` empty); the pre-commit gate fired for real on 2026-09-05 (record FM).
+
+- 2026-09-09 (records GJ, GK, GL): `scripts/git-hooks/pre-commit` now EXITS 1
+  when the delegated commit-gate is absent; before, it warned and committed
+  unscanned. The GL landing-check ran it against a fake HOME (exit 1, BLOCKED)
+  and the real one (exit 0). Still inaccurate: the comment near the record-guard
+  block says it "Fails CLOSED", but the dispatcher skips that guard when its
+  file is absent (GJ LOW, unfixed).

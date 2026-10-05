@@ -34,7 +34,7 @@ corrected 2026-08-13, record EO.)
 - Record entry (/project-memory §2): every 3 prompts of real work.
 - Handoff (§3): session end.
 - PRD next-task (§4): on request; default idle action once a PRD exists.
-- Codebase-memory bins (§5): same session as any fact-changing change.
+- Project-memory bins (§5): same session as any fact-changing change.
 - Misses are logged in the record, not hidden.
 - TIMEZONE: record/doc timestamps in **Central time, DST-aware**. Run `date`
   before stamping and label the zone by its UTC offset — **UTC-6 → CST,
@@ -48,10 +48,10 @@ corrected 2026-08-13, record EO.)
 ## Definition of done (additive to global standards)
 - REQUIRED done-check: `.venv\Scripts\python.exe -m swing_bot.test_frozen`
   must print `FROZEN TESTS: GREEN (all d=0)` — 12 pinned refs at d=±0.0000pp
-  + 19 invariants (17 until 2026-09-06, when audit FX added the two non-positive-VIX refusals). Run after ANY change to `swing_bot/` or to
+  + 22 invariants (17 until 2026-09-06, when audit FX added the two non-positive-VIX refusals; 19 until 2026-09-09, when audit GJ added the zero-DB-qty reconcile case and two calendar-enumerator assertions). Run after ANY change to `swing_bot/` or to
   `scripts/daily_swing_paper.py`. (This line said "no test suite exists yet"
   until 2026-08-06; the tripwire has been green since 2026-07-09. Corrected by
-  audit #3. Detail in `.claude/codebase-memory/testing.md`.)
+  audit #3. Detail in `.claude/project-memory/testing.md`.)
 - Any script that touches price data states its adjustment convention in a
   header comment (split-adjusted / dividend-UNadjusted if sourced from
   Trading's price_cache).
@@ -65,3 +65,7 @@ corrected 2026-08-13, record EO.)
   spread/slippage dominate.
 - `.bat` files pure ASCII (cmd.exe silently corrupts its parse otherwise).
 - Never rewrite JSON data files with PowerShell; use Node/dedicated tools.
+
+Never include "Co-Authored-By: Claude Opus 5.5 (or any other model) <noreply@anthropic.com>" in any commits or pushes
+
+Long tasks on Opus 5.5 follow the plan-split rule in the workspace-root CLAUDE.md (Opus plans and reasons; up to 3 Sonnet 5.5 agents run the code part; not for scheduled runs).

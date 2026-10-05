@@ -83,6 +83,29 @@ def _flatten(df):
     return df
 
 
+def _trailing_nan(df):
+    """True if the frame's LAST row carries a NaN in any of O/H/L/C.
+
+    Record GH (2026-09-08): Yahoo published the 2026-09-08 QQQ bar clean at
+    17:35 CT and had REVISED it into a NaN-carrying row by 19:00 CT. fetch()'s
+    filter then deletes that row, the series ends a session short, and the live
+    loop's feed-clock guard refuses -- while the log blames the vendor for a bar
+    the vendor actually published. A retry is the only thing that distinguishes
+    'not published yet' from 'published then revised', because both look
+    identical once the row is gone.
+
+    NaN is the only float not equal to itself -- the same test the row filter
+    uses below, and the one `scripts/probe_feed_publication.py:60-66` performs
+    out-of-library today. Empty frames are the caller's `df.empty` check, not
+    this one's business.
+    """
+    if df is None or df.empty:
+        return False
+    last = _flatten(df).iloc[-1]
+    return any(last.get(c) != last.get(c)
+               for c in ("Open", "High", "Low", "Close"))
+
+
 # shortcut: retry-on-empty assumes an empty result is a yfinance blip, which
 # holds for THIS project (every ticker requested here has history in the range).
 # If a caller ever legitimately requests an empty range, it pays 22s of backoff.
@@ -108,9 +131,9 @@ def fetch(ticker, start, end=None):
         try:
             df = yf.download(ticker, start=start, end=end, auto_adjust=False,
                              progress=False, actions=False)
-            if not df.empty:
+            if not df.empty and not _trailing_nan(df):
                 break
-            last_err = "empty result"
+            last_err = "empty result" if df.empty else "trailing NaN in last row"
         except Exception as e:                      # noqa: BLE001 - yfinance raises broadly
             last_err = repr(e)
             df = None
@@ -120,6 +143,17 @@ def fetch(ticker, start, end=None):
         print(f"  prices.fetch({ticker}): no data after "
               f"{len(FETCH_RETRY_BACKOFF_S) + 1} attempts ({last_err})", flush=True)
         return []
+    if _trailing_nan(df):
+        # Record GH option (c): say what actually happened. The row is still
+        # dropped by the filter below, so the series ends a session short and
+        # the feed clock will refuse -- but "the vendor never published it" and
+        # "the vendor published it and then revised it into a NaN" are opposite
+        # problems with opposite fixes, and the log has to tell them apart.
+        print(f"  prices.fetch({ticker}): last row STILL carries a NaN after "
+              f"{len(FETCH_RETRY_BACKOFF_S) + 1} attempts. The vendor DID publish "
+              f"this bar and then revised it; our O/H/L/C filter drops it, so the "
+              f"series ends short. This is our filter, not a vendor no-show "
+              f"(record GH).", flush=True)
     df = _flatten(df)
     bars = []
     for ts, row in df.iterrows():

@@ -1,6 +1,6 @@
 # testing — Swing Trading
 
-Last updated 2026-08-06. **The suite EXISTS and is the required done-check.**
+Last updated 2026-09-10 (see the newest dated section). **The suite EXISTS and is the required done-check.**
 (This file said "no test suite exists yet" until 2026-08-06 — stale since the
 tripwire went green on 2026-07-09, found by audit #3.)
 
@@ -19,7 +19,7 @@ Two kinds of case, one file (`swing_bot/test_frozen.py`, no framework, own
 - **12 pinned references** — E1/E1b/E2 total-PnL and closed-trade counts on
   fixed swing.db windows, plus E4 rotation. Declared precision is ±0.0000pp.
   These run the real engine against the real `bars` table, opened READ-ONLY.
-- **19 invariants** (17 until 2026-09-06; audit FX added `e18_zero_vix_refuses` and `e18_negative_vix_refuses`) — pure-function assertions needing no fixtures: `signals.ibs`
+- **22 invariants** (17 until 2026-09-06; audit FX added `e18_zero_vix_refuses` and `e18_negative_vix_refuses`; 19 until 2026-09-09, when audit GJ added the three listed in the 2026-09-09 section below) — pure-function assertions needing no fixtures: `signals.ibs`
   edge cases; the three live sleeve decisions (`ps.decide_e6_1x`,
   `decide_e18_vixts`, `decide_m10_1`); since 2026-08-06, the pure helpers of
   the live orchestrator (`qty_reconcile_orders` drift band + pending suppression,
@@ -145,3 +145,34 @@ FAIL.
   by running the live loop, which this project forbids in a dev session.
 - Part C captures the real printed line and pins the fragments an operator
   reads, so a reword that drops the denominator fails the check.
+
+## Added 2026-09-09 (records GK, GL)
+
+- **Suite is 12 refs + 22 invariants.** The three new invariants --
+  `reconcile_zero_db_qty_is_infinite_drift`,
+  `sessions_between_skips_weekend_and_holiday`, `ad_hoc_closure_is_not_a_session`
+  -- each FAIL against the pre-change (HEAD 7de78f3) code, per the GL
+  landing-check's mutation run, so they catch a revert.
+- **What the 12 refs cover, stated correctly** (GI said the opposite; corrected
+  in GK): every one runs an engine -- `swing_bot/backtest.py` (E1/E1b/E2) or
+  `swing_bot/rotation.py` (E4). The tripwire misses defects in runners that roll
+  their own loop because of SCOPE, not because the refs are pure helpers.
+- **Standalone, NOT part of the suite:** `scripts/prove_fetch_trailing_nan.py`
+  (5/5), the first proof built on a pandas frame, monkeypatches `yf.download`;
+  `scripts/prove_session_gap.py` (8/8; 7/7 until the 2026-09-11 Juneteenth case) pins the calendar enumerator, gap
+  detection and the ten derived ad-hoc closures.
+- **A fixture pass is not a production fix.** `prove_fetch_trailing_nan` passes,
+  and the retry it proves did not unblock one production run (record GL): its
+  positive case (NaN on attempt 1, clean on attempt 2) is a pattern production
+  never showed.
+
+## Added 2026-10-04 (record GU)
+
+- **`scripts/prove_loop_guards.py` (10/10), standalone, temp DB, no network.** Pins
+  `fill_session` (a Thursday signal whose Friday run was lost books the Friday
+  open, not the Tuesday one), `stale_sessions`, and an end-to-end `realize_pending`
+  call that must write exactly one row dated 2026-09-04. Sentinel run: reverting
+  `fill_session` to return `today` fails it 8/10 (books 09-08). The VIX staleness,
+  sanity-window and FF3-lag gates live inside `main()` and have no runnable check
+  beyond `py_compile` + `test_frozen` (shortcut, named: `main()` cannot run without
+  placing orders).

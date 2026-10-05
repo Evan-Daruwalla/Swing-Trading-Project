@@ -68,3 +68,13 @@
   **Do not "tidy" that call into `backfill_divergence`:** that function's only
   call site is inside `if args.execute:`, so the line would vanish from every
   dry run, which is precisely what M13.3 required it to survive.
+
+- 2026-09-09 (records GK, GL): **`trading_calendar.sessions_between(start,
+  end)` is the calendar's only range enumerator**; `coverage_gate.missing_sessions()`
+  diffs a series against it inside `scan_fetched_bars`, so a mid-series hole now
+  fails the live loop's DATA-SANITY GATE through the existing `RUN_FAILURES`
+  path. **`AD_HOC_CLOSURES` (10 dates) was DERIVED from QQQ's full history, not
+  recalled** -- the enumerator's only false holes across 6,918 bars,
+  1999-03-10..2026-09-09. Reverse-direction gap: Juneteenth pre-2022
+  (gotchas.md) -- fixed 2026-09-11. **Never yet run in production:** the feed-clock guard refuses
+  before the data-sanity gate on every run since it landed.

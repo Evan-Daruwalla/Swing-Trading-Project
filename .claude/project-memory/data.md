@@ -1,6 +1,7 @@
 # data — Swing Trading
 
-Last updated 2026-07-15. Canonical home for data/schema standards. The
+Last updated 2026-09-10 (header said 2026-07-15 while dated entries ran to
+2026-09-10 -- audit GJ MEDIUM, corrected 2026-09-11). Canonical home for data/schema standards. The
 Trading-read-only + EOD-only rules are also always-load INDEX invariants.
 
 ## Data layer (M0.2, DECIDED 2026-07-08 — own fetcher, NOT price_cache reuse)
@@ -114,3 +115,30 @@ Trading-read-only + EOD-only rules are also always-load INDEX invariants.
   concentrated in early history -- SPY 1993 33/233 (14.2%), 1994 9.5%, 1995 4.8%;
   IWM 2001 7.3%. The overnight leg is mechanically zero on those days and the
   session dumps into intraday, deflating any pre-2000 overnight baseline.
+
+- 2026-09-09/10 (records GK, GL): `prices.fetch` re-enters its 2/5/15 s
+  backoff when the frame's LAST row has a NaN in O/H/L/C (`_trailing_nan`), and
+  on exhaustion prints that the vendor DID publish the bar and our filter dropped
+  it. **It does NOT recover the 19:00 CT revision** (gotchas.md): the row is
+  still dropped and the loop still refuses. The message is the part that landed.
+
+- 2026-09-22 (records GO, GP): **27 `paper_nav` rows are BACKFILLED, not live
+  marks** - all three sleeves on 2026-09-08..09-11, 09-14..09-17 and 09-21. The
+  table has no provenance column, so the list lives in a comment beside
+  `ACKNOWLEDGED_NAV_HOLES` in `scripts/daily_swing_paper.py`. **Any uptime or
+  "sessions the loop actually ran" metric must exclude them.** They are exact
+  (`scripts/backfill_nav_holes_20260922.py` proved: ledger frozen, every rule said
+  HOLD, the formula reproduced all 15 live rows to 1e-9); pre-write backup at
+  `var/swing.db.pre-backfill-20260922-212738` (gitignored, local only).
+
+- 2026-10-04 (records GT, GU): **3 more BACKFILLED rows, 2026-09-22, all three
+  sleeves** - 30 in total. The first 23:45 run refused that session. Same proof as
+  GP, run with `backfill_nav_holes_20260922.py --end 2026-10-02`: ledger still frozen
+  (no transaction since 09-01), every rule HOLD on 09-22, and all 66 rows already in
+  09-01..10-02 reproduced to 1e-9. Backup `var/swing.db.pre-backfill-20261004-203404`.
+  The script now writes its backup to `var/`, not `scripts/` (GT LOW).
+- 2026-10-04 (record GU): **a pending order now fills at the open of the FIRST session
+  after its signal** (`fill_session`), even when a run in between refused. Before,
+  the next run filled it at its own `today`'s open while Alpaca had filled a session
+  earlier - a silent DB-vs-broker fork (GT MED 6). A late fill adds a `LATE FILL`
+  line to `RUN_FAILURES`.

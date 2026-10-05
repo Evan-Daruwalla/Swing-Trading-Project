@@ -11,7 +11,7 @@ git -c core.quotePath=false ls-files | wc -l                                  # 
 git -c core.quotePath=false ls-files | awk -F/ 'NF==1{print "(root)"} NF>1{print $1}' | sort | uniq -c | sort -rn
 git -c core.quotePath=false ls-files docs | awk -F/ 'NF==2{print "docs/(root)"} NF>2{print "docs/"$2}' | sort | uniq -c
 git ls-files 'scripts/run_*.py' | wc -l                                       # 39 runners
-git ls-files 'scripts/prove_*.py' | wc -l                                     # 5 proofs
+git ls-files 'scripts/prove_*.py' | wc -l                                     # 6 tracked at 7de78f3; +2 untracked (prove_fetch_trailing_nan, prove_session_gap)
 git ls-files 'docs/prereg*' | wc -l                                           # 44 preregs
 ```
 
@@ -28,7 +28,7 @@ first pass here reported 105 docs + a phantom `"docs` bucket instead of 107).
 | `docs/` | **107** | 51 at root + 56 in `research/` |
 | `scripts/` | **59** at 2026-09-06 (58 at 2026-09-05; `prove_torn_write.py` added) | 55 `.py` + `daily_swing_paper.bat` + `git-hooks/pre-commit` + `.gitkeep` |
 | `swing_bot/` | **14** | the importable package: engines, ledger, guards, tripwire |
-| `.claude/` | **15** (13 at the 2026-09-05 HEAD) | codebase-memory bins + `pm-cadence.json`; DIRECTORY.md and disclosure.md are the two not yet tracked |
+| `.claude/` | **15** (13 at the 2026-09-05 HEAD) | project-memory bins + `pm-cadence.json`; DIRECTORY.md and disclosure.md are the two not yet tracked |
 | (root) | **9** | see below |
 | `graphify-out/` | **6** | the knowledge-graph build outputs (cache is gitignored) |
 | `data/` | **1** | `fomc_announcement_dates.json` |
@@ -52,18 +52,23 @@ ledger + per-sleeve signal logic) · `alpaca_client.py` (broker) ·
 beside it) · `trading_calendar.py` (the independent clock, NEW 2026-09-05) ·
 `costs.py` · `test_frozen.py` (the tripwire).
 
-## `scripts/` — 39 runners, 5 proofs, 1 orchestrator
+## `scripts/` — 39 runners, 6 proofs tracked (+2 untracked), 1 orchestrator
 
 - **`daily_swing_paper.py`** is THE live orchestrator (+ its `.bat`, fired by
-  the Windows task `SwingTradingDailyPaper`, weekdays 19:00 CT). Never run it
+  the Windows task `SwingTradingDailyPaper`, weekdays 23:45 CT since
+  2026-09-22, 19:00 CT before -- record GO). Never run it
   by hand in a dev session.
 - **`run_*.py` (39)** — one per pre-registered experiment. `run_e8_squeeze.py`
   owns `cache_fetch`, the repo's real shared data layer for the experiment
   jungle.
-- **`prove_*.py` (5)** — standalone proofs, each runnable with no network and
+- **`prove_*.py` (6 tracked + 2 untracked)** — standalone proofs, each runnable with no network and
   no DB: `prove_cache_guard` 8/8 · `prove_refusal_gate` 10/10 ·
   `prove_liquidity_floor` 11/11 · `prove_feed_clock` 18/18 ·
-  `prove_divergence_census` 16/16.
+  `prove_divergence_census` 16/16 · `prove_torn_write` 32 · untracked since
+  2026-09-09: `prove_fetch_trailing_nan` 5/5 · `prove_session_gap` 8/8 (7/7 until 2026-09-11) ·
+  2026-10-04: `prove_loop_guards` 10/10.
+  (Said "5 proofs" while git tracked 6 -- audit GJ MEDIUM; corrected
+  2026-09-10. Regenerate every count here after the next commit.)
 - `probe_feed_publication.py` — the M13.2 timing instrument (hand-run).
 
 ## `docs/` — 107 files

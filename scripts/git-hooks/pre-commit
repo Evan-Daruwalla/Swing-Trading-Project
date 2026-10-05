@@ -24,8 +24,13 @@ GATE="${HOME}/.claude/skills/commit-gate/hooks/pre-commit"
 if [ -f "$GATE" ]; then
   sh "$GATE" || exit 1
 else
-  echo "commit-gate WARNING: gate not found at $GATE — secret gate SKIPPED (fail-open)." >&2
-  echo "The commit proceeds UNSCANNED." >&2
+  echo "commit-gate BLOCKED: secret gate not found at $GATE." >&2
+  echo "This repo holds live Alpaca credentials, is public, and has no CI" >&2
+  echo "backstop (no .github/), so this hook is the ONLY scan. It now fails" >&2
+  echo "CLOSED: a machine without the gate installed does not commit." >&2
+  echo "Install the commit-gate skill, or bypass deliberately with" >&2
+  echo "  git commit --no-verify   (you own what that lets through)." >&2
+  exit 1
 fi
 
 
