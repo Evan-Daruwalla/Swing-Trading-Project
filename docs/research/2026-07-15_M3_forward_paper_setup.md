@@ -117,7 +117,8 @@ The original blocking list is preserved below for the record.
    (CLAUDE.md), a **dedicated new paper account** is recommended over reusing one of
    Trading's ~3 existing accounts, so order flow never mixes. Paste the key/secret into
    `alpaca_keys.env` at the project root.
-2. **Choose which sleeve mirrors live** via `SWING_ALPACA_SLEEVE` in that file (or leave
+2. (Obsolete since the 3-account model, see line 59; noted 2026-10-11, record GY.)
+   **Choose which sleeve mirrors live** via `SWING_ALPACA_SLEEVE` in that file (or leave
    blank to run all three DB-only, no live orders — a legitimate choice; the DB ledger alone
    is real forward-paper evidence). **Recommendation:** start with `e6_1x` — simplest,
    single-instrument, lowest risk of a plumbing bug corrupting the evidence trail — verify a
@@ -147,6 +148,9 @@ The original blocking list is preserved below for the record.
 ## Reproduction
 
 `.venv\Scripts\python.exe scripts\daily_swing_paper.py` (dry-run; safe to run repeatedly).
+**Corrected 2026-10-11 (record GY): this is FALSE.** The default mode WRITES the
+swing.db ledger (realize_pending, mark_nav, touch_run) and only skips broker orders,
+so it is not safe to run repeatedly. Never run it by hand; the scheduled task runs it.
 `.venv\Scripts\python.exe -m swing_bot.alpaca_client` (connectivity smoke test, once keys
 are in `alpaca_keys.env`). Frozen tripwire GREEN (12 refs d=0) — new tables only, no pinned
 data touched.

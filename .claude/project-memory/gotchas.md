@@ -222,3 +222,24 @@ they apply to any yfinance-based pipeline built here:
   stress decision day. **Any fix that makes the basket form changes the rule and
   needs a prereg** (Evan, 2026-10-04: warning only for now). It has not fired
   yet only because VIX stayed under 20.
+
+- 2026-10-04 (record GW, audit GT MED 7): **a real unscheduled market closure is a
+  CALENDAR fix, not a NAV hole.** Before, the feed-clock refusal told the operator
+  to put the session in `ACKNOWLEDGED_NAV_HOLES`, and the data-sanity gate refused
+  for ~200 nights with no stated way out. Both messages now say: add the date to
+  `trading_calendar.AD_HOC_CLOSURES` (a `swing_bot/` edit, so run test_frozen).
+  If the date was NOT a closure, the vendor dropped a bar.
+
+- 2026-10-11 (record GY, audit GX): **a `run_lock` row older than 2 h is cleared
+  automatically** (`RUN_LOCK_STALE_AFTER`, `daily_swing_paper.py`). The night that
+  clears it exits 1 with "stale run_lock cleared" in RUN_FAILURES: check the
+  killed night's paper_nav rows. A row younger than 2 h, or one whose held_at
+  does not parse, still refuses; the manual clear is `DELETE FROM run_lock WHERE
+  id = 1`.
+- 2026-10-11 (record GY, audit GX): **a kept pending retries at the NEXT
+  session's open.** On a partial realize, `pending_signal_date` is moved to the
+  fill session, so `fill_session` picks the retry day. Before, the retry re-filled
+  at the original fill session's open (a past price).
+- 2026-10-11 (record GY, audit GX): **the default (no --execute) run WRITES the
+  ledger** (realize_pending, mark_nav, touch_run); it only skips broker orders.
+  It is not a dry run - never run it to "just look".

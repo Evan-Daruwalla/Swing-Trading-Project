@@ -122,8 +122,13 @@ def missing_sessions(ticker, bars):
     first = dt.date.fromisoformat(dates[0])
     last = dt.date.fromisoformat(dates[-1])
     have = set(dates)
+    # (record GT MED 7) The detail names the acknowledge path: without it,
+    # one unmodelled closure refused ~200 nights.
     return [(ticker, d.isoformat(), "missing_session",
-             f"calendar expects it within {dates[0]}..{dates[-1]}")
+             f"calendar expects it within {dates[0]}..{dates[-1]}. If "
+             f"{d.isoformat()} was an unscheduled market closure, add it to "
+             f"trading_calendar.AD_HOC_CLOSURES (the acknowledge path); "
+             f"otherwise the vendor dropped this bar")
             for d in trading_calendar.sessions_between(first, last)
             if d.isoformat() not in have]
 

@@ -159,7 +159,7 @@ FAIL.
   their own loop because of SCOPE, not because the refs are pure helpers.
 - **Standalone, NOT part of the suite:** `scripts/prove_fetch_trailing_nan.py`
   (5/5), the first proof built on a pandas frame, monkeypatches `yf.download`;
-  `scripts/prove_session_gap.py` (8/8; 7/7 until the 2026-09-11 Juneteenth case) pins the calendar enumerator, gap
+  `scripts/prove_session_gap.py` (9/9 since 2026-10-04; 8/8 before, 7/7 until the 2026-09-11 Juneteenth case) pins the calendar enumerator, gap
   detection and the ten derived ad-hoc closures.
 - **A fixture pass is not a production fix.** `prove_fetch_trailing_nan` passes,
   and the retry it proves did not unblock one production run (record GL): its
@@ -168,7 +168,7 @@ FAIL.
 
 ## Added 2026-10-04 (record GU)
 
-- **`scripts/prove_loop_guards.py` (10/10), standalone, temp DB, no network.** Pins
+- **`scripts/prove_loop_guards.py` (10/10 at creation; 17/17 since 2026-10-11), standalone, temp DB, no network.** Pins
   `fill_session` (a Thursday signal whose Friday run was lost books the Friday
   open, not the Tuesday one), `stale_sessions`, and an end-to-end `realize_pending`
   call that must write exactly one row dated 2026-09-04. Sentinel run: reverting
@@ -176,3 +176,31 @@ FAIL.
   sanity-window and FF3-lag gates live inside `main()` and have no runnable check
   beyond `py_compile` + `test_frozen` (shortcut, named: `main()` cannot run without
   placing orders).
+
+## Added 2026-10-04 (record GW)
+
+- **`prove_session_gap` is 9/9.** Case 9 plants an unmodelled weekday closure: the
+  anomaly must name `trading_calendar.AD_HOC_CLOSURES`, and adding the date there
+  must clear it. Sentinel: restoring the old message fails case 9.
+- **Harness criterion 3 can now fail.** It was `mean train size ON < OFF`, true by
+  construction. It is now a hand-computed fixture (test blocks [5..7] and [14..15]
+  in 20 observations) that the pre-fix purge failed (`[0,1,2,3,18,19]`). HARNESS
+  ACCEPTED after the fix, 5/5. Informational train size purge OFF -> ON is now
+  4462 -> 4322 (was ~~2971 -> 2901~~ 2975 -> 2905 at n=6695 - corrected
+  2026-10-11, record GY: re-derived by running HEAD's pre-fix purge; the old purge
+  wiped about a third of every train set, OFF included). No reported number moved - train indices feed nothing.
+
+## Added 2026-10-11 (record GY, audit GX)
+
+- **`prove_loop_guards` is 17/17.** Section D plants a `run_lock` row in a temp
+  DB (`ps.DB_PATH` swapped): 3 h old -> acquired, pid replaced, RUN_FAILURES
+  names it; 10 min old -> refused, row unchanged. Section E is an AST check that
+  `fresh_ff3()` and `series_with_volume()` sit inside try/except Exception.
+- **`prove_torn_write` is 38.** Section H: a partial realize on 2026-10-05 keeps
+  the pending with `pending_signal_date` moved to 2026-10-05, and the retry books
+  every row dated 2026-10-06.
+- Sentinels run 2026-10-11: reverting each of the three fixes fails its own case
+  (D "3 h old lock -> acquired" False; E "fresh_ff3() ... inside try" False; H
+  "pending_signal_date moved" = 2026-10-02). File restored byte-identical.
+- **pre-commit:** a missing record guard now exits 1. Planted with a HOME holding
+  a stub commit-gate and no record guard -> exit 1; the real HOME -> exit 0.

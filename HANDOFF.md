@@ -19,7 +19,8 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > tally reads **38** because M12 (record DU) came *after* the close and is a
 > DIAGNOSTIC, not a search attempt. `docs/trial_log.json` flags the gap as
 > UNRESOLVED and refuses to pick one; DSR deflates by the larger figure (50
-> declared variants), so nothing downstream depends on resolving it. Use 37 for
+> declared variants; **54 since the 2026-09-09 rebuild**, and the log now counts 41
+> prereg docs = the 37 search attempts + F2, two F3 amendments and X4 - record GW), so nothing downstream depends on resolving it. Use 37 for
 > "how big was the search", 38 for "how many pre-registered runs exist".
 
 > **2026-08-03 — SEARCH PHASE DECLARED CLOSED (Evan's dated decision; record DQ).** Not an
@@ -42,6 +43,32 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > `docs/M12_constraint_relaxation_plan.md`; M12's factorial answered it: HORIZON binds,
 > breadth does not — record DU.)
 
+> **2026-10-11 ~15:10 CDT - audit GX's MEDs fixed (record GY), uncommitted.**
+> The loop ran clean all week: 2026-10-05..10-09 each ended `exit code 0`
+> (`var/daily_swing_paper.log` lines 2329-2497). Fixed in
+> `scripts/daily_swing_paper.py`: (1) a `run_lock` row older than 2 h is now
+> cleared and taken, with a RUN_FAILURES line (before, a killed run blocked every
+> later night); (2) the FF3 fetch and each of the 39 universe fetches are in
+> try/except, so a fetch error no longer costs the night's NAV rows; (3) a kept
+> pending now retries at the retry day's open; (4) `--help`/docstring say the
+> default mode WRITES the ledger, and the last log line says 23:45 CT. The
+> pre-commit hook now blocks when the record guard is missing. Proofs:
+> `prove_loop_guards` 17/17, `prove_torn_write` 38, test_frozen GREEN; each fix
+> has a sentinel that fails when the fix is reverted. **Next 23:45 run (Mon
+> 10-12) is the first on this code.**
+>
+> **2026-10-04 ~22:13 CDT - GT's remaining MEDs (record GW), uncommitted.**
+> MED 7: both refusal messages now name the real acknowledge path for an
+> unscheduled closure (`trading_calendar.AD_HOC_CLOSURES`, not a NAV hole); proof
+> `prove_session_gap` 9/9. MED 10: CPCV purge now works per test block (it wiped
+> about a third of every train set, purge OFF included); harness criterion 3 is a
+> fixture that can fail; HARNESS ACCEPTED 5/5; no reported number moved. MED 11:
+> doc counts fixed (54 variants, 41 prereg docs, 23:45 trigger, cache guard RAISES
+> again, bins count). MED 12: anyio/urllib3/soupsieve/pip upgraded, `pip-audit`
+> clean, gated by tests + a live read-only fetch. ~~**First thing next session:**
+> the Mon 10-05 23:45 log line (`exit code 0`) - it is also the first run on the
+> upgraded venv.~~ Answered 2026-10-11 (record GX): 10-05..10-09 all `exit code 0`.
+>
 > **2026-10-04 ~20:35 CDT - AUDIT GT ACTED ON (record GU). The loop is marking NAV
 > every session; 23:45 was 8 of 9 nights clean.** Evan's four calls:
 > (1) **09-22 BACKFILLED** by the GP method (ledger still frozen since 09-01, every
@@ -54,8 +81,9 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > (prereg) - not done. (3) **Late fills** now book the open of the first session
 > after the signal (the one Alpaca filled at), with a `LATE FILL` line, instead of
 > a later wrong open. (4) Commit everything except the record files:
-> **authorized but NOT DONE** - the permission system denied `git add` twice
-> (record GV), so Evan runs it himself. The record waits for a relaunch with
+> ~~**authorized but NOT DONE**~~ the permission system denied `git add` twice
+> (record GV); **Evan committed it himself as `a2514fd`** (37 files, no record
+> file, no Co-Authored-By). The record waits for a relaunch with
 > `PM_RECORD_UNLOCK=1` to redact GJ.
 > Also new: a VIX staleness gate, and the sanity gate refuses a QQQ window under
 > 200 bars. Proof `scripts/prove_loop_guards.py` 10/10 (fails 8/10 on the old
@@ -87,7 +115,7 @@ first; nothing goes live without a pre-registered PASS + Evan's go.
 > GO: the 09-18 run fired at **20:51**, not 19:00 (log:1857), so the bar was clean by
 > 20:51 that night. Artifacts: `var/council/2026-09-22/` (local, gitignored).
 
-**Last updated: 2026-10-04 ~20:35 CDT** (record GU: audit GT acted on; 09-22 backfilled; late-fill/VIX/sanity/FF3 guards) — this file is the only live snapshot;
+**Last updated: 2026-10-11 ~15:10 CDT** (records GX-GY: audit GX; stale run_lock, guarded fetches, retry fill date, hook; earlier GU-GW) — this file is the only live snapshot;
 history lives in the record. **Timezone: record/doc stamps are Central,
 DST-AWARE — read the offset from `date` and label by the number: UTC-6 → CST
 (winter), UTC-5 → CDT (summer). Currently UTC-5 = CDT. The cadence hook
@@ -378,7 +406,7 @@ lines; `/docs-sync` wants the live snapshot small enough to read first.
 > $1,009.94). The 2026-08-18 marks this line used to carry were $1,007.74 / $1,001.44 /
 > $1,021.72.
 > (each started at $1,000). Task now runs S4U — fires with nobody logged on. Scheduled task
-> `SwingTradingDailyPaper` fires 7pm weekdays via `scripts/daily_swing_paper.bat --execute`;
+> `SwingTradingDailyPaper` fires ~~7pm~~ **23:45 CT** (since 2026-09-22, record GO) weekdays via `scripts/daily_swing_paper.bat --execute`;
 > logs to `var/daily_swing_paper.log`. **Do NOT fire it manually intraday** — that is what
 > caused the 07-20 round-trip and the e18 fork; the guard now blocks order submission while
 > the market is open, but the DB ledger still advances on any run.
@@ -397,7 +425,7 @@ lines; `/docs-sync` wants the live snapshot small enough to read first.
 | E4 leverage rotation (3×) | M2d | **PASS backtest, FAILED regime test** | `313d88a` PASS 2014-26; E5 `09a3a31` FAIL 2000-13 (92.7% DD). De-authorized |
 | E6 de-leveraged rotation (1×) | M2d | **PASS, later downgraded** | `0526ea2`; robust in US, but E7 showed market-dependent (3/5). Risk-mgmt overlay, not high-return |
 | E7 international validation | M2e | **Both arms FAIL** | `70ed2a1`; closed the high-return-robust question on 5 unseen non-US regimes |
-| Live paper | M3 | **RUNNING since 2026-07-15** | 3 sleeves (e6_1x / e18_vixts / m10_1_nagel), one $1,000 Alpaca paper account each; 36 sessions (2026-07-15 → 2026-09-03), task S4U green. Said "20 sessions" while :140 six lines earlier said 24 and the DB agreed with 24 — corrected 2026-09-05, finding 6. Row said BLOCKED for 4 weeks after deploy — corrected 2026-08-13, record EO |
+| Live paper | M3 | **RUNNING since 2026-07-15** | 3 sleeves (e6_1x / e18_vixts / m10_1_nagel), one $1,000 Alpaca paper account each; 36 sessions (2026-07-15 → 2026-09-03), task S4U ~~green~~ ~~(red 2026-09-22..10-02 on the lost 09-22 session, which was backfilled 2026-10-04, record GU; counts in this row stop at 2026-09-03).~~ (corrected 2026-10-11, record GY: red on all 20 logged runs 2026-09-08..10-02 - 11 feed-clock refusals (09-08..09-17, 09-21, both 09-22 runs) with one missed-session exit (09-18) among them, then 8 missed-session exits 09-23..10-02 until the 09-22 backfill; `exit code 0` on every run 10-05..10-09, record GX; counts in this row stop at 2026-09-03). Said "20 sessions" while :140 six lines earlier said 24 and the DB agreed with 24 — corrected 2026-09-05, finding 6. Row said BLOCKED for 4 weeks after deploy — corrected 2026-08-13, record EO |
 | Program write-up + packaging | M6 | **Done** | Findings doc updated to E1→E7; `README.md` added; git tag |
 | Live paper: LLM-veto overlay sleeve | M3/M4 | **NOT BUILT — spec superseded** | the `e1_control`/`e1_llm_veto` pair died with E1 (M2b); M3 deployed 3 mechanical sleeves instead. Evan's go and the Alpaca accounts are no longer blockers — an overlay arm needs its own prereg (corrected 2026-08-13, record EO) |
 | Overlay readout (continue/cascade/kill) | M4 | **GATED** | At pre-registered N / time horizon |
@@ -452,8 +480,11 @@ Full descriptions as Evan gave them: record Phase 0.
   `scripts/run_e8_squeeze.py` — the shared data layer **31** files import (30
   experiment runners + the standing proof script), 28 of them naming
   `cache_fetch` itself — raises `StaleCacheError` instead of printing.
-  **CACHE REFRESHED 2026-08-13 (record Appendix ER) — the guard is currently
-  SILENT and research scripts run.** `.e8e9_cache` is **181 price series at ONE
+  **CACHE REFRESHED 2026-08-13 (record Appendix ER) — ~~the guard is currently
+  SILENT and research scripts run.~~** **2026-10-04 (record GW): it RAISES again -
+  `cache_fetch('SPY')` -> StaleCacheError, SPY ends 2026-08-17, 48 days vs a 5-day
+  tolerance. Research runs need the full refresh below, or `SWING_ALLOW_STALE_CACHE=1`
+  set externally for a deliberate historical run.** `.e8e9_cache` is **181 price series at ONE
   vintage, 2026-08-12**, verified with the guard ON and no override. It had held
   5 vintages spanning 2026-07-09 to 2026-08-04, every one of them stale.
   **When it goes stale again, "refresh the cache" is not a one-liner.** It means
@@ -574,9 +605,13 @@ heading, the number moves +1 per append) - V3 IMPLEMENTED and ACCEPTED, but its 
 - `docs/research/` — evidence brief, experiment-ideas list (+ council
   outcome pointer), future power calc / ablation docs.
 - `.claude/project-memory/` — binned technical memory (INDEX + 13 bins; was
-  11 before M13.7 added `DIRECTORY.md` and `disclosure.md`).
-- `graphify-out/` — the knowledge graph (`/graphify` queries it). **2,070 nodes /
-  3,142 edges / 229 communities / 30 hyperedges as of 2026-09-08** (full rebuild,
+  11 before M13.7 added `DIRECTORY.md` and `disclosure.md`). **Since 2026-09-30
+  (record GS): INDEX + `important.md` + 13 topic bins + 11 one-line stubs, in the
+  folder renamed from `codebase-memory/`.**
+- `graphify-out/` — the knowledge graph (`/graphify` queries it). **Local only:
+  gitignored and untracked 2026-10-04** (a full rebuild rewrote graph.json by ~67k lines). **2,136 nodes /
+  3,409 edges / 214 communities / 31 hyperedges as of 2026-10-04** (incremental
+  update; was 2,070 / 3,142 / 229 / 30 on 2026-09-08) (full rebuild,
   5 semantic chunks; was 1,728 / 2,876 / 186 / 9 at record FO and 1665 / 2886 /
   184 / 12 at record ET). **The hyperedge-loss warning below did NOT bite on that
   rebuild** — it went through `to_json`, not `build_merge`, and hyperedges rose
@@ -608,24 +643,36 @@ STATE (2026-10-04): search phase closed at 37 attempts. M3 forward paper is the
 only lever. The loop runs at 23:45 CT Mon-Fri and has marked NAV every session
 since 2026-09-23 (the first 23:45 run, 09-22, still hit the vendor NaN and
 refused; 09-22 was then backfilled, record GU). 30 paper_nav rows (09-08..09-22)
-are backfilled and must be excluded from any uptime figure. HEAD = 5dde35a;
-the GU work (everything except the record files) was authorized for commit
-but staging was denied (record GV) - check `git status` and the git log.
+are backfilled and must be excluded from any uptime figure. HEAD = a2514fd
+(the GU work, committed by Evan); the GW work (MEDs 7/10/11/12), the GY work
+(audit GX's MEDs) and the record files are uncommitted - check `git status`.
+10-05..10-09 all ended `exit code 0` on the upgraded venv (record GX).
+graphify-out/ is STAGED for deletion while its .gitignore rule is UNSTAGED:
+stage .gitignore with it, or `git restore --staged graphify-out`, before any
+commit.
 
-FIRST THING: read the end of var/daily_swing_paper.log for the Mon 2026-10-05
-23:45 run. Expect `exit code 0` and no `REFUSING TO RUN -- price feed is
+FIRST THING: read the end of var/daily_swing_paper.log for the Mon 2026-10-12
+23:45 run, the first on the record-GY code (stale-lock clear, guarded fetches,
+retry fill date). Expect `exit code 0` and no `REFUSING TO RUN -- price feed is
 BEHIND`. Never run the loop (scripts/daily_swing_paper.py or any .bat) to check.
 
 BLOCKED-ON-EVAN -- ask, never work around:
-  1. Record Appendix GJ holds Evan's personal email (one line in the .md, one in
+  1. ~~Record Appendix GJ holds Evan's personal email (one line in the .md, one in
      the .html). Relaunch with PM_RECORD_UNLOCK=1, replace it with [redacted],
      re-render, confirm 0 case-insensitive hits in both; only then commit the
-     record files (they were deliberately left out of the GU commit).
+     record files (they were deliberately left out of the GU commit).~~
+     DONE 2026-10-11 (record GZ): GJ's email and GN's quoted account path are
+     [redacted]; 0 hits in .md and .html; record committed. STILL OPEN:
+     docs/prereg_e10_earnings_drift.md:9 holds the full account path in HEAD and
+     on the public remote since 129dc22 (record GN finding 2) - Evan's call:
+     edit forward only, or rewrite history.
   2. The live M10-1 stress basket cannot form (FF3 ends ~a month back). Any fix
      that makes it form changes the rule and needs a prereg.
   3. GJ section 4 HIGH: run_e8_squeeze.py has zero tripwire coverage.
-  4. Open from audit GT: coverage-gate ad-hoc-closure path (MED 7), CPCV purge
-     (MED 10), doc counts (MED 11), pip-audit (MED 12), and the LOWs.
+  4. Open from audits GT/GX: the LOWs (README "0 passes", embargo_pct=0.0
+     still embargoes 1 obs, no LICENSE, and the rest of GX's LOW list), and
+     GX's paper_nav provenance column (the 30 backfilled rows look live).
+     run_lock expiry and the "7pm local" print were fixed 2026-10-11 (record GY).
 
 HARD CONSTRAINTS: swing.db mode=ro unless you are the writer. test_frozen must
 print FROZEN TESTS: GREEN (all d=0) -- 12 refs + 22 invariants -- after any

@@ -16,8 +16,10 @@ it ~4:30pm ET onward). Each run:
   3. Records NAV for every sleeve in swing.db (paper_nav) regardless of
      Alpaca connectivity -- this DB-simulated ledger IS the forward-paper
      evidence, independent of whether any sleeve is broker-mirrored.
-  4. DRY-RUN by default: prints hand-checkable per-sleeve state/orders, no
-     network order calls. --execute additionally mirrors EACH sleeve to its
+  4. The swing.db ledger is ALWAYS written, with or without --execute:
+     realize_pending, mark_nav and ps.touch_run update it on every run. The
+     default mode only skips broker order calls (no Alpaca orders); it prints
+     hand-checkable per-sleeve state/orders. --execute additionally mirrors EACH sleeve to its
      OWN dedicated Alpaca PAPER account (3-account model, Evan 2026-07-15 --
      $1,000 each, fully isolated order flow), using that sleeve's own key pair
      from alpaca_keys.env (client_for_sleeve). Orders are sized to the sleeve's
@@ -662,6 +664,11 @@ def realize_pending(conn, sleeve, today, fill_open):
         if skipped_buy:
             print("  [%s] pending KEPT for retry next run (unfilled buy legs: %s)"
                   % (sleeve, skipped_buy), flush=True)
+            # (record GX) `today` here is the FILL session (the caller passes fdate). Moving
+            # the signal date to it makes the retry fill at the next session's open; before,
+            # the retry re-filled at the original fill session's open.
+            conn.execute("UPDATE paper_sleeves SET pending_signal_date=? WHERE sleeve=?",
+                         (today, sleeve))
         else:
             ps.clear_pending(conn, sleeve, commit=False)
     return True
@@ -699,6 +706,9 @@ def mark_nav(conn, sleeve, today, close_px):
 LOCK_ACQUIRE_TIMEOUT_MS = 3000   # fail fast: this is a mutual-exclusion CHECK,
                                   # not a data write -- ps.connect()'s 30s
                                   # busy_timeout is for real write contention.
+RUN_LOCK_STALE_AFTER = dt.timedelta(hours=2)   # the scheduled task's 1 h
+                                  # ExecutionTimeLimit kills any run before this,
+                                  # and a normal run takes minutes (record GX).
 
 
 def _acquire_run_lock():
@@ -716,11 +726,14 @@ def _acquire_run_lock():
     for the rest of its (multi-minute) lifetime without holding this table
     locked the whole time.
 
-    shortcut: no staleness bound -- a crashed/killed holder (ExecutionTimeLimit,
-    reboot; both documented risks elsewhere in this file, e.g. realize_pending's
-    two-phase cash write) leaves this row forever and blocks every future run
-    until it is cleared manually: `DELETE FROM run_lock WHERE id = 1`. Upgrade
-    trigger: a real stuck-lock incident."""
+    A row older than RUN_LOCK_STALE_AFTER (2 h) is treated as left by a killed
+    holder (ExecutionTimeLimit, reboot). It is cleared and taken in the same
+    transaction, and the night is reported in RUN_FAILURES (so it exits 1, red).
+    2 h is safe because the scheduled task's 1 h ExecutionTimeLimit kills any
+    live run first. An unparseable held_at still refuses (fails closed), and the
+    manual clear `DELETE FROM run_lock WHERE id = 1` still applies there. Added
+    2026-10-11, record GX; the GX audit reproduced the permanent block with an
+    os._exit(137) holder."""
     conn = sqlite3.connect(str(ps.DB_PATH))
     conn.execute(f"PRAGMA busy_timeout={LOCK_ACQUIRE_TIMEOUT_MS}")
     conn.execute("CREATE TABLE IF NOT EXISTS run_lock ("
@@ -738,13 +751,26 @@ def _acquire_run_lock():
     row = conn.execute("SELECT held_at, pid FROM run_lock WHERE id = 1").fetchone()
     if row is not None:
         held_at, pid = row
-        conn.rollback()
-        print(f"!! run_lock: another daily_swing_paper run already holds it "
-              f"(started {held_at} UTC, pid {pid}) -- exiting without "
-              f"deciding or submitting anything, rather than racing it.",
-              flush=True)
-        conn.close()
-        return None
+        try:
+            held = dt.datetime.fromisoformat(held_at)
+            age = dt.datetime.now(dt.timezone.utc) - held
+        except (ValueError, TypeError):
+            age = None
+        if age is not None and age > RUN_LOCK_STALE_AFTER:
+            print(f"!! run_lock: STALE lock (started {held_at} UTC, pid {pid}, "
+                  f"{age} old > 2 h) -- clearing it and taking the lock. The holder "
+                  f"was killed (ExecutionTimeLimit/reboot); check its night's "
+                  f"paper_nav rows.", flush=True)
+            conn.execute("DELETE FROM run_lock WHERE id = 1")
+            RUN_FAILURES.append(f"stale run_lock cleared: started {held_at} UTC, pid {pid}")
+        else:
+            conn.rollback()
+            print(f"!! run_lock: another daily_swing_paper run already holds it "
+                  f"(started {held_at} UTC, pid {pid}) -- exiting without "
+                  f"deciding or submitting anything, rather than racing it.",
+                  flush=True)
+            conn.close()
+            return None
     conn.execute("INSERT INTO run_lock (id, held_at, pid) VALUES (1, ?, ?)",
                  (dt.datetime.now(dt.timezone.utc).isoformat(), os.getpid()))
     conn.commit()
@@ -762,8 +788,10 @@ def _release_run_lock(lock_conn):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--execute", action="store_true",
-                     help="Mirror SWING_ALPACA_SLEEVE's new orders to Alpaca paper. "
-                          "Default is dry-run (no network order calls).")
+                     help="Also mirror each sleeve's new orders to its own Alpaca PAPER "
+                          "account. Without it the run still WRITES the swing.db ledger "
+                          "(realize_pending, mark_nav, touch_run) and only skips broker "
+                          "order calls.")
     args = ap.parse_args()
 
     # RUN LOCK (finding 3, 2026-08-25): is_decision_day is read from state
@@ -817,11 +845,14 @@ def _run(args):
     # -- the shape mark_nav already uses when a close price is missing.
     feed_lag = trading_calendar.check_feed_clock(today)
     if feed_lag is not None:
+        # (record GT MED 7) A real closure is a calendar fix, not a NAV hole.
         print("\n!! REFUSING TO RUN -- %s\n   Nothing was decided, marked "
               "or mirrored, and the exit code is 1 so Task Scheduler shows a "
               "red Last Result. Re-run once the feed catches up; if it never "
               "does, that session is genuinely lost and belongs in "
-              "ACKNOWLEDGED_NAV_HOLES." % feed_lag, flush=True)
+              "ACKNOWLEDGED_NAV_HOLES. If that session was an unscheduled "
+              "market closure, the calendar is wrong instead: add the date to "
+              "trading_calendar.AD_HOC_CLOSURES." % feed_lag, flush=True)
         RUN_FAILURES.append("feed clock: %s" % feed_lag)
         return 1
 
@@ -1015,7 +1046,15 @@ def _run(args):
         if vix_today is not None and vix_today > VIX_THR:
             print("Stress + weekly decision day: fetching 39-name universe + FF3 "
                   "for the residual ranking ...", flush=True)
-            ff = fresh_ff3()
+            try:
+                ff = fresh_ff3()
+            # (record GX) this runs after realize_pending commits and before mark_nav:
+            # an exception escaping here lost all 3 sleeves' NAV rows for the night.
+            except Exception as e:
+                print(f"  !! FF3 fetch failed ({e!r}) -- continuing with no factors; "
+                      f"stress basket unreachable", flush=True)
+                RUN_FAILURES.append(f"FF3 fetch failed: {e!r}")
+                ff = {}
             # Ken French publishes the daily factors ~a month late (2026-10-03: file ended
             # 2026-08-31); residual_series needs today's factor row, so the stress basket
             # cannot form live. Fixing that changes the rule (prereg), so this only says so.
@@ -1028,8 +1067,15 @@ def _run(args):
             ranks = []
             illiquid = []
             unknown_liq = []
+            fetch_failed = []
             for t in UNIV:
-                ds, cl, vol = series_with_volume(t, start="2010-01-01")
+                try:
+                    ds, cl, vol = series_with_volume(t, start="2010-01-01")
+                # (record GX) one bad name must not cost the night's NAV rows.
+                except Exception as e:
+                    fetch_failed.append((t, repr(e)))
+                    unknown_liq.append(t)
+                    continue
                 cls = [cl[d] for d in ds]
                 # LIQUIDITY FLOOR (audit #4). CLAUDE.md calls this floor
                 # mandatory in any universe filter, but MIN_MEDIAN_DOLLAR_VOL
@@ -1054,6 +1100,12 @@ def _run(args):
                 v = dict(zip(ds, form)).get(today)
                 if v is not None:
                     ranks.append((v, t))
+            if fetch_failed:
+                print("  !! universe fetch failed for %d name(s), excluded as unknown "
+                      "liquidity: %s" % (len(fetch_failed), ", ".join(t for t, _ in fetch_failed)),
+                      flush=True)
+                RUN_FAILURES.append("universe fetch failed for %d name(s): %s"
+                                    % (len(fetch_failed), "; ".join("%s %s" % p for p in fetch_failed)))
             if unknown_liq:
                 print("  liquidity floor excluded %d name(s) with too few "
                       "usable volume bars to measure: %s"
@@ -1107,7 +1159,7 @@ def _run(args):
         for t in needed - set(close_px):
             _, cl, _ = series(t, start="2024-01-01")
             close_px[t] = cl.get(today)
-    print(f"\n=== {today} - M3 forward-paper daily loop ({'EXECUTE' if args.execute else 'DRY-RUN'}) ===")
+    print(f"\n=== {today} - M3 forward-paper daily loop ({'EXECUTE' if args.execute else 'NO-ORDERS, ledger written'}) ===")
     for s in ps.SLEEVES:
         st = ps.get_sleeve(conn, s)
         positions = ps.get_positions(conn, s)
@@ -1343,7 +1395,7 @@ def _run(args):
 
     conn.close()
     print("\nDone. Scheduled task 'SwingTradingDailyPaper' runs this daily on weekday "
-          "evenings (7pm local, --execute). Log: var\\daily_swing_paper.log.")
+          "evenings (23:45 CT, --execute). Log: var\\daily_swing_paper.log.")
     if RUN_FAILURES:
         print("\n!! RUN COMPLETED WITH %d FAILURE(S) -- exit 1 so Task Scheduler "
               "shows a red Last Result instead of 0:" % len(RUN_FAILURES), flush=True)

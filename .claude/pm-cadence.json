@@ -3,13 +3,13 @@
   "handoff": 15,
   "prd_next_task": 0,
   "bins": 3,
-  "_count": 285,
-  "_last_reminder_iso": "2026-10-05T01:34:11Z",
+  "_count": 320,
+  "_last_reminder_iso": "2026-10-11T21:15:50Z",
   "_last_fired": {
-    "record_entry": 284,
-    "handoff": 276,
-    "bins": 283,
-    "drift_check": 283
+    "record_entry": 314,
+    "handoff": 306,
+    "bins": 319,
+    "drift_check": 313
   },
   "bins_max_age_days": 21,
   "drift_check": 15,

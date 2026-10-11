@@ -82,3 +82,7 @@ the scan cannot judge *embarrassment*, only *secrets*.
   commit that includes the record, grep the staged diff case-insensitively for
   email addresses and absolute user paths -- the commit-gate scans for secrets,
   not for personal identifiers.
+- 2026-10-11 (record GZ): GJ's email and GN's quoted `C:\Users\<account>` path
+  redacted to [redacted] before either reached HEAD. Not fixed:
+  `docs/prereg_e10_earnings_drift.md:9` has carried the full account path on the
+  public remote since 129dc22 (2026-07-10); a forward edit leaves it in history.

@@ -335,9 +335,23 @@ def main():
     sp_off = validation.cpcv_splits(n_min, 6, 2, label_span=0, embargo_pct=0.0)
     tr_on = statistics_mean([len(a) for a, _ in sp_on])
     tr_off = statistics_mean([len(a) for a, _ in sp_off])
-    print("  mean train size  purge OFF %.0f -> purge ON %.0f  (%.0f obs removed)"
+    print("  (informational) mean train size  purge OFF %.0f -> purge ON %.0f  (%.0f obs removed)"
           % (tr_off, tr_on, tr_off - tr_on))
-    c3 = tr_on < tr_off
+    # (record GT MED 10, 2026-10-04) `tr_on < tr_off` was true by construction:
+    # any positive purge shrinks the train set, and the old purge also wiped the
+    # middle of every non-adjacent test pair, OFF included. The check below can
+    # FAIL: a hand-computed fixture, two test blocks [5..7] and [14..15] in 20
+    # observations. The pre-fix code returned [0, 1, 2, 3, 18, 19] with purge ON and
+    # [0, 1, 2, 3, 4, 16, 17, 18, 19] with it OFF (re-derived 2026-10-11, record GY).
+    # The prereg's own wording (CPCV Sharpe lower with purge) cannot apply while
+    # no strategy trains: train indices feed no reported number.
+    fx_on = validation.purge_embargo_train(20, [5, 6, 7, 14, 15], 1, 1)
+    fx_off = validation.purge_embargo_train(20, [5, 6, 7, 14, 15], 0, 0)
+    want_on = [0, 1, 2, 3, 10, 11, 12, 18, 19]
+    want_off = [0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19]
+    print("  fixture purge ON  %s  %s" % (fx_on, "OK" if fx_on == want_on else "WANT %s" % want_on))
+    print("  fixture purge OFF %s  %s" % (fx_off, "OK" if fx_off == want_off else "WANT %s" % want_off))
+    c3 = fx_on == want_on and fx_off == want_off
 
     # section 5 falsifier: a KNOWN edge should NOT be rejected
     planted = [planted_edge(n_min, SEED + 100 + i) for i in range(len(cfgs))]
@@ -355,7 +369,7 @@ def main():
     c2 = bool(r_pat and r_pat["rejected"])
     for lbl, ok in (("1 rejects pure noise", c1),
                     ("2 rejects chart-pattern rule", c2),
-                    ("3 purging demonstrably bites", c3),
+                    ("3 purge+embargo exact on a fixture", c3),
                     ("4 cost model fails loud", c4),
                     ("5 DSR refuses stale/missing trial log", c5)):
         print("  [%s] %s" % ("PASS" if ok else "FAIL", lbl))

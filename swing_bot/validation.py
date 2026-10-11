@@ -109,13 +109,31 @@ def purge_embargo_train(n_obs, test_idx, label_span, embargo_n):
     that window touches any test observation's window, t leaks and is dropped.
     Embargo: additionally drop `embargo_n` observations immediately AFTER the
     test block, where serial correlation persists.
+
+    Purge and embargo are applied PER CONTIGUOUS TEST BLOCK. The original
+    banned one span from min(test_idx) to max(test_idx), so for any
+    non-adjacent CPCV test pair it wiped every observation between the two
+    blocks, and with label_span=0, embargo_n=0 ("purge off") it still removed
+    them (record GT MED 10, 2026-10-03). Latent: no strategy here trains, so
+    train indices feed no reported number; this matters the day a fitted model
+    uses cpcv_splits.
     """
     if not test_idx:
         return list(range(n_obs))
-    lo, hi = min(test_idx), max(test_idx)
-    banned_lo = lo - label_span          # its label can reach into the test block
-    banned_hi = hi + label_span + embargo_n
-    return [i for i in range(n_obs) if i < banned_lo or i > banned_hi]
+    idx = sorted(set(test_idx))
+    runs = []
+    lo = prev = idx[0]
+    for i in idx[1:]:
+        if i != prev + 1:
+            runs.append((lo, prev))
+            lo = i
+        prev = i
+    runs.append((lo, prev))
+    banned = set(idx)
+    for lo, hi in runs:
+        banned.update(range(max(0, lo - label_span), lo))
+        banned.update(range(hi + 1, min(n_obs, hi + label_span + embargo_n + 1)))
+    return [i for i in range(n_obs) if i not in banned]
 
 
 def cpcv_splits(n_obs, n_groups=6, n_test=2, label_span=1, embargo_pct=0.01):

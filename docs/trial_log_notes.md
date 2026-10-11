@@ -21,6 +21,18 @@ drift. This file is the machine-readable extraction.
 | **declared variants across all preregs** | **50** | **LOWER BOUND** |
 | entries with an unresolvable field | 1 (E18 verdict) | flagged, not guessed |
 
+> **Update 2026-10-04 (record GW, audit GT MED 11): the table above is the
+> 2026-08-06 build and is stale.** `docs/trial_log.json`, regenerated 2026-09-09,
+> reads: prereg docs **41** (TEMPLATE and the three infrastructure preregs V1/V2/V3
+> excluded), highest attempt number **38**, declared variants **54** (still a LOWER
+> BOUND), entries with an unresolvable field **3** (the E18, F2 and X4 verdicts; X4
+> also lacks its commit and date). 41 = the 37 search attempts + 4 later preregs
+> (F2, two F3 amendments, X4), so the gap below now runs the other way: 41 prereg
+> docs against 38 numbered attempts. DSR still takes the larger figure, now 54.
+> **Also wrong above:** "Regenerate, never hand-edit" - `build_trial_log.py`
+> writes only `trial_log.json`; this notes file is hand-written and goes stale
+> unless someone updates it.
+
 ## ⚠ UNRESOLVED: 37 vs 38
 
 The record numbers attempts up to **#38** (M12) but only **37** prereg documents

@@ -41,12 +41,15 @@ fi
 # ALONE, so a hand-splice — the failure that silently overwrote another
 # session's entry (record BT) — was blocked there and free everywhere else.
 # No-op unless the record is actually staged. Fails CLOSED.
+# The missing-guard branch below used to fall through to exit 0 despite "Fails
+# CLOSED"; it now blocks like the secret gate above (record GX, 2026-10-11).
 REC_GUARD="${HOME}/.claude/skills/project-memory/hooks/pre-commit-record"
 if [ -f "$REC_GUARD" ]; then
   sh "$REC_GUARD" || exit 1
 else
   echo "record-check WARNING: record guard not found at $REC_GUARD" >&2
   echo "  record invariants NOT verified for this commit." >&2
+  exit 1
 fi
 
 exit 0

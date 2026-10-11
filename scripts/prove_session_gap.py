@@ -138,6 +138,24 @@ def case_juneteenth_only_from_2022():
             f"{day} is an observed Juneteenth closure"
 
 
+def case_unmodelled_closure_is_acknowledgeable():
+    """record GT MED 7: one unmodelled weekday closure used to refuse the run for
+    ~200 nights with no stated way out. The anomaly now names the acknowledge
+    path, and taking it (adding the date to AD_HOC_CLOSURES) clears the refusal."""
+    d = dt.date.fromisoformat
+    series = ["2026-09-14", "2026-09-15", "2026-09-17", "2026-09-18"]  # 09-16 absent
+    anoms = coverage_gate.missing_sessions(TICK, bars(series))
+    assert kinds(anoms) == ["missing_session"] and anoms[0][1] == "2026-09-16", anoms
+    assert "AD_HOC_CLOSURES" in anoms[0][3], f"detail must name the fix: {anoms[0][3]}"
+    old = trading_calendar.AD_HOC_CLOSURES
+    try:
+        trading_calendar.AD_HOC_CLOSURES = old | {d("2026-09-16")}
+        assert coverage_gate.missing_sessions(TICK, bars(series)) == [], \
+            "adding the closure must clear the anomaly"
+    finally:
+        trading_calendar.AD_HOC_CLOSURES = old
+
+
 def main():
     print("prove_session_gap -- a hole in the MIDDLE of a series is now caught\n")
     for name, fn in (
@@ -149,13 +167,14 @@ def main():
         ("sessions_between excludes wknd+holiday ", case_sessions_between_itself),
         ("ad-hoc closures are not false holes    ", case_ad_hoc_closures_are_not_holes),
         ("Juneteenth is a holiday only from 2022 ", case_juneteenth_only_from_2022),
+        ("unmodelled closure is acknowledgeable  ", case_unmodelled_closure_is_acknowledgeable),
     ):
         check(name, fn)
 
     if failures:
         print(f"\nSESSION GAP PROOF: {len(failures)} FAILED -> {failures}")
         return 1
-    print("\nSESSION GAP PROOF: 8/8 PASS")
+    print("\nSESSION GAP PROOF: 9/9 PASS")
     return 0
 
 

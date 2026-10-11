@@ -7,17 +7,24 @@ it went five weeks without one.
 **Every count below is grepped, not eyeballed.** Reproduce them all:
 
 ```bash
-git -c core.quotePath=false ls-files | wc -l                                  # 208 total
+git -c core.quotePath=false ls-files | wc -l                                  # 208 total at 2026-09-05; 228 at 2026-10-11
 git -c core.quotePath=false ls-files | awk -F/ 'NF==1{print "(root)"} NF>1{print $1}' | sort | uniq -c | sort -rn
 git -c core.quotePath=false ls-files docs | awk -F/ 'NF==2{print "docs/(root)"} NF>2{print "docs/"$2}' | sort | uniq -c
 git ls-files 'scripts/run_*.py' | wc -l                                       # 39 runners
-git ls-files 'scripts/prove_*.py' | wc -l                                     # 6 tracked at 7de78f3; +2 untracked (prove_fetch_trailing_nan, prove_session_gap)
-git ls-files 'docs/prereg*' | wc -l                                           # 44 preregs
+git ls-files 'scripts/prove_*.py' | wc -l                                     # 6 tracked at 7de78f3; 9 tracked at a2514fd
+git ls-files 'docs/prereg*' | wc -l                                           # 44 preregs at 2026-09-05; 45 at 2026-10-11
 ```
 
 `core.quotePath=false` matters: the record's filename contains an em dash, and
 without it git quotes the path and `awk -F/` counts it as its own directory (a
 first pass here reported 105 docs + a phantom `"docs` bucket instead of 107).
+
+## Counts re-derived 2026-10-11 (record GY), with the commands above
+
+228 tracked (index, with graphify-out's deletion staged): docs 111, scripts 66,
+.claude 27, swing_bot 14, (root) 9, data 1. Runners 39, proofs 9, preregs 45.
+The record has 207 appendices with GY (2026-10-11); GX was the 206th. The table below is the 2026-09-05
+snapshot and is kept for history.
 
 ## Counts at 2026-09-05 (208 tracked at HEAD; **210 by 2026-09-06**)
 
@@ -30,7 +37,7 @@ first pass here reported 105 docs + a phantom `"docs` bucket instead of 107).
 | `swing_bot/` | **14** | the importable package: engines, ledger, guards, tripwire |
 | `.claude/` | **15** (13 at the 2026-09-05 HEAD) | project-memory bins + `pm-cadence.json`; DIRECTORY.md and disclosure.md are the two not yet tracked |
 | (root) | **9** | see below |
-| `graphify-out/` | **6** | the knowledge-graph build outputs (cache is gitignored) |
+| `graphify-out/` | **6** (local) | the knowledge-graph build outputs; WHOLE folder gitignored and untracked since 2026-10-04 (a full rebuild rewrote graph.json by ~67k lines) |
 | `data/` | **1** | `fomc_announcement_dates.json` |
 
 ## Root (9 files)
@@ -52,7 +59,7 @@ ledger + per-sleeve signal logic) · `alpaca_client.py` (broker) ·
 beside it) · `trading_calendar.py` (the independent clock, NEW 2026-09-05) ·
 `costs.py` · `test_frozen.py` (the tripwire).
 
-## `scripts/` — 39 runners, 6 proofs tracked (+2 untracked), 1 orchestrator
+## `scripts/` - 39 runners, 9 proofs tracked, 1 orchestrator (said 6 + 2 untracked until 2026-10-11)
 
 - **`daily_swing_paper.py`** is THE live orchestrator (+ its `.bat`, fired by
   the Windows task `SwingTradingDailyPaper`, weekdays 23:45 CT since
@@ -61,12 +68,13 @@ beside it) · `trading_calendar.py` (the independent clock, NEW 2026-09-05) ·
 - **`run_*.py` (39)** — one per pre-registered experiment. `run_e8_squeeze.py`
   owns `cache_fetch`, the repo's real shared data layer for the experiment
   jungle.
-- **`prove_*.py` (6 tracked + 2 untracked)** — standalone proofs, each runnable with no network and
+- **`prove_*.py` (9 tracked since a2514fd; was 6 + 2 untracked)** — standalone proofs, each runnable with no network and
   no DB: `prove_cache_guard` 8/8 · `prove_refusal_gate` 10/10 ·
   `prove_liquidity_floor` 11/11 · `prove_feed_clock` 18/18 ·
-  `prove_divergence_census` 16/16 · `prove_torn_write` 32 · untracked since
-  2026-09-09: `prove_fetch_trailing_nan` 5/5 · `prove_session_gap` 8/8 (7/7 until 2026-09-11) ·
-  2026-10-04: `prove_loop_guards` 10/10.
+  `prove_divergence_census` 16/16 · `prove_torn_write` 38 (32 until 2026-10-11) · untracked since
+  2026-09-09: `prove_fetch_trailing_nan` 5/5 · `prove_session_gap` 9/9 (7/7 until 2026-09-11, 8/8 until 2026-10-04) ·
+  2026-10-04: `prove_loop_guards` 17/17 (10/10 until 2026-10-11). All 9 are tracked
+  at HEAD a2514fd (re-derived 2026-10-11).
   (Said "5 proofs" while git tracked 6 -- audit GJ MEDIUM; corrected
   2026-09-10. Regenerate every count here after the next commit.)
 - `probe_feed_publication.py` — the M13.2 timing instrument (hand-run).
@@ -88,4 +96,4 @@ beside it) · `trading_calendar.py` (the independent clock, NEW 2026-09-05) ·
 `.venv/` · `swing.db` (+ journal/wal/shm) · `.e8e9_cache/` (292 files at
 2026-09-05) · `var/` (M3 runtime logs) · `alpaca_keys.env` (via `*_keys.env`
 and `*.env`) · the various `.<source>_cache/` research caches ·
-`graphify-out/cache/`. See `disclosure.md` for what that boundary is protecting.
+`graphify-out/` (whole folder since 2026-10-04). See `disclosure.md` for what that boundary is protecting.

@@ -22,3 +22,12 @@ transitive, `pip freeze`).
 - After any dependency change, re-pin `requirements.txt` and refresh the lock.
 
 - Reviewed 2026-09-05 against `requirements.txt`: no change; no dependency added by F3 (stdlib only).
+
+- 2026-10-04 (record GW, audit GT MED 12): **anyio 4.14.1 -> 4.14.2, urllib3 2.7.0 ->
+  2.8.0, soupsieve 2.8.4 -> 2.9.0** in `requirements.lock` and `.venv`; pip 26.1.2 ->
+  26.2.1 in `.venv` only (pip is not in the runtime lock). `pip-audit -r
+  requirements.lock` went from 8 advisories in 3 packages to "No known
+  vulnerabilities found". Gate before Monday's run: test_frozen GREEN, all 9
+  proofs exit 0, `swing_bot.alpaca_client` imports, the harness stays ACCEPTED with
+  identical numbers, and a read-only fetch of QQQ, ^VIX, VIX3M (CBOE) and FF3 works.
+  Rollback = reinstall the three old pins.

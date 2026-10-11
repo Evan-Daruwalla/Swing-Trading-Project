@@ -18,6 +18,10 @@ internally, and an inner commit ENDS the transaction a `with conn:` opened -- so
 the wrap was a no-op that made the source read as fixed. Arm G measures that
 directly, on this machine, rather than asserting it.
 
+SECTION H (record GX, 2026-10-11): a BUY leg with no open keeps the pending, and
+now also moves pending_signal_date to the fill session, so the retry day's
+fill_session() is the retry day and its rows are dated then, not back-dated.
+
 DATA CONVENTION: no price data is read. The prices below are synthetic
 placeholders, so no split-adjusted / dividend-UNADJUSTED question arises.
 """
@@ -253,6 +257,39 @@ c.close()
 survived = sqlite3.connect(str(tmp)).execute("SELECT count(*) FROM t").fetchone()[0]
 check("rows surviving a ROLLED-BACK `with conn:` (2 => wrap is a no-op)",
       survived, 2)
+
+print("\nH. RETRY FILL DATE -- a kept pending re-fills at the retry day's open (record GX)")
+import shutil  # noqa: E402
+tmp_h = Path(tempfile.mkdtemp())
+try:
+    conn = ps.connect(tmp_h / "retry.db")
+    ps.init_sleeve(conn, SLEEVE)
+    conn.execute("UPDATE paper_sleeves SET cash=? WHERE sleeve=?", (1000.0, SLEEVE))
+    conn.commit()
+    ps.set_pending(conn, SLEEVE, {"QQQ": 0.5, "AAA": 0.5}, "2026-10-02")
+
+    dsp.realize_pending(conn, SLEEVE, "2026-10-05", {"QQQ": 100.0})   # AAA: no open
+    sl = ps.get_sleeve(conn, SLEEVE)
+    check("partial realize keeps the pending", sl["pending_json"] is not None, True)
+    check("pending_signal_date moved to the fill session",
+          sl["pending_signal_date"], "2026-10-05")
+    check("next fill session is the retry day",
+          dsp.fill_session(sl["pending_signal_date"], "2026-10-06"), "2026-10-06")
+
+    max_id = conn.execute("SELECT COALESCE(MAX(id), 0) FROM paper_transactions"
+                          ).fetchone()[0]
+    dsp.realize_pending(conn, SLEEVE, "2026-10-06", {"QQQ": 101.0, "AAA": 50.0})
+    new_rows = conn.execute("SELECT date, ticker, side FROM paper_transactions "
+                            "WHERE id > ?", (max_id,)).fetchall()
+    check("every retry row is dated 2026-10-06",
+          {r["date"] for r in new_rows}, {"2026-10-06"})
+    check("retry bought AAA",
+          any(r["ticker"] == "AAA" and r["side"] == "buy" for r in new_rows), True)
+    check("pending cleared after a full fill",
+          ps.get_sleeve(conn, SLEEVE)["pending_json"] is None, True)
+    conn.close()
+finally:
+    shutil.rmtree(tmp_h, ignore_errors=True)
 
 print("\n%s: %d checks" % ("PROVEN" if ok else "FAILED", n))
 sys.exit(0 if ok else 1)
