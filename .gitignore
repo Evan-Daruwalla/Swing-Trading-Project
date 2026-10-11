@@ -10,8 +10,10 @@ swing.db-shm
 # E8/E9 live-fetch scratch cache (data, never committed)
 .e8e9_cache/
 
-# graphify build cache (regeneratable; keep the graph outputs, not the cache)
-graphify-out/cache/
+# graphify output, local only (2026-10-04): every full rebuild rewrites graph.json
+# wholesale (~37k added / ~30k removed lines on 2026-09-08), which buried the real
+# diff. Regenerate with /graphify; nothing in the repo links to it.
+graphify-out/
 
 # secrets (Alpaca keys etc.)
 *_keys.env
@@ -28,10 +30,6 @@ Thumbs.db
 .DS_Store
 .vscode/
 .idea/
-graphify-out/.graphify_python
-graphify-out/.graphify_root
-graphify-out/.graphify_chunk_*.json
-graphify-out/.prev_chunks/
 .edgar_cache/
 .finra_cache/
 .regsho_cache/
